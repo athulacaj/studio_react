@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { createTheme, ThemeProvider, CssBaseline, Box } from '@mui/material';
-import { Routes, Route } from 'react-router-dom';
-import Header from './core/components/Header';
-import Footer from './core/components/Footer';
-import Home from './pages/Home';
-import About from './pages/About';
-import NotFound from './pages/NotFound';
+import Header from '../../core/components/Header';
+import PhotoGrid from '../../core/components/PhotoGrid';
+import Footer from '../../core/components/Footer';
+import Hero from '../../core/components/Hero';
 
 const darkTheme = createTheme({
   palette: {
@@ -76,11 +74,12 @@ function App() {
           onAlbumChange={handleAlbumChange}
         />
         <Box component="main" sx={{ flexGrow: 1 }}>
-          <Routes>
-            <Route path="/" element={<Home albums={albums} setAlbums={setAlbums} selectedAlbum={selectedAlbum} />} />
-            <Route path="/about" element={<About />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Hero />
+          <PhotoGrid
+            albums={albums}
+            setAlbums={setAlbums}
+            selectedAlbum={selectedAlbum}
+          />
         </Box>
         <Footer />
       </Box>
