@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Select, MenuItem, FormControl, InputLabel, Box, Button } from '@mui/material';
 import CameraIcon from '@mui/icons-material/Camera';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Header = ({ albums, selectedAlbum, onAlbumChange }) => {
   const navigate = useNavigate();
@@ -17,8 +17,9 @@ const Header = ({ albums, selectedAlbum, onAlbumChange }) => {
     >
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Box
-          sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}
-          onClick={() => navigate('/')}
+          component={Link}
+          to="/"
+          sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer', textDecoration: 'none' }}
         >
           <CameraIcon sx={{ color: '#a855f7', fontSize: 32 }} />
           <Typography
@@ -38,7 +39,8 @@ const Header = ({ albums, selectedAlbum, onAlbumChange }) => {
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Button
-            onClick={() => navigate('/about')}
+            component={Link}
+            to="/about"
             sx={{ color: 'white', fontWeight: 500 }}
           >
             About
