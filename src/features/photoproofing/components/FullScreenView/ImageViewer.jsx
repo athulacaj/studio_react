@@ -1,0 +1,64 @@
+import React from 'react';
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+
+const ImageViewer = ({
+    transformRef,
+    image,
+    imageIndex,
+    onImageClick
+}) => {
+    return (
+        <TransformWrapper
+            ref={transformRef}
+            initialScale={1}
+            minScale={0.5}
+            maxScale={8}
+            centerOnInit={true}
+            wheel={{ step: 0.1 }}
+            doubleClick={{ disabled: true }}
+        >
+            {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
+                <TransformComponent
+                    wrapperStyle={{
+                        width: "100%",
+                        height: "100%",
+                    }}
+                    contentStyle={{
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center"
+                    }}
+                >
+                    <div
+                        onClick={onImageClick}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            cursor: 'grab'
+                        }}
+                    >
+                        <img
+                            src={image}
+                            alt={`Photo ${imageIndex + 1}`}
+                            style={{
+                                maxHeight: '100%',
+                                maxWidth: '100%',
+                                objectFit: 'contain',
+                                transition: 'opacity 0.3s ease-in-out',
+                                pointerEvents: 'none',
+                                userSelect: 'none'
+                            }}
+                        />
+                    </div>
+                </TransformComponent>
+            )}
+        </TransformWrapper>
+    );
+};
+
+export default ImageViewer;

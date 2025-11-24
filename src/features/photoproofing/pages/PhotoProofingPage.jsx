@@ -1,12 +1,11 @@
 import React from 'react';
-import Hero from '../core/components/Hero';
-import PhotoGrid from '../core/components/PhotoGrid';
 import { Box } from '@mui/material';
+import PhotoGrid from '../components/PhotoGrid';
 
-const Home = ({ albums, setAlbums, selectedAlbum }) => {
+const PhotoProofingPage = ({ albums, setAlbums, selectedAlbum }) => {
     return (
         <Box>
-            <Hero />
+            <Box sx={{ height: '50px' }} />
             <PhotoGrid
                 albums={albums}
                 setAlbums={setAlbums}
@@ -16,4 +15,4 @@ const Home = ({ albums, setAlbums, selectedAlbum }) => {
     );
 };
 
-export default Home;
+export default PhotoProofingPage;

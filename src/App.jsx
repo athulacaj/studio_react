@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { createTheme, ThemeProvider, CssBaseline, Box } from '@mui/material';
 import { Routes, Route } from 'react-router-dom';
-import Header from './core/components/Header';
-import Footer from './core/components/Footer';
-import Home from './pages/Home';
+import { Header, Footer } from './shared/components';
+import PhotoProofingPage from './features/photoproofing';
 import About from './pages/About';
 import NotFound from './pages/NotFound';
+
 
 const darkTheme = createTheme({
   palette: {
@@ -77,7 +77,8 @@ function App() {
         />
         <Box component="main" sx={{ flexGrow: 1 }}>
           <Routes>
-            <Route path="/" element={<Home albums={albums} setAlbums={setAlbums} selectedAlbum={selectedAlbum} />} />
+            <Route path="/" element={<PhotoProofingPage albums={albums} setAlbums={setAlbums} selectedAlbum={selectedAlbum} />} />
+
             <Route path="/about" element={<About />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
