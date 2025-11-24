@@ -3,12 +3,14 @@ import { Box } from '@mui/material';
 import PhotoCard from './PhotoCard';
 import EmptyState from './EmptyState';
 import FullScreenView from '../FullScreenView';
+import { usePhotoProofing } from '../../context/PhotoProofingContext';
 
 const images = [
     ...Array.from({ length: 100 }, (_, i) => `https://picsum.photos/seed/${i + 1}/800/600`),
 ];
 
-const PhotoGrid = ({ albums = {}, setAlbums, selectedAlbum }) => {
+const PhotoGrid = () => {
+    const { albums, selectedAlbum, handleAddToAlbum, handleRemoveFromAlbum } = usePhotoProofing();
     const [fullScreenOpen, setFullScreenOpen] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -19,20 +21,6 @@ const PhotoGrid = ({ albums = {}, setAlbums, selectedAlbum }) => {
 
     const handleCloseFullScreen = () => {
         setFullScreenOpen(false);
-    };
-
-    const handleAddToAlbum = (albumName, photoIndex) => {
-        setAlbums((prevAlbums) => ({
-            ...prevAlbums,
-            [albumName]: [...(prevAlbums[albumName] || []), photoIndex],
-        }));
-    };
-
-    const handleRemoveFromAlbum = (albumName, photoIndex) => {
-        setAlbums((prevAlbums) => ({
-            ...prevAlbums,
-            [albumName]: (prevAlbums[albumName] || []).filter(index => index !== photoIndex),
-        }));
     };
 
     const displayedImages = selectedAlbum === 'all'
@@ -63,6 +51,10 @@ const PhotoGrid = ({ albums = {}, setAlbums, selectedAlbum }) => {
                                 index={originalIndex}
                                 isLiked={isLiked}
                                 onOpenFullScreen={handleOpenFullScreen}
+                                selectedAlbum={selectedAlbum}
+                                albums={albums}
+                                onAddToAlbum={handleAddToAlbum}
+                                onRemoveFromAlbum={handleRemoveFromAlbum}
                             />
                         );
                     })}

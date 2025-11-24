@@ -1,7 +1,31 @@
 import React from 'react';
-import { Card, CardMedia, Typography, Box } from '@mui/material';
+import { Card, CardMedia, Typography, Box, IconButton, Menu, MenuItem, Fade, Tooltip } from '@mui/material';
+import { DeleteOutline, PlaylistAdd, FolderOpen } from '@mui/icons-material';
 
-const PhotoCard = ({ image, index, isLiked, onOpenFullScreen }) => {
+const PhotoCard = ({ image, index, isLiked, onOpenFullScreen, selectedAlbum, albums, onAddToAlbum, onRemoveFromAlbum }) => {
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleMenuOpen = (event) => {
+        event.stopPropagation();
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = (event) => {
+        if (event && event.stopPropagation) event.stopPropagation();
+        setAnchorEl(null);
+    };
+
+    const handleAlbumSelect = (event, albumName) => {
+        event.stopPropagation();
+        onAddToAlbum(albumName, index);
+        handleMenuClose();
+    };
+
+    const handleRemove = (event) => {
+        event.stopPropagation();
+        onRemoveFromAlbum(selectedAlbum, index);
+    };
     return (
         <Box>
             <Card
@@ -26,6 +50,10 @@ const PhotoCard = ({ image, index, isLiked, onOpenFullScreen }) => {
                         '& .info-bar': {
                             transform: 'translateY(0)',
                             opacity: 1,
+                        },
+                        '& .action-btn': {
+                            opacity: 1,
+                            transform: 'translateY(0)',
                         }
                     }
                 }}
@@ -76,6 +104,110 @@ const PhotoCard = ({ image, index, isLiked, onOpenFullScreen }) => {
                         >
                             <Typography variant="button">View</Typography>
                         </Box>
+                    </Box>
+
+                    {/* Action Button (Add/Remove) */}
+                    <Box
+                        className="action-btn"
+                        sx={{
+                            position: 'absolute',
+                            top: 12,
+                            right: 12,
+                            zIndex: 10,
+                            opacity: 0,
+                            transform: 'translateY(-10px)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        }}
+                    >
+                        {selectedAlbum === 'all' ? (
+                            <>
+                                <Tooltip title="Add to Album" arrow>
+                                    <IconButton
+                                        onClick={handleMenuOpen}
+                                        sx={{
+                                            bgcolor: 'rgba(255, 255, 255, 0.2)',
+                                            backdropFilter: 'blur(8px)',
+                                            color: 'white',
+                                            '&:hover': {
+                                                bgcolor: 'rgba(255, 255, 255, 0.3)',
+                                                transform: 'scale(1.1)',
+                                            },
+                                            width: 40,
+                                            height: 40,
+                                            transition: 'all 0.2s ease',
+                                            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                                        }}
+                                    >
+                                        <PlaylistAdd />
+                                    </IconButton>
+                                </Tooltip>
+                                <Menu
+                                    anchorEl={anchorEl}
+                                    open={open}
+                                    onClose={handleMenuClose}
+                                    TransitionComponent={Fade}
+                                    PaperProps={{
+                                        sx: {
+                                            bgcolor: 'rgba(30, 30, 30, 0.95)',
+                                            backdropFilter: 'blur(12px)',
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            borderRadius: '12px',
+                                            mt: 1,
+                                            minWidth: 180,
+                                            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                                            '& .MuiMenuItem-root': {
+                                                color: 'white',
+                                                fontSize: '0.9rem',
+                                                py: 1.5,
+                                                px: 2,
+                                                gap: 1.5,
+                                                '&:hover': {
+                                                    bgcolor: 'rgba(255,255,255,0.1)',
+                                                },
+                                            },
+                                        }
+                                    }}
+                                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                                >
+                                    {Object.keys(albums).length > 0 ? (
+                                        Object.keys(albums).map((album) => (
+                                            <MenuItem key={album} onClick={(e) => handleAlbumSelect(e, album)}>
+                                                <FolderOpen fontSize="small" sx={{ color: '#a78bfa' }} />
+                                                {album}
+                                            </MenuItem>
+                                        ))
+                                    ) : (
+                                        <MenuItem disabled sx={{ opacity: 0.7 }}>
+                                            No albums created
+                                        </MenuItem>
+                                    )}
+                                </Menu>
+                            </>
+                        ) : (
+                            <Tooltip title="Remove from Album" arrow>
+                                <IconButton
+                                    onClick={handleRemove}
+                                    sx={{
+                                        bgcolor: 'rgba(239, 68, 68, 0.2)', // Red tint
+                                        backdropFilter: 'blur(8px)',
+                                        color: '#fca5a5', // Light red
+                                        '&:hover': {
+                                            bgcolor: 'rgba(239, 68, 68, 0.4)',
+                                            color: '#fff',
+                                            transform: 'scale(1.1) rotate(90deg)',
+                                        },
+                                        width: 40,
+                                        height: 40,
+                                        transition: 'all 0.3s ease',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                                        border: '1px solid rgba(239, 68, 68, 0.3)'
+                                    }}
+                                >
+                                    <DeleteOutline />
+                                </IconButton>
+                            </Tooltip>
+                        )}
                     </Box>
 
                     {/* Info Bar (Like status, etc) */}

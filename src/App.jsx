@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { createTheme, ThemeProvider, CssBaseline, Box } from '@mui/material';
 import { Routes, Route } from 'react-router-dom';
 import { Header, Footer } from './shared/components';
@@ -54,37 +54,38 @@ const darkTheme = createTheme({
   },
 });
 
+import { PhotoProofingProvider, usePhotoProofing } from './features/photoproofing';
+
+const AppContent = () => {
+  const { albums, selectedAlbum, handleAlbumChange } = usePhotoProofing();
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Header
+        albums={albums}
+        selectedAlbum={selectedAlbum}
+        onAlbumChange={handleAlbumChange}
+      />
+      <Box component="main" sx={{ flexGrow: 1 }}>
+        <Routes>
+          <Route path="/" element={<PhotoProofingPage />} />
+
+          <Route path="/about" element={<About />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Box>
+      <Footer />
+    </Box>
+  );
+};
+
 function App() {
-  const [albums, setAlbums] = useState({
-    "favourites": [],
-    "custom": [],
-    "recent": []
-  });
-  const [selectedAlbum, setSelectedAlbum] = useState('all');
-
-  const handleAlbumChange = (event) => {
-    setSelectedAlbum(event.target.value);
-  };
-
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        <Header
-          albums={albums}
-          selectedAlbum={selectedAlbum}
-          onAlbumChange={handleAlbumChange}
-        />
-        <Box component="main" sx={{ flexGrow: 1 }}>
-          <Routes>
-            <Route path="/" element={<PhotoProofingPage albums={albums} setAlbums={setAlbums} selectedAlbum={selectedAlbum} />} />
-
-            <Route path="/about" element={<About />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Box>
-        <Footer />
-      </Box>
+      <PhotoProofingProvider>
+        <AppContent />
+      </PhotoProofingProvider>
     </ThemeProvider>
   );
 }
