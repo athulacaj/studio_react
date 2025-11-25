@@ -1,14 +1,12 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import {GoogleGenAI } from '@google/genai';
 
 // Initialize Gemini AI
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 
-let genAI = null;
-let model = null;
+let client = null;
 
 if (API_KEY) {
-  genAI = new GoogleGenerativeAI(API_KEY);
-  model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+  client = new GoogleGenAI({ apiKey: API_KEY });
 }
 
 /**
@@ -17,14 +15,25 @@ if (API_KEY) {
  * @returns {Promise<string>} - Generated content
  */
 export async function generateContent(prompt) {
-  if (!model) {
+  if (!client) {
     throw new Error('Gemini API key not configured. Please add VITE_GEMINI_API_KEY to your .env file');
   }
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    return response.text();
+    const response = await client.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: [{ parts: [{ text: prompt }] }]
+    });
+    
+    let text = "";
+    if (typeof response.text === 'function') {
+        text = response.text();
+    } else if (response.response && typeof response.response.text === 'function') {
+         text = response.response.text();
+    } else {
+         text = response.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    }
+    return text;
   } catch (error) {
     console.error('Error generating content:', error);
     throw error;
@@ -132,4 +141,4 @@ Generate the following in JSON format:
   }
 }
 
-export { genAI, model };
+export { client };
