@@ -1,10 +1,9 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Select, MenuItem, FormControl, InputLabel, Box, Button } from '@mui/material';
 import CameraIcon from '@mui/icons-material/Camera';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Header = ({ albums, selectedAlbum, onAlbumChange }) => {
-    const navigate = useNavigate();
     return (
         <AppBar
             position="fixed"
@@ -38,6 +37,23 @@ const Header = ({ albums, selectedAlbum, onAlbumChange }) => {
                 </Box>
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Button
+                        component={Link}
+                        to="/portfolio-builder"
+                        variant="outlined"
+                        sx={{
+                            color: 'white',
+                            borderColor: '#a855f7',
+                            fontWeight: 500,
+                            '&:hover': {
+                                borderColor: '#c084fc',
+                                background: 'rgba(168, 85, 247, 0.1)'
+                            }
+                        }}
+                    >
+                        Portfolio Builder
+                    </Button>
+
                     <Button
                         component={Link}
                         to="/about"
