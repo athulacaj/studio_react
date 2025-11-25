@@ -54,23 +54,22 @@ const darkTheme = createTheme({
   },
 });
 
-import { PhotoProofingProvider, usePhotoProofing } from './features/photoproofing';
-import { PortfolioBuilderProvider, PortfolioBuilderPage } from './features/portfoliobuilder';
+import { PhotoProofingProvider } from './features/photoproofing';
+import { PortfolioBuilderProvider, PortfolioBuilderPage, PortfolioViewerPage } from './features/portfoliobuilder';
+import { AuthProvider, LoginPage, SignupPage } from './features/auth';
 
 const AppContent = () => {
-  const { albums, selectedAlbum, handleAlbumChange } = usePhotoProofing();
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Header
-        albums={albums}
-        selectedAlbum={selectedAlbum}
-        onAlbumChange={handleAlbumChange}
-      />
+
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Routes>
           <Route path="/" element={<PhotoProofingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
           <Route path="/portfolio-builder" element={<PortfolioBuilderPage />} />
+          <Route path="/portfolio/:domain" element={<PortfolioViewerPage />} />
           <Route path="/about" element={<About />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
@@ -86,7 +85,9 @@ function App() {
       <CssBaseline />
       <PhotoProofingProvider>
         <PortfolioBuilderProvider>
-          <AppContent />
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
         </PortfolioBuilderProvider>
       </PhotoProofingProvider>
     </ThemeProvider>

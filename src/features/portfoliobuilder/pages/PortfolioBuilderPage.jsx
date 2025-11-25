@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Stepper,
@@ -29,8 +29,40 @@ const PortfolioBuilderPage = () => {
         content: {},
         gallery: []
     });
+    const [isDomainValid, setIsDomainValid] = useState(false);
     const [error, setError] = useState(null);
-    const { createPortfolio, updatePortfolio, portfolio, loading } = usePortfolioBuilder();
+    const [isPublished, setIsPublished] = useState(false);
+    const { createPortfolio, updatePortfolio, portfolio, loading, loadPortfolio, togglePublish } = usePortfolioBuilder();
+
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            if (user) {
+                loadPortfolio(user.uid);
+            }
+        });
+        return () => unsubscribe();
+    }, [loadPortfolio]);
+
+    // Update local state when portfolio is loaded
+    useEffect(() => {
+        if (portfolio) {
+            setPortfolioData(prev => ({
+                ...prev,
+                basicInfo: {
+                    ...portfolio.basicInfo,
+                    // If portfolio exists, use its domain. If not, use what's in local state or empty.
+                    domain: portfolio.basicInfo?.domain || prev.basicInfo.domain
+                },
+                design: portfolio.design || {},
+                content: portfolio.content || {},
+                gallery: portfolio.gallery || []
+            }));
+            // If loading existing portfolio and it has a domain, it's valid
+            if (portfolio.basicInfo?.domain) {
+                setIsDomainValid(true);
+            }
+        }
+    }, [portfolio]);
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -56,20 +88,33 @@ const PortfolioBuilderPage = () => {
             }
 
             if (portfolio) {
-                await updatePortfolio(user.uid, portfolioData);
+                await updatePortfolio(portfolio.id, portfolioData);
             } else {
                 await createPortfolio(user.uid, portfolioData);
             }
 
             setError(null);
+            return true;
         } catch (err) {
             setError(err.message);
+            return false;
         }
     };
 
     const handlePublish = async () => {
-        await handleSave();
-        // Additional publish logic here
+        const saved = await handleSave();
+        if (!saved) return;
+
+        try {
+            const result = await togglePublish(portfolio.id, true);
+            if (result.success) {
+                setIsPublished(true);
+            } else {
+                setError(result.error);
+            }
+        } catch (err) {
+            setError(err.message);
+        }
     };
 
     const handleFillDemo = () => {
@@ -80,6 +125,7 @@ const PortfolioBuilderPage = () => {
                 phone: '+1 (555) 123-4567',
                 location: 'San Francisco, CA',
                 website: 'https://alexmorgan.photography',
+                domain: `alexmorgan-${Math.floor(Math.random() * 10000)}`,
                 photographyStyles: ['Wedding', 'Portrait', 'Landscape'],
                 experience: '8',
                 tagline: 'Capturing Life\'s Beautiful Moments Through My Lens'
@@ -152,6 +198,8 @@ const PortfolioBuilderPage = () => {
         };
 
         setPortfolioData(demoData);
+        // For demo data, we assume domain is valid (it's random)
+        setIsDomainValid(true);
         setError(null);
     };
 
@@ -162,6 +210,8 @@ const PortfolioBuilderPage = () => {
                     <BasicInfoStep
                         data={portfolioData.basicInfo}
                         onUpdate={(data) => handleStepData('basicInfo', data)}
+                        currentDomain={portfolio?.basicInfo?.domain}
+                        onValidityChange={setIsDomainValid}
                     />
                 );
             case 1:
@@ -197,6 +247,78 @@ const PortfolioBuilderPage = () => {
                 return 'Unknown step';
         }
     };
+
+    if (isPublished) {
+        return (
+            <Box
+                sx={{
+                    minHeight: '100vh',
+                    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    p: 4
+                }}
+            >
+                <Paper
+                    elevation={3}
+                    sx={{
+                        p: 6,
+                        borderRadius: 4,
+                        background: 'rgba(30, 41, 59, 0.8)',
+                        backdropFilter: 'blur(10px)',
+                        maxWidth: 600,
+                        width: '100%',
+                        textAlign: 'center'
+                    }}
+                >
+                    <motion.div
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <Typography variant="h1" sx={{ fontSize: 60, mb: 2 }}>
+                            🎉
+                        </Typography>
+                        <Typography variant="h4" sx={{ fontWeight: 700, mb: 2, color: '#fff' }}>
+                            Portfolio Published!
+                        </Typography>
+                        <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4 }}>
+                            Your portfolio is now live and accessible to the world.
+                        </Typography>
+
+                        <Box sx={{ p: 3, bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 2, mb: 4 }}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>
+                                Your Portfolio URL:
+                            </Typography>
+                            <Typography variant="h6" sx={{ color: '#6366f1', wordBreak: 'break-all' }}>
+                                {window.location.origin}/portfolio/{portfolioData.basicInfo.domain}
+                            </Typography>
+                        </Box>
+
+                        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                            <Button
+                                variant="contained"
+                                href={`/portfolio/${portfolioData.basicInfo.domain}`}
+                                target="_blank"
+                                sx={{
+                                    background: 'linear-gradient(45deg, #6366f1 30%, #a855f7 90%)',
+                                }}
+                            >
+                                Visit Portfolio
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                onClick={() => setIsPublished(false)}
+                            >
+                                Continue Editing
+                            </Button>
+                        </Box>
+                    </motion.div>
+                </Paper>
+            </Box>
+        );
+    }
 
     return (
         <Box
@@ -329,6 +451,7 @@ const PortfolioBuilderPage = () => {
                                         onClick={handleNext}
                                         variant="contained"
                                         sx={{ minWidth: 100 }}
+                                        disabled={activeStep === 0 && !isDomainValid}
                                     >
                                         Next
                                     </Button>

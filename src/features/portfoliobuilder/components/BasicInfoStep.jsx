@@ -9,8 +9,14 @@ import {
     Select,
     MenuItem,
     Chip,
-    OutlinedInput
+    OutlinedInput,
+    InputAdornment,
+    CircularProgress,
+    Button
 } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import { usePortfolioBuilder } from '../context/PortfolioBuilderContext';
 
 const photographyStyles = [
     'Wedding',
@@ -27,7 +33,8 @@ const photographyStyles = [
     'Documentary'
 ];
 
-const BasicInfoStep = ({ data, onUpdate }) => {
+const BasicInfoStep = ({ data, onUpdate, currentDomain, onValidityChange }) => {
+    const { checkDomainAvailability } = usePortfolioBuilder();
     const [formData, setFormData] = useState({
         name: data.name || '',
         email: data.email || '',
@@ -36,13 +43,47 @@ const BasicInfoStep = ({ data, onUpdate }) => {
         website: data.website || '',
         photographyStyles: data.photographyStyles || [],
         experience: data.experience || '',
-        tagline: data.tagline || ''
+        tagline: data.tagline || '',
+        domain: data.domain || ''
     });
+    const [domainStatus, setDomainStatus] = useState(null); // 'checking', 'available', 'taken', 'error'
 
     const handleChange = (field, value) => {
         const newData = { ...formData, [field]: value };
         setFormData(newData);
         onUpdate(newData);
+    };
+
+    const handleDomainChange = (e) => {
+        const value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+        handleChange('domain', value);
+        setDomainStatus(null);
+        if (onValidityChange) onValidityChange(false);
+    };
+
+    const handleCheckDomain = async () => {
+        const value = formData.domain;
+
+        if (!value || value.length < 3) {
+            return;
+        }
+
+        if (currentDomain && value === currentDomain) {
+            setDomainStatus('available');
+            if (onValidityChange) onValidityChange(true);
+            return;
+        }
+
+        setDomainStatus('checking');
+        try {
+            const isAvailable = await checkDomainAvailability(value);
+            setDomainStatus(isAvailable ? 'available' : 'taken');
+            if (onValidityChange) onValidityChange(isAvailable);
+        } catch (error) {
+            console.error('Error checking domain:', error);
+            setDomainStatus('error');
+            if (onValidityChange) onValidityChange(false);
+        }
     };
 
     return (
@@ -52,6 +93,43 @@ const BasicInfoStep = ({ data, onUpdate }) => {
             </Typography>
 
             <Grid container spacing={3}>
+                <Grid item xs={12}>
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                        <TextField
+                            fullWidth
+                            label="Portfolio Domain ID"
+                            value={formData.domain}
+                            onChange={handleDomainChange}
+                            required
+                            variant="outlined"
+                            helperText={
+                                domainStatus === 'available' ? 'Domain is available!' :
+                                    domainStatus === 'taken' ? 'Domain is already taken' :
+                                        domainStatus === 'checking' ? 'Checking availability...' :
+                                            'Choose a unique ID for your portfolio (e.g., samplestudio)'
+                            }
+                            error={domainStatus === 'taken' || domainStatus === 'error'}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        {domainStatus === 'checking' && <CircularProgress size={20} />}
+                                        {domainStatus === 'available' && <CheckCircleIcon color="success" />}
+                                        {domainStatus === 'taken' && <ErrorIcon color="error" />}
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+                        <Button
+                            variant="contained"
+                            onClick={handleCheckDomain}
+                            disabled={!formData.domain || formData.domain.length < 3 || domainStatus === 'checking'}
+                            sx={{ height: 56 }}
+                        >
+                            Check
+                        </Button>
+                    </Box>
+                </Grid>
+
                 <Grid item xs={12} md={6}>
                     <TextField
                         fullWidth
