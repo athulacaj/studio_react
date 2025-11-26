@@ -1,7 +1,6 @@
 import React from 'react';
 import { createTheme, ThemeProvider, CssBaseline, Box } from '@mui/material';
 import { Routes, Route } from 'react-router-dom';
-import { Header, Footer } from './shared/components';
 import PhotoProofingPage from './features/photoproofing';
 import About from './pages/About';
 import NotFound from './pages/NotFound';
@@ -74,7 +73,11 @@ const AppContent = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Box>
-      <Footer />
+      {
+        !location.pathname.includes('/portfolio') && (
+          <Footer />
+        )
+      }
     </Box>
   );
 };

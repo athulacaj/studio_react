@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alex Morgan | Modern Portfolio</title>
+    
+    <!-- Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;400;500&family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- CSS Reset & Variables --- */
+        :root {
+            /* Colors are injected via JS as RGB values for opacity support */
+            /* Default fallback */
+            --primary: #1a1a1a;
+            --secondary: #e0e0e0;
+            --accent: #ff4757;
+            --background: #ffffff;
+            --text: #2f3542;
+            
+            /* Derived RGB variables for rgba() usage (set by JS) */
+            --bg-rgb: 255, 255, 255;
+            --primary-rgb: 26, 26, 26;
+            
+            /* Spacing & Layout */
+            --container-width: 1200px;
+            --section-spacing: 120px;
+            --border-radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+            font-size: 18px;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            color: var(--primary);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        /* --- Utilities --- */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 16px 32px;
+            background-color: var(--primary);
+            color: var(--background); /* Text color inside button contrasts with primary */
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border: 2px solid var(--primary);
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: transparent;
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .section-header {
+            margin-bottom: 4rem;
+        }
+
+        .section-subtitle {
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            color: var(--primary);
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 0;
+            z-index: 1000;
+            transition: background 0.3s ease, padding 0.3s ease;
+        }
+
+        nav.scrolled {
+            /* Dynamic Glass Effect using Data Colors */
+            background: rgba(var(--bg-rgb), 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .nav-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--primary);
+            letter-spacing: -1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+        }
+
+        .nav-links a {
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--text);
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* --- Hero Section --- */
+        #hero {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Dynamic Gradient Overlay based on Background Color */
+            background: linear-gradient(90deg, 
+                rgba(var(--bg-rgb), 1) 0%, 
+                rgba(var(--bg-rgb), 0.8) 40%, 
+                rgba(var(--bg-rgb), 0.2) 100%
+            );
+        }
+
+        .hero-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-content {
+            max-width: 650px;
+            z-index: 1;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            padding: 8px 16px;
+            /* Dynamic semi-transparent background */
+            background: rgba(var(--bg-rgb), 0.8);
+            border: 1px solid var(--secondary);
+            backdrop-filter: blur(5px);
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        #hero h1 {
+            font-size: 5rem;
+            color: var(--primary);
+            line-height: 1;
+            margin-bottom: 1.5rem;
+        }
+
+        #hero p {
+            font-size: 1.25rem;
+            color: var(--text);
+            opacity: 0.9;
+            margin-bottom: 3rem;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            opacity: 0.5;
+            color: var(--text);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);}
+            40% {transform: translateX(-50%) translateY(-10px);}
+            60% {transform: translateX(-50%) translateY(-5px);}
+        }
+
+        /* --- About Section --- */
+        #about {
+            padding: var(--section-spacing) 0;
+        }
+
+        .about-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+        }
+
+        .about-text {
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+
+        .about-text p {
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .stat-card {
+            /* Use a very subtle variation of the background/primary for card bg */
+            background: rgba(var(--primary-rgb), 0.03); 
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.3s;
+            border: 1px solid var(--secondary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+        }
+
+        .stat-number {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text);
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- Gallery Section --- */
+        #gallery {
+            padding: var(--section-spacing) 0;
+            /* Use a slightly different shade for section contrast */
+            background-color: rgba(var(--primary-rgb), 0.02);
+        }
+
+        .filter-nav {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            border: 1px solid var(--secondary);
+            background: transparent;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 8px 24px;
+            cursor: pointer;
+            color: var(--text);
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: var(--primary);
+            color: var(--background);
+            border-color: var(--primary);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .gallery-card {
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            aspect-ratio: 4/5;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            background: var(--secondary);
+        }
+
+        .gallery-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        .gallery-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .gallery-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem;
+            /* Gradient must always be dark for text legibility, or adaptive. 
+               We'll keep it dark gradient with white text for images. */
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            color: white;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+        }
+
+        .gallery-card:hover .gallery-info {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .gallery-cat {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .gallery-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        .gallery-info p {
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* --- Services --- */
+        #services {
+            padding: var(--section-spacing) 0;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-item {
+            padding: 3rem 2rem;
+            border-radius: var(--border-radius);
+            background: rgba(var(--primary-rgb), 0.03); /* Dynamic card bg */
+            border: 1px solid var(--secondary);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .service-item:hover {
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .service-item:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .service-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .service-desc {
+            color: var(--text);
+            opacity: 0.8;
+            font-size: 1rem;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--primary);
+            color: var(--background); /* Invert for footer */
+            padding: 80px 0 40px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 4rem;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid rgba(var(--bg-rgb), 0.1);
+        }
+
+        .footer-brand h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--background);
+        }
+
+        .footer-brand p {
+            max-width: 400px;
+            opacity: 0.7;
+        }
+
+        .footer-links h4 {
+            color: var(--background);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-links a, .footer-links p {
+            display: block;
+            opacity: 0.7;
+            margin-bottom: 0.8rem;
+            transition: opacity 0.3s;
+            color: var(--background);
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--accent);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            opacity: 0.5;
+            font-size: 0.9rem;
+        }
+
+        /* --- Mobile --- */
+        @media (max-width: 968px) {
+            #hero h1 { font-size: 3.5rem; }
+            .about-wrapper { grid-template-columns: 1fr; }
+            .footer-content { grid-template-columns: 1fr; gap: 3rem; }
+            .nav-links { display: none; } /* Simplified */
+            :root { --section-spacing: 80px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav id="navbar">
+        <div class="container nav-inner">
+            <a href="#" class="logo" id="nav-logo">ALEX.</a>
+            <div class="nav-links">
+                <a href="#about">About</a>
+                <a href="#gallery">Portfolio</a>
+                <a href="#services">Services</a>
+                <a href="#contact" style="color: var(--accent);">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <header id="hero">
+        <div class="hero-bg">
+            <img src="" alt="Hero Background" id="hero-img">
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <h1 id="hero-name">Alex Morgan</h1>
+                <p id="hero-sub">Creating timeless visual stories through the lens of passion and precision.</p>
+                <a href="#gallery" class="btn">View Works</a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
+            </svg>
+        </div>
+    </header>
+
+    <section id="about">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle">Who I Am</span>
+                <h2 class="section-title">Behind The Lens</h2>
+            </div>
+            <div class="about-wrapper">
+                <div class="about-text" id="about-text">
+                    <!-- Bio injected here -->
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-number" id="stat-exp">8+</span>
+                        <span class="stat-label">Years Experience</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="stat-weddings">200+</span>
+                        <span class="stat-label">Weddings Shot</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Client Satisfaction</span>
+                    </div>
+                    <div class="stat-card" style="border-color: var(--accent);">
+                        <span class="stat-number" style="color: var(--accent);">No.1</span>
+                        <span class="stat-label">Award Winner</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="gallery">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle">Portfolio</span>
+                <h2 class="section-title">Selected Works</h2>
+            </div>
+            
+            <div class="filter-nav" id="filter-container">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <!-- Filters injected here -->
+            </div>
+
+            <div class="gallery-grid" id="gallery-grid">
+                <!-- Gallery Items Injected Here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="services">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle">Services</span>
+                <h2 class="section-title">What I Offer</h2>
+            </div>
+            <div class="services-grid" id="services-grid">
+                <!-- Services injected here -->
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h2 id="footer-name">Alex Morgan</h2>
+                    <p id="footer-bio"></p>
+                </div>
+                <div class="footer-links">
+                    <h4>Contact</h4>
+                    <p id="contact-phone"></p>
+                    <a id="contact-email" href=""></a>
+                    <p id="contact-location"></p>
+                </div>
+                <div class="footer-links">
+                    <h4>Menu</h4>
+                    <a href="#about">About Me</a>
+                    <a href="#gallery">Portfolio</a>
+                    <a href="#services">Services</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; <span id="year"></span> <span id="copyright-name"></span>.</span>
+                <span>Designed with PortfolioAI</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- DATA ---
+        // Setting to DARK MODE config to demonstrate capability
+    
+        const data_example = {
+            "id": "layxml9UiSRQRcuk0rTX7WeSy0A3",
+            "content": {
+                "aboutSection": "Hello! I'm Alex Morgan, a passionate photographer based in San Francisco. My journey into photography began 8 years ago, and since then, I've had the privilege of capturing countless beautiful moments.\n\nI specialize in wedding and portrait photography, but I also love exploring landscape photography during my travels. My approach is to blend artistic vision with authentic emotion, creating images that tell your unique story.",
+                "achievements": "• Winner of Best Wedding Photographer 2023\n• Featured in Photography Magazine\n• Over 200 weddings captured\n• Published in National Geographic",
+                "tagline": "Capturing Life's Beautiful Moments",
+                "bio": "Award-winning photographer specializing in wedding and portrait photography with over 8 years of experience creating timeless memories.",
+                "services": "• Wedding Photography\n• Engagement Sessions\n• Portrait Photography\n• Family Photos\n• Event Coverage\n• Photo Editing & Retouching"
+            },
+            "gallery": [
+                {
+                    "category": "Wedding",
+                    "title": "Sunset Ceremony",
+                    "description": "Golden hour magic",
+                    "url": "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800"
+                },
+                {
+                    "url": "https://images.unsplash.com/photo-1519741497674-611481863552?w=800",
+                    "description": "Studio lighting setup",
+                    "category": "Portrait",
+                    "title": "Natural Light"
+                }
+            ],
+            "design": {
+                "customColors": {
+                    // Dark Mode Configuration
+                    "background": "#0f172a", // Deep Slate Blue/Black
+                    "primary": "#f8fafc",     // Off-White for text
+                    "secondary": "#334155",   // Slate for borders/subtle elements
+                    "accent": "#38bdf8",      // Light Blue accent
+                    "text": "#94a3b8"         // Muted Slate for body text
+                }
+            },
+            "basicInfo": {
+                "name": "Alex Morgan",
+                "experience": "8",
+                "phone": "+1 (555) 123-4567",
+                "email": "alex.morgan@example.com",
+                "location": "San Francisco, CA"
+            }
+        };
+
+        // --- HELPER: Hex to RGB ---
+        function hexToRgb(hex) {
+            // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+            var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+            hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+                return r + r + g + g + b + b;
+            });
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : null;
+        }
+
+        // --- RENDER ---
+        function init() {
+            // Colors
+            const root = document.documentElement;
+            const c = data.design.customColors;
+            
+            // Set Standard Variables
+            root.style.setProperty('--primary', c.primary);
+            root.style.setProperty('--secondary', c.secondary);
+            root.style.setProperty('--accent', c.accent);
+            root.style.setProperty('--background', c.background);
+            root.style.setProperty('--text', c.text);
+
+            // Set RGB Variables for Opacity Control
+            // This is crucial for "dependent on data" overlays
+            if(c.background) root.style.setProperty('--bg-rgb', hexToRgb(c.background));
+            if(c.primary) root.style.setProperty('--primary-rgb', hexToRgb(c.primary));
+
+            // Hero
+            document.getElementById('nav-logo').textContent = data.basicInfo.name.toUpperCase();
+            document.getElementById('hero-name').textContent = data.basicInfo.name;
+            document.getElementById('hero-sub').textContent = data.content.tagline;
+            // Use the first portrait image as hero bg if available, else first image
+            const heroUrl = data.gallery.find(g => g.category === 'Portrait')?.url || data.gallery[0].url;
+            document.getElementById('hero-img').src = heroUrl;
+
+            // About
+            const aboutLines = data.content.aboutSection.split('\n');
+            const aboutContainer = document.getElementById('about-text');
+            aboutLines.forEach(line => {
+                if(line.trim()) {
+                    const p = document.createElement('p');
+                    p.textContent = line;
+                    aboutContainer.appendChild(p);
+                }
+            });
+
+            // Stats Logic (Simple extraction from strings)
+            document.getElementById('stat-exp').textContent = data.basicInfo.experience + "+";
+            
+            // Services Grid
+            const servicesList = data.content.services.split('\n').filter(s => s.trim());
+            const servicesGrid = document.getElementById('services-grid');
+            servicesList.forEach(service => {
+                const cleanName = service.replace(/•\s*/g, '');
+                const div = document.createElement('div');
+                div.className = 'service-item';
+                div.innerHTML = `
+                    <span class="service-icon">✦</span>
+                    <h3 class="service-title">${cleanName}</h3>
+                    <p class="service-desc">Professional ${cleanName.toLowerCase()} services tailored to your needs.</p>
+                `;
+                servicesGrid.appendChild(div);
+            });
+
+            // Gallery
+            const galleryGrid = document.getElementById('gallery-grid');
+            const filterContainer = document.getElementById('filter-container');
+            const categories = new Set();
+
+            data.gallery.forEach(item => {
+                categories.add(item.category);
+                const card = document.createElement('div');
+                card.className = `gallery-card ${item.category}`;
+                card.innerHTML = `
+                    <img src="${item.url}" alt="${item.title}">
+                    <div class="gallery-info">
+                        <span class="gallery-cat">${item.category}</span>
+                        <h3 class="gallery-title">${item.title}</h3>
+                        <p>${item.description}</p>
+                    </div>
+                `;
+                galleryGrid.appendChild(card);
+            });
+
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.textContent = cat;
+                btn.onclick = () => filterGallery(cat, btn);
+                filterContainer.appendChild(btn);
+            });
+
+            // Footer
+            document.getElementById('footer-name').textContent = data.basicInfo.name;
+            document.getElementById('footer-bio').textContent = data.content.bio;
+            document.getElementById('contact-phone').textContent = data.basicInfo.phone;
+            document.getElementById('contact-email').textContent = data.basicInfo.email;
+            document.getElementById('contact-email').href = "mailto:" + data.basicInfo.email;
+            document.getElementById('contact-location').textContent = data.basicInfo.location;
+            document.getElementById('year').textContent = new Date().getFullYear();
+            document.getElementById('copyright-name').textContent = data.basicInfo.name;
+        }
+
+        // Filtering
+        function filterGallery(cat, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const cards = document.querySelectorAll('.gallery-card');
+            cards.forEach(card => {
+                if(cat === 'all' || card.classList.contains(cat)) {
+                    card.style.display = 'block';
+                    setTimeout(() => card.style.opacity = '1', 50);
+                } else {
+                    card.style.display = 'none';
+                    card.style.opacity = '0';
+                }
+            });
+        }
+        
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Setup All Filter
+        document.querySelector('[data-filter="all"]').onclick = function() {
+            filterGallery('all', this);
+        };
+
+        window.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>

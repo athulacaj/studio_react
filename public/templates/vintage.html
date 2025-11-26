@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <!-- Importing Fonts for Vintage Feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+
+    <style>
+        /* CSS Variables - Values will be injected by JS */
+        :root {
+            --primary: #000;
+            --secondary: #000;
+            --accent: #000;
+            --background: #fff;
+            --text: #000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            font-family: 'Lato', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background-color: var(--background);
+            z-index: 100;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-links a {
+            margin-left: 2rem;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--secondary);
+        }
+
+        /* --- Hero Section --- */
+        #hero {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            background-image: linear-gradient(to bottom, rgba(253, 251, 246, 0.8), rgba(253, 251, 246, 1)), url('https://images.unsplash.com/photo-1519741497674-611481863552?w=1600');
+            background-size: cover;
+            background-position: center;
+        }
+
+        #hero h1 {
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        #hero p {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: var(--text);
+            max-width: 600px;
+        }
+
+        .cta-btn {
+            margin-top: 2rem;
+            padding: 12px 30px;
+            background-color: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 2px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+            transition: transform 0.3s;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        /* --- About Section --- */
+        .section {
+            padding: 5rem 10%;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary);
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            width: 60px;
+            height: 3px;
+            background-color: var(--secondary);
+        }
+
+        .bio-text {
+            white-space: pre-line; /* Preserves JSON newlines */
+            font-size: 1.1rem;
+            color: var(--text);
+            opacity: 0.9;
+        }
+
+        .achievements-box {
+            background-color: rgba(0,0,0,0.03);
+            padding: 2rem;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .achievements-box h3 {
+            margin-bottom: 1rem;
+        }
+
+        .achievements-list, .services-list {
+            list-style: none;
+        }
+
+        .achievements-list li, .services-list li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .achievements-list li::before, .services-list li::before {
+            content: '•';
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+        }
+
+        /* --- Gallery Section --- */
+        #gallery {
+            background-color: white; /* Slight contrast */
+        }
+
+        .filter-container {
+            margin-bottom: 3rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: none;
+            border: none;
+            font-family: 'Lato', sans-serif;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            color: var(--text);
+            padding-bottom: 5px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            color: var(--primary);
+            border-color: var(--secondary);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            height: 400px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, rgba(62, 39, 35, 0.9), transparent);
+            padding: 20px;
+            color: white;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .gallery-category {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--secondary);
+        }
+
+        .gallery-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            margin: 5px 0;
+        }
+
+        /* --- Services --- */
+        .services-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+        }
+        
+        .service-card {
+            flex: 1 1 300px;
+            border: 1px solid rgba(0,0,0,0.1);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--text);
+            color: var(--background);
+            padding: 4rem 10%;
+            text-align: center;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+            text-align: left;
+        }
+
+        .footer-col h4 {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-col p, .footer-col a {
+            color: #ccc;
+            margin-bottom: 0.5rem;
+            display: block;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-col a:hover {
+            color: var(--secondary);
+        }
+
+        .copyright {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 2rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #hero h1 { font-size: 2.5rem; }
+            .about-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; } /* Simplified for demo */
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#" class="logo" id="nav-logo"></a>
+        <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#gallery">Portfolio</a>
+            <a href="#services">Services</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+
+    <header id="hero">
+        <h1 id="hero-name"></h1>
+        <p id="hero-tagline"></p>
+        <a href="#contact" class="cta-btn">Book a Session</a>
+    </header>
+
+    <section id="about" class="section">
+        <div class="about-grid">
+            <div>
+                <h2 class="section-title">About Me</h2>
+                <div id="about-content" class="bio-text"></div>
+            </div>
+            <div class="achievements-box">
+                <h3>Achievements</h3>
+                <ul id="achievements-list" class="achievements-list"></ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="gallery" class="section">
+        <h2 class="section-title" style="margin-bottom: 1rem;">Selected Works</h2>
+        <div id="filter-container" class="filter-container">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <!-- Categories injected here -->
+        </div>
+        <div id="gallery-grid" class="gallery-grid">
+            <!-- Images injected here -->
+        </div>
+    </section>
+
+    <section id="services" class="section" style="background-color: rgba(0,0,0,0.02);">
+        <h2 class="section-title">Services</h2>
+        <div id="services-content" class="bio-text" style="margin-top: 1rem;">
+            <ul id="services-list" class="services-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;"></ul>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4 id="footer-name"></h4>
+                <p id="footer-bio"></p>
+            </div>
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <p id="contact-phone"></p>
+                <p><a id="contact-email" href=""></a></p>
+                <p id="contact-location"></p>
+            </div>
+            <div class="footer-col">
+                <h4>Styles</h4>
+                <div id="footer-styles"></div>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; <span id="year"></span> <span id="copyright-name"></span>. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        // --- DATA INJECTION ---
+   
+        // --- RENDER LOGIC ---
+
+        function renderPortfolio() {
+            // 1. Apply Design Colors
+            const colors = portfolioData.design.customColors;
+            const root = document.documentElement;
+            root.style.setProperty('--primary', colors.primary);
+            root.style.setProperty('--secondary', colors.secondary);
+            root.style.setProperty('--accent', colors.accent);
+            root.style.setProperty('--background', colors.background);
+            root.style.setProperty('--text', colors.text);
+
+            // 2. Render Basic Info & Header
+            document.title = `${portfolioData.basicInfo.name} | Portfolio`;
+            document.getElementById('nav-logo').textContent = portfolioData.basicInfo.name.toUpperCase();
+            document.getElementById('hero-name').textContent = portfolioData.basicInfo.name;
+            document.getElementById('hero-tagline').textContent = portfolioData.content.tagline;
+            
+            // 3. Render About Content
+            document.getElementById('about-content').textContent = portfolioData.content.aboutSection;
+            
+            // Helper to process bullet points string into LI elements
+            const renderList = (text, elementId) => {
+                const listContainer = document.getElementById(elementId);
+                const items = text.split('\n');
+                items.forEach(item => {
+                    if(item.trim()) {
+                        const li = document.createElement('li');
+                        li.textContent = item.replace(/•\s*/g, ''); // Remove bullet char if present
+                        listContainer.appendChild(li);
+                    }
+                });
+            };
+
+            renderList(portfolioData.content.achievements, 'achievements-list');
+            renderList(portfolioData.content.services, 'services-list');
+
+            // 4. Render Gallery & Filters
+            const galleryGrid = document.getElementById('gallery-grid');
+            const filterContainer = document.getElementById('filter-container');
+            const categories = new Set();
+
+            // Create Image Cards
+            portfolioData.gallery.forEach(img => {
+                categories.add(img.category);
+
+                const card = document.createElement('div');
+                card.className = `gallery-item ${img.category}`;
+                card.innerHTML = `
+                    <img src="${img.url}" alt="${img.description}">
+                    <div class="gallery-overlay">
+                        <div class="gallery-category">${img.category}</div>
+                        <h3 class="gallery-title">${img.title}</h3>
+                        <p>${img.description}</p>
+                    </div>
+                `;
+                galleryGrid.appendChild(card);
+            });
+
+            // Create Filters
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.textContent = cat;
+                btn.onclick = () => filterGallery(cat, btn);
+                filterContainer.appendChild(btn);
+            });
+
+            // 5. Render Footer/Contact
+            document.getElementById('footer-name').textContent = portfolioData.basicInfo.name;
+            document.getElementById('footer-bio').textContent = portfolioData.content.bio;
+            document.getElementById('contact-phone').textContent = portfolioData.basicInfo.phone;
+            
+            const emailLink = document.getElementById('contact-email');
+            emailLink.textContent = portfolioData.basicInfo.email;
+            emailLink.href = `mailto:${portfolioData.basicInfo.email}`;
+            
+            document.getElementById('contact-location').textContent = portfolioData.basicInfo.location;
+            
+            // Styles list
+            const stylesContainer = document.getElementById('footer-styles');
+            portfolioData.basicInfo.photographyStyles.forEach(style => {
+                const p = document.createElement('p');
+                p.textContent = style;
+                stylesContainer.appendChild(p);
+            });
+
+            document.getElementById('year').textContent = new Date().getFullYear();
+            document.getElementById('copyright-name').textContent = portfolioData.basicInfo.name;
+        }
+
+        // --- FILTER FUNCTIONALITY ---
+        function filterGallery(category, clickedBtn) {
+            // Update buttons state
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            clickedBtn.classList.add('active');
+
+            // Filter items
+            const items = document.querySelectorAll('.gallery-item');
+            items.forEach(item => {
+                if (category === 'all' || item.classList.contains(category)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Setup "All" button
+        document.querySelector('.filter-btn[data-filter="all"]').onclick = function() {
+            filterGallery('all', this);
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', renderPortfolio);
+
+    </script>
+</body>
+</html>

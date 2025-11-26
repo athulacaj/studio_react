@@ -160,13 +160,37 @@ const PortfolioTemplate = ({ portfolioData }) => {
                     <Typography variant="h6" sx={{ flexGrow: 1, color: colors.text }}>
                         {basicInfo.name || 'Your Name'}
                     </Typography>
-                    <Button onClick={() => setActiveTab(1)} sx={{ color: colors.text }}>Gallery</Button>
-                    <Button onClick={() => setActiveTab(2)} sx={{ color: colors.text }}>About</Button>
-                    <Button onClick={() => setActiveTab(2)} sx={{ color: colors.text }}>Contact</Button>
+                    <Button
+                        onClick={() => setActiveTab(0)}
+                        sx={{
+                            color: activeTab === 0 ? colors.primary : colors.text,
+                            fontWeight: activeTab === 0 ? 'bold' : 'normal'
+                        }}
+                    >
+                        Home
+                    </Button>
+                    <Button
+                        onClick={() => setActiveTab(1)}
+                        sx={{
+                            color: activeTab === 1 ? colors.primary : colors.text,
+                            fontWeight: activeTab === 1 ? 'bold' : 'normal'
+                        }}
+                    >
+                        Gallery
+                    </Button>
+                    <Button
+                        onClick={() => setActiveTab(2)}
+                        sx={{
+                            color: activeTab === 2 ? colors.primary : colors.text,
+                            fontWeight: activeTab === 2 ? 'bold' : 'normal'
+                        }}
+                    >
+                        About
+                    </Button>
                 </Toolbar>
             </AppBar>
 
-            <Tabs
+            {/* <Tabs
                 value={activeTab}
                 onChange={(e, newValue) => setActiveTab(newValue)}
                 centered
@@ -182,7 +206,7 @@ const PortfolioTemplate = ({ portfolioData }) => {
                 <Tab label="Home" />
                 <Tab label="Gallery" />
                 <Tab label="About" />
-            </Tabs>
+            </Tabs> */}
 
             <Container sx={{ py: 4 }}>
                 {/* Home Tab */}
