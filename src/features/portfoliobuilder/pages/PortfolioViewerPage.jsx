@@ -23,6 +23,13 @@ const PortfolioViewerPage = () => {
             setLoading(true);
             try {
                 const data = await getPortfolioByDomain(domain);
+                window.getData = (removeHtml = true) => {
+                    let temp = { ...data }
+                    if (removeHtml) {
+                        delete temp.design.templateHtml
+                    }
+                    return temp;
+                }
                 setPortfolio(data);
             } catch (err) {
                 console.error("Failed to load portfolio:", err);

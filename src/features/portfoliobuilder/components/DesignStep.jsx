@@ -18,8 +18,7 @@ import {
     IconButton,
     Tooltip
 } from '@mui/material';
-import { Sparkles, Palette, Edit2, FileText } from 'lucide-react';
-import { generatePortfolioDesign } from '../../../config/gemini';
+import { Palette, Edit2, FileText } from 'lucide-react';
 import { fetchTemplate, getAvailableTemplates } from '../utils/templateUtils';
 
 const layouts = [
@@ -29,26 +28,161 @@ const layouts = [
 ];
 
 const colorSchemes = [
-    { value: 'dark', label: 'Dark', primary: '#6366f1', secondary: '#a855f7' },
-    { value: 'light', label: 'Light', primary: '#3b82f6', secondary: '#8b5cf6' },
-    { value: 'minimal', label: 'Minimal', primary: '#000000', secondary: '#ffffff' },
-    { value: 'vibrant', label: 'Vibrant', primary: '#ec4899', secondary: '#f59e0b' }
+    {
+        value: 'dark',
+        label: 'Dark',
+        palette: {
+            primary: '#6366f1',
+            secondary: '#a855f7',
+            accent: '#818cf8',
+            background: '#1e1b4b',
+            text: '#f1f5f9',
+            extra1: '#4f46e5',
+            extra2: '#7c3aed',
+            extra3: '#c7d2fe'
+        }
+    },
+    {
+        value: 'light',
+        label: 'Light',
+        palette: {
+            primary: '#3b82f6',
+            secondary: '#8b5cf6',
+            accent: '#60a5fa',
+            background: '#f8fafc',
+            text: '#1e293b',
+            extra1: '#2563eb',
+            extra2: '#7c3aed',
+            extra3: '#dbeafe'
+        }
+    },
+    {
+        value: 'minimal',
+        label: 'Minimal',
+        palette: {
+            primary: '#000000',
+            secondary: '#ffffff',
+            accent: '#6b7280',
+            background: '#f9fafb',
+            text: '#111827',
+            extra1: '#374151',
+            extra2: '#9ca3af',
+            extra3: '#e5e7eb'
+        }
+    },
+    {
+        value: 'vibrant',
+        label: 'Vibrant',
+        palette: {
+            primary: '#ec4899',
+            secondary: '#f59e0b',
+            accent: '#f472b6',
+            background: '#fdf2f8',
+            text: '#831843',
+            extra1: '#db2777',
+            extra2: '#fbbf24',
+            extra3: '#fce7f3'
+        }
+    },
+    {
+        value: 'extra1',
+        label: 'Ocean',
+        palette: {
+            primary: '#0ea5e9',
+            secondary: '#06b6d4',
+            accent: '#38bdf8',
+            background: '#0c4a6e',
+            text: '#f0f9ff',
+            extra1: '#0284c7',
+            extra2: '#0891b2',
+            extra3: '#7dd3fc'
+        }
+    },
+    {
+        value: 'extra2',
+        label: 'Sunset',
+        palette: {
+            primary: '#f97316',
+            secondary: '#ef4444',
+            accent: '#fb923c',
+            background: '#7c2d12',
+            text: '#fff7ed',
+            extra1: '#ea580c',
+            extra2: '#dc2626',
+            extra3: '#fed7aa'
+        }
+    },
+    {
+        value: 'extra3',
+        label: 'Forest',
+        palette: {
+            primary: '#10b981',
+            secondary: '#059669',
+            accent: '#34d399',
+            background: '#064e3b',
+            text: '#ecfdf5',
+            extra1: '#059669',
+            extra2: '#047857',
+            extra3: '#6ee7b7'
+        }
+    },
+    {
+        value: 'extra4',
+        label: 'Royal',
+        palette: {
+            primary: '#9333ea',
+            secondary: '#d946ef',
+            accent: '#a855f7',
+            background: '#581c87',
+            text: '#faf5ff',
+            extra1: '#7c3aed',
+            extra2: '#c026d3',
+            extra3: '#e9d5ff'
+        }
+    },
+    {
+        value: 'extra5',
+        label: 'Earth',
+        palette: {
+            primary: '#d97706',
+            secondary: '#92400e',
+            accent: '#f59e0b',
+            background: '#78350f',
+            text: '#fffbeb',
+            extra1: '#b45309',
+            extra2: '#78350f',
+            extra3: '#fde68a'
+        }
+    },
+    {
+        value: 'extra6',
+        label: 'Aqua',
+        palette: {
+            primary: '#14b8a6',
+            secondary: '#0d9488',
+            accent: '#2dd4bf',
+            background: '#134e4a',
+            text: '#f0fdfa',
+            extra1: '#0f766e',
+            extra2: '#115e59',
+            extra3: '#5eead4'
+        }
+    }
 ];
 
 const moods = ['Professional', 'Creative', 'Elegant', 'Modern', 'Vintage', 'Bold'];
 
-const DesignStep = ({ data, basicInfo, onUpdate }) => {
+const DesignStep = ({ data, onUpdate }) => {
     const [formData, setFormData] = useState({
         layout: data.layout || 'grid',
         colorScheme: data.colorScheme || 'dark',
         mood: data.mood || 'Professional',
         customColors: data.customColors || null,
         aiGenerated: data.aiGenerated || false,
+        presetScheme: data.presetScheme || null,
         templateName: data.templateName || null,
         templateHtml: data.templateHtml || null
     });
-    const [generating, setGenerating] = useState(false);
-    const [aiSuggestion, setAiSuggestion] = useState(null);
     const [error, setError] = useState(null);
     const [loadingTemplate, setLoadingTemplate] = useState(false);
 
@@ -85,7 +219,13 @@ const DesignStep = ({ data, basicInfo, onUpdate }) => {
                 ...(formData.customColors || getDefaultColorPalette()),
                 [selectedColorKey]: tempColorValue
             };
-            handleChange('customColors', newColors);
+            const newData = {
+                ...formData,
+                customColors: newColors,
+                presetScheme: null  // Reset preset scheme when manually editing
+            };
+            setFormData(newData);
+            onUpdate(newData);
         }
         handleCloseColorPicker();
     };
@@ -96,14 +236,37 @@ const DesignStep = ({ data, basicInfo, onUpdate }) => {
             secondary: '#6A7F8E',
             accent: '#E09F77',
             background: '#0E0E0E',
-            text: '#F0F0F0'
+            text: '#F0F0F0',
+            extra1: '#4A4458',
+            extra2: '#8B9EB0',
+            extra3: '#D4A574'
         };
     };
 
     const handleCreateManualPalette = () => {
         if (!formData.customColors) {
-            handleChange('customColors', getDefaultColorPalette());
+            const newData = {
+                ...formData,
+                customColors: getDefaultColorPalette(),
+                aiGenerated: false,
+                presetScheme: null
+            };
+            setFormData(newData);
+            onUpdate(newData);
         }
+    };
+
+    const handleColorSchemeChange = (schemeValue) => {
+        const selectedScheme = colorSchemes.find(s => s.value === schemeValue);
+        const newData = {
+            ...formData,
+            colorScheme: schemeValue,
+            customColors: selectedScheme ? selectedScheme.palette : null,
+            presetScheme: selectedScheme ? selectedScheme.label : null,
+            aiGenerated: false
+        };
+        setFormData(newData);
+        onUpdate(newData);
     };
 
     const handleTemplateChange = async (templateName) => {
@@ -139,34 +302,7 @@ const DesignStep = ({ data, basicInfo, onUpdate }) => {
         }
     };
 
-    const handleGenerateAI = async () => {
-        setGenerating(true);
-        setError(null);
-        try {
-            const suggestion = await generatePortfolioDesign({
-                photographyStyle: basicInfo.photographyStyles?.join(', ') || 'General',
-                targetAudience: 'Potential clients and art enthusiasts',
-                colorPreference: formData.colorScheme,
-                mood: formData.mood
-            });
 
-            setAiSuggestion(suggestion);
-
-            // Apply AI suggestions
-            const newData = {
-                ...formData,
-                customColors: suggestion.colorPalette,
-                aiGenerated: true,
-                aiSuggestion: suggestion
-            };
-            setFormData(newData);
-            onUpdate(newData);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setGenerating(false);
-        }
-    };
 
     const colorPickerOpen = Boolean(colorPickerAnchor);
 
@@ -194,17 +330,6 @@ const DesignStep = ({ data, basicInfo, onUpdate }) => {
                             Create Custom Palette
                         </Button>
                     )}
-                    <Button
-                        variant="contained"
-                        startIcon={generating ? <CircularProgress size={20} /> : <Sparkles size={20} />}
-                        onClick={handleGenerateAI}
-                        disabled={generating || !basicInfo.photographyStyles?.length}
-                        sx={{
-                            background: 'linear-gradient(45deg, #6366f1 30%, #a855f7 90%)',
-                        }}
-                    >
-                        {generating ? 'Generating...' : 'AI Design Suggestions'}
-                    </Button>
                 </Box>
             </Box>
 
@@ -214,16 +339,7 @@ const DesignStep = ({ data, basicInfo, onUpdate }) => {
                 </Alert>
             )}
 
-            {aiSuggestion && (
-                <Alert severity="success" sx={{ mb: 3 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                        AI Design Notes:
-                    </Typography>
-                    <Typography variant="body2">
-                        {aiSuggestion.designNotes}
-                    </Typography>
-                </Alert>
-            )}
+
 
             {/* Template Selection */}
             <Card
@@ -330,7 +446,7 @@ const DesignStep = ({ data, basicInfo, onUpdate }) => {
                         <InputLabel>Color Scheme</InputLabel>
                         <Select
                             value={formData.colorScheme}
-                            onChange={(e) => handleChange('colorScheme', e.target.value)}
+                            onChange={(e) => handleColorSchemeChange(e.target.value)}
                             label="Color Scheme"
                         >
                             {colorSchemes.map((scheme) => (
@@ -341,7 +457,7 @@ const DesignStep = ({ data, basicInfo, onUpdate }) => {
                                                 width: 20,
                                                 height: 20,
                                                 borderRadius: 1,
-                                                background: `linear-gradient(45deg, ${scheme.primary}, ${scheme.secondary})`
+                                                background: `linear-gradient(45deg, ${scheme.palette.primary}, ${scheme.palette.secondary})`
                                             }}
                                         />
                                         {scheme.label}
@@ -380,8 +496,8 @@ const DesignStep = ({ data, basicInfo, onUpdate }) => {
                             <CardContent>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                                     <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        {formData.aiGenerated ? <Sparkles size={20} /> : <Palette size={20} />}
-                                        {formData.aiGenerated ? 'AI-Generated' : 'Custom'} Color Palette
+                                        <Palette size={20} />
+                                        {formData.presetScheme ? `${formData.presetScheme} Scheme` : 'Custom'} Color Palette
                                     </Typography>
                                     <Chip
                                         icon={<Edit2 size={14} />}

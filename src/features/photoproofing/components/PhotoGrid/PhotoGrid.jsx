@@ -6,19 +6,15 @@ import EmptyState from './EmptyState';
 import FullScreenView from '../FullScreenView';
 import { usePhotoProofing } from '../../context/PhotoProofingContext';
 
-const images = [
-    ...Array.from({ length: 100 }, (_, i) => `https://picsum.photos/seed/${i + 1}/800/600`),
-];
-
 const PhotoGrid = () => {
-    const { albums, selectedAlbum, handleAddToAlbum, handleRemoveFromAlbum } = usePhotoProofing();
+    const { albums, selectedAlbum, images, handleAddToAlbum, handleRemoveFromAlbum } = usePhotoProofing();
     const [fullScreenOpen, setFullScreenOpen] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [searchParams, setSearchParams] = useSearchParams();
     const prevAlbumRef = useRef(selectedAlbum);
 
     const page = parseInt(searchParams.get('page') || '1', 10);
-    const itemsPerPage = 12;
+    const itemsPerPage = 8;
 
     // Reset page to 1 when album changes
     useEffect(() => {
@@ -72,14 +68,14 @@ const PhotoGrid = () => {
                         gap: 3,
                         mb: 4
                     }}>
-                        {paginatedImages.map((image) => {
-                            const originalIndex = images.indexOf(image);
+                        {paginatedImages.map((imageObj, i) => {
+                            const originalIndex = images.indexOf(imageObj);
                             const isLiked = (albums['favourites'] || []).includes(originalIndex);
 
                             return (
                                 <PhotoCard
                                     key={originalIndex}
-                                    image={image}
+                                    imageObj={imageObj}
                                     index={originalIndex}
                                     isLiked={isLiked}
                                     onOpenFullScreen={handleOpenFullScreen}

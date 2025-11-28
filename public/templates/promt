@@ -1,0 +1,3 @@
+this is a template data for creating a portfoliwebsite. create single page web app based on the data above this data will be avialble as window.data and create a modern beautiful website
+
+dont hardcord any color add design.customColors to css variable from data  and use that so that if the data change color can also changed also keep in mind to keep mobile responsiveness

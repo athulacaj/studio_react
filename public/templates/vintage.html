@@ -1,529 +1,467 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-    <!-- Importing Fonts for Vintage Feel -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    <title>Portfolio Loading...</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Using Inter (sans) and Playfair Display (serif) for modern look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        // TAILWIND CONFIG: Extend colors to use CSS variables
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    // Map custom names to CSS variables
+                    colors: {
+                        custom: {
+                            bg: 'var(--bg-color)',
+                            text: 'var(--text-color)',
+                            primary: 'var(--primary-color)',
+                            secondary: 'var(--secondary-color)',
+                            accent: 'var(--accent-color)',
+                            // Used for borders, subtle highlights, etc.
+                            subtle: 'var(--text-color)',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
-        /* CSS Variables - Values will be injected by JS */
+        /* CSS Variable Definitions (Default fallbacks) */
         :root {
-            --primary: #000;
-            --secondary: #000;
-            --accent: #000;
-            --background: #fff;
-            --text: #000;
+            --bg-color: #0a0a0a;
+            --text-color: #ffffff;
+            --primary-color: #3b82f6;
+            --secondary-color: #ec4899;
+            --accent-color: #1f2937;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        /* Base styles using CSS variables */
         body {
-            background-color: var(--background);
-            color: var(--text);
-            font-family: 'Lato', sans-serif;
-            line-height: 1.6;
-            overflow-x: hidden;
+            background-color: var(--bg-color);
+            color: var(--text-color);
         }
 
-        h1, h2, h3, h4 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
+        /* Custom Scrollbar (Subtle) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
         }
 
-        /* --- Navigation --- */
-        nav {
-            padding: 2rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            background-color: var(--background);
-            z-index: 100;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+        /* Mobile-first Masonry Grid */
+        .masonry-grid {
+            column-count: 1; /* Default for mobile */
+            column-gap: 1.5rem;
         }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            font-family: 'Playfair Display', serif;
-            color: var(--primary);
-            text-decoration: none;
-            letter-spacing: 1px;
-        }
-
-        .nav-links a {
-            margin-left: 2rem;
-            text-decoration: none;
-            color: var(--text);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--secondary);
-        }
-
-        /* --- Hero Section --- */
-        #hero {
-            height: 80vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0 20px;
-            background-image: linear-gradient(to bottom, rgba(253, 251, 246, 0.8), rgba(253, 251, 246, 1)), url('https://images.unsplash.com/photo-1519741497674-611481863552?w=1600');
-            background-size: cover;
-            background-position: center;
-        }
-
-        #hero h1 {
-            font-size: 3.5rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
-
-        #hero p {
-            font-size: 1.2rem;
-            font-style: italic;
-            color: var(--text);
-            max-width: 600px;
-        }
-
-        .cta-btn {
-            margin-top: 2rem;
-            padding: 12px 30px;
-            background-color: var(--accent);
-            color: white;
-            text-decoration: none;
-            border-radius: 2px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.8rem;
-            transition: transform 0.3s;
-        }
-
-        .cta-btn:hover {
-            transform: translateY(-3px);
-        }
-
-        /* --- About Section --- */
-        .section {
-            padding: 5rem 10%;
-        }
-
-        .about-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: start;
-        }
-
-        .section-title {
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-            color: var(--primary);
-            position: relative;
-            display: inline-block;
-        }
-
-        .section-title::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: -10px;
-            width: 60px;
-            height: 3px;
-            background-color: var(--secondary);
-        }
-
-        .bio-text {
-            white-space: pre-line; /* Preserves JSON newlines */
-            font-size: 1.1rem;
-            color: var(--text);
-            opacity: 0.9;
-        }
-
-        .achievements-box {
-            background-color: rgba(0,0,0,0.03);
-            padding: 2rem;
-            border-left: 4px solid var(--secondary);
-        }
-
-        .achievements-box h3 {
-            margin-bottom: 1rem;
-        }
-
-        .achievements-list, .services-list {
-            list-style: none;
-        }
-
-        .achievements-list li, .services-list li {
-            margin-bottom: 10px;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .achievements-list li::before, .services-list li::before {
-            content: '•';
-            color: var(--accent);
-            position: absolute;
-            left: 0;
-        }
-
-        /* --- Gallery Section --- */
-        #gallery {
-            background-color: white; /* Slight contrast */
-        }
-
-        .filter-container {
-            margin-bottom: 3rem;
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            background: none;
-            border: none;
-            font-family: 'Lato', sans-serif;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            color: var(--text);
-            padding-bottom: 5px;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .filter-btn:hover, .filter-btn.active {
-            color: var(--primary);
-            border-color: var(--secondary);
-        }
-
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
-        }
-
-        .gallery-item {
-            position: relative;
-            height: 400px;
-            overflow: hidden;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .gallery-item:hover img {
-            transform: scale(1.05);
-        }
-
-        .gallery-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(to top, rgba(62, 39, 35, 0.9), transparent);
-            padding: 20px;
-            color: white;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
-        }
-
-        .gallery-item:hover .gallery-overlay {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .gallery-category {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--secondary);
-        }
-
-        .gallery-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.4rem;
-            margin: 5px 0;
-        }
-
-        /* --- Services --- */
-        .services-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2rem;
-            justify-content: center;
+        @media (min-width: 640px) { .masonry-grid { column-count: 2; } } /* sm: */
+        @media (min-width: 1024px) { .masonry-grid { column-count: 3; } } /* lg: */
+        
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
+            transition: opacity 0.5s ease-in-out;
         }
         
-        .service-card {
-            flex: 1 1 300px;
-            border: 1px solid rgba(0,0,0,0.1);
-            padding: 2rem;
-            text-align: center;
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
         }
 
-        /* --- Footer --- */
-        footer {
-            background-color: var(--text);
-            color: var(--background);
-            padding: 4rem 10%;
-            text-align: center;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 3rem;
-            margin-bottom: 3rem;
-            text-align: left;
-        }
-
-        .footer-col h4 {
-            color: var(--secondary);
-            margin-bottom: 1.5rem;
-            font-size: 1.2rem;
-        }
-
-        .footer-col p, .footer-col a {
-            color: #ccc;
-            margin-bottom: 0.5rem;
-            display: block;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-col a:hover {
-            color: var(--secondary);
-        }
-
-        .copyright {
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 2rem;
-            font-size: 0.9rem;
-            color: #888;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            #hero h1 { font-size: 2.5rem; }
-            .about-grid { grid-template-columns: 1fr; }
-            .nav-links { display: none; } /* Simplified for demo */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body>
+<body class="antialiased opacity-0 transition-opacity duration-500 font-sans" id="main-body">
 
-    <nav>
-        <a href="#" class="logo" id="nav-logo"></a>
-        <div class="nav-links">
-            <a href="#about">About</a>
-            <a href="#gallery">Portfolio</a>
-            <a href="#services">Services</a>
-            <a href="#contact">Contact</a>
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 backdrop-blur-sm bg-custom-bg/95 border-b border-custom-subtle/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0">
+                    <a href="#" id="nav-logo" class="font-serif text-2xl font-bold tracking-wider text-custom-primary"></a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#about" class="hover:text-custom-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">About</a>
+                        <a href="#services" class="hover:text-custom-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Services</a>
+                        <a href="#gallery" class="hover:text-custom-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Portfolio</a>
+                        <a href="#contact" class="px-5 py-2 rounded-full bg-custom-primary text-custom-text hover:opacity-90 transition-all text-sm font-medium shadow-lg shadow-custom-primary/30">Contact</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <header id="hero">
-        <h1 id="hero-name"></h1>
-        <p id="hero-tagline"></p>
-        <a href="#contact" class="cta-btn">Book a Session</a>
-    </header>
+    <!-- Hero Section -->
+    <section id="hero" class="relative min-h-screen flex items-center justify-center pt-24 overflow-hidden">
+        <!-- Background decorative blob (uses dynamic secondary/primary colors) -->
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-custom-primary rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse hidden lg:block"></div>
+        <div class="absolute top-1/3 right-1/4 w-96 h-96 bg-custom-secondary rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-2000 hidden lg:block"></div>
 
-    <section id="about" class="section">
-        <div class="about-grid">
-            <div>
-                <h2 class="section-title">About Me</h2>
-                <div id="about-content" class="bio-text"></div>
-            </div>
-            <div class="achievements-box">
-                <h3>Achievements</h3>
-                <ul id="achievements-list" class="achievements-list"></ul>
+        <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10 fade-in">
+            <h2 id="hero-welcome" class="text-custom-primary font-semibold tracking-widest uppercase text-sm mb-4">Award-winning Photography</h2>
+            <h1 id="hero-name" class="font-serif text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight text-custom-text"></h1>
+            <p id="hero-tagline" class="text-lg md:text-xl text-custom-subtle/80 max-w-2xl mx-auto mb-10 font-light"></p>
+            <div class="flex justify-center gap-4">
+                <a href="#gallery" class="px-8 py-4 border border-custom-primary text-custom-primary hover:bg-custom-primary hover:text-custom-bg transition-all rounded-lg uppercase tracking-widest text-sm shadow-md shadow-custom-primary/20">View Portfolio</a>
             </div>
         </div>
     </section>
 
-    <section id="gallery" class="section">
-        <h2 class="section-title" style="margin-bottom: 1rem;">Selected Works</h2>
-        <div id="filter-container" class="filter-container">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <!-- Categories injected here -->
-        </div>
-        <div id="gallery-grid" class="gallery-grid">
-            <!-- Images injected here -->
+    <!-- About Section -->
+    <section id="about" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <div class="order-2 lg:order-1 relative p-4">
+                    <div class="absolute inset-0 border-2 border-custom-primary translate-x-3 translate-y-3 rounded-xl hidden sm:block"></div>
+                    <!-- Placeholder image with dynamic styling -->
+                    <img id="about-image" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800" alt="Profile of Alex Morgan" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/800x600/141519/f1f5f9?text=Profile+Image'"
+                         class="relative rounded-xl shadow-2xl w-full object-cover h-[450px] sm:h-[600px] grayscale hover:grayscale-0 transition-all duration-500 border border-custom-accent">
+                </div>
+                <div class="order-1 lg:order-2">
+                    <h2 class="font-serif text-4xl md:text-5xl font-bold mb-8">The Artist Behind the Lens</h2>
+                    <div id="about-text" class="text-custom-subtle leading-relaxed mb-8 whitespace-pre-line"></div>
+                    
+                    <div class="bg-custom-accent p-6 rounded-xl border border-custom-subtle/10">
+                        <h3 class="text-xl font-semibold mb-4 text-custom-primary">Key Achievements</h3>
+                        <ul id="achievements-list" class="space-y-3 text-custom-subtle"></ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <section id="services" class="section" style="background-color: rgba(0,0,0,0.02);">
-        <h2 class="section-title">Services</h2>
-        <div id="services-content" class="bio-text" style="margin-top: 1rem;">
-            <ul id="services-list" class="services-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;"></ul>
+    <!-- Services Section -->
+    <section id="services" class="py-24 bg-custom-accent/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="font-serif text-4xl font-bold mb-4 text-custom-text">Professional Services</h2>
+                <div class="h-1 w-20 bg-custom-primary mx-auto rounded-full"></div>
+            </div>
+            <div id="services-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Services injected here -->
+            </div>
         </div>
     </section>
 
-    <footer id="contact">
-        <div class="footer-grid">
-            <div class="footer-col">
-                <h4 id="footer-name"></h4>
-                <p id="footer-bio"></p>
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12">
+                <div>
+                    <h2 class="font-serif text-4xl font-bold mb-2 text-custom-text">Selected Works</h2>
+                    <p class="text-custom-subtle">A collection of moments frozen in time</p>
+                </div>
+                <!-- Filters -->
+                <div id="gallery-filters" class="flex flex-wrap gap-4 mt-6 md:mt-0 pb-2 border-b border-custom-subtle/10 md:border-none w-full md:w-auto">
+                    <button class="filter-btn active text-custom-primary border-b-2 border-custom-primary pb-1 font-semibold text-sm transition-colors" data-filter="all">All</button>
+                    <!-- Dynamic filters injected here -->
+                </div>
             </div>
-            <div class="footer-col">
-                <h4>Contact</h4>
-                <p id="contact-phone"></p>
-                <p><a id="contact-email" href=""></a></p>
-                <p id="contact-location"></p>
-            </div>
-            <div class="footer-col">
-                <h4>Styles</h4>
-                <div id="footer-styles"></div>
+
+            <!-- Masonry Grid -->
+            <div id="gallery-grid" class="masonry-grid">
+                <!-- Images injected here -->
             </div>
         </div>
-        <div class="copyright">
-            &copy; <span id="year"></span> <span id="copyright-name"></span>. All rights reserved.
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 bg-custom-accent">
+        <div class="max-w-3xl mx-auto px-4 text-center">
+            <h2 class="font-serif text-4xl font-bold mb-8 text-custom-text">Let's Create Together</h2>
+            <p class="text-custom-subtle mb-12 text-lg">Ready to capture your special moments? Get in touch to discuss your vision.</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+                <div class="p-6 border border-custom-subtle/10 rounded-xl bg-custom-bg/50">
+                    <i class="fas fa-envelope text-custom-primary text-2xl mb-4"></i>
+                    <a id="contact-email-link" href="#" class="text-sm block hover:text-custom-primary transition-colors">
+                        <span id="contact-email"></span>
+                    </a>
+                </div>
+                <div class="p-6 border border-custom-subtle/10 rounded-xl bg-custom-bg/50">
+                    <i class="fas fa-phone text-custom-primary text-2xl mb-4"></i>
+                    <p id="contact-phone" class="text-sm"></p>
+                </div>
+                <div class="p-6 border border-custom-subtle/10 rounded-xl bg-custom-bg/50">
+                    <i class="fas fa-location-dot text-custom-primary text-2xl mb-4"></i>
+                    <p id="contact-location" class="text-sm"></p>
+                </div>
+            </div>
+
+            <a id="contact-cta" href="#" class="inline-block bg-custom-primary text-custom-text px-10 py-4 rounded-full font-semibold hover:opacity-90 transition-transform hover:-translate-y-1 shadow-xl shadow-custom-primary/30">
+                Book a Consultation
+            </a>
         </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 border-t border-custom-subtle/10 text-center text-custom-subtle text-sm bg-custom-accent/20">
+        <p>&copy; 2025 <span id="footer-name"></span>. All rights reserved.</p>
     </footer>
 
     <script>
-        // --- DATA INJECTION ---
-   
-        // --- RENDER LOGIC ---
+        // ---------------------------------------------------------
+        // 1. DATA INJECTION
+        // ---------------------------------------------------------
+        
+        // This is the user provided JSON data (Available as window.data)
+        window.data = {
+            "id": "layxml9UiSRQRcuk0rTX7WeSy0A3",
+            "content": {
+                "bio": "Award-winning photographer specializing in wedding and portrait photography with over 8 years of experience creating timeless memories.",
+                "achievements": "• Winner of Best Wedding Photographer 2023\n• Featured in Photography Magazine\n• Over 200 weddings captured\n• Published in National Geographic",
+                "metaDescription": "Alex Morgan - Professional Wedding & Portrait Photographer in San Francisco. Award-winning photography services with 8 years of experience.",
+                "aboutSection": "Hello! I'm Alex Morgan, a passionate photographer based in San Francisco. My journey into photography began 8 years ago, and since then, I've had the privilege of capturing countless beautiful moments.\n\nI specialize in wedding and portrait photography, but I also love exploring landscape photography during my travels. My approach is to blend artistic vision with authentic emotion, creating images that tell your unique story.\n\nWhen I'm not behind the camera, you can find me exploring new locations, experimenting with new techniques, or teaching photography workshops to aspiring photographers.",
+                "services": "• Wedding Photography\n• Engagement Sessions\n• Portrait Photography\n• Family Photos\n• Event Coverage\n• Photo Editing & Retouching",
+                "tagline": "Capturing Life's Beautiful Moments Through My Lens"
+            },
+            "published": true,
+            "updatedAt": "2025-11-26T16:20:20.730Z",
+            "design": {
+                "colorScheme": "dark",
+                "templateName": "modern",
+                "customColors": {
+                    "extra1": "#625be6",
+                    "secondary": "#a855f7",
+                    "extra2": "#7c3aed",
+                    "background": "#0f0e10",
+                    "text": "#f1f5f9",
+                    "accent": "#141519",
+                    "extra3": "#c7d2fe",
+                    "primary": "#6366f1"
+                },
+                "aiGenerated": false,
+                "presetScheme": null,
+                "mood": "Modern",
+                "layout": "masonry"
+            },
+            "gallery": [
+                {
+                    "url": "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800",
+                    "title": "Sunset Wedding Ceremony",
+                    "uploadedAt": "2025-11-25T21:11:53.925Z",
+                    "fileName": "demo_wedding_1.jpg",
+                    "category": "Wedding",
+                    "description": "Beautiful outdoor wedding at golden hour"
+                },
+                {
+                    "category": "Portrait",
+                    "url": "https://images.unsplash.com/photo-1519741497674-611481863552?w=800",
+                    "title": "Natural Light Portrait",
+                    "description": "Studio portrait with natural lighting",
+                    "uploadedAt": "2025-11-25T21:11:53.925Z",
+                    "fileName": "demo_portrait_1.jpg"
+                },
+                {
+                    "description": "Breathtaking mountain landscape at sunrise",
+                    "title": "Mountain Vista",
+                    "fileName": "demo_landscape_1.jpg",
+                    "category": "Landscape",
+                    "url": "https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800",
+                    "uploadedAt": "2025-11-25T21:11:53.925Z"
+                },
+                {
+                    "description": "Romantic first dance moment",
+                    "category": "Wedding",
+                    "uploadedAt": "2025-11-25T21:11:53.925Z",
+                    "url": "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800",
+                    "fileName": "demo_wedding_2.jpg",
+                    "title": "First Dance"
+                },
+                {
+                    "title": "Candid Moment",
+                    "description": "Genuine smile captured in the moment",
+                    "fileName": "demo_portrait_2.jpg",
+                    "uploadedAt": "2025-11-25T21:11:53.925Z",
+                    "url": "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800",
+                    "category": "Portrait"
+                },
+                {
+                    "description": "Dramatic coastal landscape",
+                    "category": "Landscape",
+                    "title": "Coastal Sunset",
+                    "fileName": "demo_landscape_2.jpg",
+                    "uploadedAt": "2025-11-25T21:11:53.925Z",
+                    "url": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800"
+                }
+            ],
+            "userId": "layxml9UiSRQRcuk0rTX7WeSy0A3",
+            "basicInfo": {
+                "name": "Athul Jacob",
+                "experience": "8",
+                "location": "San Francisco, CA",
+                "phone": "+1 (555) 123-4567",
+                "domain": "studio",
+                "website": "https://alexmorgan.photography",
+                "tagline": "Capturing Life's Beautiful Moments Through My Lens",
+                "email": "alex.morgan@example.com",
+                "photographyStyles": [
+                    "Wedding",
+                    "Portrait",
+                    "Landscape"
+                ]
+            },
+            "createdAt": "2025-11-25T17:00:25.524Z"
+        };
 
-        function renderPortfolio() {
-            // 1. Apply Design Colors
-            const colors = portfolioData.design.customColors;
+        // ---------------------------------------------------------
+        // 2. APP LOGIC (Dynamically setting colors and content)
+        // ---------------------------------------------------------
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const d = window.data;
+            
+            // --- 1. SET CSS VARIABLES DYNAMICALLY ---
             const root = document.documentElement;
-            root.style.setProperty('--primary', colors.primary);
-            root.style.setProperty('--secondary', colors.secondary);
-            root.style.setProperty('--accent', colors.accent);
-            root.style.setProperty('--background', colors.background);
-            root.style.setProperty('--text', colors.text);
-
-            // 2. Render Basic Info & Header
-            document.title = `${portfolioData.basicInfo.name} | Portfolio`;
-            document.getElementById('nav-logo').textContent = portfolioData.basicInfo.name.toUpperCase();
-            document.getElementById('hero-name').textContent = portfolioData.basicInfo.name;
-            document.getElementById('hero-tagline').textContent = portfolioData.content.tagline;
+            const colors = d.design.customColors;
             
-            // 3. Render About Content
-            document.getElementById('about-content').textContent = portfolioData.content.aboutSection;
+            // Map JSON colors to CSS variables
+            root.style.setProperty('--bg-color', colors.background);
+            root.style.setProperty('--text-color', colors.text);
+            root.style.setProperty('--primary-color', colors.primary);
+            root.style.setProperty('--secondary-color', colors.secondary);
+            root.style.setProperty('--accent-color', colors.accent); // Used for card/alternate section background
+            root.style.setProperty('--subtle-color', colors.text); // Used for subtle text/border color
             
-            // Helper to process bullet points string into LI elements
-            const renderList = (text, elementId) => {
-                const listContainer = document.getElementById(elementId);
-                const items = text.split('\n');
-                items.forEach(item => {
-                    if(item.trim()) {
-                        const li = document.createElement('li');
-                        li.textContent = item.replace(/•\s*/g, ''); // Remove bullet char if present
-                        listContainer.appendChild(li);
-                    }
-                });
-            };
+            // Set Page Title
+            document.title = `${d.basicInfo.name} | Portfolio`;
 
-            renderList(portfolioData.content.achievements, 'achievements-list');
-            renderList(portfolioData.content.services, 'services-list');
+            // --- 2. POPULATE CONTENT ---
 
-            // 4. Render Gallery & Filters
-            const galleryGrid = document.getElementById('gallery-grid');
-            const filterContainer = document.getElementById('filter-container');
-            const categories = new Set();
+            // Header / Hero
+            document.getElementById('nav-logo').textContent = d.basicInfo.name;
+            document.getElementById('hero-name').textContent = d.basicInfo.name;
+            document.getElementById('hero-tagline').textContent = d.content.tagline;
 
-            // Create Image Cards
-            portfolioData.gallery.forEach(img => {
-                categories.add(img.category);
+            // About
+            document.getElementById('about-text').textContent = d.content.aboutSection.replace("Alex Morgan", d.basicInfo.name);
 
-                const card = document.createElement('div');
-                card.className = `gallery-item ${img.category}`;
-                card.innerHTML = `
-                    <img src="${img.url}" alt="${img.description}">
-                    <div class="gallery-overlay">
-                        <div class="gallery-category">${img.category}</div>
-                        <h3 class="gallery-title">${img.title}</h3>
-                        <p>${img.description}</p>
-                    </div>
-                `;
-                galleryGrid.appendChild(card);
+            const achievementsList = document.getElementById('achievements-list');
+            d.content.achievements.split('\n').forEach(item => {
+                if(item.trim()) {
+                    const li = document.createElement('li');
+                    li.className = "flex items-start text-custom-subtle/90";
+                    li.innerHTML = `<span class="text-custom-primary mr-2 font-bold">»</span> ${item.replace('•', '').trim()}`;
+                    achievementsList.appendChild(li);
+                }
             });
 
-            // Create Filters
-            categories.forEach(cat => {
+            // Services (Uses dynamic custom-accent for background)
+            const servicesContainer = document.getElementById('services-grid');
+            const icons = ['camera', 'heart', 'user', 'users', 'star', 'wand-magic-sparkles']; 
+            
+            d.content.services.split('\n').forEach((service, index) => {
+                if(service.trim()) {
+                    const cleanService = service.replace('•', '').trim();
+                    const div = document.createElement('div');
+                    // Styling uses bg-custom-accent/20 (lighter than section bg) and text-custom-subtle
+                    div.className = "bg-custom-accent/20 border border-custom-subtle/10 p-6 sm:p-8 rounded-xl hover:border-custom-primary transition-all group shadow-md";
+                    div.innerHTML = `
+                        <div class="w-12 h-12 bg-custom-primary/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-custom-primary transition-colors">
+                            <i class="fas fa-${icons[index % icons.length]} text-custom-primary text-xl group-hover:text-custom-text"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-custom-text">${cleanService}</h3>
+                        <p class="text-custom-subtle text-sm">Professional ${cleanService.toLowerCase()} tailored to your specific needs.</p>
+                    `;
+                    servicesContainer.appendChild(div);
+                }
+            });
+
+            // Gallery & Filters
+            const galleryGrid = document.getElementById('gallery-grid');
+            const filterContainer = document.getElementById('gallery-filters');
+            const uniqueCategories = [...new Set(d.gallery.map(item => item.category))];
+
+            // Create Filter Buttons
+            uniqueCategories.forEach(cat => {
                 const btn = document.createElement('button');
-                btn.className = 'filter-btn';
+                btn.className = "filter-btn text-custom-subtle hover:text-custom-primary transition-colors pb-1 font-medium text-sm";
                 btn.textContent = cat;
-                btn.onclick = () => filterGallery(cat, btn);
+                btn.dataset.filter = cat;
                 filterContainer.appendChild(btn);
             });
 
-            // 5. Render Footer/Contact
-            document.getElementById('footer-name').textContent = portfolioData.basicInfo.name;
-            document.getElementById('footer-bio').textContent = portfolioData.content.bio;
-            document.getElementById('contact-phone').textContent = portfolioData.basicInfo.phone;
-            
-            const emailLink = document.getElementById('contact-email');
-            emailLink.textContent = portfolioData.basicInfo.email;
-            emailLink.href = `mailto:${portfolioData.basicInfo.email}`;
-            
-            document.getElementById('contact-location').textContent = portfolioData.basicInfo.location;
-            
-            // Styles list
-            const stylesContainer = document.getElementById('footer-styles');
-            portfolioData.basicInfo.photographyStyles.forEach(style => {
-                const p = document.createElement('p');
-                p.textContent = style;
-                stylesContainer.appendChild(p);
+            // Render Images
+            d.gallery.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `masonry-item group relative overflow-hidden rounded-xl cursor-pointer shadow-lg`;
+                div.dataset.category = item.category;
+                div.innerHTML = `
+                    <img src="${item.url}" alt="${item.title}" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/400x600/141519/f1f5f9?text=${item.category}'"
+                         class="w-full h-auto transform transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-custom-bg/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                        <span class="text-custom-primary text-xs uppercase tracking-wider font-bold mb-1">${item.category}</span>
+                        <h3 class="text-custom-text text-lg font-bold">${item.title}</h3>
+                        <p class="text-custom-subtle/90 text-xs mt-1">${item.description}</p>
+                    </div>
+                `;
+                galleryGrid.appendChild(div);
             });
 
-            document.getElementById('year').textContent = new Date().getFullYear();
-            document.getElementById('copyright-name').textContent = portfolioData.basicInfo.name;
-        }
+            // Filter Logic
+            const buttons = document.querySelectorAll('.filter-btn');
+            const items = document.querySelectorAll('.masonry-item');
 
-        // --- FILTER FUNCTIONALITY ---
-        function filterGallery(category, clickedBtn) {
-            // Update buttons state
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            clickedBtn.classList.add('active');
+            const filterGallery = (filter) => {
+                items.forEach(item => {
+                    const matchesFilter = filter === 'all' || item.dataset.category === filter;
+                    item.style.display = matchesFilter ? 'block' : 'none';
+                });
+            };
 
-            // Filter items
-            const items = document.querySelectorAll('.gallery-item');
-            items.forEach(item => {
-                if (category === 'all' || item.classList.contains(category)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update Active State
+                    buttons.forEach(b => {
+                        b.classList.remove('text-custom-primary', 'border-b-2', 'border-custom-primary');
+                        b.classList.add('text-custom-subtle');
+                    });
+                    btn.classList.remove('text-custom-subtle');
+                    btn.classList.add('text-custom-primary', 'border-b-2', 'border-custom-primary');
+                    filterGallery(btn.dataset.filter);
+                });
             });
-        }
 
-        // Setup "All" button
-        document.querySelector('.filter-btn[data-filter="all"]').onclick = function() {
-            filterGallery('all', this);
-        };
+            // Initialize filter to 'All'
+            document.querySelector('.filter-btn[data-filter="all"]').click();
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', renderPortfolio);
 
+            // Contact
+            document.getElementById('contact-email').textContent = d.basicInfo.email;
+            document.getElementById('contact-email-link').href = `mailto:${d.basicInfo.email}`;
+            
+            document.getElementById('contact-phone').textContent = d.basicInfo.phone;
+            
+            document.getElementById('contact-location').textContent = d.basicInfo.location;
+            
+            document.getElementById('contact-cta').href = `mailto:${d.basicInfo.email}`;
+
+            document.getElementById('footer-name').textContent = d.basicInfo.name;
+
+            // Final Reveal
+            document.getElementById('main-body').classList.remove('opacity-0');
+        });
     </script>
 </body>
 </html>

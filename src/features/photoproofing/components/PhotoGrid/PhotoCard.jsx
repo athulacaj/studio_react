@@ -2,9 +2,10 @@ import React from 'react';
 import { Card, CardMedia, Typography, Box, IconButton, Menu, MenuItem, Fade, Tooltip } from '@mui/material';
 import { DeleteOutline, PlaylistAdd, FolderOpen } from '@mui/icons-material';
 
-const PhotoCard = ({ image, index, isLiked, onOpenFullScreen, selectedAlbum, albums, onAddToAlbum, onRemoveFromAlbum }) => {
+const PhotoCard = ({ imageObj, index, isLiked, onOpenFullScreen, selectedAlbum, albums, onAddToAlbum, onRemoveFromAlbum }) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
+    const image = imageObj.src || imageObj.thumbnailLink;
 
     const handleMenuOpen = (event) => {
         event.stopPropagation();

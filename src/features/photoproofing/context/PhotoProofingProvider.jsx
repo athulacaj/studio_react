@@ -8,6 +8,7 @@ export const PhotoProofingProvider = ({ children }) => {
         "recent": []
     });
     const [selectedAlbum, setSelectedAlbum] = useState('all');
+    const [images, setImages] = useState([]);
 
     const handleAlbumChange = (event) => {
         setSelectedAlbum(event.target.value);
@@ -34,8 +35,10 @@ export const PhotoProofingProvider = ({ children }) => {
     const value = {
         albums,
         selectedAlbum,
+        images,
         setAlbums,
         setSelectedAlbum,
+        setImages,
         handleAlbumChange,
         handleAddToAlbum,
         handleRemoveFromAlbum

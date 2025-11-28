@@ -493,7 +493,7 @@
 
         /* --- Footer --- */
         footer {
-            background-color: var(--primary);
+            background-color: var(--extra1);
             color: var(--background); /* Invert for footer */
             padding: 80px 0 40px;
         }
@@ -563,7 +563,7 @@
                 <a href="#about">About</a>
                 <a href="#gallery">Portfolio</a>
                 <a href="#services">Services</a>
-                <a href="#contact" style="color: var(--accent);">Contact</a>
+                <a href="#contact">Contact</a>
             </div>
         </div>
     </nav>
@@ -744,6 +744,9 @@
             root.style.setProperty('--accent', c.accent);
             root.style.setProperty('--background', c.background);
             root.style.setProperty('--text', c.text);
+            root.style.setProperty('--extra1', c.extra1);
+            root.style.setProperty('--extra2', c.extra2);
+            root.style.setProperty('--extra3', c.extra3);
 
             // Set RGB Variables for Opacity Control
             // This is crucial for "dependent on data" overlays
