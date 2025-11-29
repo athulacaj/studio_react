@@ -9,7 +9,7 @@ import PhotoProofingPage from '../../photoproofing/pages/PhotoProofingPage';
 
 // Wrapper component to use the context
 const ProjectViewer = ({ projectId }) => {
-    const { setImages, setFolders, currentFolderId, setCurrentFolderId, setBreadcrumbs } = usePhotoProofing();
+    const { setImages, setFolders, currentFolderId, setCurrentFolderId, setBreadcrumbs, breadcrumbs } = usePhotoProofing();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [project, setProject] = useState(null);
@@ -66,7 +66,7 @@ const ProjectViewer = ({ projectId }) => {
             setLoading(true);
             try {
                 const [imagesData, foldersData] = await Promise.all([
-                    fetchDriveImages(currentFolderId),
+                    fetchDriveImages(currentFolderId, breadcrumbs),
                     fetchDriveFolders(currentFolderId)
                 ]);
 
@@ -84,7 +84,7 @@ const ProjectViewer = ({ projectId }) => {
         };
 
         fetchContent();
-    }, [currentFolderId, setImages, setFolders]);
+    }, [currentFolderId, setImages, setFolders, breadcrumbs]);
 
     if (loading) {
         return (

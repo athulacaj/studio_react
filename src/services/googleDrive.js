@@ -18,7 +18,7 @@ export const extractFolderId = (url) => {
     return null;
 };
 
-export const fetchDriveImages = async (folderId) => {
+export const fetchDriveImages = async (folderId, folderPath = []) => {
     if (!folderId) return [];
 
     try {
@@ -44,7 +44,9 @@ export const fetchDriveImages = async (folderId) => {
             return {
                 ...file,
                 src: src,
-                thumbnailLink: file.thumbnailLink // Keep original just in case
+                thumbnailLink: file.thumbnailLink, // Keep original just in case
+                folderId: folderId,
+                folderPath: folderPath
             };
         });
     } catch (error) {
