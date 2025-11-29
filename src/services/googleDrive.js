@@ -1,5 +1,5 @@
 
-const API_KEY = 'AIzaSyAY1UcT-6e67iALXlIXuYbOXPRshJ6ph48';
+const DRIVE_API_KEY = import.meta.env.VITE_DRIVE_API_KEY;
 
 export const extractFolderId = (url) => {
     if (!url) return null;
@@ -24,7 +24,7 @@ export const fetchDriveImages = async (folderId) => {
     try {
         // Query to list files in the folder that are images
         const query = `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`;
-        const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name,thumbnailLink,webContentLink,webViewLink)&key=${API_KEY}`;
+        const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name,thumbnailLink,webContentLink,webViewLink)&key=${DRIVE_API_KEY}`;
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -49,6 +49,27 @@ export const fetchDriveImages = async (folderId) => {
         });
     } catch (error) {
         console.error("Error fetching Drive images:", error);
+        throw error;
+    }
+};
+
+export const fetchDriveFolders = async (folderId) => {
+    if (!folderId) return [];
+
+    try {
+        // Query to list folders in the parent folder
+        const query = `'${folderId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
+        const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name)&key=${DRIVE_API_KEY}`;
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Google Drive API error: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data.files;
+    } catch (error) {
+        console.error("Error fetching Drive folders:", error);
         throw error;
     }
 };

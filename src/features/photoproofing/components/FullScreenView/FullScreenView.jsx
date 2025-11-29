@@ -46,7 +46,11 @@ const FullScreenView = ({
         resetZoom
     );
 
-    const { slideshowPlaying, slideshowSpeed, setSlideshowSpeed, toggleSlideshow } = useSlideshow(handleNext);
+    const { slideshowPlaying, slideshowSpeed, setSlideshowSpeed, toggleSlideshow } = useSlideshow(
+        handleNext,
+        currentIndex,
+        images.length
+    );
 
     // Check if current image is in the selected album
     const isImageInAlbum = (albums[selectedAlbum] || []).includes(currentIndex);
@@ -158,7 +162,7 @@ const FullScreenView = ({
                     {/* Image Viewer with Zoom */}
                     <ImageViewer
                         transformRef={transformComponentRef}
-                        image={images[currentIndex]}
+                        image={images[currentIndex].src}
                         imageIndex={currentIndex}
                         onImageClick={handleImageClick}
                     />

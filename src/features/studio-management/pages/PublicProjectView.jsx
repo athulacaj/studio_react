@@ -3,13 +3,13 @@ import { useParams } from 'react-router-dom';
 import { Box, Typography, CircularProgress, Container, Alert } from '@mui/material';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../config/firebase';
-import { fetchDriveImages, extractFolderId } from '../../../services/googleDrive';
+import { fetchDriveImages, extractFolderId, fetchDriveFolders } from '../../../services/googleDrive';
 import { PhotoProofingProvider, usePhotoProofing } from '../../photoproofing';
 import PhotoProofingPage from '../../photoproofing/pages/PhotoProofingPage';
 
 // Wrapper component to use the context
 const ProjectViewer = ({ projectId }) => {
-    const { setImages } = usePhotoProofing();
+    const { setImages, setFolders, currentFolderId, setCurrentFolderId, setBreadcrumbs } = usePhotoProofing();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [project, setProject] = useState(null);
@@ -28,24 +28,24 @@ const ProjectViewer = ({ projectId }) => {
                 const projectData = projectSnap.data();
                 setProject(projectData);
 
-                // 2. Fetch Images
-                let imageFiles = [];
+                // 2. Set Initial Folder ID
                 if (projectData.source === 'google_drive' && projectData.driveUrl) {
                     const folderId = extractFolderId(projectData.driveUrl);
                     if (folderId) {
-                        imageFiles = await fetchDriveImages(folderId);
+                        // Only set if not already set (to avoid overriding navigation if this effect re-runs)
+                        // But since this is mount, it should be fine.
+                        // However, we need to check if currentFolderId is null.
+                        // Actually, since we want to trigger the fetch effect, we should set it.
+                        // But we need to be careful not to cause loops if loadProject runs again.
+                        // Given the dependency array [projectId], it should only run once per project.
+                        setCurrentFolderId(folderId);
+
+                        // Set initial breadcrumb
+                        setBreadcrumbs([{ id: folderId, name: 'Home' }]);
                     } else {
                         console.warn('Could not extract folder ID from URL:', projectData.driveUrl);
                     }
-                } else if (projectData.source === 'google_photos') {
-                    // Placeholder for Google Photos integration
-                    // For now, maybe load some dummy images or show a message
-                    console.log('Google Photos source selected');
-                    // imageUrls = ...
                 }
-
-                // 3. Update Context
-                setImages(imageFiles);
 
             } catch (err) {
                 console.error("Error loading project:", err);
@@ -56,7 +56,35 @@ const ProjectViewer = ({ projectId }) => {
         };
 
         loadProject();
-    }, [projectId, setImages]);
+    }, [projectId, setCurrentFolderId, setBreadcrumbs]);
+
+    // Effect to fetch content when currentFolderId changes
+    useEffect(() => {
+        const fetchContent = async () => {
+            if (!currentFolderId) return;
+
+            setLoading(true);
+            try {
+                const [imagesData, foldersData] = await Promise.all([
+                    fetchDriveImages(currentFolderId),
+                    fetchDriveFolders(currentFolderId)
+                ]);
+
+                setImages(imagesData);
+                setFolders(foldersData);
+            } catch (err) {
+                console.error("Error fetching Drive content:", err);
+                // Don't block UI, just log error or show toast?
+                // For now, maybe just empty lists
+                setImages([]);
+                setFolders([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchContent();
+    }, [currentFolderId, setImages, setFolders]);
 
     if (loading) {
         return (

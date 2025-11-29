@@ -9,6 +9,9 @@ export const PhotoProofingProvider = ({ children }) => {
     });
     const [selectedAlbum, setSelectedAlbum] = useState('all');
     const [images, setImages] = useState([]);
+    const [folders, setFolders] = useState([]);
+    const [currentFolderId, setCurrentFolderId] = useState(null);
+    const [breadcrumbs, setBreadcrumbs] = useState([]);
 
     const handleAlbumChange = (event) => {
         setSelectedAlbum(event.target.value);
@@ -32,6 +35,23 @@ export const PhotoProofingProvider = ({ children }) => {
         }));
     };
 
+    const navigateToFolder = (folderId, folderName) => {
+        setCurrentFolderId(folderId);
+        if (folderId) {
+            setBreadcrumbs(prev => {
+                // Check if we are navigating back
+                const index = prev.findIndex(b => b.id === folderId);
+                if (index !== -1) {
+                    return prev.slice(0, index + 1);
+                }
+                return [...prev, { id: folderId, name: folderName }];
+            });
+        } else {
+            // Reset to root
+            setBreadcrumbs([]);
+        }
+    };
+
     const value = {
         albums,
         selectedAlbum,
@@ -41,7 +61,14 @@ export const PhotoProofingProvider = ({ children }) => {
         setImages,
         handleAlbumChange,
         handleAddToAlbum,
-        handleRemoveFromAlbum
+        handleRemoveFromAlbum,
+        folders,
+        setFolders,
+        currentFolderId,
+        setCurrentFolderId,
+        breadcrumbs,
+        setBreadcrumbs,
+        navigateToFolder
     };
 
     return (
