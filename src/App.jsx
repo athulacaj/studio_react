@@ -73,7 +73,7 @@ const AppContent = () => {
           <Route path="/portfolio-builder" element={<PortfolioBuilderPage />} />
           <Route path="/portfolio/:domain" element={<PortfolioViewerPage />} />
           <Route path="/studio" element={<StudioDashboard />} />
-          <Route path="/view/:projectId" element={<PublicProjectView />} />
+          <Route path="/view/:userId/:projectId" element={<PublicProjectView />} />
           <Route path="/about" element={<About />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

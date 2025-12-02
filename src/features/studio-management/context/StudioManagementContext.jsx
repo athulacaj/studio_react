@@ -20,8 +20,8 @@ export const StudioManagementProvider = ({ children }) => {
         setLoading(true);
         try {
             const q = query(
-                collection(db, 'projects'),
-                where('userId', '==', currentUser.uid)
+                collection(db, 'projects', currentUser.uid, 'projects'),
+                orderBy('createdAt', 'desc')
             );
             const querySnapshot = await getDocs(q);
             const projectsData = querySnapshot.docs.map(doc => ({
@@ -45,7 +45,7 @@ export const StudioManagementProvider = ({ children }) => {
         if (!currentUser) return;
         setLoading(true);
         try {
-            const docRef = await addDoc(collection(db, 'projects'), {
+            const docRef = await addDoc(collection(db, 'projects', currentUser.uid, 'projects'), {
                 ...projectData,
                 userId: currentUser.uid,
                 createdAt: serverTimestamp(),

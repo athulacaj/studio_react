@@ -12,14 +12,17 @@ import {
     Alert
 } from '@mui/material';
 import { useStudioManagement } from '../context/StudioManagementContext';
+import { useAuth } from '../../auth';
 import { Google as GoogleIcon, Cloud as CloudIcon, ContentCopy as CopyIcon } from '@mui/icons-material';
 
 const ProjectList = () => {
     const { projects } = useStudioManagement();
+    const { currentUser } = useAuth();
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     const handleCopyLink = (projectId) => {
-        const link = `${window.location.origin}/view/${projectId}`;
+        if (!currentUser) return;
+        const link = `${window.location.origin}/view/${currentUser.uid}/${projectId}`;
         navigator.clipboard.writeText(link);
         setSnackbarOpen(true);
     };

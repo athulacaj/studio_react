@@ -8,7 +8,7 @@ import { PhotoProofingProvider, usePhotoProofing } from '../../photoproofing';
 import PhotoProofingPage from '../../photoproofing/pages/PhotoProofingPage';
 
 // Wrapper component to use the context
-const ProjectViewer = ({ projectId }) => {
+const ProjectViewer = ({ userId, projectId }) => {
     const { setImages, setFolders, currentFolderId, setCurrentFolderId, setBreadcrumbs, breadcrumbs } = usePhotoProofing();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -18,7 +18,7 @@ const ProjectViewer = ({ projectId }) => {
         const loadProject = async () => {
             try {
                 // 1. Fetch Project Details
-                const projectRef = doc(db, 'projects', projectId);
+                const projectRef = doc(db, 'projects', userId, 'projects', projectId);
                 const projectSnap = await getDoc(projectRef);
 
                 if (!projectSnap.exists()) {
@@ -56,7 +56,7 @@ const ProjectViewer = ({ projectId }) => {
         };
 
         loadProject();
-    }, [projectId, setCurrentFolderId, setBreadcrumbs]);
+    }, [userId, projectId, setCurrentFolderId, setBreadcrumbs]);
 
     // Effect to fetch content when currentFolderId changes
     useEffect(() => {
@@ -123,11 +123,11 @@ const ProjectViewer = ({ projectId }) => {
 };
 
 const PublicProjectView = () => {
-    const { projectId } = useParams();
+    const { userId, projectId } = useParams();
 
     return (
         <PhotoProofingProvider>
-            <ProjectViewer projectId={projectId} />
+            <ProjectViewer userId={userId} projectId={projectId} />
         </PhotoProofingProvider>
     );
 };
