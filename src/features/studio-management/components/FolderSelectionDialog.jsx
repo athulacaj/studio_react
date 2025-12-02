@@ -1,81 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Dialog,
     DialogTitle,
     DialogContent,
     DialogActions,
     Button,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    Checkbox,
-    Collapse,
-    IconButton,
-    Box
 } from '@mui/material';
-import { ExpandLess, ExpandMore, Folder as FolderIcon } from '@mui/icons-material';
+import FolderTree from './FolderTree';
 
-const FolderItem = ({ folder, selectedFolders, onToggleSelect, level = 0 }) => {
-    const [open, setOpen] = useState(false);
-    const hasSubfolders = folder.folders && Object.keys(folder.folders).length > 0;
-    const isSelected = selectedFolders.has(folder.id);
+const FolderSelectionDialog = ({ open, onClose, folderStructure, onConfirm, initialSelection = [] }) => {
+    const [selectedFolders, setSelectedFolders] = useState(new Set(initialSelection));
 
-    const handleExpandClick = (e) => {
-        e.stopPropagation();
-        setOpen(!open);
-    };
-
-    const handleToggle = () => {
-        onToggleSelect(folder.id);
-    };
-
-    return (
-        <>
-            <ListItem
-                button
-                onClick={handleToggle}
-                sx={{ pl: level * 2 + 2 }}
-            >
-                <ListItemIcon sx={{ minWidth: 40 }}>
-                    <Checkbox
-                        edge="start"
-                        checked={isSelected}
-                        tabIndex={-1}
-                        disableRipple
-                    />
-                </ListItemIcon>
-                {hasSubfolders ? (
-                    <IconButton size="small" onClick={handleExpandClick} sx={{ mr: 1 }}>
-                        {open ? <ExpandLess /> : <ExpandMore />}
-                    </IconButton>
-                ) : (
-                    <Box sx={{ width: 28, mr: 1 }} />
-                )}
-                <FolderIcon sx={{ mr: 1, color: 'action.active' }} />
-                <ListItemText primary={folder.name} />
-            </ListItem>
-            {hasSubfolders && (
-                <Collapse in={open} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                        {Object.values(folder.folders).map((subfolder) => (
-                            <FolderItem
-                                key={subfolder.id}
-                                folder={subfolder}
-                                selectedFolders={selectedFolders}
-                                onToggleSelect={onToggleSelect}
-                                level={level + 1}
-                            />
-                        ))}
-                    </List>
-                </Collapse>
-            )}
-        </>
-    );
-};
-
-const FolderSelectionDialog = ({ open, onClose, folderStructure, onConfirm }) => {
-    const [selectedFolders, setSelectedFolders] = useState(new Set());
+    // Reset selection when dialog opens or initialSelection changes
+    useEffect(() => {
+        if (open) {
+            setSelectedFolders(new Set(initialSelection));
+        }
+    }, [open, initialSelection]);
 
     const handleToggleSelect = (folderId) => {
         const newSelected = new Set(selectedFolders);
@@ -95,20 +36,16 @@ const FolderSelectionDialog = ({ open, onClose, folderStructure, onConfirm }) =>
         <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
             <DialogTitle>Select Folders to Sync</DialogTitle>
             <DialogContent dividers>
-                <List>
-                    {folderStructure && (
-                        <FolderItem
-                            folder={folderStructure}
-                            selectedFolders={selectedFolders}
-                            onToggleSelect={handleToggleSelect}
-                        />
-                    )}
-                </List>
+                <FolderTree
+                    folderStructure={folderStructure}
+                    selectedFolders={selectedFolders}
+                    onToggleSelect={handleToggleSelect}
+                />
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Cancel</Button>
                 <Button onClick={handleConfirm} variant="contained" color="primary">
-                    Confirm & Create
+                    Confirm & Save
                 </Button>
             </DialogActions>
         </Dialog>

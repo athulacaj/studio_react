@@ -2,10 +2,27 @@ import React, { useState } from 'react';
 import { Container, Typography, Box, Button, Paper } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import CreateProjectModal from '../components/CreateProjectModal';
+import ManageShareLinksModal from '../components/ManageShareLinksModal';
 import ProjectList from '../components/ProjectList';
 
 const StudioDashboard = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [editingProject, setEditingProject] = useState(null);
+    const [managingLinksProject, setManagingLinksProject] = useState(null);
+
+    const handleEditProject = (project) => {
+        setEditingProject(project);
+        setIsCreateModalOpen(true);
+    };
+
+    const handleManageLinks = (project) => {
+        setManagingLinksProject(project);
+    };
+
+    const handleCloseCreateModal = () => {
+        setIsCreateModalOpen(false);
+        setEditingProject(null);
+    };
 
     return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -26,12 +43,22 @@ const StudioDashboard = () => {
                 <Typography variant="h6" gutterBottom>
                     Projects
                 </Typography>
-                <ProjectList />
+                <ProjectList
+                    onEdit={handleEditProject}
+                    onManageLinks={handleManageLinks}
+                />
             </Paper>
 
             <CreateProjectModal
                 open={isCreateModalOpen}
-                onClose={() => setIsCreateModalOpen(false)}
+                onClose={handleCloseCreateModal}
+                project={editingProject}
+            />
+
+            <ManageShareLinksModal
+                open={!!managingLinksProject}
+                onClose={() => setManagingLinksProject(null)}
+                project={managingLinksProject}
             />
         </Container>
     );
