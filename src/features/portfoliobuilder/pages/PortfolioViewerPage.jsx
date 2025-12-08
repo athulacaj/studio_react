@@ -253,7 +253,7 @@ const PortfolioViewerPage = () => {
 
                                 <Button
                                     component={Link}
-                                    to="/portfolio-builder"
+                                    to="/private/portfolio-builder"
                                     variant="outlined"
                                     size="large"
                                     sx={{

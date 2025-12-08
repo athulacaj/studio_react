@@ -9,7 +9,7 @@ import {
     Alert,
     Link as MuiLink
 } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
@@ -19,6 +19,7 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -27,7 +28,8 @@ export default function LoginPage() {
             setError('');
             setLoading(true);
             await login(email, password);
-            navigate('/');
+            const from = location.state?.from?.pathname || "/";
+            navigate(from, { replace: true });
         } catch (err) {
             console.error(err);
             setError('Failed to log in: ' + err.message);

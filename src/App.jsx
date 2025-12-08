@@ -56,7 +56,7 @@ const darkTheme = createTheme({
 
 import { PhotoProofingProvider } from './features/photoproofing';
 import { PortfolioBuilderProvider, PortfolioBuilderPage, PortfolioViewerPage } from './features/portfoliobuilder';
-import { AuthProvider, LoginPage, SignupPage } from './features/auth';
+import { AuthProvider, LoginPage, SignupPage, ProtectedRoute } from './features/auth';
 import { StudioManagementProvider, StudioDashboard, PublicProjectView } from './features/studio-management';
 import Footer from './core/components/Footer';
 
@@ -70,9 +70,14 @@ const AppContent = () => {
           <Route path="/" element={<PhotoProofingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
-          <Route path="/portfolio-builder" element={<PortfolioBuilderPage />} />
+
+          {/* Protected Routes */}
+          <Route path="/private" element={<ProtectedRoute />}>
+            <Route path="portfolio-builder" element={<PortfolioBuilderPage />} />
+            <Route path="studio" element={<StudioDashboard />} />
+          </Route>
+
           <Route path="/portfolio/:domain" element={<PortfolioViewerPage />} />
-          <Route path="/studio" element={<StudioDashboard />} />
           <Route path="/view/:userId/:projectId" element={<PublicProjectView />} />
           <Route path="/share/:userId/:projectId/:linkId" element={<PublicProjectView />} />
           <Route path="/about" element={<About />} />
