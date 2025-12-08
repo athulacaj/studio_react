@@ -1,6 +1,6 @@
 import React from 'react';
 import { createTheme, ThemeProvider, CssBaseline, Box } from '@mui/material';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import PhotoProofingPage from './features/photoproofing';
 import About from './pages/About';
 import NotFound from './pages/NotFound';
@@ -61,6 +61,7 @@ import { StudioManagementProvider, StudioDashboard, PublicProjectView } from './
 import Footer from './core/components/Footer';
 
 const AppContent = () => {
+  const location = useLocation();
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>

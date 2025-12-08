@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PhotoProofingContext } from './PhotoProofingContext';
+import { PhotoProofingContext, PhotoProofingContextType } from './PhotoProofingContext';
 
 export const PhotoProofingProvider = ({ children }) => {
     const [albums, setAlbums] = useState({
@@ -52,7 +52,7 @@ export const PhotoProofingProvider = ({ children }) => {
         }
     };
 
-    const value = {
+    const value: PhotoProofingContextType = {
         albums,
         selectedAlbum,
         images,

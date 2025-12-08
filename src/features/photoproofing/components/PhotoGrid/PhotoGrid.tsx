@@ -5,10 +5,10 @@ import { useSearchParams } from 'react-router-dom';
 import PhotoCard from './PhotoCard';
 import EmptyState from './EmptyState';
 import FullScreenView from '../FullScreenView';
-import { usePhotoProofing } from '../../context/PhotoProofingContext';
+import { PhotoProofingContextType, usePhotoProofing } from '../../context/PhotoProofingContext';
 
 const PhotoGrid = () => {
-    const { albums, selectedAlbum, images, handleAddToAlbum, handleRemoveFromAlbum, folders, navigateToFolder, breadcrumbs, currentFolderId } = usePhotoProofing();
+    const { albums, selectedAlbum, images, handleAddToAlbum, handleRemoveFromAlbum, folders, navigateToFolder, breadcrumbs, currentFolderId }: PhotoProofingContextType = usePhotoProofing();
     const [fullScreenOpen, setFullScreenOpen] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [searchParams, setSearchParams] = useSearchParams();
