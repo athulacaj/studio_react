@@ -1,5 +1,4 @@
-import React from 'react';
-import { createTheme, ThemeProvider, CssBaseline, Box } from '@mui/material';
+import { createTheme, ThemeProvider, CssBaseline, Box, Backdrop, CircularProgress } from '@mui/material';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import PhotoProofingPage from './features/photoproofing';
 import About from './pages/About';
@@ -59,6 +58,7 @@ import { PortfolioBuilderProvider, PortfolioBuilderPage, PortfolioViewerPage } f
 import { AuthProvider, LoginPage, SignupPage, ProtectedRoute } from './features/auth';
 import { StudioManagementProvider, StudioDashboard, PublicProjectView } from './features/studio-management';
 import Footer from './core/components/Footer';
+import { useGlobalLoader } from './core/context/globalLoader';
 
 const AppContent = () => {
   const location = useLocation();
@@ -95,6 +95,7 @@ const AppContent = () => {
 };
 
 function App() {
+  const { isLoading } = useGlobalLoader();
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -102,6 +103,12 @@ function App() {
         <PortfolioBuilderProvider>
           <AuthProvider>
             <StudioManagementProvider>
+              <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={isLoading}
+              >
+                <CircularProgress color="inherit" />
+              </Backdrop>
               <AppContent />
             </StudioManagementProvider>
           </AuthProvider>

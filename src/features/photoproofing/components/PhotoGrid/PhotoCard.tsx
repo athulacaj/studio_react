@@ -2,28 +2,41 @@ import React from 'react';
 import { Card, CardMedia, Typography, Box, IconButton, Menu, MenuItem, Fade, Tooltip } from '@mui/material';
 import { DeleteOutline, PlaylistAdd, FolderOpen } from '@mui/icons-material';
 
-const PhotoCard = ({ imageObj, index, isLiked, onOpenFullScreen, selectedAlbum, albums, onAddToAlbum, onRemoveFromAlbum }) => {
-    const [anchorEl, setAnchorEl] = React.useState(null);
+import { ImageObj } from '../../types';
+
+interface PhotoCardProps {
+    imageObj: ImageObj;
+    index: number;
+    isLiked: boolean;
+    onOpenFullScreen: (index: number) => void;
+    selectedAlbum: string;
+    albums: Record<string, number[]>;
+    onAddToAlbum: (albumName: string, index: number) => void;
+    onRemoveFromAlbum: (albumName: string, index: number) => void;
+}
+
+const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, index, isLiked, onOpenFullScreen, selectedAlbum, albums, onAddToAlbum, onRemoveFromAlbum }) => {
+    const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
     const open = Boolean(anchorEl);
     const image = imageObj.src || imageObj.thumbnailLink;
 
-    const handleMenuOpen = (event) => {
+    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
         setAnchorEl(event.currentTarget);
     };
 
-    const handleMenuClose = (event) => {
-        if (event && event.stopPropagation) event.stopPropagation();
+    const handleMenuClose = (event?: object) => {
+        if (event && 'stopPropagation' in event) (event as any).stopPropagation();
         setAnchorEl(null);
     };
 
-    const handleAlbumSelect = (event, albumName) => {
+    const handleAlbumSelect = (event: React.MouseEvent<HTMLElement>, albumName: string) => {
         event.stopPropagation();
         onAddToAlbum(albumName, index);
         handleMenuClose();
     };
 
-    const handleRemove = (event) => {
+    const handleRemove = (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
         onRemoveFromAlbum(selectedAlbum, index);
     };

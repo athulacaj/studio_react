@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
-import { PhotoProofingContext, PhotoProofingContextType } from './PhotoProofingContext';
+import { PhotoProofingContext } from './PhotoProofingContext';
+import { ImageObj, Folder, PhotoProofingContextType } from '../types';
 
-export const PhotoProofingProvider = ({ children }) => {
-    const [albums, setAlbums] = useState({
+export const PhotoProofingProvider = ({ children }: { children: React.ReactNode }) => {
+
+    const [loading, setLoading] = useState(true);
+
+    const [albums, setAlbums] = useState<{ [key: string]: number[] }>({
         "favourites": [],
         "custom": [],
         "recent": []
     });
-    const [selectedAlbum, setSelectedAlbum] = useState('all');
-    const [images, setImages] = useState([]);
-    const [folders, setFolders] = useState([]);
-    const [currentFolderId, setCurrentFolderId] = useState(null);
-    const [breadcrumbs, setBreadcrumbs] = useState([]);
+    const [selectedAlbum, setSelectedAlbum] = useState<string>('all');
+    const [images, setImages] = useState<ImageObj[]>([]);
+    const [folders, setFolders] = useState<Folder[]>([]);
+    const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+    const [breadcrumbs, setBreadcrumbs] = useState<{ id: string; name: string }[]>([]);
 
-    const handleAlbumChange = (event) => {
-        setSelectedAlbum(event.target.value);
+    const handleAlbumChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        setSelectedAlbum(event.target.value as string);
     };
 
-    const handleAddToAlbum = (albumName, photoIndex) => {
+    const handleAddToAlbum = (albumName: string, photoIndex: number) => {
         setAlbums((prevAlbums) => {
             const currentAlbum = prevAlbums[albumName] || [];
             if (currentAlbum.includes(photoIndex)) return prevAlbums;
@@ -28,14 +32,14 @@ export const PhotoProofingProvider = ({ children }) => {
         });
     };
 
-    const handleRemoveFromAlbum = (albumName, photoIndex) => {
+    const handleRemoveFromAlbum = (albumName: string, photoIndex: number) => {
         setAlbums((prevAlbums) => ({
             ...prevAlbums,
-            [albumName]: (prevAlbums[albumName] || []).filter(index => index !== photoIndex),
+            [albumName]: (prevAlbums[albumName] || []).filter((index: number) => index !== photoIndex),
         }));
     };
 
-    const navigateToFolder = (folderId, folderName) => {
+    const navigateToFolder = (folderId: string | null, folderName: string) => {
         setCurrentFolderId(folderId);
         if (folderId) {
             setBreadcrumbs(prev => {
@@ -68,7 +72,8 @@ export const PhotoProofingProvider = ({ children }) => {
         setCurrentFolderId,
         breadcrumbs,
         setBreadcrumbs,
-        navigateToFolder
+        navigateToFolder,
+        loading, setLoading
     };
 
     return (

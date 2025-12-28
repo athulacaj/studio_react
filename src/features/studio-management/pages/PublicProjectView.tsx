@@ -1,20 +1,23 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Typography, CircularProgress, Container, Alert } from '@mui/material';
+import { Box, Typography, CircularProgress, Container, Alert, Backdrop } from '@mui/material';
 import { PhotoProofingProvider } from '../../photoproofing';
 import PhotoProofingPage from '../../photoproofing/pages/PhotoProofingPage';
-import { usePublicProject } from '../hooks/usePublicProject';
+import { usePhotoProofing } from '../../photoproofing/hooks/usePhotoProofing';
 
 // Wrapper component to use the context and hook
-const ProjectViewer = ({ userId, projectId, linkId }) => {
+const ProjectViewer = ({ userId, projectId, linkId }: { userId: string, projectId: string, linkId?: string }) => {
     // The hook handles data fetching and updates the context (PhotoProofingProvider)
-    const { loading, error, project, shareLink } = usePublicProject(userId, projectId, linkId);
+    const { loading, error, project, shareLink } = usePhotoProofing(userId, projectId, linkId);
 
     if (loading && !project) { // Only full screen loading for initial project load
         return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-                <CircularProgress />
-            </Box>
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={loading}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
         );
     }
 
@@ -31,28 +34,30 @@ const ProjectViewer = ({ userId, projectId, linkId }) => {
 
     return (
         <Box>
-            <Box sx={{ py: 4, px: 4, borderBottom: 1, borderColor: 'divider' }}>
-                <Typography variant="h4" component="h1" fontWeight="bold">
-                    {project?.name}
-                </Typography>
-                {linkId && shareLink && (
-                    <Typography variant="subtitle1" color="primary">
-                        Shared View: {shareLink.name}
-                    </Typography>
-                )}
-                {project?.source === 'google_drive' && (
-                    <Typography variant="body2" color="text.secondary">
-                        Images loaded from Google Drive (Synced)
-                    </Typography>
-                )}
-            </Box>
+
             <PhotoProofingPage />
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={loading}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </Box>
     );
 };
 
 const PublicProjectView = () => {
-    const { userId, projectId, linkId } = useParams();
+    const { userId, projectId, linkId } = useParams<{ userId: string; projectId: string; linkId?: string }>();
+
+    if (!userId || !projectId) {
+        return (
+            <Container maxWidth="sm" sx={{ mt: 8 }}>
+                <Alert severity="error">
+                    Invalid Project URL
+                </Alert>
+            </Container>
+        );
+    }
 
     return (
         <PhotoProofingProvider>

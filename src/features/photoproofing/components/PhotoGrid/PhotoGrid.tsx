@@ -5,10 +5,12 @@ import { useSearchParams } from 'react-router-dom';
 import PhotoCard from './PhotoCard';
 import EmptyState from './EmptyState';
 import FullScreenView from '../FullScreenView';
-import { PhotoProofingContextType, usePhotoProofing } from '../../context/PhotoProofingContext';
+import { usePhotoProofingcontext } from '../../context/PhotoProofingContext';
+import { PhotoProofingContextType } from '../../types';
 
 const PhotoGrid = () => {
-    const { albums, selectedAlbum, images, handleAddToAlbum, handleRemoveFromAlbum, folders, navigateToFolder, breadcrumbs, currentFolderId }: PhotoProofingContextType = usePhotoProofing();
+    const { albums, selectedAlbum, images, handleAddToAlbum, handleRemoveFromAlbum,
+        folders, navigateToFolder, breadcrumbs, currentFolderId }: PhotoProofingContextType = usePhotoProofingcontext();
     const [fullScreenOpen, setFullScreenOpen] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [searchParams, setSearchParams] = useSearchParams();
@@ -31,7 +33,7 @@ const PhotoGrid = () => {
         }
     }, [selectedAlbum, currentFolderId, setSearchParams]);
 
-    const handleOpenFullScreen = (index) => {
+    const handleOpenFullScreen = (index: number) => {
         setCurrentIndex(index);
         setFullScreenOpen(true);
     };
@@ -40,7 +42,7 @@ const PhotoGrid = () => {
         setFullScreenOpen(false);
     };
 
-    const handlePageChange = (event, value) => {
+    const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
         setSearchParams(prev => {
             const newParams = new URLSearchParams(prev);
             newParams.set('page', value.toString());
@@ -51,7 +53,7 @@ const PhotoGrid = () => {
 
     const allDisplayedImages = selectedAlbum === 'all'
         ? images
-        : albums[selectedAlbum]?.map(index => images[index]) || [];
+        : albums[selectedAlbum]?.map((index: number) => images[index]) || [];
 
     const totalPages = Math.ceil(allDisplayedImages.length / itemsPerPage);
     const paginatedImages = allDisplayedImages.slice((page - 1) * itemsPerPage, page * itemsPerPage);
@@ -61,7 +63,7 @@ const PhotoGrid = () => {
             {/* Breadcrumbs */}
             {selectedAlbum === 'all' && breadcrumbs.length > 0 && (
                 <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
-                    {breadcrumbs.map((crumb, index) => {
+                    {breadcrumbs.map((crumb: any, index: number) => {
                         const isLast = index === breadcrumbs.length - 1;
                         return isLast ? (
                             <Typography key={crumb.id} color="text.primary">
@@ -132,7 +134,7 @@ const PhotoGrid = () => {
                         gap: 3,
                         mb: 4
                     }}>
-                        {paginatedImages.map((imageObj, i) => {
+                        {paginatedImages.map((imageObj, i: number) => {
                             const originalIndex = images.indexOf(imageObj);
                             const isLiked = (albums['favourites'] || []).includes(originalIndex);
 

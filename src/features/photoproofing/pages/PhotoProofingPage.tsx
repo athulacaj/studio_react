@@ -1,11 +1,12 @@
 import React from 'react';
 import { Box } from '@mui/material';
 import PhotoGrid from '../components/PhotoGrid';
-import { PhotoProofingContextType, usePhotoProofing } from '../context/PhotoProofingContext';
+import { usePhotoProofingcontext } from '../context/PhotoProofingContext';
 import HeaderPhotoProofing from '../components/Header_photo_proofing';
+import { PhotoProofingContextType } from '../types';
 
 const PhotoProofingPage = () => {
-    const { albums, selectedAlbum, handleAlbumChange }: PhotoProofingContextType = usePhotoProofing();
+    const { albums, selectedAlbum, handleAlbumChange }: PhotoProofingContextType = usePhotoProofingcontext();
     return (
         <Box>
             <HeaderPhotoProofing
