@@ -37,8 +37,18 @@ const findNodeById = (node: DriveNode, id: string): DriveNode | null => {
     return null;
 };
 
-export const usePhotoProofing = (userId: string, projectId: string, linkId?: string) => {
-    const { loading, setLoading, setImages, setFolders, currentFolderId, setCurrentFolderId, setBreadcrumbs } = usePhotoProofingcontext();
+export default function usePhotoProofing(userId: string, projectId: string, linkId?: string) {
+    const {
+        loading, setLoading, setImages, setFolders,
+        currentFolderId, setCurrentFolderId, setBreadcrumbs,
+        setUserId, setProjectId, setLinkId
+    } = usePhotoProofingcontext();
+
+    useEffect(() => {
+        setUserId(userId);
+        setProjectId(projectId);
+        setLinkId(linkId || null);
+    }, [userId, projectId, linkId, setUserId, setProjectId, setLinkId]);
     const [error, setError] = useState<string | null>(null);
     const [project, setProject] = useState<Project | null>(null);
     const [shareLink, setShareLink] = useState<SharedLink | null>(null);
@@ -283,6 +293,8 @@ export const usePhotoProofing = (userId: string, projectId: string, linkId?: str
         if (!currentFolderId) return;
         fetchContent();
     }, [currentFolderId]);
+
+
 
     return {
         loading,

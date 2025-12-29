@@ -4,18 +4,19 @@ import { Add as AddIcon } from '@mui/icons-material';
 import CreateProjectModal from '../components/CreateProjectModal';
 import ManageShareLinksModal from '../components/ManageShareLinksModal';
 import ProjectList from '../components/ProjectList';
+import { Project } from '../types';
 
-const StudioDashboard = () => {
+const StudioDashboard: React.FC = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [editingProject, setEditingProject] = useState(null);
-    const [managingLinksProject, setManagingLinksProject] = useState(null);
+    const [editingProject, setEditingProject] = useState<Project | null>(null);
+    const [managingLinksProject, setManagingLinksProject] = useState<Project | null>(null);
 
-    const handleEditProject = (project) => {
+    const handleEditProject = (project: Project) => {
         setEditingProject(project);
         setIsCreateModalOpen(true);
     };
 
-    const handleManageLinks = (project) => {
+    const handleManageLinks = (project: Project) => {
         setManagingLinksProject(project);
     };
 

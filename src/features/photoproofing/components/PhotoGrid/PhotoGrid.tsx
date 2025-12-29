@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Pagination, Breadcrumbs, Link, Typography, Card, CardContent } from '@mui/material';
+import { Box, Pagination, Breadcrumbs, Link, Typography, Card } from '@mui/material';
 import { Folder as FolderIcon } from '@mui/icons-material';
 import { useSearchParams } from 'react-router-dom';
 import PhotoCard from './PhotoCard';
 import EmptyState from './EmptyState';
 import FullScreenView from '../FullScreenView';
 import { usePhotoProofingcontext } from '../../context/PhotoProofingContext';
-import { PhotoProofingContextType } from '../../types';
+import { PhotoProofingContextType, ImageObj } from '../../types';
 
 const PhotoGrid = () => {
     const { albums, selectedAlbum, images, handleAddToAlbum, handleRemoveFromAlbum,
@@ -42,7 +42,7 @@ const PhotoGrid = () => {
         setFullScreenOpen(false);
     };
 
-    const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
         setSearchParams(prev => {
             const newParams = new URLSearchParams(prev);
             newParams.set('page', value.toString());
@@ -53,7 +53,7 @@ const PhotoGrid = () => {
 
     const allDisplayedImages = selectedAlbum === 'all'
         ? images
-        : albums[selectedAlbum]?.map((index: number) => images[index]) || [];
+        : (albums[selectedAlbum] || []).map((id: string) => images.find(img => img.id === id)).filter(Boolean) as ImageObj[];
 
     const totalPages = Math.ceil(allDisplayedImages.length / itemsPerPage);
     const paginatedImages = allDisplayedImages.slice((page - 1) * itemsPerPage, page * itemsPerPage);
@@ -134,9 +134,9 @@ const PhotoGrid = () => {
                         gap: 3,
                         mb: 4
                     }}>
-                        {paginatedImages.map((imageObj, i: number) => {
+                        {paginatedImages.map((imageObj) => {
                             const originalIndex = images.indexOf(imageObj);
-                            const isLiked = (albums['favourites'] || []).includes(originalIndex);
+                            const isLiked = (albums['favourites'] || []).includes(imageObj.id);
 
                             return (
                                 <PhotoCard

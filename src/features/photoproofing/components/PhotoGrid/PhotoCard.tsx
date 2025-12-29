@@ -10,7 +10,7 @@ interface PhotoCardProps {
     isLiked: boolean;
     onOpenFullScreen: (index: number) => void;
     selectedAlbum: string;
-    albums: Record<string, number[]>;
+    albums: Record<string, string[]>;
     onAddToAlbum: (albumName: string, index: number) => void;
     onRemoveFromAlbum: (albumName: string, index: number) => void;
 }

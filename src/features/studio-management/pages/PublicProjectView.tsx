@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Box, Typography, CircularProgress, Container, Alert, Backdrop } from '@mui/material';
 import { PhotoProofingProvider } from '../../photoproofing';
 import PhotoProofingPage from '../../photoproofing/pages/PhotoProofingPage';
-import { usePhotoProofing } from '../../photoproofing/hooks/usePhotoProofing';
+import { usePhotoProofing } from '../../photoproofing/hooks/';
 
 // Wrapper component to use the context and hook
 const ProjectViewer = ({ userId, projectId, linkId }: { userId: string, projectId: string, linkId?: string }) => {

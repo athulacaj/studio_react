@@ -15,16 +15,26 @@ export interface DriveNode {
 }
 
 export interface Project {
-    id?: string;
-    userId?: string;
+    id: string;
+    name: string;
+    userId: string;
     driveData?: DriveNode;
     source?: string;
     driveUrl?: string;
+    selectedFolders?: string[];
+    createdAt?: any;
+    updatedAt?: any;
+    status?: string;
     [key: string]: any;
 }
 
 export interface SharedLink {
-    includedFolders?: string[];
-    [key: string]: any;
+    id: string;
+    name: string;
+    includedFolders: string[];
+    sourceProjectId: string;
+    createdAt?: any;
+    updatedAt?: any;
+    createdBy?: string;
 }
 

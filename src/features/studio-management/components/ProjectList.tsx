@@ -7,7 +7,6 @@ import {
     Chip,
     Box,
     IconButton,
-    Tooltip,
     Snackbar,
     Alert,
     Menu,
@@ -25,13 +24,21 @@ import {
     Edit as EditIcon,
     Share as ShareIcon
 } from '@mui/icons-material';
+import { Project } from '../types';
 
-const ProjectCard = ({ project, onEdit, onManageLinks }) => {
-    const { currentUser } = useAuth();
-    const [anchorEl, setAnchorEl] = useState(null);
+interface ProjectCardProps {
+    project: Project;
+    onEdit: (project: Project) => void;
+    onManageLinks: (project: Project) => void;
+}
+
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onManageLinks }) => {
+    const auth = useAuth();
+    const currentUser = auth?.currentUser;
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-    const handleMenuOpen = (event) => {
+    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
 
@@ -130,7 +137,12 @@ const ProjectCard = ({ project, onEdit, onManageLinks }) => {
     );
 };
 
-const ProjectList = ({ onEdit, onManageLinks }) => {
+interface ProjectListProps {
+    onEdit: (project: Project) => void;
+    onManageLinks: (project: Project) => void;
+}
+
+const ProjectList: React.FC<ProjectListProps> = ({ onEdit, onManageLinks }) => {
     const { projects } = useStudioManagement();
 
     if (!projects || projects.length === 0) {

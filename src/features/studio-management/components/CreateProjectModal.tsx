@@ -11,17 +11,26 @@ import {
     Select,
     MenuItem,
     Box,
-    Alert
+    Alert,
+    SelectChangeEvent
 } from '@mui/material';
 import { useStudioManagement } from '../context/StudioManagementContext';
 import { useAuth } from '../../auth';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../../config/firebase';
 import FolderSelectionDialog from './FolderSelectionDialog';
+import { Project, DriveNode } from '../types';
 
-const CreateProjectModal = ({ open, onClose, project = null }) => {
+interface CreateProjectModalProps {
+    open: boolean;
+    onClose: () => void;
+    project?: Project | null;
+}
+
+const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, project = null }) => {
     const { addProject, updateProject } = useStudioManagement();
-    const { currentUser } = useAuth();
+    const auth = useAuth();
+    const currentUser = auth?.currentUser;
     const [projectName, setProjectName] = useState('');
     const [source, setSource] = useState('google_photos');
     const [driveUrl, setDriveUrl] = useState('');
@@ -30,8 +39,8 @@ const CreateProjectModal = ({ open, onClose, project = null }) => {
 
     // New state for folder selection
     const [folderSelectionOpen, setFolderSelectionOpen] = useState(false);
-    const [folderStructure, setFolderStructure] = useState(null);
-    const [selectedFolders, setSelectedFolders] = useState([]);
+    const [folderStructure, setFolderStructure] = useState<DriveNode | null>(null);
+    const [selectedFolders, setSelectedFolders] = useState<string[]>([]);
 
     const isEditMode = !!project;
 
@@ -80,7 +89,7 @@ const CreateProjectModal = ({ open, onClose, project = null }) => {
         setLoading(true);
         try {
             if (source === 'google_drive') {
-                if (isEditMode && project.driveData) {
+                if (isEditMode && project && project.driveData) {
                     // Use existing structure for edit
                     setFolderStructure(project.driveData);
                     setFolderSelectionOpen(true);
@@ -89,7 +98,7 @@ const CreateProjectModal = ({ open, onClose, project = null }) => {
                     // Fetch folder structure first
                     const getFolderStructure = httpsCallable(functions, 'getFolderStructure');
                     const result = await getFolderStructure({ url: driveUrl });
-                    setFolderStructure(result.data);
+                    setFolderStructure(result.data as DriveNode);
                     setFolderSelectionOpen(true); // Open selection dialog
                     setLoading(false); // Stop loading for this modal
                 }
@@ -97,55 +106,42 @@ const CreateProjectModal = ({ open, onClose, project = null }) => {
                 // For other sources, proceed directly
                 await handleSubmit();
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error fetching folder structure:", err);
             setError(err.message || 'Failed to fetch folder structure. Please try again.');
             setLoading(false);
         }
     };
 
-    const handleSubmit = async (newSelectedFolders = []) => {
+    const handleSubmit = async (newSelectedFolders: string[] = []) => {
         setLoading(true);
         try {
             const foldersToSave = source === 'google_drive' ? newSelectedFolders : [];
 
-            if (isEditMode) {
+            if (isEditMode && project) {
                 await updateProject(project.id, {
                     name: projectName,
                     selectedFolders: foldersToSave
                 });
+                if (source === 'google_drive') {
+                    await handleDriveUpload(project.id, foldersToSave);
+                }
             } else {
                 const projectId = await addProject({
                     name: projectName,
                     source,
-                    driveUrl: source === 'google_drive' ? driveUrl : null,
-                    driveData: folderStructure, // Save the full structure
+                    driveUrl: source === 'google_drive' ? driveUrl : undefined,
+                    driveData: folderStructure || undefined, // Save the full structure
                     selectedFolders: foldersToSave, // Save selected IDs
                 });
 
-                // Trigger upload for new projects only? Or should we re-upload on edit if selection changes?
-                // Requirement: "on edit the user cannot change the google drive option but they can slect the folders to sync."
-                // If they select NEW folders, we probably need to upload data for those new folders.
-                // But `uploadDriveData` is for uploading file metadata to Firestore.
-                // If we select new folders, we should probably run it for them.
-
-                if (source === 'google_drive' && foldersToSave.length > 0) {
-                    await handleDriveUpload(projectId || project.id, foldersToSave);
+                if (projectId && source === 'google_drive' && foldersToSave.length > 0) {
+                    await handleDriveUpload(projectId, foldersToSave);
                 }
             }
 
-            // If editing and folders changed, we might need to trigger upload for newly selected ones.
-            // For simplicity, let's re-run upload for all selected folders on edit too? 
-            // Or filter for only new ones? 
-            // The requirement says "folders which already synced can be selected for this" (referring to share link).
-            // For edit, "they can slect the folders to sync".
-            // Let's assume we should sync (upload data) for the current selection.
-            if (isEditMode && source === 'google_drive') {
-                await handleDriveUpload(project.id, foldersToSave);
-            }
-
             handleClose();
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error saving project:", err);
             setError(err.message || 'Failed to save project. Please try again.');
         } finally {
@@ -153,7 +149,8 @@ const CreateProjectModal = ({ open, onClose, project = null }) => {
         }
     };
 
-    const handleDriveUpload = async (projectId, folders) => {
+    const handleDriveUpload = async (projectId: string, folders: string[]) => {
+        if (!currentUser) return;
         const uploadDriveData = httpsCallable(functions, 'uploadDriveData');
         const uploadPromises = folders.map(folderId => {
             return uploadDriveData({
@@ -166,6 +163,10 @@ const CreateProjectModal = ({ open, onClose, project = null }) => {
             });
         });
         await Promise.all(uploadPromises);
+    };
+
+    const handleSourceChange = (e: SelectChangeEvent) => {
+        setSource(e.target.value);
     };
 
     return (
@@ -187,7 +188,7 @@ const CreateProjectModal = ({ open, onClose, project = null }) => {
                             <Select
                                 value={source}
                                 label="Source"
-                                onChange={(e) => setSource(e.target.value)}
+                                onChange={handleSourceChange}
                             >
                                 <MenuItem value="google_photos">Google Photos</MenuItem>
                                 <MenuItem value="google_drive">Google Drive</MenuItem>

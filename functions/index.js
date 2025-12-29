@@ -103,8 +103,8 @@ const fetchFolderContents = async (folderId, recursive = true) => {
     // Recursively fetch subfolders
     if (recursive) {
       for (const folder of subfolders) {
-        folderData.folders[folder.name] = await fetchFolderContents(folder.id, true);
-        folderData.folders[folder.name].name = folder.name; // Assign name here
+        folderData.folders[folder.id] = await fetchFolderContents(folder.id, true);
+        folderData.folders[folder.id].name = folder.name; // Assign name here
       }
     }
 
@@ -252,8 +252,8 @@ const fetchFolderStructureRecursive = async (folderId) => {
 
     // Recursively fetch subfolders
     for (const folder of allFolders) {
-      folderData.folders[folder.name] = await fetchFolderStructureRecursive(folder.id);
-      folderData.folders[folder.name].name = folder.name;
+      folderData.folders[folder.id] = await fetchFolderStructureRecursive(folder.id);
+      folderData.folders[folder.id].name = folder.name;
     }
 
     return folderData;

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
     Dialog,
-    DialogTitle,
     DialogContent,
     DialogActions,
     Button,
@@ -21,24 +20,31 @@ import {
     Add as AddIcon,
     Delete as DeleteIcon,
     Edit as EditIcon,
-    ContentCopy as CopyIcon,
-    Link as LinkIcon
+    ContentCopy as CopyIcon
 } from '@mui/icons-material';
 import { useStudioManagement } from '../context/StudioManagementContext';
-import { useAuth } from '../../auth';
 import FolderTree from './FolderTree';
+import { Project, SharedLink } from '../types';
 
-const ManageShareLinksModal = ({ open, onClose, project }) => {
+interface ManageShareLinksModalProps {
+    open: boolean;
+    onClose: () => void;
+    project: Project | null;
+}
+
+type ViewMode = 'list' | 'create' | 'edit';
+
+const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onClose, project }) => {
     const { fetchShareLinks, createShareLink, updateShareLink, deleteShareLink } = useStudioManagement();
-    const [links, setLinks] = useState([]);
+    const [links, setLinks] = useState<SharedLink[]>([]);
     const [loading, setLoading] = useState(false);
-    const [view, setView] = useState('list'); // 'list', 'create', 'edit'
-    const [currentLink, setCurrentLink] = useState(null);
+    const [view, setView] = useState<ViewMode>('list');
+    const [currentLink, setCurrentLink] = useState<SharedLink | null>(null);
     const [error, setError] = useState('');
 
     // Form state
     const [linkName, setLinkName] = useState('');
-    const [selectedFolders, setSelectedFolders] = useState(new Set());
+    const [selectedFolders, setSelectedFolders] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         if (open && project) {
@@ -49,6 +55,7 @@ const ManageShareLinksModal = ({ open, onClose, project }) => {
     }, [open, project]);
 
     const loadLinks = async () => {
+        if (!project) return;
         setLoading(true);
         try {
             const fetchedLinks = await fetchShareLinks(project.id);
@@ -68,7 +75,7 @@ const ManageShareLinksModal = ({ open, onClose, project }) => {
         setError('');
     };
 
-    const handleEditClick = (link) => {
+    const handleEditClick = (link: SharedLink) => {
         setLinkName(link.name);
         setSelectedFolders(new Set(link.includedFolders || []));
         setCurrentLink(link);
@@ -76,7 +83,8 @@ const ManageShareLinksModal = ({ open, onClose, project }) => {
         setError('');
     };
 
-    const handleDeleteClick = async (linkId) => {
+    const handleDeleteClick = async (linkId: string) => {
+        if (!project) return;
         if (window.confirm("Are you sure you want to delete this link?")) {
             try {
                 await deleteShareLink(project.id, linkId);
@@ -88,15 +96,15 @@ const ManageShareLinksModal = ({ open, onClose, project }) => {
         }
     };
 
-    const handleCopyLink = (linkId) => {
+    const handleCopyLink = (linkId: string) => {
+        if (!project) return;
         const userId = project.userId;
         const url = `${window.location.origin}/share/${userId}/${project.id}/${linkId}`;
         navigator.clipboard.writeText(url);
-        // Could show a snackbar here, but for now just alert or nothing
         alert("Link copied to clipboard!");
     };
 
-    const handleToggleSelect = (folderId) => {
+    const handleToggleSelect = (folderId: string) => {
         const newSelected = new Set(selectedFolders);
         if (newSelected.has(folderId)) {
             newSelected.delete(folderId);
@@ -107,7 +115,7 @@ const ManageShareLinksModal = ({ open, onClose, project }) => {
     };
 
     const handleSave = async () => {
-        if (!linkName.trim()) {
+        if (!project || !linkName.trim()) {
             setError('Link name is required');
             return;
         }
@@ -126,7 +134,7 @@ const ManageShareLinksModal = ({ open, onClose, project }) => {
 
             if (view === 'create') {
                 await createShareLink(project.id, linkData);
-            } else if (view === 'edit') {
+            } else if (view === 'edit' && currentLink) {
                 await updateShareLink(project.id, currentLink.id, linkData);
             }
 
@@ -140,7 +148,7 @@ const ManageShareLinksModal = ({ open, onClose, project }) => {
         }
     };
 
-    const allowedFolderIds = project?.selectedFolders ? new Set(project.selectedFolders) : new Set();
+    const allowedFolderIds = project?.selectedFolders ? new Set(project.selectedFolders) : new Set<string>();
 
     const renderList = () => (
         <>

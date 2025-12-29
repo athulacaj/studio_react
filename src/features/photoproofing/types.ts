@@ -12,10 +12,10 @@ export interface Folder {
 
 
 export interface PhotoProofingContextType {
-    albums: Record<string, number[]>;
+    albums: Record<string, string[]>;
     selectedAlbum: string;
     images: ImageObj[];
-    setAlbums: React.Dispatch<React.SetStateAction<Record<string, number[]>>>;
+    setAlbums: React.Dispatch<React.SetStateAction<Record<string, string[]>>>;
     setSelectedAlbum: React.Dispatch<React.SetStateAction<string>>;
     setImages: React.Dispatch<React.SetStateAction<ImageObj[]>>;
     handleAlbumChange: (event: React.ChangeEvent<{ value: unknown }>) => void;
@@ -30,4 +30,10 @@ export interface PhotoProofingContextType {
     navigateToFolder: (folderId: string | null, folderName: string) => void;
     loading: boolean;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    userId: string | null;
+    setUserId: React.Dispatch<React.SetStateAction<string | null>>;
+    projectId: string | null;
+    setProjectId: React.Dispatch<React.SetStateAction<string | null>>;
+    linkId: string | null;
+    setLinkId: React.Dispatch<React.SetStateAction<string | null>>;
 }

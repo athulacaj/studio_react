@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, Box } from '@mui/material';
+import { ImageObj } from '../../types';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
@@ -15,7 +16,18 @@ import NavigationButton from './NavigationButton';
 import ImageViewer from './ImageViewer';
 import AlbumActionButton from './AlbumActionButton';
 
-const FullScreenView = ({
+interface FullScreenViewProps {
+    images: ImageObj[];
+    currentIndex: number;
+    onClose: () => void;
+    onAddToAlbum: (albumName: string, index: number) => void;
+    onRemoveFromAlbum: (albumName: string, index: number) => void;
+    albums: Record<string, string[]>;
+    open: boolean;
+    setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
+}
+
+const FullScreenView: React.FC<FullScreenViewProps> = ({
     images,
     currentIndex,
     onClose,
@@ -28,7 +40,7 @@ const FullScreenView = ({
     const [selectedAlbum, setSelectedAlbum] = useState('favourites');
     const [showLikeAnimation, setShowLikeAnimation] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
-    const transformComponentRef = useRef(null);
+    const transformComponentRef = useRef<any>(null);
 
     // Custom hooks
     const { isFullscreen, controlsVisible, toggleFullscreen } = useFullscreenControls(isHovering);
@@ -53,7 +65,7 @@ const FullScreenView = ({
     );
 
     // Check if current image is in the selected album
-    const isImageInAlbum = (albums[selectedAlbum] || []).includes(currentIndex);
+    const isImageInAlbum = (albums[selectedAlbum] || []).includes(images[currentIndex]?.id);
 
     const handleAddToAlbum = () => {
         if (isImageInAlbum) {
