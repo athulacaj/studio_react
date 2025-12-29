@@ -3,6 +3,7 @@ export interface DriveFile {
     name: string;
     thumbnailLink?: string;
     mimeType?: string;
+    folderPathList: string[];
     [key: string]: any;
 }
 

@@ -6,16 +6,20 @@ import HeaderPhotoProofing from '../components/Header_photo_proofing';
 import { PhotoProofingContextType } from '../types';
 
 const PhotoProofingPage = () => {
-    const { albums, selectedAlbum, handleAlbumChange }: PhotoProofingContextType = usePhotoProofingcontext();
+    const { albums, selectedAlbum, handleAlbumChange, images }: PhotoProofingContextType = usePhotoProofingcontext();
+    const allDisplayedImages = selectedAlbum === 'all'
+        ? images
+        : (albums[selectedAlbum] || []).map((img: string) => JSON.parse(img));
     return (
         <Box>
             <HeaderPhotoProofing
                 albums={albums}
                 selectedAlbum={selectedAlbum}
                 onAlbumChange={handleAlbumChange}
+                allDisplayedImages={allDisplayedImages}
             />
             <Box sx={{ height: '50px' }} />
-            <PhotoGrid />
+            <PhotoGrid allDisplayedImages={allDisplayedImages} />
         </Box>
     );
 };

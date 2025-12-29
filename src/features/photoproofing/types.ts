@@ -1,5 +1,6 @@
 export interface ImageObj {
     src?: string;
+    folderPathList?: string[];
     thumbnailLink?: string;
     [key: string]: any;
 }

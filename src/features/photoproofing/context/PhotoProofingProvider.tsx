@@ -8,7 +8,7 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
 
     const [loading, setLoading] = useState(true);
 
-    const [albums, setAlbums] = useState<{ [key: string]: string[] }>({
+    const [albums, setAlbums] = useState<{ [key: string]: any }>({
         "favourites": [],
         "custom": [],
         "recent": []
@@ -28,6 +28,7 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
 
     const handleAddToAlbum = async (albumName: string, photoIndex: number) => {
         const image = images[photoIndex];
+        image.folderPathList = breadcrumbs.map((b) => b.name).slice(1);
         if (!image || !image.id) return;
 
         setAlbums((prevAlbums) => {
@@ -36,7 +37,7 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
 
             const newAlbums = {
                 ...prevAlbums,
-                [albumName]: [...currentAlbum, image.id],
+                [albumName]: [...currentAlbum, JSON.stringify(image)],
             } as Record<string, string[]>;
 
             // Sync with Firestore: Document ID is file ID
@@ -45,7 +46,8 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
 
                 setDoc(photoDocRef, {
                     selections: arrayUnion(albumName),
-                    updatedAt: serverTimestamp()
+                    updatedAt: serverTimestamp(),
+                    image: JSON.stringify(image)
                 }, { merge: true }).catch(err => console.error("Error updating photo albums in Firestore:", err));
             }
 
@@ -70,7 +72,7 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
 
                 setDoc(photoDocRef, {
                     selections: arrayRemove(albumName),
-                    updatedAt: serverTimestamp()
+                    updatedAt: serverTimestamp(),
                 }, { merge: true }).catch(err => console.error("Error updating photo albums in Firestore:", err));
             }
 

@@ -3,7 +3,14 @@ import { AppBar, Toolbar, Typography, Select, MenuItem, FormControl, InputLabel,
 import CameraIcon from '@mui/icons-material/Camera';
 import { useNavigate, Link } from 'react-router-dom';
 
-const HeaderPhotoProofing = ({ albums, selectedAlbum, onAlbumChange }) => {
+interface HeaderPhotoProofingProps {
+  albums: any,
+  selectedAlbum: string,
+  onAlbumChange: any,
+  allDisplayedImages: string[],
+}
+
+const HeaderPhotoProofing = ({ albums, selectedAlbum, onAlbumChange, allDisplayedImages }: HeaderPhotoProofingProps) => {
   const navigate = useNavigate();
   return (
     <AppBar

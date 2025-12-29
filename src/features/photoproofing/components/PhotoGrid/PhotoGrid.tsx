@@ -8,7 +8,7 @@ import FullScreenView from '../FullScreenView';
 import { usePhotoProofingcontext } from '../../context/PhotoProofingContext';
 import { PhotoProofingContextType, ImageObj } from '../../types';
 
-const PhotoGrid = () => {
+const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) => {
     const { albums, selectedAlbum, images, handleAddToAlbum, handleRemoveFromAlbum,
         folders, navigateToFolder, breadcrumbs, currentFolderId }: PhotoProofingContextType = usePhotoProofingcontext();
     const [fullScreenOpen, setFullScreenOpen] = useState(false);
@@ -51,9 +51,7 @@ const PhotoGrid = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const allDisplayedImages = selectedAlbum === 'all'
-        ? images
-        : (albums[selectedAlbum] || []).map((id: string) => images.find(img => img.id === id)).filter(Boolean) as ImageObj[];
+
 
     const totalPages = Math.ceil(allDisplayedImages.length / itemsPerPage);
     const paginatedImages = allDisplayedImages.slice((page - 1) * itemsPerPage, page * itemsPerPage);
