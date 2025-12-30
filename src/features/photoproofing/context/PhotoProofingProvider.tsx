@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PhotoProofingContext } from './PhotoProofingContext';
-import { ImageObj, Folder, PhotoProofingContextType } from '../types';
+import { ImageObj, Folder, PhotoProofingContextType, SelectedImageObj } from '../types';
 import { db } from '../../../config/firebase';
 import { doc, setDoc, serverTimestamp, arrayUnion, arrayRemove } from 'firebase/firestore';
 
@@ -13,6 +13,7 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
         "custom": [],
         "recent": []
     });
+    const [selectedImages, setSelectedImages] = useState<SelectedImageObj[]>([]);
     const [selectedAlbum, setSelectedAlbum] = useState<string>('all');
     const [images, setImages] = useState<ImageObj[]>([]);
     const [folders, setFolders] = useState<Folder[]>([]);
@@ -21,6 +22,8 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
     const [userId, setUserId] = useState<string | null>(null);
     const [projectId, setProjectId] = useState<string | null>(null);
     const [linkId, setLinkId] = useState<string | null>(null);
+    const [sourceDirectoryHandle, setSourceDirectoryHandle] = useState<FileSystemDirectoryHandle | null>(null);
+    const [destinationDirectoryHandle, setDestinationDirectoryHandle] = useState<FileSystemDirectoryHandle | null>(null);
 
     const handleAlbumChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         setSelectedAlbum(event.target.value as string);
@@ -117,7 +120,9 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
         loading, setLoading,
         userId, setUserId,
         projectId, setProjectId,
-        linkId, setLinkId
+        linkId, setLinkId,
+        sourceDirectoryHandle, setSourceDirectoryHandle,
+        destinationDirectoryHandle, setDestinationDirectoryHandle
     };
 
     return (

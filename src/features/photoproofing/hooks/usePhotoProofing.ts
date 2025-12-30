@@ -4,6 +4,7 @@ import { usePhotoProofingcontext } from '..';
 import { getProject, getSharedLink, getProjectTreeData } from '../../studio-management/api/projectService';
 import { Project, SharedLink, DriveNode } from '../../studio-management/types';
 import { useGlobalLoader } from '../../../core/context/globalLoader';
+import { albumSyncService } from '../services/AlbumSyncService';
 
 // Helper to find shared roots in the drive tree
 const findSharedRoots = (folder: DriveNode, includedIds?: Set<string> | undefined, roots: DriveNode[] = []): DriveNode[] => {
@@ -41,7 +42,7 @@ export default function usePhotoProofing(userId: string, projectId: string, link
     const {
         loading, setLoading, setImages, setFolders,
         currentFolderId, setCurrentFolderId, setBreadcrumbs,
-        setUserId, setProjectId, setLinkId
+        setUserId, setProjectId, setLinkId, setAlbums
     } = usePhotoProofingcontext();
 
     useEffect(() => {
@@ -293,6 +294,27 @@ export default function usePhotoProofing(userId: string, projectId: string, link
         if (!currentFolderId) return;
         fetchContent();
     }, [currentFolderId]);
+
+    // Effect to sync albums on page load
+    useEffect(() => {
+        if (userId && projectId && linkId) {
+            const syncAndLoad = async () => {
+                try {
+                    await albumSyncService.syncAlbums(userId, projectId, linkId);
+
+                    // After sync, load everything from local cache to state
+                    const localAlbums = await albumSyncService.getAggregatedAlbums(userId, projectId, linkId);
+                    setAlbums(prev => ({
+                        ...prev,
+                        ...localAlbums
+                    }));
+                } catch (error) {
+                    console.error("Failed to sync albums:", error);
+                }
+            };
+            syncAndLoad();
+        }
+    }, [userId, projectId, linkId]);
 
 
 

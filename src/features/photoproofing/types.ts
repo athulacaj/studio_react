@@ -4,6 +4,13 @@ export interface ImageObj {
     thumbnailLink?: string;
     [key: string]: any;
 }
+export interface SelectedImageObj {
+    src?: string;
+    folderPathList?: string[];
+    thumbnailLink?: string;
+    [key: string]: any;
+    selections: string[];
+}
 
 export interface Folder {
     id: string;
@@ -37,4 +44,8 @@ export interface PhotoProofingContextType {
     setProjectId: React.Dispatch<React.SetStateAction<string | null>>;
     linkId: string | null;
     setLinkId: React.Dispatch<React.SetStateAction<string | null>>;
+    sourceDirectoryHandle: FileSystemDirectoryHandle | null;
+    setSourceDirectoryHandle: React.Dispatch<React.SetStateAction<FileSystemDirectoryHandle | null>>;
+    destinationDirectoryHandle: FileSystemDirectoryHandle | null;
+    setDestinationDirectoryHandle: React.Dispatch<React.SetStateAction<FileSystemDirectoryHandle | null>>;
 }
