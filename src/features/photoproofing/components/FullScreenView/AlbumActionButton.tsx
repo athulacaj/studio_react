@@ -3,7 +3,18 @@ import { Button, Box, Slide } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
-const AlbumActionButton = ({
+interface AlbumActionButtonProps {
+    controlsVisible: boolean;
+    onMouseEnter: () => void;
+    onMouseLeave: () => void;
+    isImageInAlbum: boolean;
+    selectedAlbum: string;
+    onAction: () => void;
+    slideshowPlaying: boolean;
+}
+
+
+const AlbumActionButton: React.FC<AlbumActionButtonProps> = ({
     controlsVisible,
     onMouseEnter,
     onMouseLeave,

@@ -66,6 +66,13 @@ export class AlbumSyncService {
     }
 
     /**
+     * Gets images for a specific selection (e.g., 'favourites') using the IndexedDB index.
+     */
+    async getImagesBySelection(projectId: string, selectionName: string): Promise<any[]> {
+        return indexedDBService.getImagesBySelection(projectId, selectionName);
+    }
+
+    /**
      * Gets all synced data and aggregates it into the format expected by the UI
      */
     async getAggregatedAlbums(userId: string, projectId: string, linkId: string): Promise<Record<string, string[]>> {

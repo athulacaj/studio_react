@@ -12,10 +12,11 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
     const { albums, selectedAlbum, images, handleAddToAlbum, handleRemoveFromAlbum,
         folders, navigateToFolder, breadcrumbs, currentFolderId }: PhotoProofingContextType = usePhotoProofingcontext();
     const [fullScreenOpen, setFullScreenOpen] = useState(false);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [currentImage, setCurrentImage] = useState<ImageObj | null>(null);
+
     const prevAlbumRef = useRef(selectedAlbum);
     const prevFolderIdRef = useRef(currentFolderId);
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const page = parseInt(searchParams.get('page') || '1', 10);
     const itemsPerPage = 8;
@@ -33,8 +34,8 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
         }
     }, [selectedAlbum, currentFolderId, setSearchParams]);
 
-    const handleOpenFullScreen = (index: number) => {
-        setCurrentIndex(index);
+    const handleOpenFullScreen = (imageObj: ImageObj) => {
+        setCurrentImage(imageObj);
         setFullScreenOpen(true);
     };
 
@@ -140,13 +141,9 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
                                 <PhotoCard
                                     key={originalIndex}
                                     imageObj={imageObj}
-                                    index={originalIndex}
                                     isLiked={isLiked}
                                     onOpenFullScreen={handleOpenFullScreen}
-                                    selectedAlbum={selectedAlbum}
-                                    albums={albums}
-                                    onAddToAlbum={handleAddToAlbum}
-                                    onRemoveFromAlbum={handleRemoveFromAlbum}
+
                                 />
                             );
                         })}
@@ -170,16 +167,14 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
                 <EmptyState />
             )}
 
-            <FullScreenView
-                open={fullScreenOpen}
-                onClose={handleCloseFullScreen}
-                images={images}
-                currentIndex={currentIndex}
-                setCurrentIndex={setCurrentIndex}
-                albums={albums}
-                onAddToAlbum={handleAddToAlbum}
-                onRemoveFromAlbum={handleRemoveFromAlbum}
-            />
+            {currentImage && (
+                <FullScreenView
+                    open={fullScreenOpen}
+                    onClose={handleCloseFullScreen}
+                    images={images}
+                    currentImage={currentImage}
+                />
+            )}
         </Box>
     );
 };

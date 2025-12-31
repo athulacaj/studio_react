@@ -1,11 +1,26 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import { CachedImage } from '../../../../shared/utils/MakeGlobalImageCache';
 
-const ImageViewer = ({
+
+interface ImageViewerProps {
+    transformRef: React.RefObject<any>;
+    image: string;
+    imageName?: string;
+    onImageClick: (e: any) => void;
+    onLoad?: () => void;
+}
+
+
+
+
+
+const ImageViewer: React.FC<ImageViewerProps> = ({
     transformRef,
     image,
-    imageIndex,
-    onImageClick
+    imageName,
+    onImageClick,
+    onLoad
 }) => {
     return (
         <TransformWrapper
@@ -42,9 +57,24 @@ const ImageViewer = ({
                             cursor: 'grab'
                         }}
                     >
-                        <img
+                        <CachedImage src={image} className="cached-image" props={
+                            {
+                                alt: imageName ?? '',
+                                onLoad: onLoad,
+                                style: {
+                                    maxHeight: '100%',
+                                    maxWidth: '100%',
+                                    objectFit: 'contain',
+                                    transition: 'opacity 0.3s ease-in-out',
+                                    pointerEvents: 'none',
+                                    userSelect: 'none'
+                                }
+                            }
+                        } />
+                        {/* <img
                             src={image}
-                            alt={`Photo ${imageIndex + 1}`}
+                            alt={imageName ?? ''}
+                            onLoad={onLoad}
                             style={{
                                 maxHeight: '100%',
                                 maxWidth: '100%',
@@ -53,7 +83,7 @@ const ImageViewer = ({
                                 pointerEvents: 'none',
                                 userSelect: 'none'
                             }}
-                        />
+                        /> */}
                     </div>
                 </TransformComponent>
             )}

@@ -30,3 +30,15 @@ This document outlines the development plan for a modern, responsive photo proof
 4.  **Album Filtering:**
     *   Add a `Select` component to the `Header` or `PhotoGrid` to allow users to filter the displayed photos by album.
 
+
+#### Iteration 3: Advanced Image Caching
+
+1.  **Image Caching Utility:**
+    *   Implement `fetchWithCache` utility using the browser's Cache API.
+    *   Bypass standard HTTP caching using `cache: "no-store"` to handle headers manually.
+    *   Use LocalStorage to track cache timestamps and enforce a 2-minute TTL.
+2.  **useCachedImage Hook:**
+    *   Create a custom hook to fetch images and manage blob URL lifecycles (including cleanup with `URL.revokeObjectURL`).
+3.  **UI Integration:**
+    *   Update `ImageViewer` to use the caching hook.
+    *   Add a "Clear Cache" action to the `ControlBar` for manual cache invalidation.

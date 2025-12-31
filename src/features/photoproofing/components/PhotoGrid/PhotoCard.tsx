@@ -2,20 +2,18 @@ import React from 'react';
 import { Card, CardMedia, Typography, Box, IconButton, Menu, MenuItem, Fade, Tooltip } from '@mui/material';
 import { DeleteOutline, PlaylistAdd, FolderOpen } from '@mui/icons-material';
 
-import { ImageObj } from '../../types';
+import { ImageObj, PhotoProofingContextType } from '../../types';
+import { usePhotoProofingcontext } from '../../context/PhotoProofingContext';
 
 interface PhotoCardProps {
     imageObj: ImageObj;
-    index: number;
     isLiked: boolean;
-    onOpenFullScreen: (index: number) => void;
-    selectedAlbum: string;
-    albums: Record<string, string[]>;
-    onAddToAlbum: (albumName: string, index: number) => void;
-    onRemoveFromAlbum: (albumName: string, index: number) => void;
+    onOpenFullScreen: (imageObj: ImageObj) => void
 }
 
-const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, index, isLiked, onOpenFullScreen, selectedAlbum, albums, onAddToAlbum, onRemoveFromAlbum }) => {
+const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScreen }) => {
+
+    const { albums, selectedAlbum, handleAddToAlbum, handleRemoveFromAlbum }: PhotoProofingContextType = usePhotoProofingcontext();
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
     const open = Boolean(anchorEl);
     const image = imageObj.src || imageObj.thumbnailLink;
@@ -32,18 +30,18 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, index, isLiked, onOpenF
 
     const handleAlbumSelect = (event: React.MouseEvent<HTMLElement>, albumName: string) => {
         event.stopPropagation();
-        onAddToAlbum(albumName, index);
+        handleAddToAlbum(albumName, imageObj);
         handleMenuClose();
     };
 
     const handleRemove = (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
-        onRemoveFromAlbum(selectedAlbum, index);
+        handleRemoveFromAlbum(selectedAlbum, imageObj);
     };
     return (
         <Box>
             <Card
-                onClick={() => onOpenFullScreen(index)}
+                onClick={() => onOpenFullScreen(imageObj)}
                 sx={{
                     cursor: 'pointer',
                     borderRadius: '20px',
@@ -76,7 +74,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, index, isLiked, onOpenF
                     <CardMedia
                         component="img"
                         image={image}
-                        alt={`Photo ${index + 1}`}
+                        alt={imageObj.name}
                         loading="lazy"
                         sx={{
                             position: 'absolute',
@@ -243,7 +241,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, index, isLiked, onOpenF
                         }}
                     >
                         <Typography variant="body2" sx={{ color: 'white', fontWeight: 500, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-                            IMG_{index + 1000}
+                            {imageObj.name}
                         </Typography>
                         {isLiked && (
                             <Box sx={{

@@ -27,8 +27,8 @@ export interface PhotoProofingContextType {
     setSelectedAlbum: React.Dispatch<React.SetStateAction<string>>;
     setImages: React.Dispatch<React.SetStateAction<ImageObj[]>>;
     handleAlbumChange: (event: React.ChangeEvent<{ value: unknown }>) => void;
-    handleAddToAlbum: (albumName: string, photoIndex: number) => void;
-    handleRemoveFromAlbum: (albumName: string, photoIndex: number) => void;
+    handleAddToAlbum: (albumName: string, ImageObj: ImageObj) => void;
+    handleRemoveFromAlbum: (albumName: string, ImageObj: ImageObj) => void;
     folders: Folder[];
     setFolders: React.Dispatch<React.SetStateAction<Folder[]>>;
     currentFolderId: string | null;

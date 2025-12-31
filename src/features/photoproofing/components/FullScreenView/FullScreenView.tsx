@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, Box } from '@mui/material';
-import { ImageObj } from '../../types';
+import { ImageObj, PhotoProofingContextType } from '../../types';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
@@ -15,32 +15,48 @@ import LikeAnimation from './LikeAnimation';
 import NavigationButton from './NavigationButton';
 import ImageViewer from './ImageViewer';
 import AlbumActionButton from './AlbumActionButton';
+import FullScreenLoader from './FullScreenLoader';
+import { usePhotoProofingcontext } from '../../context/PhotoProofingContext';
+import { useSearchParams } from 'react-router-dom';
+import { Loader } from 'lucide-react';
+import { indexedDBService } from '../../services/IndexedDBService';
 
 interface FullScreenViewProps {
     images: ImageObj[];
-    currentIndex: number;
     onClose: () => void;
-    onAddToAlbum: (albumName: string, index: number) => void;
-    onRemoveFromAlbum: (albumName: string, index: number) => void;
-    albums: Record<string, string[]>;
     open: boolean;
-    setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
+    currentImage: ImageObj;
 }
 
 const FullScreenView: React.FC<FullScreenViewProps> = ({
     images,
-    currentIndex,
     onClose,
-    onAddToAlbum,
-    onRemoveFromAlbum,
-    albums,
     open,
-    setCurrentIndex,
+    currentImage
 }) => {
+    const { albums, handleAddToAlbum, handleRemoveFromAlbum, projectId }: PhotoProofingContextType = usePhotoProofingcontext();
+    const [currentIndex, setCurrentIndex] = useState(-1);
+    const [isImageInAlbum, setIsImageInAlbum] = useState(false);
+
     const [selectedAlbum, setSelectedAlbum] = useState('favourites');
     const [showLikeAnimation, setShowLikeAnimation] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
     const transformComponentRef = useRef<any>(null);
+    const [loader, setLoader] = useState(true);
+
+    useEffect(() => {
+        // When currentImage changes, reset index and show loader
+        setTimeout(() => {
+            setLoader(false);
+        }, 1000);
+        setTimeout(() => {
+            setCurrentIndex(
+                images.findIndex((image) => image.id === currentImage.id)
+            );
+        }, 1);
+    }, [currentImage]);
+
+
 
     // Custom hooks
     const { isFullscreen, controlsVisible, toggleFullscreen } = useFullscreenControls(isHovering);
@@ -64,14 +80,37 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
         images.length
     );
 
-    // Check if current image is in the selected album
-    const isImageInAlbum = (albums[selectedAlbum] || []).includes(images[currentIndex]?.id);
+    // Check if current image is in the selected album using IndexedDB
+    useEffect(() => {
+        const checkAlbumStatus = async () => {
+            if (!projectId || !images[currentIndex]?.id) {
+                setIsImageInAlbum(false);
+                return;
+            }
 
-    const handleAddToAlbum = () => {
+            try {
+                const imageRecord = await indexedDBService.getImageById(projectId, images[currentIndex].id);
+                if (imageRecord && imageRecord.selections) {
+                    setIsImageInAlbum(imageRecord.selections.includes(selectedAlbum));
+                } else {
+                    setIsImageInAlbum(false);
+                }
+            } catch (error) {
+                console.error("Error checking album status from IndexedDB:", error);
+                setIsImageInAlbum(false);
+            }
+        };
+
+        if (currentIndex >= 0) {
+            checkAlbumStatus();
+        }
+    }, [projectId, currentIndex, selectedAlbum, albums]);
+
+    const onhandleAddToAlbum = () => {
         if (isImageInAlbum) {
-            onRemoveFromAlbum(selectedAlbum, currentIndex);
+            handleRemoveFromAlbum(selectedAlbum, images[currentIndex]);
         } else {
-            onAddToAlbum(selectedAlbum, currentIndex);
+            handleAddToAlbum(selectedAlbum, images[currentIndex]);
             setShowLikeAnimation(true);
             setTimeout(() => setShowLikeAnimation(false), 2000);
         }
@@ -174,10 +213,13 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                     {/* Image Viewer with Zoom */}
                     <ImageViewer
                         transformRef={transformComponentRef}
-                        image={images[currentIndex].src}
-                        imageIndex={currentIndex}
+                        image={images[currentIndex]?.src ?? ""}
+                        imageName={images[currentIndex]?.name ?? "no image available"}
                         onImageClick={handleImageClick}
                     />
+
+                    {/* Loader */}
+                    <FullScreenLoader show={loader} />
 
                     {/* Next Button */}
                     <NavigationButton
@@ -194,7 +236,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                     onMouseLeave={handleMouseLeave}
                     isImageInAlbum={isImageInAlbum}
                     selectedAlbum={selectedAlbum}
-                    onAction={handleAddToAlbum}
+                    onAction={onhandleAddToAlbum}
                     slideshowPlaying={slideshowPlaying}
                 />
             </Box>

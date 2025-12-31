@@ -5,7 +5,26 @@ import ZoomControls from './ZoomControls';
 import AlbumSelector from './AlbumSelector';
 import SlideshowControls from './SlideshowControls';
 
-const ControlBar = ({
+interface ControlBarProps {
+    controlsVisible: boolean;
+    onMouseEnter: () => void;
+    onMouseLeave: () => void;
+    onClose: () => void;
+    currentIndex: number;
+    totalImages: number;
+    transformRef: React.RefObject<any>;
+    selectedAlbum: string;
+    onAlbumChange: (album: string) => void;
+    albums: Record<string, string[]>;
+    slideshowPlaying: boolean;
+    onToggleSlideshow: () => void;
+    slideshowSpeed: number;
+    onSpeedChange: (speed: number) => void;
+    isFullscreen: boolean;
+    onToggleFullscreen: () => void;
+}
+
+const ControlBar: React.FC<ControlBarProps> = ({
     controlsVisible,
     onMouseEnter,
     onMouseLeave,

@@ -6,7 +6,7 @@ export interface SyncMetadata {
 
 export class IndexedDBService {
     private dbNamePrefix: string = 'PhotoProofingDB_';
-    private dbVersion: number = 1;
+    private dbVersion: number = 2; // Bumped version for new index
     // Map to keep track of open DB connections: { projectId: IDBDatabase }
     private dbs: Map<string, IDBDatabase> = new Map();
 
@@ -19,19 +19,31 @@ export class IndexedDBService {
         }
 
         const dbName = `${this.dbNamePrefix}${projectId}`;
-        const imagesStore = `${projectId}_images`;
-        const metadataStore = `${projectId}_sync_metadata`;
+        const imagesStoreName = `${projectId}_images`;
+        const metadataStoreName = `${projectId}_sync_metadata`;
 
         return new Promise((resolve, reject) => {
             const request = indexedDB.open(dbName, this.dbVersion);
 
             request.onupgradeneeded = (event) => {
                 const db = (event.target as IDBOpenDBRequest).result;
-                if (!db.objectStoreNames.contains(imagesStore)) {
-                    db.createObjectStore(imagesStore, { keyPath: 'id' });
+
+                // Create or get images store
+                let imagesStore;
+                if (!db.objectStoreNames.contains(imagesStoreName)) {
+                    imagesStore = db.createObjectStore(imagesStoreName, { keyPath: 'id' });
+                } else {
+                    imagesStore = (event.target as IDBOpenDBRequest).transaction?.objectStore(imagesStoreName);
                 }
-                if (!db.objectStoreNames.contains(metadataStore)) {
-                    db.createObjectStore(metadataStore, { keyPath: 'id' });
+
+                // Add selections index if it doesn't exist
+                if (imagesStore && !imagesStore.indexNames.contains('selections')) {
+                    imagesStore.createIndex('selections', 'selections', { multiEntry: true });
+                }
+
+                // Create metadata store
+                if (!db.objectStoreNames.contains(metadataStoreName)) {
+                    db.createObjectStore(metadataStoreName, { keyPath: 'id' });
                 }
             };
 
@@ -62,6 +74,23 @@ export class IndexedDBService {
             const transaction = db.transaction(storeName, 'readonly');
             const store = transaction.objectStore(storeName);
             const request = store.get(id);
+
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    /**
+     * Get images for a specific selection (e.g., 'favourites') using the index
+     */
+    async getImagesBySelection(projectId: string, selectionName: string): Promise<any[]> {
+        const db = await this.getDB(projectId);
+        const { images: storeName } = this.getStoreNames(projectId);
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(storeName, 'readonly');
+            const store = transaction.objectStore(storeName);
+            const index = store.index('selections');
+            const request = index.getAll(selectionName);
 
             request.onsuccess = () => resolve(request.result);
             request.onerror = () => reject(request.error);
@@ -134,4 +163,6 @@ export class IndexedDBService {
     }
 }
 
-export const indexedDBService = new IndexedDBService();
+const indexedDBService = new IndexedDBService();
+(window as any).indexedDBService = indexedDBService;
+export { indexedDBService };
