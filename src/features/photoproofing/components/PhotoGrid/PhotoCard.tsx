@@ -4,6 +4,7 @@ import { DeleteOutline, PlaylistAdd, FolderOpen } from '@mui/icons-material';
 
 import { ImageObj, PhotoProofingContextType } from '../../types';
 import { usePhotoProofingcontext } from '../../context/PhotoProofingContext';
+import { CachedImage } from '../../../../shared/utils/MakeGlobalImageCache';
 
 interface PhotoCardProps {
     imageObj: ImageObj;
@@ -71,7 +72,22 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
                 }}
             >
                 <Box sx={{ position: 'relative', overflow: 'hidden', paddingTop: '75%' }}>
-                    <CardMedia
+                    <CachedImage
+                        src={image}
+                        alt={imageObj.name}
+                        loading="lazy"
+                        className="MuiCardMedia-root"
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                        }}
+                    />
+                    {/* <CardMedia
                         component="img"
                         image={image}
                         alt={imageObj.name}
@@ -85,7 +101,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
                             objectFit: 'cover',
                             transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
                         }}
-                    />
+                    /> */}
 
                     {/* Gradient Overlay */}
                     <Box

@@ -20,6 +20,7 @@ import { usePhotoProofingcontext } from '../../context/PhotoProofingContext';
 import { useSearchParams } from 'react-router-dom';
 import { Loader } from 'lucide-react';
 import { indexedDBService } from '../../services/IndexedDBService';
+import { CachedImage } from '../../../../shared/utils/MakeGlobalImageCache';
 
 interface FullScreenViewProps {
     images: ImageObj[];
@@ -125,9 +126,41 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
         resetZoom();
     }, [currentImageIndex]);
 
+    const [preloadImages, setPreloadImages] = useState<ImageObj[]>([]);
+
+
+    function preloadImagesFn(imgIndex: number) {
+        // preoload 3 images 
+        const r = []
+        const limit = 3;
+        let count = 0;
+        for (let i = imgIndex + 1; i < images.length; i++) {
+            r.push(images[i])
+            count++;
+            if (count >= limit) {
+                break;
+            }
+        }
+        setPreloadImages(r);
+    }
+
+
+    useEffect(() => {
+        const refTimeout = setTimeout(() => {
+            preloadImagesFn(currentImageIndex);
+        }, 1000)
+        return () => {
+            clearTimeout(refTimeout)
+        }
+    }, [currentImageIndex])
+
+
+
+
     if (!open) {
         return null;
     }
+
 
     return (
         <Dialog
@@ -141,6 +174,24 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                 },
             }}
         >
+            <Box display={"none"}>
+                {
+                    preloadImages.map((img: ImageObj, index: number) => (
+                        <CachedImage src={img.src} className="cached-image"
+                            alt={img.name ?? ''}
+                            style={{
+                                maxHeight: '100%',
+                                maxWidth: '100%',
+                                objectFit: 'contain',
+                                transition: 'opacity 0.3s ease-in-out',
+                                pointerEvents: 'none',
+                                userSelect: 'none'
+                            }}
+                        />
+                    ))
+                }
+            </Box>
+
             <Box
                 sx={{
                     height: '100vh',
@@ -240,6 +291,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                 />
             </Box>
         </Dialog>
+
     );
 };
 

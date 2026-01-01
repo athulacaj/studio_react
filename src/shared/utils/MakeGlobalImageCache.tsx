@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 
+const InOnePage = 8;
+const LIMIT = 8 + 3; // 3 preload when viewing full screent
 // ImageCache.js
 class RAMImageCache {
     limit: number;
@@ -53,6 +55,10 @@ class RAMImageCache {
         // 4. Cleanup if too big
         if (this.cache.size > this.limit) {
             const oldestKey = this.cache.keys().next().value;
+            // const keys = Array.from(this.cache.keys());
+            // const midKey = keys[Math.floor(keys.length / 2)];
+
+
             if (oldestKey) {
                 this.cache.delete(oldestKey); // The browser will now garbage collect this one
             }
@@ -66,12 +72,12 @@ class RAMImageCache {
     }
 }
 // Export a single shared instance
-export const globalImageCache = new RAMImageCache(5);
+export const globalImageCache = new RAMImageCache(LIMIT);
 
 
 const CachedImage = ({ src, className, ...props }: { src: string | undefined; className?: string;[key: string]: any }) => {
 
-    const { shouldAdd = false } = props ?? {};
+    const { shouldAdd = true } = props ?? {};
     const containerRef = useRef<HTMLDivElement>(null);
     const isImageAvailableRef = useRef<boolean>(false);
 
@@ -104,9 +110,9 @@ const CachedImage = ({ src, className, ...props }: { src: string | undefined; cl
         };
     }, [src, className]);
 
-    if (isImageAvailableRef.current == false) {
-        return <img src={src} className={className} {...props} />
-    }
+    // if (isImageAvailableRef.current == false) {
+    //     return <img src={src} className={className} {...props} />
+    // }
 
     return (
         // We render a placeholder div that we will manually fill
@@ -120,6 +126,11 @@ const CachedImage = ({ src, className, ...props }: { src: string | undefined; cl
 function clearGlobalImageCache() {
     globalImageCache.clear();
 }
+
+
+
+
+
 
 
 export { CachedImage, clearGlobalImageCache };

@@ -12,7 +12,7 @@ import { globalImageCache } from '../../../../shared/utils/MakeGlobalImageCache'
 const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) => {
     const { albums, selectedAlbum, images, itemsPerPage,
         folders, navigateToFolder, breadcrumbs, currentFolderId,
-        imagesCache, setImagesCache }: PhotoProofingContextType = usePhotoProofingcontext();
+        imagesCache, setImagesCache, }: PhotoProofingContextType = usePhotoProofingcontext();
     const [fullScreenOpen, setFullScreenOpen] = useState(false);
     const [currentImage, setCurrentImage] = useState<ImageObj | null>(null);
 

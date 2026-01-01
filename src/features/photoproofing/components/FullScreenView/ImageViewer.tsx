@@ -57,20 +57,18 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
                             cursor: 'grab'
                         }}
                     >
-                        <CachedImage src={image} className="cached-image" props={
-                            {
-                                alt: imageName ?? '',
-                                onLoad: onLoad,
-                                style: {
-                                    maxHeight: '100%',
-                                    maxWidth: '100%',
-                                    objectFit: 'contain',
-                                    transition: 'opacity 0.3s ease-in-out',
-                                    pointerEvents: 'none',
-                                    userSelect: 'none'
-                                }
-                            }
-                        } />
+                        <CachedImage src={image} className="cached-image"
+                            alt={imageName ?? ''}
+                            onLoad={onLoad}
+                            style={{
+                                maxHeight: '100%',
+                                maxWidth: '100%',
+                                objectFit: 'contain',
+                                transition: 'opacity 0.3s ease-in-out',
+                                pointerEvents: 'none',
+                                userSelect: 'none'
+                            }}
+                        />
                         {/* <img
                             src={image}
                             alt={imageName ?? ''}
