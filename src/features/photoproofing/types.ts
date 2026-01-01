@@ -48,4 +48,9 @@ export interface PhotoProofingContextType {
     setSourceDirectoryHandle: React.Dispatch<React.SetStateAction<FileSystemDirectoryHandle | null>>;
     destinationDirectoryHandle: FileSystemDirectoryHandle | null;
     setDestinationDirectoryHandle: React.Dispatch<React.SetStateAction<FileSystemDirectoryHandle | null>>;
+    currentImageIndex: number;
+    setCurrentImageIndex: React.Dispatch<React.SetStateAction<number>>;
+    itemsPerPage: number;
+    imagesCache: HTMLImageElement[];
+    setImagesCache: React.Dispatch<React.SetStateAction<HTMLImageElement[]>>;
 }

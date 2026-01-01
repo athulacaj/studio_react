@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Box, Pagination, Breadcrumbs, Link, Typography, Card } from '@mui/material';
 import { Folder as FolderIcon } from '@mui/icons-material';
 import { useSearchParams } from 'react-router-dom';
@@ -7,10 +7,12 @@ import EmptyState from './EmptyState';
 import FullScreenView from '../FullScreenView';
 import { usePhotoProofingcontext } from '../../context/PhotoProofingContext';
 import { PhotoProofingContextType, ImageObj } from '../../types';
+import { globalImageCache } from '../../../../shared/utils/MakeGlobalImageCache';
 
 const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) => {
-    const { albums, selectedAlbum, images, handleAddToAlbum, handleRemoveFromAlbum,
-        folders, navigateToFolder, breadcrumbs, currentFolderId }: PhotoProofingContextType = usePhotoProofingcontext();
+    const { albums, selectedAlbum, images, itemsPerPage,
+        folders, navigateToFolder, breadcrumbs, currentFolderId,
+        imagesCache, setImagesCache }: PhotoProofingContextType = usePhotoProofingcontext();
     const [fullScreenOpen, setFullScreenOpen] = useState(false);
     const [currentImage, setCurrentImage] = useState<ImageObj | null>(null);
 
@@ -19,7 +21,6 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
     const [searchParams, setSearchParams] = useSearchParams();
 
     const page = parseInt(searchParams.get('page') || '1', 10);
-    const itemsPerPage = 8;
 
     // Reset page to 1 when album or folder changes
     useEffect(() => {
@@ -55,8 +56,45 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
 
 
     const totalPages = Math.ceil(allDisplayedImages.length / itemsPerPage);
-    const paginatedImages = allDisplayedImages.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+    const paginatedImages =
+        useMemo(() => allDisplayedImages.slice((page - 1) * itemsPerPage, page * itemsPerPage), [allDisplayedImages, page, itemsPerPage]);
 
+
+    // useEffect(() => {
+    //     paginatedImages.forEach(e => {
+    //         if (e.src) {
+    //             const img = globalImageCache.getImageElement(e.src, true, {
+    //                 alt: e.name,
+    //                 loading: 'lazy',
+    //                 className: 'MuiCardMedia-root',
+    //                 style: {
+    //                     position: 'absolute',
+    //                     top: 0,
+    //                     left: 0,
+    //                     width: '100%',
+    //                     height: '100%',
+    //                     objectFit: 'cover',
+    //                     transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+    //                 }
+    //             })
+    //             if (img)
+    //                 document.getElementById('images_cache')?.appendChild(img)
+    //         }
+    //     })
+    // }, [paginatedImages])
+
+
+
+    if (fullScreenOpen && currentImage) {
+        return (
+            <FullScreenView
+                open={fullScreenOpen}
+                onClose={handleCloseFullScreen}
+                images={images}
+                currentImage={currentImage}
+            />
+        )
+    }
     return (
         <Box sx={{ p: 4, minHeight: '60vh' }}>
             {/* Breadcrumbs */}
@@ -167,14 +205,7 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
                 <EmptyState />
             )}
 
-            {currentImage && (
-                <FullScreenView
-                    open={fullScreenOpen}
-                    onClose={handleCloseFullScreen}
-                    images={images}
-                    currentImage={currentImage}
-                />
-            )}
+
         </Box>
     );
 };

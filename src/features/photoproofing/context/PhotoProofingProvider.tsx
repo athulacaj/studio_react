@@ -25,6 +25,7 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
     const [linkId, setLinkId] = useState<string | null>(null);
     const [sourceDirectoryHandle, setSourceDirectoryHandle] = useState<FileSystemDirectoryHandle | null>(null);
     const [destinationDirectoryHandle, setDestinationDirectoryHandle] = useState<FileSystemDirectoryHandle | null>(null);
+    const [currentImageIndex, setCurrentImageIndex] = useState(-1);
 
     const handleAlbumChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         setSelectedAlbum(event.target.value as string);
@@ -126,6 +127,10 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
             setBreadcrumbs([]);
         }
     };
+    const itemsPerPage = 8;
+    const [imagesCache, setImagesCache] = useState<HTMLImageElement[]>([]);
+
+
 
     const value: PhotoProofingContextType = {
         albums,
@@ -149,7 +154,11 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
         projectId, setProjectId,
         linkId, setLinkId,
         sourceDirectoryHandle, setSourceDirectoryHandle,
-        destinationDirectoryHandle, setDestinationDirectoryHandle
+        destinationDirectoryHandle, setDestinationDirectoryHandle,
+        currentImageIndex, setCurrentImageIndex,
+        itemsPerPage,
+        imagesCache,
+        setImagesCache
     };
 
     return (

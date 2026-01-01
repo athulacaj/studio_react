@@ -34,8 +34,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
     open,
     currentImage
 }) => {
-    const { albums, handleAddToAlbum, handleRemoveFromAlbum, projectId }: PhotoProofingContextType = usePhotoProofingcontext();
-    const [currentIndex, setCurrentIndex] = useState(-1);
+    const { albums, handleAddToAlbum, handleRemoveFromAlbum, projectId, currentImageIndex, setCurrentImageIndex }: PhotoProofingContextType = usePhotoProofingcontext();
     const [isImageInAlbum, setIsImageInAlbum] = useState(false);
 
     const [selectedAlbum, setSelectedAlbum] = useState('favourites');
@@ -50,7 +49,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
             setLoader(false);
         }, 1000);
         setTimeout(() => {
-            setCurrentIndex(
+            setCurrentImageIndex(
                 images.findIndex((image) => image.id === currentImage.id)
             );
         }, 1);
@@ -68,28 +67,28 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
     };
 
     const { handleNext, handlePrev } = useImageNavigation(
-        currentIndex,
-        setCurrentIndex,
+        currentImageIndex,
+        setCurrentImageIndex,
         images.length,
         resetZoom
     );
 
     const { slideshowPlaying, slideshowSpeed, setSlideshowSpeed, toggleSlideshow } = useSlideshow(
         handleNext,
-        currentIndex,
+        currentImageIndex,
         images.length
     );
 
     // Check if current image is in the selected album using IndexedDB
     useEffect(() => {
         const checkAlbumStatus = async () => {
-            if (!projectId || !images[currentIndex]?.id) {
+            if (!projectId || !images[currentImageIndex]?.id) {
                 setIsImageInAlbum(false);
                 return;
             }
 
             try {
-                const imageRecord = await indexedDBService.getImageById(projectId, images[currentIndex].id);
+                const imageRecord = await indexedDBService.getImageById(projectId, images[currentImageIndex].id);
                 if (imageRecord && imageRecord.selections) {
                     setIsImageInAlbum(imageRecord.selections.includes(selectedAlbum));
                 } else {
@@ -101,16 +100,16 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
             }
         };
 
-        if (currentIndex >= 0) {
+        if (currentImageIndex >= 0) {
             checkAlbumStatus();
         }
-    }, [projectId, currentIndex, selectedAlbum, albums]);
+    }, [projectId, currentImageIndex, selectedAlbum, albums]);
 
     const onhandleAddToAlbum = () => {
         if (isImageInAlbum) {
-            handleRemoveFromAlbum(selectedAlbum, images[currentIndex]);
+            handleRemoveFromAlbum(selectedAlbum, images[currentImageIndex]);
         } else {
-            handleAddToAlbum(selectedAlbum, images[currentIndex]);
+            handleAddToAlbum(selectedAlbum, images[currentImageIndex]);
             setShowLikeAnimation(true);
             setTimeout(() => setShowLikeAnimation(false), 2000);
         }
@@ -124,7 +123,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
     // Reset zoom when image changes
     useEffect(() => {
         resetZoom();
-    }, [currentIndex]);
+    }, [currentImageIndex]);
 
     if (!open) {
         return null;
@@ -173,7 +172,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                     onClose={onClose}
-                    currentIndex={currentIndex}
+                    currentIndex={currentImageIndex}
                     totalImages={images.length}
                     transformRef={transformComponentRef}
                     selectedAlbum={selectedAlbum}
@@ -213,8 +212,8 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                     {/* Image Viewer with Zoom */}
                     <ImageViewer
                         transformRef={transformComponentRef}
-                        image={images[currentIndex]?.src ?? ""}
-                        imageName={images[currentIndex]?.name ?? "no image available"}
+                        image={images[currentImageIndex]?.src ?? ""}
+                        imageName={images[currentImageIndex]?.name ?? "no image available"}
                         onImageClick={handleImageClick}
                     />
 

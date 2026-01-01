@@ -5,6 +5,7 @@ import { getProject, getSharedLink, getProjectTreeData } from '../../studio-mana
 import { Project, SharedLink, DriveNode } from '../../studio-management/types';
 import { useGlobalLoader } from '../../../core/context/globalLoader';
 import { albumSyncService } from '../services/AlbumSyncService';
+import { useSearchParams } from 'react-router-dom';
 
 // Helper to find shared roots in the drive tree
 const findSharedRoots = (folder: DriveNode, includedIds?: Set<string> | undefined, roots: DriveNode[] = []): DriveNode[] => {
@@ -42,7 +43,7 @@ export default function usePhotoProofing(userId: string, projectId: string, link
     const {
         loading, setLoading, setImages, setFolders,
         currentFolderId, setCurrentFolderId, setBreadcrumbs,
-        setUserId, setProjectId, setLinkId, setAlbums
+        setUserId, setProjectId, setLinkId, setAlbums, currentImageIndex, itemsPerPage
     } = usePhotoProofingcontext();
 
     useEffect(() => {
@@ -317,6 +318,20 @@ export default function usePhotoProofing(userId: string, projectId: string, link
     }, [userId, projectId, linkId]);
 
 
+    // cahnge page number if the user changes to the next or previous page through fullscreen autoplay or next button
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    useEffect(() => {
+        if (currentImageIndex > -1) {
+            const newPage = Math.ceil((currentImageIndex + 1) / itemsPerPage);
+            setSearchParams(prev => {
+                const newParams = new URLSearchParams(prev);
+                newParams.set('page', newPage.toString());
+                return newParams;
+            });
+        }
+
+    }, [currentImageIndex]);
 
     return {
         loading,
