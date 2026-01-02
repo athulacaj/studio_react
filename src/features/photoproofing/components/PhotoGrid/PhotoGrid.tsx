@@ -90,7 +90,7 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
             <FullScreenView
                 open={fullScreenOpen}
                 onClose={handleCloseFullScreen}
-                images={images}
+                images={allDisplayedImages}
                 currentImage={currentImage}
             />
         )
