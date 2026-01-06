@@ -3,7 +3,7 @@ import { useState, useRef } from 'react';
 /**
  * Custom hook to handle double-click detection for adding images to albums
  */
-const useDoubleClick = (onDoubleClick) => {
+const useDoubleClick = (onDoubleClick, onSingleClick) => {
   const clickTimer = useRef();
 
   const handleClick = (e) => {
@@ -13,12 +13,14 @@ const useDoubleClick = (onDoubleClick) => {
       // This is a double-click
       clearTimeout(clickTimer.current);
       clickTimer.current = null;
-      onDoubleClick();
+      onDoubleClick(e);
     } else {
       // This is a single click, wait to see if another click comes
       clickTimer.current = setTimeout(() => {
         clickTimer.current = null;
-        // Single click action (currently none, but could toggle controls)
+        if (onSingleClick) {
+          onSingleClick(e);
+        }
       }, 300);
     }
   };

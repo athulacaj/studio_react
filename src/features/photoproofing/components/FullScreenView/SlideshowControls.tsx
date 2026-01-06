@@ -11,11 +11,13 @@ const SlideshowControls = ({
     slideshowSpeed,
     onSpeedChange,
     isFullscreen,
-    onToggleFullscreen
+    onToggleFullscreen,
+    isMobile
 }) => {
     return (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <FormControl size="small" variant="standard" sx={{ minWidth: 80 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: isMobile ? 0 : 1 }}>
+            {/* {!isMobile && ( */}
+            <FormControl size="small" variant="standard" sx={{ minWidth: isMobile ? 50 : 100 }}>
                 <Select
                     value={slideshowSpeed}
                     onChange={(e) => onSpeedChange(e.target.value)}
@@ -30,15 +32,17 @@ const SlideshowControls = ({
                     <MenuItem value={1000}>1s</MenuItem>
                     <MenuItem value={3000}>3s</MenuItem>
                     <MenuItem value={5000}>5s</MenuItem>
+                    <MenuItem value={10000}>10s</MenuItem>
                 </Select>
             </FormControl>
+            {/* )} */}
 
-            <IconButton color="inherit" onClick={onToggleSlideshow} aria-label="Toggle slideshow">
-                {slideshowPlaying ? <PauseIcon /> : <PlayArrowIcon />}
+            <IconButton color="inherit" onClick={onToggleSlideshow} aria-label="Toggle slideshow" size={isMobile ? "small" : "medium"}>
+                {slideshowPlaying ? <PauseIcon fontSize={isMobile ? "small" : "medium"} /> : <PlayArrowIcon fontSize={isMobile ? "small" : "medium"} />}
             </IconButton>
 
-            <IconButton color="inherit" onClick={onToggleFullscreen} aria-label="Toggle fullscreen">
-                {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+            <IconButton color="inherit" onClick={onToggleFullscreen} aria-label="Toggle fullscreen" size={isMobile ? "small" : "medium"}>
+                {isFullscreen ? <FullscreenExitIcon fontSize={isMobile ? "small" : "medium"} /> : <FullscreenIcon fontSize={isMobile ? "small" : "medium"} />}
             </IconButton>
         </Box>
     );

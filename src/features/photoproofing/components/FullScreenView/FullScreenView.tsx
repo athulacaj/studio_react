@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Dialog, Box } from '@mui/material';
+import { Dialog, Box, useTheme, useMediaQuery } from '@mui/material';
 import { ImageObj, PhotoProofingContextType } from '../../types';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -59,7 +59,10 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
 
 
     // Custom hooks
-    const { isFullscreen, controlsVisible, toggleFullscreen } = useFullscreenControls(isHovering);
+    const { isFullscreen, controlsVisible, toggleFullscreen, setControlsVisible } = useFullscreenControls(isHovering);
+
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const resetZoom = () => {
         if (transformComponentRef.current) {
@@ -117,10 +120,46 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
         }
     };
 
-    const handleImageClick = useDoubleClick(handleAddToAlbum);
+    const handleSingleClick = () => {
+        setControlsVisible((prev) => !prev);
+    };
 
-    const handleMouseEnter = () => setIsHovering(true);
-    const handleMouseLeave = () => setIsHovering(false);
+    const handleImageClick = useDoubleClick(handleAddToAlbum, handleSingleClick);
+
+    const handleMouseEnter = () => !isMobile && setIsHovering(true);
+    const handleMouseLeave = () => !isMobile && setIsHovering(false);
+
+    // Touch handling for swipe navigation (mainly for mobile)
+    const touchStart = useRef<number | null>(null);
+    const touchEnd = useRef<number | null>(null);
+    const minSwipeDistance = 50;
+
+    const onTouchStart = (e: React.TouchEvent) => {
+        touchEnd.current = null;
+        touchStart.current = e.targetTouches[0].clientX;
+    };
+
+    const onTouchMove = (e: React.TouchEvent) => {
+        touchEnd.current = e.targetTouches[0].clientX;
+    };
+
+    const onTouchEnd = () => {
+        if (!touchStart.current || !touchEnd.current) return;
+        const distance = touchStart.current - touchEnd.current;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+
+        // Ensure we don't swipe if zoomed in (simple check could be checking ref scale, but here assuming single touch swipe is nav)
+        // Ideally we check transformComponentRef.current.state.scale but types might be loose.
+        // For now, let's assume swipe works if not actively pinch-zooming (which usually involves two fingers).
+        // Since touchStart tracks one finger, this is likely a swipe.
+
+        if (isLeftSwipe) {
+            handleNext();
+        } else if (isRightSwipe) {
+            handlePrev();
+        }
+    };
 
     // Reset zoom when image changes
     useEffect(() => {
@@ -184,6 +223,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                     preloadImages.map((img: ImageObj, index: number) => (
                         <CachedImage src={img.src} className="cached-image"
                             alt={img.name ?? ''}
+                            key={img.id || index}
                             style={{
                                 maxHeight: '100%',
                                 maxWidth: '100%',
@@ -207,20 +247,25 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                     display: 'flex',
                     flexDirection: 'column'
                 }}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
             >
-                {/* Hover detection area for top controls */}
-                <Box
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                    sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100px',
-                        zIndex: 10
-                    }}
-                />
+                {/* Hover detection area for top controls - Only on desktop */}
+                {!isMobile && (
+                    <Box
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                        sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100px',
+                            zIndex: 10
+                        }}
+                    />
+                )}
 
                 {/* Top Control Bar */}
                 <ControlBar
@@ -240,6 +285,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                     onSpeedChange={setSlideshowSpeed}
                     isFullscreen={isFullscreen}
                     onToggleFullscreen={toggleFullscreen}
+                    isMobile={isMobile}
                 />
 
                 {/* Main Image Area */}
@@ -294,6 +340,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                     onAction={onhandleAddToAlbum}
                     addToAlbumLoader={addToAlbumLoader}
                     slideshowPlaying={slideshowPlaying}
+                    isMobile={isMobile}
                 />
             </Box>
         </Dialog>

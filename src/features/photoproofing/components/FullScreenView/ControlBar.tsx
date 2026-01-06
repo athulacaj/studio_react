@@ -22,6 +22,7 @@ interface ControlBarProps {
     onSpeedChange: (speed: number) => void;
     isFullscreen: boolean;
     onToggleFullscreen: () => void;
+    isMobile?: boolean;
 }
 
 const ControlBar: React.FC<ControlBarProps> = ({
@@ -40,7 +41,8 @@ const ControlBar: React.FC<ControlBarProps> = ({
     slideshowSpeed,
     onSpeedChange,
     isFullscreen,
-    onToggleFullscreen
+    onToggleFullscreen,
+    isMobile
 }) => {
     return (
         <Slide appear={false} direction="down" in={controlsVisible}>
@@ -54,34 +56,39 @@ const ControlBar: React.FC<ControlBarProps> = ({
                     backgroundColor: 'rgba(15, 23, 42, 0.6)',
                     backdropFilter: 'blur(12px)',
                     borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                    zIndex: 1200
+                    zIndex: 1200,
+                    height: isMobile ? '56px' : '64px',
                 }}
             >
-                <Toolbar sx={{ justifyContent: 'space-between' }}>
+                <Toolbar sx={{ justifyContent: 'space-between', minHeight: isMobile ? '56px !important' : '64px' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <IconButton
                             edge="start"
                             color="inherit"
                             onClick={onClose}
                             aria-label="close"
-                            sx={{ mr: 2 }}
+                            sx={{ mr: isMobile ? 1 : 2 }}
                         >
                             <CloseIcon />
                         </IconButton>
-                        <Typography variant="subtitle1" component="div" sx={{ fontWeight: 500, color: 'white' }}>
+                        <Typography variant="subtitle1" component="div" sx={{ fontWeight: 500, color: 'white', fontSize: isMobile ? '0.9rem' : '1rem', whiteSpace: 'nowrap' }}>
                             {currentIndex + 1} / {totalImages}
                         </Typography>
                     </Box>
 
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <ZoomControls transformRef={transformRef} />
-
-                        <Box sx={{ width: '1px', height: '24px', bgcolor: 'rgba(255,255,255,0.2)', mx: 1 }} />
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: isMobile ? 0.5 : 1 }}>
+                        {!isMobile && (
+                            <>
+                                <ZoomControls transformRef={transformRef} />
+                                <Box sx={{ width: '1px', height: '24px', bgcolor: 'rgba(255,255,255,0.2)', mx: 1 }} />
+                            </>
+                        )}
 
                         <AlbumSelector
                             selectedAlbum={selectedAlbum}
                             onAlbumChange={onAlbumChange}
                             albums={albums}
+                            isMobile={isMobile}
                         />
 
                         <SlideshowControls
@@ -91,6 +98,7 @@ const ControlBar: React.FC<ControlBarProps> = ({
                             onSpeedChange={onSpeedChange}
                             isFullscreen={isFullscreen}
                             onToggleFullscreen={onToggleFullscreen}
+                            isMobile={isMobile}
                         />
                     </Box>
                 </Toolbar>

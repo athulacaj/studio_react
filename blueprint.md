@@ -41,4 +41,19 @@ This document outlines the development plan for a modern, responsive photo proof
     *   Create a custom hook to fetch images and manage blob URL lifecycles (including cleanup with `URL.revokeObjectURL`).
 3.  **UI Integration:**
     *   Update `ImageViewer` to use the caching hook.
-    *   Add a "Clear Cache" action to the `ControlBar` for manual cache invalidation.
+
+#### Iteration 4: Responsive Mobile Header
+
+1.  **Mobile Layout Detection:**
+    *   Utilize MUI's `useTheme` and `useMediaQuery` to detect mobile viewports (screens smaller than `md` breakpoint).
+2.  **Adaptive Navigation:**
+    *   **Desktop:** Retain the full toolbar with direct access to "About", "Download", and "Album Selector".
+    *   **Mobile:** Consolidate navigation items into a `Drawer` accessible via a hamburger menu icon.
+3.  **Mobile Drawer Components:**
+    *   **Album Selector:** Adapted full-width selector for easier touch interaction.
+    *   **Download Actions:** Integrated the download button and its options menu into the drawer flow.
+    *   **Navigation Links:** Full-width layout for "About" and other future links.
+4.  **Styling Enhancements:**
+    *   Responsive font sizes for the logo.
+    *   Blur-backed App Bar for a modern, glassmorphism feel on both mobile and desktop.
+

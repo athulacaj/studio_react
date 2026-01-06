@@ -52,6 +52,7 @@ const useFullscreenControls = (isHovering) => {
   return {
     isFullscreen,
     controlsVisible,
+    setControlsVisible, // Expose setter for manual control
     toggleFullscreen
   };
 };

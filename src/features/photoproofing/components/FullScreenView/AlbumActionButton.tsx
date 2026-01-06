@@ -12,6 +12,7 @@ interface AlbumActionButtonProps {
     onAction: () => void;
     slideshowPlaying: boolean;
     addToAlbumLoader: boolean;
+    isMobile?: boolean;
 }
 
 
@@ -23,7 +24,8 @@ const AlbumActionButton: React.FC<AlbumActionButtonProps> = ({
     selectedAlbum,
     onAction,
     slideshowPlaying,
-    addToAlbumLoader
+    addToAlbumLoader,
+    isMobile
 }) => {
     if (slideshowPlaying) return null;
 
@@ -36,7 +38,7 @@ const AlbumActionButton: React.FC<AlbumActionButtonProps> = ({
                     display: 'flex',
                     justifyContent: 'center',
                     position: 'absolute',
-                    bottom: 30,
+                    bottom: isMobile ? 20 : 30,
                     width: '100%',
                     zIndex: 20,
                     pointerEvents: 'none'
@@ -59,10 +61,10 @@ const AlbumActionButton: React.FC<AlbumActionButtonProps> = ({
                     sx={{
                         mx: 1,
                         borderRadius: 50,
-                        px: 4,
-                        py: 1.5,
+                        px: isMobile ? 3 : 4,
+                        py: isMobile ? 1 : 1.5,
                         textTransform: 'none',
-                        fontSize: '1rem',
+                        fontSize: isMobile ? '0.875rem' : '1rem',
                         fontWeight: 600,
                         boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
                         backdropFilter: 'blur(4px)',
@@ -84,7 +86,7 @@ const AlbumActionButton: React.FC<AlbumActionButtonProps> = ({
                         }
                     }}
                 >
-                    {addToAlbumLoader ? 'Processing...' : isImageInAlbum ? `Remove from ${selectedAlbum}` : `Add to ${selectedAlbum}`}
+                    {addToAlbumLoader ? 'Processing...' : isImageInAlbum ? (isMobile ? 'Remove' : `Remove from ${selectedAlbum}`) : (isMobile ? 'Add' : `Add to ${selectedAlbum}`)}
                 </Button>
             </Box>
         </Slide>
