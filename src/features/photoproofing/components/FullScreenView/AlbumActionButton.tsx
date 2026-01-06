@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Box, Slide } from '@mui/material';
+import { Button, Box, Slide, CircularProgress } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
@@ -11,6 +11,7 @@ interface AlbumActionButtonProps {
     selectedAlbum: string;
     onAction: () => void;
     slideshowPlaying: boolean;
+    addToAlbumLoader: boolean;
 }
 
 
@@ -21,7 +22,8 @@ const AlbumActionButton: React.FC<AlbumActionButtonProps> = ({
     isImageInAlbum,
     selectedAlbum,
     onAction,
-    slideshowPlaying
+    slideshowPlaying,
+    addToAlbumLoader
 }) => {
     if (slideshowPlaying) return null;
 
@@ -44,7 +46,16 @@ const AlbumActionButton: React.FC<AlbumActionButtonProps> = ({
                     variant="contained"
                     color="secondary"
                     onClick={onAction}
-                    startIcon={isImageInAlbum ? <CloseIcon /> : <FavoriteIcon />}
+                    disabled={addToAlbumLoader}
+                    startIcon={
+                        addToAlbumLoader ? (
+                            <CircularProgress size={20} color="inherit" />
+                        ) : isImageInAlbum ? (
+                            <CloseIcon />
+                        ) : (
+                            <FavoriteIcon />
+                        )
+                    }
                     sx={{
                         mx: 1,
                         borderRadius: 50,
@@ -63,10 +74,17 @@ const AlbumActionButton: React.FC<AlbumActionButtonProps> = ({
                             boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.5)',
                             transform: 'translateY(-2px)',
                             transition: 'all 0.2s ease-in-out'
+                        },
+                        '&.Mui-disabled': {
+                            background: isImageInAlbum
+                                ? 'linear-gradient(45deg, #ef4444 30%, #dc2626 90%)'
+                                : 'linear-gradient(45deg, #a855f7 30%, #6366f1 90%)',
+                            color: 'white',
+                            opacity: 0.8
                         }
                     }}
                 >
-                    {isImageInAlbum ? `Remove from ${selectedAlbum}` : `Add to ${selectedAlbum}`}
+                    {addToAlbumLoader ? 'Processing...' : isImageInAlbum ? `Remove from ${selectedAlbum}` : `Add to ${selectedAlbum}`}
                 </Button>
             </Box>
         </Slide>

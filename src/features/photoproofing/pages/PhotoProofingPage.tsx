@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Box } from '@mui/material';
 import PhotoGrid from '../components/PhotoGrid';
 import { usePhotoProofingcontext } from '../context/PhotoProofingContext';
@@ -12,7 +12,13 @@ const PhotoProofingPage = () => {
         ? images
         : (albums[selectedAlbum] || []).map((img: string) => JSON.parse(img));
 
-
+    const [reload, setReload] = useState(true);
+    useEffect(() => {
+        setReload(true);
+        setTimeout(() => {
+            setReload(false);
+        }, 100);
+    }, [selectedAlbum]);
 
 
 
@@ -26,8 +32,7 @@ const PhotoProofingPage = () => {
             />
             <Box sx={{ height: '50px' }} />
 
-
-            <PhotoGrid allDisplayedImages={allDisplayedImages} />
+            {!reload && <PhotoGrid allDisplayedImages={allDisplayedImages} />}
         </Box>
     );
 };

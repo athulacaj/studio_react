@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Select, MenuItem, FormControl, Box, Button, Menu, ListItemIcon, ListItemText, CircularProgress, Tooltip } from '@mui/material';
 import CameraIcon from '@mui/icons-material/Camera';
-import { CreateNewFolder, Download } from '@mui/icons-material';
+import { CreateNewFolder, Download, Close } from '@mui/icons-material';
 import { useNavigate, Link } from 'react-router-dom';
 import { ImageObj } from '../types';
 import { useDownloadImages } from '../hooks/useDownloadImages';
@@ -18,7 +18,7 @@ const HeaderPhotoProofing = ({ albums, selectedAlbum, onAlbumChange, allDisplaye
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [localDownloadModalOpen, setLocalDownloadModalOpen] = useState(false);
-  const { downloading, progress, currentFileName, downloadToFolder } = useDownloadImages();
+  const { downloading, progress, currentFileName, downloadToFolder, cancelDownload } = useDownloadImages();
 
   const handleDownloadClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -83,24 +83,30 @@ const HeaderPhotoProofing = ({ albums, selectedAlbum, onAlbumChange, allDisplaye
 
             {/* Download Button */}
             <Box sx={{ position: 'relative' }}>
-              <Tooltip title={downloading ? `Saving: ${currentFileName}` : "Download to local folder"} arrow>
+              <Tooltip title={downloading ? "Cancel Download" : "Download to local folder"} arrow>
                 <Button
                   variant="contained"
-                  disabled={downloading || allDisplayedImages.length === 0}
-                  onClick={handleDownloadClick}
-                  startIcon={downloading ? <CircularProgress size={20} color="inherit" /> : <Download />}
+                  disabled={allDisplayedImages.length === 0}
+                  onClick={(e) => {
+                    if (downloading) {
+                      cancelDownload();
+                    } else {
+                      handleDownloadClick(e);
+                    }
+                  }}
+                  startIcon={downloading ? <Close /> : <Download />}
                   sx={{
-                    bgcolor: '#a855f7',
+                    bgcolor: downloading ? '#ef4444' : '#a855f7', // Red if downloading
                     borderRadius: '20px',
                     textTransform: 'none',
                     fontWeight: 600,
                     '&:hover': {
-                      bgcolor: '#9333ea',
+                      bgcolor: downloading ? '#dc2626' : '#9333ea',
                     },
                     px: 3
                   }}
                 >
-                  {downloading ? `Downloading ${progress}%` : `Download (${allDisplayedImages.length})`}
+                  {downloading ? `Cancel (${progress}%)` : `Download (${allDisplayedImages.length})`}
                 </Button>
               </Tooltip>
               <Menu

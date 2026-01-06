@@ -35,7 +35,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
     open,
     currentImage
 }) => {
-    const { albums, handleAddToAlbum, handleRemoveFromAlbum, projectId, currentImageIndex, setCurrentImageIndex }: PhotoProofingContextType = usePhotoProofingcontext();
+    const { albums, handleAddToAlbum, addToAlbumLoader, handleRemoveFromAlbum, projectId, currentImageIndex, setCurrentImageIndex }: PhotoProofingContextType = usePhotoProofingcontext();
     const [isImageInAlbum, setIsImageInAlbum] = useState(false);
 
     const [selectedAlbum, setSelectedAlbum] = useState('favourites');
@@ -82,6 +82,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
 
     // Check if current image is in the selected album using IndexedDB
     useEffect(() => {
+        if (addToAlbumLoader) return;
         const checkAlbumStatus = async () => {
             if (!projectId || !images[currentImageIndex]?.id) {
                 setIsImageInAlbum(false);
@@ -104,7 +105,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
         if (currentImageIndex >= 0) {
             checkAlbumStatus();
         }
-    }, [projectId, currentImageIndex, selectedAlbum, albums]);
+    }, [projectId, currentImageIndex, selectedAlbum, albums, addToAlbumLoader]);
 
     const onhandleAddToAlbum = () => {
         if (isImageInAlbum) {
@@ -154,6 +155,9 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
         }
     }, [currentImageIndex])
 
+    useEffect(() => {
+        console.log("albums changed ")
+    }, [albums])
 
 
 
@@ -161,6 +165,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
         return null;
     }
 
+    console.log("rerender")
 
     return (
         <Dialog
@@ -287,6 +292,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                     isImageInAlbum={isImageInAlbum}
                     selectedAlbum={selectedAlbum}
                     onAction={onhandleAddToAlbum}
+                    addToAlbumLoader={addToAlbumLoader}
                     slideshowPlaying={slideshowPlaying}
                 />
             </Box>

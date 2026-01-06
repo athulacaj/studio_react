@@ -42,6 +42,7 @@ const LocalDownloadModal: React.FC<LocalDownloadModalProps> = ({ open, onClose, 
         progress,
         currentFileName,
         startLocalCopy,
+        cancelDownload,
         error
     } = useDownloadImages();
 
@@ -206,8 +207,8 @@ const LocalDownloadModal: React.FC<LocalDownloadModalProps> = ({ open, onClose, 
                     </>
                 ) : (
                     <Button
-                        onClick={onClose}
-                        disabled={downloading}
+                        onClick={downloading ? cancelDownload : onClose}
+                        disabled={false}
                         variant={!downloading ? "contained" : "text"}
                     >
                         {downloading ? 'Cancel' : 'Close'}

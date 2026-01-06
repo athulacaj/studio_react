@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ImageObj } from '../types';
 import { usePhotoProofingcontext } from '../context/PhotoProofingContext';
 import { delay } from '../../../shared/utils/delay';
@@ -8,10 +8,19 @@ export const useDownloadImages = () => {
     const [progress, setProgress] = useState(0);
     const [currentFileName, setCurrentFileName] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const abortControllerRef = useRef<AbortController | null>(null);
+
     const {
         sourceDirectoryHandle, setSourceDirectoryHandle,
         destinationDirectoryHandle, setDestinationDirectoryHandle
     } = usePhotoProofingcontext();
+
+    const cancelDownload = () => {
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+        }
+        setDownloading(false);
+    };
 
     /**
      * Downloads images directly to a selected local folder.
@@ -62,79 +71,111 @@ export const useDownloadImages = () => {
                 if (!sourceRoot) return;
             }
 
+
             setDownloading(true);
             setProgress(0);
+            abortControllerRef.current = new AbortController();
+            const signal = abortControllerRef.current.signal;
 
+            if (isGdriveUrl && source === 'cloud') {
+                const batchSize = 4;
+                for (let i = 0; i < images.length; i += batchSize) {
+                    if (signal.aborted) throw new Error('Download aborted by user');
+                    const batch = images.slice(i, i + batchSize);
 
-            for (let i = 0; i < images.length; i++) {
-                const image = images[i];
-                const fileName = image.name || `image_${i}.jpg`;
-                setCurrentFileName(fileName);
-                if (isGdriveUrl) {
-                    const downloadUrl = `https://drive.usercontent.google.com/download?id=${image.id}&export=download`
-                    // open the url in a new window
-                    window.open(downloadUrl, '_blank');
-                    await delay(1000);
+                    for (let j = 0; j < batch.length; j++) {
+                        if (signal.aborted) throw new Error('Download aborted by user');
+                        const image = batch[j];
+                        const fileName = image.name || `image_${i + j}.jpg`;
+                        setCurrentFileName(fileName);
 
-                } else if (destRoot) {
-                    try {
-                        // 1. Handle subfolder structure in destination
-                        let currentDestHandle = destRoot;
-                        if (image.folderPathList && image.folderPathList.length > 0) {
-                            for (const folderName of image.folderPathList) {
-                                currentDestHandle = await currentDestHandle.getDirectoryHandle(folderName, { create: true });
-                            }
-                        }
+                        const downloadUrl = `https://drive.usercontent.google.com/download?id=${image.id}&export=download`
+                        // open the url in a new window
+                        await delay(500)
+                        window.open(downloadUrl, '_blank', "noopener");
 
-                        // 2. Create the target file
-                        const destFileHandle = await currentDestHandle.getFileHandle(fileName, { create: true });
-                        const writable = await destFileHandle.createWritable();
+                        setProgress(Math.round(((i + j + 1) / images.length) * 100));
+                    }
 
+                    if (i + batchSize < images.length) {
                         try {
-                            if (source === 'cloud') {
-                                // Download from Cloud and stream to disk
-
-                                const downloadUrl = `https://drive.usercontent.google.com/download?id=${image.id}&export=download`
-                                const res = await fetch(downloadUrl);
-                                if (res.body) {
-                                    await res.body.pipeTo(writable);
-                                } else {
-                                    const blob = await res.blob();
-                                    await writable.write(blob);
-                                }
-
-
-
-                            } else if (source === 'local' && sourceRoot) {
-                                // Local to Local copy
-                                await copyLocalFile(sourceRoot, writable, image, fileName);
-                            }
-
-                            try {
-                                await writable.close();
-                            } catch (e) {
-                                // Already closed or aborted
-                            }
-                        } catch (innerErr) {
-                            console.error(`Error during write/copy for ${fileName}:`, innerErr);
-                            try {
-                                await writable.abort();
-                            } catch (e) { /* ignore */ }
+                            // Wait for 4 seconds between batches
+                            await delay(4000);
+                        } catch (e) {
+                            // ignore delay abort if any
                         }
-                    } catch (err) {
-                        console.error(`Error saving ${fileName}:`, err);
+                        if (signal.aborted) throw new Error('Download aborted by user');
                     }
                 }
+            } else {
+                // File System Access API path (Local or future Cloud-to-FS)
+                for (let i = 0; i < images.length; i++) {
+                    if (signal.aborted) throw new Error('Download aborted by user');
+                    const image = images[i];
+                    const fileName = image.name || `image_${i}.jpg`;
+                    setCurrentFileName(fileName);
 
+                    if (destRoot) {
+                        try {
+                            // 1. Handle subfolder structure in destination
+                            let currentDestHandle = destRoot;
+                            if (image.folderPathList && image.folderPathList.length > 0) {
+                                for (const folderName of image.folderPathList) {
+                                    currentDestHandle = await currentDestHandle.getDirectoryHandle(folderName, { create: true });
+                                }
+                            }
 
-                setProgress(Math.round(((i + 1) / images.length) * 100));
+                            // 2. Create the target file
+                            const destFileHandle = await currentDestHandle.getFileHandle(fileName, { create: true });
+                            const writable = await destFileHandle.createWritable();
+
+                            try {
+                                if (source === 'cloud') {
+                                    // Download from Cloud and stream to disk
+                                    const downloadUrl = `https://drive.usercontent.google.com/download?id=${image.id}&export=download`
+                                    const res = await fetch(downloadUrl, { signal });
+                                    if (res.body) {
+                                        await res.body.pipeTo(writable, { signal });
+                                    } else {
+                                        const blob = await res.blob();
+                                        await writable.write(blob);
+                                    }
+
+                                } else if (source === 'local' && sourceRoot) {
+                                    // Local to Local copy
+                                    await copyLocalFile(sourceRoot, writable, image, fileName, signal);
+                                }
+
+                                try {
+                                    await writable.close();
+                                } catch (e) {
+                                    // Already closed or aborted
+                                }
+                            } catch (innerErr: any) {
+                                if (innerErr.name !== 'AbortError') {
+                                    console.error(`Error during write/copy for ${fileName}:`, innerErr);
+                                }
+                                try {
+                                    await writable.abort();
+                                } catch (e) { /* ignore */ }
+                                if (signal.aborted || innerErr.name === 'AbortError') throw new Error('Download aborted by user');
+                            }
+                        } catch (err: any) {
+                            if (err.message === 'Download aborted by user') throw err;
+                            console.error(`Error saving ${fileName}:`, err);
+                        }
+                    }
+
+                    setProgress(Math.round(((i + 1) / images.length) * 100));
+                }
             }
 
             alert(`${source === 'local' ? 'Copy' : 'Download'} complete! All images saved to your folder.`);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Folder operation failed:', error);
-            if (error instanceof Error && (error.name === 'AbortError' || error.name === 'NotAllowedError')) {
+            if (error instanceof Error && (error.name === 'AbortError' || error.name === 'NotAllowedError' || error.message === 'Download aborted by user')) {
                 // User cancelled or denied
+                console.log('Operation cancelled by user');
             } else if (error instanceof Error) {
                 alert(error.message);
             }
@@ -142,10 +183,11 @@ export const useDownloadImages = () => {
             setDownloading(false);
             setProgress(0);
             setCurrentFileName('');
+            abortControllerRef.current = null;
         }
     };
 
-    const copyLocalFile = async (sourceRoot: FileSystemDirectoryHandle, writable: FileSystemWritableFileStream, image: ImageObj, fileName: string) => {
+    const copyLocalFile = async (sourceRoot: FileSystemDirectoryHandle, writable: FileSystemWritableFileStream, image: ImageObj, fileName: string, signal?: AbortSignal) => {
         try {
             let currentSourceHandle = sourceRoot;
             if (image.folderPathList && image.folderPathList.length > 0) {
@@ -159,7 +201,7 @@ export const useDownloadImages = () => {
             const sourceFile = await sourceFileHandle.getFile();
 
             // Stream local file to destination
-            await sourceFile.stream().pipeTo(writable);
+            await sourceFile.stream().pipeTo(writable, { signal });
         } catch (localErr) {
             console.error(`Could not find source file for ${fileName}:`, localErr);
             throw localErr;
@@ -175,12 +217,15 @@ export const useDownloadImages = () => {
         setDownloading(true);
         setProgress(0);
         setError(null);
+        abortControllerRef.current = new AbortController();
+        const signal = abortControllerRef.current.signal;
 
         try {
             // Create the album folder once (optimization) or per file (safer for async race if not careful, but JS is single threaded enough here)
             // safer to do it inside loop or just ensure it exists.
 
             for (let i = 0; i < images.length; i++) {
+                if (signal.aborted) throw new Error('Download aborted by user');
                 const image = images[i];
                 const fileName = image.name || `image_${i}.jpg`;
                 setCurrentFileName(fileName);
@@ -201,11 +246,14 @@ export const useDownloadImages = () => {
                     const writable = await destFileHandle.createWritable();
 
                     try {
-                        await copyLocalFile(sourceDirectoryHandle, writable, image, fileName);
+                        await copyLocalFile(sourceDirectoryHandle, writable, image, fileName, signal);
                         try { await writable.close(); } catch (e) { /* already closed */ }
-                    } catch (innerErr) {
-                        console.error(`Error during write/copy for ${fileName}:`, innerErr);
+                    } catch (innerErr: any) {
+                        if (innerErr.name !== 'AbortError') {
+                            console.error(`Error during write/copy for ${fileName}:`, innerErr);
+                        }
                         try { await writable.abort(); } catch (e) { /* ignore */ }
+                        if (signal.aborted || innerErr.name === 'AbortError') throw new Error('Download aborted by user');
                         throw innerErr;
                     }
 
@@ -217,10 +265,15 @@ export const useDownloadImages = () => {
                 setProgress(Math.round(((i + 1) / images.length) * 100));
             }
         } catch (e: any) {
-            setError(e.message || "An unexpected error occurred during copy.");
+            if (e.message === 'Download aborted by user' || e.name === 'AbortError') {
+                console.log('Copy operation cancelled by user');
+            } else {
+                setError(e.message || "An unexpected error occurred during copy.");
+            }
         } finally {
             setDownloading(false);
             setCurrentFileName('');
+            abortControllerRef.current = null;
         }
 
     }
@@ -231,6 +284,7 @@ export const useDownloadImages = () => {
         currentFileName,
         downloadToFolder,
         startLocalCopy,
+        cancelDownload,
         error
     };
 };

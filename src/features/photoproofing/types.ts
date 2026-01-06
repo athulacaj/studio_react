@@ -53,4 +53,5 @@ export interface PhotoProofingContextType {
     itemsPerPage: number;
     imagesCache: HTMLImageElement[];
     setImagesCache: React.Dispatch<React.SetStateAction<HTMLImageElement[]>>;
+    addToAlbumLoader: boolean;
 }

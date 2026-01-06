@@ -26,7 +26,7 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
     const [sourceDirectoryHandle, setSourceDirectoryHandle] = useState<FileSystemDirectoryHandle | null>(null);
     const [destinationDirectoryHandle, setDestinationDirectoryHandle] = useState<FileSystemDirectoryHandle | null>(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(-1);
-
+    const [addToAlbumLoader, setAddToAlbumLoader] = useState(false);
     const handleAlbumChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         setSelectedAlbum(event.target.value as string);
     };
@@ -34,81 +34,86 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
     const handleAddToAlbum = async (albumName: string, image: ImageObj) => {
         image.folderPathList = breadcrumbs.map((b) => b.name).slice(1);
         if (!image || !image.id) return;
+        setAddToAlbumLoader(true);
+        // Sync with Firestore: Document ID is file ID
+        if (userId && projectId && linkId) {
+            const photoDocRef = doc(db, 'projects', userId, 'projects', projectId, 'shared_links', linkId, 'albums', image.id);
 
-        setAlbums((prevAlbums) => {
-            const currentAlbum = prevAlbums[albumName] || [];
-            if (currentAlbum.includes(image.id)) return prevAlbums;
+            setDoc(photoDocRef, {
+                selections: arrayUnion(albumName),
+                updatedAt: serverTimestamp(),
+                image: JSON.stringify(image)
+            }, { merge: true })
+                .then(async () => {
+                    // Also update IndexedDB
+                    if (projectId) {
+                        const localImage = await indexedDBService.getImageById(projectId, image.id);
+                        const updatedSelections = localImage?.selections ? [...new Set([...localImage.selections, albumName])] : [albumName];
+                        await indexedDBService.insertOrUpdateImage(projectId, {
+                            ...localImage,
+                            id: image.id,
+                            selections: updatedSelections,
+                            image: JSON.stringify(image)
+                        });
+                    }
+                    setAlbums((prevAlbums) => {
+                        const currentAlbum = prevAlbums[albumName] || [];
+                        if (currentAlbum.includes(image.id)) return prevAlbums;
 
-            const newAlbums = {
-                ...prevAlbums,
-                [albumName]: [...currentAlbum, JSON.stringify(image)],
-            } as Record<string, string[]>;
+                        const newAlbums = {
+                            ...prevAlbums,
+                            [albumName]: [...currentAlbum, JSON.stringify(image)],
+                        } as Record<string, string[]>;
 
-            // Sync with Firestore: Document ID is file ID
-            if (userId && projectId && linkId) {
-                const photoDocRef = doc(db, 'projects', userId, 'projects', projectId, 'shared_links', linkId, 'albums', image.id);
+                        return newAlbums;
+                    });
+                    setAddToAlbumLoader(false);
+                })
+                .catch(err => console.error("Error updating photo albums in Firestore:", err));
+        }
 
-                setDoc(photoDocRef, {
-                    selections: arrayUnion(albumName),
-                    updatedAt: serverTimestamp(),
-                    image: JSON.stringify(image)
-                }, { merge: true })
-                    .then(async () => {
-                        // Also update IndexedDB
-                        if (projectId) {
-                            const localImage = await indexedDBService.getImageById(projectId, image.id);
-                            const updatedSelections = localImage?.selections ? [...new Set([...localImage.selections, albumName])] : [albumName];
-                            await indexedDBService.insertOrUpdateImage(projectId, {
-                                ...localImage,
-                                id: image.id,
-                                selections: updatedSelections,
-                                image: JSON.stringify(image)
-                            });
-                        }
-                    })
-                    .catch(err => console.error("Error updating photo albums in Firestore:", err));
-            }
 
-            return newAlbums;
-        });
     };
 
     const handleRemoveFromAlbum = (albumName: string, image: ImageObj) => {
         if (!image || !image.id) return;
+        setAddToAlbumLoader(true);
+        // Sync with Firestore: Document ID is file ID
+        if (userId && projectId && linkId) {
+            const photoDocRef = doc(db, 'projects', userId, 'projects', projectId, 'shared_links', linkId, 'albums', image.id);
 
-        setAlbums((prevAlbums) => {
-            const newAlbum = (prevAlbums[albumName] || []).filter((id: string) => id !== image.id);
-            const newAlbums = {
-                ...prevAlbums,
-                [albumName]: newAlbum,
-            };
-
-            // Sync with Firestore: Document ID is file ID
-            if (userId && projectId && linkId) {
-                const photoDocRef = doc(db, 'projects', userId, 'projects', projectId, 'shared_links', linkId, 'albums', image.id);
-
-                setDoc(photoDocRef, {
-                    selections: arrayRemove(albumName),
-                    updatedAt: serverTimestamp(),
-                }, { merge: true })
-                    .then(async () => {
-                        // Also update IndexedDB
-                        if (projectId) {
-                            const localImage = await indexedDBService.getImageById(projectId, image.id);
-                            if (localImage && localImage.selections) {
-                                const updatedSelections = localImage.selections.filter((s: string) => s !== albumName);
-                                await indexedDBService.insertOrUpdateImage(projectId, {
-                                    ...localImage,
-                                    selections: updatedSelections
-                                });
-                            }
+            setDoc(photoDocRef, {
+                selections: arrayRemove(albumName),
+                updatedAt: serverTimestamp(),
+            }, { merge: true })
+                .then(async () => {
+                    // Also update IndexedDB
+                    if (projectId) {
+                        const localImage = await indexedDBService.getImageById(projectId, image.id);
+                        if (localImage && localImage.selections) {
+                            const updatedSelections = localImage.selections.filter((s: string) => s !== albumName);
+                            await indexedDBService.insertOrUpdateImage(projectId, {
+                                ...localImage,
+                                selections: updatedSelections
+                            });
                         }
-                    })
-                    .catch(err => console.error("Error updating photo albums in Firestore:", err));
-            }
+                        setAlbums((prevAlbums) => {
+                            const newAlbum = (prevAlbums[albumName] || []).filter((id: string) => id !== image.id);
+                            const newAlbums = {
+                                ...prevAlbums,
+                                [albumName]: newAlbum,
+                            };
 
-            return newAlbums;
-        });
+
+                            return newAlbums;
+                        });
+                        setAddToAlbumLoader(false);
+                    }
+                })
+                .catch(err => console.error("Error updating photo albums in Firestore:", err));
+        }
+
+
     };
 
     const navigateToFolder = (folderId: string | null, folderName: string) => {
@@ -158,7 +163,8 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
         currentImageIndex, setCurrentImageIndex,
         itemsPerPage,
         imagesCache,
-        setImagesCache
+        setImagesCache,
+        addToAlbumLoader
     };
 
     return (
