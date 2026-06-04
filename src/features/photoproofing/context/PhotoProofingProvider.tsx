@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { PhotoProofingContext } from './PhotoProofingContext';
-import { ImageObj, Folder, PhotoProofingContextType, SelectedImageObj } from '../types';
+import { ImageObj, Folder, PhotoProofingContextType } from '../types';
 import { db } from '../../../config/firebase';
 import { doc, setDoc, serverTimestamp, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { indexedDBService } from '../services/IndexedDBService';
 
+import { useSearchParams } from 'react-router-dom';
+
 export const PhotoProofingProvider = ({ children }: { children: React.ReactNode }) => {
+
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const [loading, setLoading] = useState(true);
 
@@ -14,11 +18,16 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
         "custom": [],
         "recent": []
     });
-    const [selectedImages, setSelectedImages] = useState<SelectedImageObj[]>([]);
-    const [selectedAlbum, setSelectedAlbum] = useState<string>('all');
+
+
+    // Initialize from URL (Single Source of Truth)
+    const selectedAlbum = searchParams.get('album') || 'all';
+
     const [images, setImages] = useState<ImageObj[]>([]);
     const [folders, setFolders] = useState<Folder[]>([]);
-    const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+
+    const currentFolderId = searchParams.get('folderId') || null;
+
     const [breadcrumbs, setBreadcrumbs] = useState<{ id: string; name: string }[]>([]);
     const [userId, setUserId] = useState<string | null>(null);
     const [projectId, setProjectId] = useState<string | null>(null);
@@ -27,6 +36,38 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
     const [destinationDirectoryHandle, setDestinationDirectoryHandle] = useState<FileSystemDirectoryHandle | null>(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(-1);
     const [addToAlbumLoader, setAddToAlbumLoader] = useState(false);
+
+    // Custom Setters to sync with URL
+    const setSelectedAlbum: React.Dispatch<React.SetStateAction<string>> = (valueOrFn) => {
+        setSearchParams(prev => {
+            const current = prev.get('album') || 'all';
+            const newValue = typeof valueOrFn === 'function' ? (valueOrFn as Function)(current) : valueOrFn;
+            const newParams = new URLSearchParams(prev);
+            if (newValue && newValue !== 'all') {
+                newParams.set('album', newValue);
+            } else {
+                newParams.delete('album');
+            }
+            newParams.set('page', '1');
+            return newParams;
+        });
+    };
+
+    const setCurrentFolderId: React.Dispatch<React.SetStateAction<string | null>> = (valueOrFn) => {
+        setSearchParams(prev => {
+            const current = prev.get('folderId');
+            const newValue = typeof valueOrFn === 'function' ? (valueOrFn as Function)(current) : valueOrFn;
+            const newParams = new URLSearchParams(prev);
+            if (newValue) {
+                newParams.set('folderId', newValue);
+            } else {
+                newParams.delete('folderId');
+            }
+            newParams.set('page', '1');
+            return newParams;
+        });
+    };
+
     const handleAlbumChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         setSelectedAlbum(event.target.value as string);
     };

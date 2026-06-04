@@ -1,9 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { extractFolderId } from '../../../services/googleDrive';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePhotoProofingcontext } from '..';
 import { getProject, getSharedLink, getProjectTreeData } from '../../studio-management/api/projectService';
 import { Project, SharedLink, DriveNode } from '../../studio-management/types';
-import { useGlobalLoader } from '../../../core/context/globalLoader';
 import { albumSyncService } from '../services/AlbumSyncService';
 import { useSearchParams } from 'react-router-dom';
 
@@ -27,7 +25,6 @@ const findSharedRoots = (folder: DriveNode, includedIds?: Set<string> | undefine
     return roots;
 };
 
-// Helper to find a node in the tree by ID
 const findNodeById = (node: DriveNode, id: string): DriveNode | null => {
     if (node.id === id) return node;
     if (node.folders) {
@@ -39,12 +36,36 @@ const findNodeById = (node: DriveNode, id: string): DriveNode | null => {
     return null;
 };
 
+// Helper to find path to a node
+const findPathToNode = (node: DriveNode, targetId: string, path: { id: string, name: string }[] = []): { id: string, name: string }[] | null => {
+    if (node.id === targetId) {
+        return [...path, { id: node.id, name: node.name }];
+    }
+    if (node.folders) {
+        for (const child of Object.values(node.folders)) {
+            const result = findPathToNode(child, targetId, [...path, { id: node.id, name: node.name }]);
+            if (result) return result;
+        }
+    }
+    return null;
+};
+
 export default function usePhotoProofing(userId: string, projectId: string, linkId?: string) {
     const {
         loading, setLoading, setImages, setFolders,
-        currentFolderId, setCurrentFolderId, setBreadcrumbs,
+        currentFolderId, setCurrentFolderId, breadcrumbs, setBreadcrumbs,
         setUserId, setProjectId, setLinkId, setAlbums, currentImageIndex, itemsPerPage
     } = usePhotoProofingcontext();
+
+    const breadcrumbsRef = useRef(breadcrumbs);
+    useEffect(() => {
+        breadcrumbsRef.current = breadcrumbs;
+    }, [breadcrumbs]);
+
+    const currentFolderIdRef = useRef(currentFolderId);
+    useEffect(() => {
+        currentFolderIdRef.current = currentFolderId;
+    }, [currentFolderId]);
 
     useEffect(() => {
         setUserId(userId);
@@ -71,8 +92,6 @@ export default function usePhotoProofing(userId: string, projectId: string, link
             const linkData = await getSharedLink(userId, projectId, linkId);
             setShareLink(linkData);
 
-            const includedIds = new Set<string>(linkData.includedFolders || []);
-
             // Find the "roots" of the shared selection from the project's driveData
             if (projectData.driveData) {
                 const sharedRoots = findSharedRoots(projectData.driveData);
@@ -81,10 +100,12 @@ export default function usePhotoProofing(userId: string, projectId: string, link
 
             initialBreadcrumbs = [{ id: 'SHARED_ROOT', name: 'Shared Files' }];
 
-            setCurrentFolderId(null);
-            setFolders(initialFolders);
-            setBreadcrumbs(initialBreadcrumbs);
-            setImages([]);
+            if (!currentFolderIdRef.current) {
+                setCurrentFolderId(null);
+                setFolders(initialFolders);
+                setBreadcrumbs(initialBreadcrumbs);
+                setImages([]);
+            }
             setLoading(false);
         }
     }, [linkId, userId, projectId]);
@@ -205,7 +226,7 @@ export default function usePhotoProofing(userId: string, projectId: string, link
 
             // If we don't have the tree, we need to fetch it.
             if (!tree && rootId && project[rootId]) {
-                const { filePath, filesCount } = project[rootId];
+                const { filePath } = project[rootId];
 
                 // Show dummy files while loading
                 // if (filesCount) {
@@ -273,6 +294,21 @@ export default function usePhotoProofing(userId: string, projectId: string, link
                 // Extract subfolders
                 const subfolders = currentNode.folders ? Object.values(currentNode.folders) : [];
                 setFolders(subfolders);
+
+                // Reconstruct breadcrumbs if missing/empty but we are deep in structure
+                const currentBreadcrumbs = breadcrumbsRef.current;
+                if (currentBreadcrumbs.length === 0 || (currentBreadcrumbs.length === 1 && currentBreadcrumbs[0].id === 'SHARED_ROOT' && currentFolderId !== 'SHARED_ROOT')) {
+                    if (tree) {
+                        const path = findPathToNode(tree, currentFolderId);
+                        if (path) {
+                            let fullPath = path;
+                            if (linkId) {
+                                fullPath = [{ id: 'SHARED_ROOT', name: 'Shared Files' }, ...path];
+                            }
+                            setBreadcrumbs(fullPath);
+                        }
+                    }
+                }
             } else {
                 console.warn("Could not find node for", currentFolderId);
                 setImages([]);
@@ -290,11 +326,11 @@ export default function usePhotoProofing(userId: string, projectId: string, link
         }
     };
 
-    // Effect to fetch content when currentFolderId changes
+    // Effect to fetch content when currentFolderId changes or project/shareLink loads
     useEffect(() => {
         if (!currentFolderId) return;
         fetchContent();
-    }, [currentFolderId]);
+    }, [currentFolderId, project, shareLink]);
 
     // Effect to sync albums on page load
     useEffect(() => {
@@ -319,7 +355,7 @@ export default function usePhotoProofing(userId: string, projectId: string, link
 
 
     // cahnge page number if the user changes to the next or previous page through fullscreen autoplay or next button
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [, setSearchParams] = useSearchParams();
 
     useEffect(() => {
         if (currentImageIndex > -1) {
