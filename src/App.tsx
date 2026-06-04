@@ -1,8 +1,5 @@
-import { createTheme, ThemeProvider, CssBaseline, Box, Backdrop, CircularProgress } from '@mui/material';
-import { Routes, Route, useLocation } from 'react-router-dom';
-import PhotoProofingPage from './features/photoproofing';
-import About from './pages/About';
-import NotFound from './pages/NotFound';
+import { createTheme, ThemeProvider, CssBaseline, Backdrop, CircularProgress } from '@mui/material';
+import AppRouter from './router';
 
 
 const darkTheme = createTheme({
@@ -54,45 +51,10 @@ const darkTheme = createTheme({
 
 
 import { PhotoProofingProvider } from './features/photoproofing';
-import { PortfolioBuilderProvider, PortfolioBuilderPage, PortfolioViewerPage } from './features/portfoliobuilder';
-import { AuthProvider, LoginPage, SignupPage, ProtectedRoute } from './features/auth';
-import { StudioManagementProvider, StudioDashboard, PublicProjectView } from './features/studio-management';
-import Footer from './core/components/Footer';
+import { PortfolioBuilderProvider } from './features/portfoliobuilder';
+import { AuthProvider } from './features/auth';
+import { StudioManagementProvider } from './features/studio-management';
 import { useGlobalLoader } from './core/context/globalLoader';
-
-const AppContent = () => {
-  const location = useLocation();
-
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-
-      <Box component="main" sx={{ flexGrow: 1 }}>
-        <Routes>
-          <Route path="/" element={<PhotoProofingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-
-          {/* Protected Routes */}
-          <Route path="/private" element={<ProtectedRoute />}>
-            <Route path="portfolio-builder" element={<PortfolioBuilderPage />} />
-            <Route path="studio" element={<StudioDashboard />} />
-          </Route>
-
-          <Route path="/portfolio/:domain" element={<PortfolioViewerPage />} />
-          <Route path="/view/:userId/:projectId" element={<PublicProjectView />} />
-          <Route path="/share/:userId/:projectId/:linkId" element={<PublicProjectView />} />
-          <Route path="/about" element={<About />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Box>
-      {
-        !location.pathname.includes('/portfolio') && (
-          <Footer />
-        )
-      }
-    </Box>
-  );
-};
 
 function App() {
   const { isLoading } = useGlobalLoader();
@@ -109,7 +71,7 @@ function App() {
               >
                 <CircularProgress color="inherit" />
               </Backdrop>
-              <AppContent />
+              <AppRouter />
             </StudioManagementProvider>
           </AuthProvider>
         </PortfolioBuilderProvider>
