@@ -10,14 +10,14 @@ import {
     Link as MuiLink
 } from '@mui/material';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../store/authStore';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { login } = useAuth();
+    const login = useAuthStore((state) => state.login);
     const navigate = useNavigate();
     const location = useLocation();
 

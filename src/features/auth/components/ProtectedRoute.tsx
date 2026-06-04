@@ -1,10 +1,10 @@
 import React from 'react';
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../store/authStore';
 import { Box, CircularProgress } from '@mui/material';
 
 const ProtectedRoute = () => {
-    const { currentUser, loading } = useAuth();
+    const { currentUser, loading } = useAuthStore();
     const location = useLocation();
 
     if (loading) {

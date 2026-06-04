@@ -15,7 +15,7 @@ import {
     ListItemText
 } from '@mui/material';
 import { useStudioManagement } from '../context/StudioManagementContext';
-import { useAuth } from '../../auth';
+import { useAuthStore } from '../../auth';
 import {
     Google as GoogleIcon,
     Cloud as CloudIcon,
@@ -33,8 +33,7 @@ interface ProjectCardProps {
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onManageLinks }) => {
-    const auth = useAuth();
-    const currentUser = auth?.currentUser;
+    const currentUser = useAuthStore((state) => state.currentUser);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 

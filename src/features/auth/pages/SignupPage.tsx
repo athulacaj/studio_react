@@ -10,7 +10,7 @@ import {
     Link as MuiLink
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../store/authStore';
 
 export default function SignupPage() {
     const [email, setEmail] = useState('');
@@ -18,7 +18,7 @@ export default function SignupPage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { signup } = useAuth();
+    const signup = useAuthStore((state) => state.signup);
     const navigate = useNavigate();
 
     async function handleSubmit(e) {

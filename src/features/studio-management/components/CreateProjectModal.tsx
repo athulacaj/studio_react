@@ -15,7 +15,7 @@ import {
     SelectChangeEvent
 } from '@mui/material';
 import { useStudioManagement } from '../context/StudioManagementContext';
-import { useAuth } from '../../auth';
+import { useAuthStore } from '../../auth';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../../config/firebase';
 import FolderSelectionDialog from './FolderSelectionDialog';
@@ -29,8 +29,7 @@ interface CreateProjectModalProps {
 
 const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, project = null }) => {
     const { addProject, updateProject } = useStudioManagement();
-    const auth = useAuth();
-    const currentUser = auth?.currentUser;
+    const currentUser = useAuthStore((state) => state.currentUser);
     const [projectName, setProjectName] = useState('');
     const [source, setSource] = useState('google_photos');
     const [driveUrl, setDriveUrl] = useState('');

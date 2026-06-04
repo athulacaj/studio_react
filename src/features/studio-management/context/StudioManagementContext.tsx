@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { useAuth } from '../../auth';
+import { useAuthStore } from '../../auth';
 import { db } from '../../../config/firebase';
 import { Project, SharedLink } from '../types';
 
@@ -35,8 +35,7 @@ export const StudioManagementProvider: React.FC<ProviderProps> = ({ children }) 
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const auth = useAuth();
-    const currentUser = auth?.currentUser;
+    const currentUser = useAuthStore((state) => state.currentUser);
 
     const fetchProjects = useCallback(async () => {
         if (!currentUser) return;
