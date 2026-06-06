@@ -9,6 +9,9 @@ import {
     Chip,
     Box,
     alpha,
+    Button,
+    CircularProgress,
+    Skeleton,
 } from '@mui/material';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import {
@@ -16,6 +19,8 @@ import {
     Cloud as CloudIcon,
     ArrowForward as ArrowForwardIcon,
     Folder as FolderIcon,
+    NavigateBefore as NavigateBeforeIcon,
+    NavigateNext as NavigateNextIcon,
 } from '@mui/icons-material';
 import { Project } from '../types';
 
@@ -148,22 +153,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                         )}
                     </Box>
 
-                    {/* Drive URL (truncated) */}
-                    {/* {project.driveUrl && (
-                        <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            noWrap
-                            sx={{
-                                display: 'block',
-                                mb: 1.5,
-                                opacity: 0.7,
-                            }}
-                        >
-                            {project.driveUrl}
-                        </Typography>
-                    )} */}
-
                     {/* Footer: Date + Arrow */}
                     <Box
                         sx={{
@@ -196,9 +185,52 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     );
 };
 
+const ProjectCardSkeleton: React.FC = () => (
+    <Card
+        sx={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            border: '1px solid',
+            borderColor: (theme) => alpha(theme.palette.divider, 0.08),
+        }}
+    >
+        <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                <Skeleton variant="text" width="65%" height={32} />
+                <Skeleton variant="circular" width={22} height={22} />
+            </Box>
+            <Box sx={{ display: 'flex', gap: 0.75, mb: 2 }}>
+                <Skeleton variant="rounded" width={90} height={24} sx={{ borderRadius: 2 }} />
+                <Skeleton variant="rounded" width={60} height={24} sx={{ borderRadius: 2 }} />
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 1.5, borderTop: '1px solid', borderColor: (theme) => alpha(theme.palette.divider, 0.08) }}>
+                <Skeleton variant="text" width={80} height={20} />
+            </Box>
+        </CardContent>
+    </Card>
+);
+
 const ProjectList: React.FC = () => {
     const projects = useStudioManagementStore((state) => state.projects);
-    const navigate = useNavigate();
+    const loading = useStudioManagementStore((state) => state.loading);
+    const currentPage = useStudioManagementStore((state) => state.currentPage);
+    const hasNextPage = useStudioManagementStore((state) => state.hasNextPage);
+    const hasPreviousPage = useStudioManagementStore((state) => state.hasPreviousPage);
+    const fetchNextPage = useStudioManagementStore((state) => state.fetchNextPage);
+    const fetchPreviousPage = useStudioManagementStore((state) => state.fetchPreviousPage);
+
+    if (loading && projects.length === 0) {
+        return (
+            <Grid container spacing={3}>
+                {[...Array(4)].map((_, i) => (
+                    <Grid item xs={12} sm={6} md={4} key={i}>
+                        <ProjectCardSkeleton />
+                    </Grid>
+                ))}
+            </Grid>
+        );
+    }
 
     if (!projects || projects.length === 0) {
         return (
@@ -219,13 +251,115 @@ const ProjectList: React.FC = () => {
     }
 
     return (
-        <Grid container spacing={3}>
-            {projects.map((project) => (
-                <Grid item xs={12} sm={6} md={4} key={project.id}>
-                    <ProjectCard project={project} />
+        <Box>
+            {/* Project Grid */}
+            <Box sx={{ position: 'relative', minHeight: 200 }}>
+                {loading && (
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            inset: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: (theme) => alpha(theme.palette.background.paper, 0.7),
+                            zIndex: 2,
+                            borderRadius: 2,
+                            backdropFilter: 'blur(4px)',
+                        }}
+                    >
+                        <CircularProgress size={36} sx={{ color: '#6366f1' }} />
+                    </Box>
+                )}
+                <Grid container spacing={3}>
+                    {projects.map((project) => (
+                        <Grid item xs={12} sm={6} md={4} key={project.id}>
+                            <ProjectCard project={project} />
+                        </Grid>
+                    ))}
                 </Grid>
-            ))}
-        </Grid>
+            </Box>
+
+            {/* Pagination Controls */}
+            {(hasPreviousPage || hasNextPage) && (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 2,
+                        mt: 4,
+                        pt: 3,
+                        borderTop: '1px solid',
+                        borderColor: (theme) => alpha(theme.palette.divider, 0.1),
+                    }}
+                >
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<NavigateBeforeIcon />}
+                        onClick={fetchPreviousPage}
+                        disabled={!hasPreviousPage || loading}
+                        sx={{
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            px: 2.5,
+                            borderColor: (theme) => alpha(theme.palette.primary.main, 0.3),
+                            '&:hover': {
+                                borderColor: 'primary.main',
+                                backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.04),
+                            },
+                            '&.Mui-disabled': {
+                                borderColor: (theme) => alpha(theme.palette.divider, 0.15),
+                            },
+                        }}
+                    >
+                        Previous
+                    </Button>
+
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            minWidth: 40,
+                            height: 36,
+                            borderRadius: 2,
+                            background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                            color: '#fff',
+                            fontWeight: 600,
+                            fontSize: '0.875rem',
+                            boxShadow: '0 2px 8px rgba(99, 102, 241, 0.25)',
+                        }}
+                    >
+                        {currentPage}
+                    </Box>
+
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        endIcon={<NavigateNextIcon />}
+                        onClick={fetchNextPage}
+                        disabled={!hasNextPage || loading}
+                        sx={{
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            px: 2.5,
+                            borderColor: (theme) => alpha(theme.palette.primary.main, 0.3),
+                            '&:hover': {
+                                borderColor: 'primary.main',
+                                backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.04),
+                            },
+                            '&.Mui-disabled': {
+                                borderColor: (theme) => alpha(theme.palette.divider, 0.15),
+                            },
+                        }}
+                    >
+                        Next
+                    </Button>
+                </Box>
+            )}
+        </Box>
     );
 };
 
