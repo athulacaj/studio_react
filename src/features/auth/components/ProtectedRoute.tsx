@@ -1,13 +1,17 @@
 import React from 'react';
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { useUserStore } from '../store/userStore';
 import { Box, CircularProgress } from '@mui/material';
+import UserDetailsModal from './UserDetailsModal';
 
 const ProtectedRoute = () => {
-    const { currentUser, loading } = useAuthStore();
+    const { currentUser, loading: authLoading } = useAuthStore();
+    const { userProfile, loading: profileLoading, initialized } = useUserStore();
     const location = useLocation();
 
-    if (loading) {
+    // Wait for auth to resolve
+    if (authLoading) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                 <CircularProgress />
@@ -20,7 +24,22 @@ const ProtectedRoute = () => {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    return <Outlet />;
+    // Wait for user profile to be fetched at least once
+    if (!initialized || profileLoading) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    return (
+        <>
+            {/* Force user to fill name if missing */}
+            <UserDetailsModal forcedMode />
+            <Outlet />
+        </>
+    );
 };
 
 export default ProtectedRoute;

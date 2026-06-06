@@ -54,6 +54,7 @@ import { PhotoProofingProvider } from './features/photoproofing';
 import { PortfolioBuilderProvider } from './features/portfoliobuilder';
 import { AuthProvider } from './features/auth';
 import './features/studio-management/store/studioManagementStore';
+import './features/auth/store/userStore';
 import { useGlobalLoader } from './core/context/globalLoader';
 
 function App() {
