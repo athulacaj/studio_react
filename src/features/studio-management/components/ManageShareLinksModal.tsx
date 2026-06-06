@@ -22,7 +22,7 @@ import {
     Edit as EditIcon,
     ContentCopy as CopyIcon
 } from '@mui/icons-material';
-import { useStudioManagement } from '../context/StudioManagementContext';
+import { useStudioManagementStore } from '../store/studioManagementStore';
 import FolderTree from './FolderTree';
 import { Project, SharedLink } from '../types';
 
@@ -35,7 +35,10 @@ interface ManageShareLinksModalProps {
 type ViewMode = 'list' | 'create' | 'edit';
 
 const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onClose, project }) => {
-    const { fetchShareLinks, createShareLink, updateShareLink, deleteShareLink } = useStudioManagement();
+    const fetchShareLinks = useStudioManagementStore((state) => state.fetchShareLinks);
+    const createShareLink = useStudioManagementStore((state) => state.createShareLink);
+    const updateShareLink = useStudioManagementStore((state) => state.updateShareLink);
+    const deleteShareLink = useStudioManagementStore((state) => state.deleteShareLink);
     const [links, setLinks] = useState<SharedLink[]>([]);
     const [loading, setLoading] = useState(false);
     const [view, setView] = useState<ViewMode>('list');

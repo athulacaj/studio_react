@@ -53,7 +53,7 @@ const darkTheme = createTheme({
 import { PhotoProofingProvider } from './features/photoproofing';
 import { PortfolioBuilderProvider } from './features/portfoliobuilder';
 import { AuthProvider } from './features/auth';
-import { StudioManagementProvider } from './features/studio-management';
+import './features/studio-management/store/studioManagementStore';
 import { useGlobalLoader } from './core/context/globalLoader';
 
 function App() {
@@ -64,7 +64,7 @@ function App() {
       <PhotoProofingProvider>
         <PortfolioBuilderProvider>
           <AuthProvider>
-            <StudioManagementProvider>
+            <>
               <Backdrop
                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
                 open={isLoading}
@@ -72,7 +72,7 @@ function App() {
                 <CircularProgress color="inherit" />
               </Backdrop>
               <AppRouter />
-            </StudioManagementProvider>
+            </>
           </AuthProvider>
         </PortfolioBuilderProvider>
       </PhotoProofingProvider>

@@ -14,7 +14,7 @@ import {
     ListItemIcon,
     ListItemText
 } from '@mui/material';
-import { useStudioManagement } from '../context/StudioManagementContext';
+import { useStudioManagementStore } from '../store/studioManagementStore';
 import { useAuthStore } from '../../auth';
 import {
     Google as GoogleIcon,
@@ -142,7 +142,7 @@ interface ProjectListProps {
 }
 
 const ProjectList: React.FC<ProjectListProps> = ({ onEdit, onManageLinks }) => {
-    const { projects } = useStudioManagement();
+    const projects = useStudioManagementStore((state) => state.projects);
 
     if (!projects || projects.length === 0) {
         return (

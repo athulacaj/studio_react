@@ -14,7 +14,7 @@ import {
     Alert,
     SelectChangeEvent
 } from '@mui/material';
-import { useStudioManagement } from '../context/StudioManagementContext';
+import { useStudioManagementStore } from '../store/studioManagementStore';
 import { useAuthStore } from '../../auth';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../../config/firebase';
@@ -28,7 +28,8 @@ interface CreateProjectModalProps {
 }
 
 const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, project = null }) => {
-    const { addProject, updateProject } = useStudioManagement();
+    const addProject = useStudioManagementStore((state) => state.addProject);
+    const updateProject = useStudioManagementStore((state) => state.updateProject);
     const currentUser = useAuthStore((state) => state.currentUser);
     const [projectName, setProjectName] = useState('');
     const [source, setSource] = useState('google_photos');

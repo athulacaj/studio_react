@@ -10,11 +10,11 @@ import {
     Alert,
     Typography
 } from '@mui/material';
-import { useStudioManagement } from '../context/StudioManagementContext';
+import { useStudioManagementStore } from '../store/studioManagementStore';
 import FolderTree from './FolderTree';
 
 const CreateShareLinkModal = ({ open, onClose, project }) => {
-    const { createShareLink } = useStudioManagement();
+    const createShareLink = useStudioManagementStore((state) => state.createShareLink);
     const [linkName, setLinkName] = useState('');
     const [selectedFolders, setSelectedFolders] = useState(new Set());
     const [loading, setLoading] = useState(false);
