@@ -1,29 +1,11 @@
 import React, { useState } from 'react';
-import { Container, Typography, Box, Button, Paper } from '@mui/material';
+import { Container, Typography, Box, Button, Paper, alpha } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import CreateProjectModal from '../components/CreateProjectModal';
-import ManageShareLinksModal from '../components/ManageShareLinksModal';
 import ProjectList from '../components/ProjectList';
-import { Project } from '../types';
 
 const StudioDashboard: React.FC = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [editingProject, setEditingProject] = useState<Project | null>(null);
-    const [managingLinksProject, setManagingLinksProject] = useState<Project | null>(null);
-
-    const handleEditProject = (project: Project) => {
-        setEditingProject(project);
-        setIsCreateModalOpen(true);
-    };
-
-    const handleManageLinks = (project: Project) => {
-        setManagingLinksProject(project);
-    };
-
-    const handleCloseCreateModal = () => {
-        setIsCreateModalOpen(false);
-        setEditingProject(null);
-    };
 
     return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -35,31 +17,39 @@ const StudioDashboard: React.FC = () => {
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={() => setIsCreateModalOpen(true)}
+                    sx={{
+                        borderRadius: 2,
+                        background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                        boxShadow: '0 4px 14px rgba(99, 102, 241, 0.3)',
+                        '&:hover': {
+                            boxShadow: '0 6px 20px rgba(99, 102, 241, 0.45)',
+                        },
+                    }}
                 >
                     Add Project
                 </Button>
             </Box>
 
-            <Paper sx={{ p: 3, mb: 4, backgroundColor: 'background.paper' }} elevation={0}>
-                <Typography variant="h6" gutterBottom>
+            <Paper
+                sx={{
+                    p: 3,
+                    mb: 4,
+                    backgroundColor: 'background.paper',
+                    borderRadius: 3,
+                    border: '1px solid',
+                    borderColor: (theme) => alpha(theme.palette.divider, 0.1),
+                }}
+                elevation={0}
+            >
+                <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
                     Projects
                 </Typography>
-                <ProjectList
-                    onEdit={handleEditProject}
-                    onManageLinks={handleManageLinks}
-                />
+                <ProjectList />
             </Paper>
 
             <CreateProjectModal
                 open={isCreateModalOpen}
-                onClose={handleCloseCreateModal}
-                project={editingProject}
-            />
-
-            <ManageShareLinksModal
-                open={!!managingLinksProject}
-                onClose={() => setManagingLinksProject(null)}
-                project={managingLinksProject}
+                onClose={() => setIsCreateModalOpen(false)}
             />
         </Container>
     );

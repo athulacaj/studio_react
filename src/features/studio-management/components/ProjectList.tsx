@@ -1,154 +1,219 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Grid,
     Card,
     CardContent,
+    CardActionArea,
     Typography,
     Chip,
     Box,
-    IconButton,
-    Snackbar,
-    Alert,
-    Menu,
-    MenuItem,
-    ListItemIcon,
-    ListItemText
+    alpha,
 } from '@mui/material';
 import { useStudioManagementStore } from '../store/studioManagementStore';
-import { useAuthStore } from '../../auth';
 import {
     Google as GoogleIcon,
     Cloud as CloudIcon,
-    ContentCopy as CopyIcon,
-    MoreVert as MoreVertIcon,
-    Edit as EditIcon,
-    Share as ShareIcon
+    ArrowForward as ArrowForwardIcon,
+    Folder as FolderIcon,
 } from '@mui/icons-material';
 import { Project } from '../types';
 
 interface ProjectCardProps {
     project: Project;
-    onEdit: (project: Project) => void;
-    onManageLinks: (project: Project) => void;
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onManageLinks }) => {
-    const currentUser = useAuthStore((state) => state.currentUser);
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
+const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
+    const navigate = useNavigate();
 
-    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
+    const formattedDate = project.createdAt?.toDate
+        ? project.createdAt.toDate().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        })
+        : 'Just now';
 
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-
-    const handleCopyLink = () => {
-        if (!currentUser) return;
-        const link = `${window.location.origin}/view/${currentUser.uid}/${project.id}`;
-        navigator.clipboard.writeText(link);
-        setSnackbarOpen(true);
-        handleMenuClose();
-    };
-
-    const handleEdit = () => {
-        onEdit(project);
-        handleMenuClose();
-    };
-
-    const handleManageLinks = () => {
-        onManageLinks(project);
-        handleMenuClose();
-    };
+    const folderCount = project.selectedFolders?.length || 0;
 
     return (
-        <>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <CardContent>
+        <Card
+            sx={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                position: 'relative',
+                overflow: 'hidden',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                border: '1px solid',
+                borderColor: (theme) => alpha(theme.palette.divider, 0.08),
+                '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: (theme) =>
+                        `0 12px 28px ${alpha(theme.palette.primary.main, 0.15)}, 0 4px 10px ${alpha(theme.palette.common.black, 0.2)}`,
+                    borderColor: (theme) => alpha(theme.palette.primary.main, 0.3),
+                    '& .arrow-icon': {
+                        opacity: 1,
+                        transform: 'translateX(0)',
+                    },
+                    '& .project-name': {
+                        color: 'primary.main',
+                    },
+                    '& .gradient-accent': {
+                        opacity: 1,
+                    },
+                },
+            }}
+        >
+            {/* Gradient accent line at top */}
+            <Box
+                className="gradient-accent"
+                sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 3,
+                    background: 'linear-gradient(90deg, #6366f1 0%, #a855f7 100%)',
+                    opacity: 0,
+                    transition: 'opacity 0.3s ease',
+                }}
+            />
+
+            <CardActionArea
+                onClick={() => navigate(`/private/studio/${project.id}`)}
+                sx={{
+                    flexGrow: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'stretch',
+                    p: 0,
+                }}
+            >
+                <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
+                    {/* Header: Name + Source Icon */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                        <Typography variant="h6" component="div" noWrap sx={{ maxWidth: '70%' }}>
+                        <Typography
+                            className="project-name"
+                            variant="h6"
+                            component="div"
+                            noWrap
+                            sx={{
+                                maxWidth: '80%',
+                                fontWeight: 600,
+                                transition: 'color 0.2s ease',
+                            }}
+                        >
                             {project.name}
                         </Typography>
-                        <Box>
-                            <IconButton size="small" onClick={handleMenuOpen}>
-                                <MoreVertIcon />
-                            </IconButton>
-                            <Menu
-                                anchorEl={anchorEl}
-                                open={Boolean(anchorEl)}
-                                onClose={handleMenuClose}
-                            >
-                                <MenuItem onClick={handleEdit}>
-                                    <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
-                                    <ListItemText>Edit Project</ListItemText>
-                                </MenuItem>
-                                <MenuItem onClick={handleManageLinks}>
-                                    <ListItemIcon><ShareIcon fontSize="small" /></ListItemIcon>
-                                    <ListItemText>Manage Shareable Links</ListItemText>
-                                </MenuItem>
-                                <MenuItem onClick={handleCopyLink}>
-                                    <ListItemIcon><CopyIcon fontSize="small" /></ListItemIcon>
-                                    <ListItemText>Copy Project Link</ListItemText>
-                                </MenuItem>
-                            </Menu>
-                            {project.source === 'google_photos' ? (
-                                <GoogleIcon color="primary" sx={{ ml: 1 }} />
-                            ) : (
-                                <CloudIcon color="secondary" sx={{ ml: 1 }} />
-                            )}
-                        </Box>
+                        {project.source === 'google_photos' ? (
+                            <GoogleIcon color="primary" sx={{ fontSize: 22, opacity: 0.7 }} />
+                        ) : (
+                            <CloudIcon color="secondary" sx={{ fontSize: 22, opacity: 0.7 }} />
+                        )}
                     </Box>
-                    <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+
+                    {/* Tags */}
+                    <Box sx={{ display: 'flex', gap: 0.75, mb: 2, flexWrap: 'wrap' }}>
                         <Chip
-                            label={project.source === 'google_photos' ? 'Google Photos' : 'Google Drive'}
+                            label={
+                                project.source === 'google_photos'
+                                    ? 'Google Photos'
+                                    : 'Google Drive'
+                            }
                             size="small"
                             variant="outlined"
+                            sx={{ borderRadius: 2, fontSize: '0.7rem', height: 24 }}
                         />
                         <Chip
                             label={project.status}
                             size="small"
                             color={project.status === 'active' ? 'success' : 'default'}
+                            sx={{ borderRadius: 2, fontSize: '0.7rem', height: 24 }}
+                        />
+                        {folderCount > 0 && (
+                            <Chip
+                                icon={<FolderIcon sx={{ fontSize: '14px !important' }} />}
+                                label={`${folderCount} folder${folderCount !== 1 ? 's' : ''}`}
+                                size="small"
+                                variant="outlined"
+                                sx={{
+                                    borderRadius: 2,
+                                    fontSize: '0.7rem',
+                                    height: 24,
+                                    borderColor: (theme) => alpha(theme.palette.info.main, 0.3),
+                                    color: 'info.main',
+                                }}
+                            />
+                        )}
+                    </Box>
+
+                    {/* Drive URL (truncated) */}
+                    {/* {project.driveUrl && (
+                        <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            noWrap
+                            sx={{
+                                display: 'block',
+                                mb: 1.5,
+                                opacity: 0.7,
+                            }}
+                        >
+                            {project.driveUrl}
+                        </Typography>
+                    )} */}
+
+                    {/* Footer: Date + Arrow */}
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            mt: 'auto',
+                            pt: 1.5,
+                            borderTop: '1px solid',
+                            borderColor: (theme) => alpha(theme.palette.divider, 0.08),
+                        }}
+                    >
+                        <Typography variant="caption" color="text.secondary">
+                            {formattedDate}
+                        </Typography>
+                        <ArrowForwardIcon
+                            className="arrow-icon"
+                            sx={{
+                                fontSize: 18,
+                                color: 'primary.main',
+                                opacity: 0,
+                                transform: 'translateX(-8px)',
+                                transition: 'all 0.3s ease',
+                            }}
                         />
                     </Box>
-                    {project.driveUrl && (
-                        <Typography variant="body2" color="text.secondary" noWrap>
-                            URL: {project.driveUrl}
-                        </Typography>
-                    )}
-                    <Typography variant="caption" display="block" sx={{ mt: 2, color: 'text.secondary' }}>
-                        Created: {project.createdAt?.toDate ? project.createdAt.toDate().toLocaleDateString() : 'Just now'}
-                    </Typography>
                 </CardContent>
-            </Card>
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={3000}
-                onClose={() => setSnackbarOpen(false)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            >
-                <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%' }}>
-                    Project link copied to clipboard!
-                </Alert>
-            </Snackbar>
-        </>
+            </CardActionArea>
+        </Card>
     );
 };
 
-interface ProjectListProps {
-    onEdit: (project: Project) => void;
-    onManageLinks: (project: Project) => void;
-}
-
-const ProjectList: React.FC<ProjectListProps> = ({ onEdit, onManageLinks }) => {
+const ProjectList: React.FC = () => {
     const projects = useStudioManagementStore((state) => state.projects);
+    const navigate = useNavigate();
 
     if (!projects || projects.length === 0) {
         return (
-            <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
+            <Box
+                sx={{
+                    textAlign: 'center',
+                    py: 6,
+                    color: 'text.secondary',
+                }}
+            >
+                <FolderIcon sx={{ fontSize: 48, opacity: 0.3, mb: 2 }} />
                 <Typography variant="h6">No projects found</Typography>
-                <Typography variant="body2">Create a new project to get started</Typography>
+                <Typography variant="body2" sx={{ mt: 0.5 }}>
+                    Create a new project to get started
+                </Typography>
             </Box>
         );
     }
@@ -157,11 +222,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onEdit, onManageLinks }) => {
         <Grid container spacing={3}>
             {projects.map((project) => (
                 <Grid item xs={12} sm={6} md={4} key={project.id}>
-                    <ProjectCard
-                        project={project}
-                        onEdit={onEdit}
-                        onManageLinks={onManageLinks}
-                    />
+                    <ProjectCard project={project} />
                 </Grid>
             ))}
         </Grid>

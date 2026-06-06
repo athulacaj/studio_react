@@ -5,7 +5,7 @@ import About from './pages/About';
 import NotFound from './pages/NotFound';
 import { PortfolioBuilderPage, PortfolioViewerPage } from './features/portfoliobuilder';
 import { LoginPage, SignupPage, ProtectedRoute } from './features/auth';
-import { StudioDashboard, PublicProjectView } from './features/studio-management';
+import { StudioDashboard, ProjectDetailView, PublicProjectView } from './features/studio-management';
 import Footer from './core/components/Footer';
 
 const AppRouter = () => {
@@ -23,6 +23,7 @@ const AppRouter = () => {
           <Route path="/private" element={<ProtectedRoute />}>
             <Route path="portfolio-builder" element={<PortfolioBuilderPage />} />
             <Route path="studio" element={<StudioDashboard />} />
+            <Route path="studio/:projectId" element={<ProjectDetailView />} />
           </Route>
 
           <Route path="/portfolio/:domain" element={<PortfolioViewerPage />} />
