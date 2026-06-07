@@ -11,6 +11,12 @@ interface StudioManagementState {
     loading: boolean;
     error: string | null;
 
+    // Admin view-as-user support
+    /** When set, the store operates on this user's data instead of the logged-in user */
+    viewAsUserId: string | null;
+    setViewAsUserId: (uid: string | null) => void;
+    clearViewAsUserId: () => void;
+
     // Pagination state
     currentPage: number;
     hasNextPage: boolean;
@@ -31,10 +37,49 @@ interface StudioManagementState {
 
 const getCurrentUser = () => useAuthStore.getState().currentUser;
 
+/**
+ * Returns the effective user ID for Firestore queries.
+ * If viewAsUserId is set (admin viewing another user), returns that.
+ * Otherwise returns the current authenticated user's uid.
+ */
+const getEffectiveUserId = (): string | null => {
+    const viewAsUserId = useStudioManagementStore.getState().viewAsUserId;
+    if (viewAsUserId) return viewAsUserId;
+    const currentUser = getCurrentUser();
+    return currentUser?.uid || null;
+};
+
 export const useStudioManagementStore = create<StudioManagementState>((set, get) => ({
     projects: [],
     loading: false,
     error: null,
+
+    // Admin view-as-user
+    viewAsUserId: null,
+    setViewAsUserId: (uid: string | null) => {
+        set({
+            viewAsUserId: uid,
+            projects: [],
+            error: null,
+            currentPage: 1,
+            hasNextPage: false,
+            hasPreviousPage: false,
+            lastVisibleDoc: null,
+            pageStartCursors: [null],
+        });
+    },
+    clearViewAsUserId: () => {
+        set({
+            viewAsUserId: null,
+            projects: [],
+            error: null,
+            currentPage: 1,
+            hasNextPage: false,
+            hasPreviousPage: false,
+            lastVisibleDoc: null,
+            pageStartCursors: [null],
+        });
+    },
 
     // Pagination initial state
     currentPage: 1,
@@ -44,13 +89,13 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     pageStartCursors: [null], // index 0 = page 1 cursor (null = start from beginning)
 
     fetchProjects: async () => {
-        const currentUser = getCurrentUser();
-        if (!currentUser) return;
+        const effectiveUid = getEffectiveUserId();
+        if (!effectiveUid) return;
         set({ loading: true });
         try {
             // Fetch limit + 1 to check if there's a next page
             const q = query(
-                collection(db, 'projects', currentUser.uid, 'projects'),
+                collection(db, 'projects', effectiveUid, 'projects'),
                 orderBy('createdAt', 'desc'),
                 limit(PAGE_LIMIT + 1)
             );
@@ -84,14 +129,14 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     },
 
     fetchNextPage: async () => {
-        const currentUser = getCurrentUser();
+        const effectiveUid = getEffectiveUserId();
         const { lastVisibleDoc, hasNextPage, currentPage, pageStartCursors } = get();
-        if (!currentUser || !hasNextPage || !lastVisibleDoc) return;
+        if (!effectiveUid || !hasNextPage || !lastVisibleDoc) return;
 
         set({ loading: true });
         try {
             const q = query(
-                collection(db, 'projects', currentUser.uid, 'projects'),
+                collection(db, 'projects', effectiveUid, 'projects'),
                 orderBy('createdAt', 'desc'),
                 startAfter(lastVisibleDoc),
                 limit(PAGE_LIMIT + 1)
@@ -139,9 +184,9 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     },
 
     fetchPreviousPage: async () => {
-        const currentUser = getCurrentUser();
+        const effectiveUid = getEffectiveUserId();
         const { currentPage, pageStartCursors } = get();
-        if (!currentUser || currentPage <= 1) return;
+        if (!effectiveUid || currentPage <= 1) return;
 
         set({ loading: true });
         try {
@@ -158,7 +203,7 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
             }
 
             const q = query(
-                collection(db, 'projects', currentUser.uid, 'projects'),
+                collection(db, 'projects', effectiveUid, 'projects'),
                 ...constraints
             );
             const querySnapshot = await getDocs(q);
@@ -190,13 +235,13 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     },
 
     addProject: async (projectData: Partial<Project>) => {
-        const currentUser = getCurrentUser();
-        if (!currentUser) throw new Error("No user authenticated");
+        const effectiveUid = getEffectiveUserId();
+        if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
         try {
-            const docRef = await addDoc(collection(db, 'projects', currentUser.uid, 'projects'), {
+            const docRef = await addDoc(collection(db, 'projects', effectiveUid, 'projects'), {
                 ...projectData,
-                userId: currentUser.uid,
+                userId: effectiveUid,
                 createdAt: serverTimestamp(),
                 status: 'active'
             });
@@ -213,11 +258,11 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     },
 
     updateProject: async (projectId: string, updates: Partial<Project>) => {
-        const currentUser = getCurrentUser();
-        if (!currentUser) throw new Error("No user authenticated");
+        const effectiveUid = getEffectiveUserId();
+        if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
         try {
-            const projectRef = doc(db, 'projects', currentUser.uid, 'projects', projectId);
+            const projectRef = doc(db, 'projects', effectiveUid, 'projects', projectId);
             await updateDoc(projectRef, {
                 ...updates,
                 updatedAt: serverTimestamp()
@@ -239,14 +284,14 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     },
 
     createShareLink: async (projectId: string, linkData: Omit<SharedLink, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>) => {
-        const currentUser = getCurrentUser();
-        if (!currentUser) throw new Error("No user authenticated");
+        const effectiveUid = getEffectiveUserId();
+        if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
         try {
-            const shareLinkRef = await addDoc(collection(db, 'projects', currentUser.uid, 'projects', projectId, 'shared_links'), {
+            const shareLinkRef = await addDoc(collection(db, 'projects', effectiveUid, 'projects', projectId, 'shared_links'), {
                 ...linkData,
                 createdAt: serverTimestamp(),
-                createdBy: currentUser.uid
+                createdBy: effectiveUid
             });
             return shareLinkRef.id;
         } catch (err: any) {
@@ -259,12 +304,12 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     },
 
     fetchShareLinks: async (projectId: string) => {
-        const currentUser = getCurrentUser();
-        if (!currentUser) return [];
+        const effectiveUid = getEffectiveUserId();
+        if (!effectiveUid) return [];
         set({ loading: true });
         try {
             const q = query(
-                collection(db, 'projects', currentUser.uid, 'projects', projectId, 'shared_links'),
+                collection(db, 'projects', effectiveUid, 'projects', projectId, 'shared_links'),
                 orderBy('createdAt', 'desc')
             );
             const querySnapshot = await getDocs(q);
@@ -282,11 +327,11 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     },
 
     updateShareLink: async (projectId: string, linkId: string, updates: Partial<SharedLink>) => {
-        const currentUser = getCurrentUser();
-        if (!currentUser) throw new Error("No user authenticated");
+        const effectiveUid = getEffectiveUserId();
+        if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
         try {
-            const linkRef = doc(db, 'projects', currentUser.uid, 'projects', projectId, 'shared_links', linkId);
+            const linkRef = doc(db, 'projects', effectiveUid, 'projects', projectId, 'shared_links', linkId);
             await updateDoc(linkRef, {
                 ...updates,
                 updatedAt: serverTimestamp()
@@ -301,11 +346,11 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     },
 
     deleteShareLink: async (projectId: string, linkId: string) => {
-        const currentUser = getCurrentUser();
-        if (!currentUser) throw new Error("No user authenticated");
+        const effectiveUid = getEffectiveUserId();
+        if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
         try {
-            const linkRef = doc(db, 'projects', currentUser.uid, 'projects', projectId, 'shared_links', linkId);
+            const linkRef = doc(db, 'projects', effectiveUid, 'projects', projectId, 'shared_links', linkId);
             await deleteDoc(linkRef);
         } catch (err: any) {
             console.error("Error deleting share link:", err);
@@ -323,6 +368,6 @@ useAuthStore.subscribe((state, prevState) => {
         useStudioManagementStore.getState().fetchProjects();
     }
     if (!state.currentUser && prevState.currentUser) {
-        useStudioManagementStore.setState({ projects: [], error: null, currentPage: 1, hasNextPage: false, hasPreviousPage: false, lastVisibleDoc: null, pageStartCursors: [null] });
+        useStudioManagementStore.setState({ projects: [], error: null, viewAsUserId: null, currentPage: 1, hasNextPage: false, hasPreviousPage: false, lastVisibleDoc: null, pageStartCursors: [null] });
     }
 });

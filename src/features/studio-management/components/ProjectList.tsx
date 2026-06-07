@@ -30,6 +30,7 @@ interface ProjectCardProps {
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     const navigate = useNavigate();
+    const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
 
     const formattedDate = project.createdAt?.toDate
         ? project.createdAt.toDate().toLocaleDateString('en-US', {
@@ -86,7 +87,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
             />
 
             <CardActionArea
-                onClick={() => navigate(`/private/studio/${project.id}`)}
+                onClick={() => navigate(
+                    viewAsUserId
+                        ? `/private/admin/user/${viewAsUserId}/studio/${project.id}`
+                        : `/private/studio/${project.id}`
+                )}
                 sx={{
                     flexGrow: 1,
                     display: 'flex',

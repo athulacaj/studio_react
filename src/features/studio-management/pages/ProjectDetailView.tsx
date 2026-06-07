@@ -29,6 +29,7 @@ import {
 } from '@mui/icons-material';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import { useAuthStore } from '../../auth';
+import { useUserStore } from '../../auth';
 import CreateProjectModal from '../components/CreateProjectModal';
 import ManageShareLinksModal from '../components/ManageShareLinksModal';
 
@@ -38,6 +39,12 @@ const ProjectDetailView: React.FC = () => {
     const currentUser = useAuthStore((state) => state.currentUser);
     const projects = useStudioManagementStore((state) => state.projects);
     const loading = useStudioManagementStore((state) => state.loading);
+    const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
+    const { userProfile } = useUserStore();
+
+    // When admin is viewing another user, use that user's ID for links
+    const effectiveUserId = viewAsUserId || currentUser?.uid;
+    const isAdminViewing = !!viewAsUserId && userProfile?.isAdmin;
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -50,8 +57,8 @@ const ProjectDetailView: React.FC = () => {
     );
 
     const handleCopyLink = () => {
-        if (!currentUser || !project) return;
-        const link = `${window.location.origin}/view/${currentUser.uid}/${project.id}`;
+        if (!effectiveUserId || !project) return;
+        const link = `${window.location.origin}/view/${effectiveUserId}/${project.id}`;
         navigator.clipboard.writeText(link);
         setSnackbarMessage('Project link copied to clipboard!');
         setSnackbarOpen(true);
@@ -89,7 +96,7 @@ const ProjectDetailView: React.FC = () => {
                     </Typography>
                     <Button
                         startIcon={<ArrowBackIcon />}
-                        onClick={() => navigate('/private/studio')}
+                        onClick={() => navigate(isAdminViewing ? `/private/admin/user/${viewAsUserId}` : '/private/studio')}
                         sx={{ mt: 2 }}
                     >
                         Back to Projects
@@ -137,9 +144,9 @@ const ProjectDetailView: React.FC = () => {
             >
                 {/* Left side: Back button + Name */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 0 }}>
-                    <Tooltip title="Back to projects">
+                    <Tooltip title={isAdminViewing ? 'Back to user dashboard' : 'Back to projects'}>
                         <IconButton
-                            onClick={() => navigate('/private/studio')}
+                            onClick={() => navigate(isAdminViewing ? `/private/admin/user/${viewAsUserId}` : '/private/studio')}
                             sx={{
                                 backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.1),
                                 '&:hover': {
@@ -372,9 +379,9 @@ const ProjectDetailView: React.FC = () => {
                             variant="contained"
                             startIcon={<OpenInNewIcon />}
                             onClick={() => {
-                                if (currentUser) {
+                                if (effectiveUserId) {
                                     window.open(
-                                        `/view/${currentUser.uid}/${project.id}`,
+                                        `/view/${effectiveUserId}/${project.id}`,
                                         '_blank'
                                     );
                                 }

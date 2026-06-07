@@ -46,6 +46,7 @@ export const useUserStore = create<UserState>((set, get) => ({
                         email: data.email || currentUser.email || '',
                         name: data.name || '',
                         photoURL: data.photoURL || currentUser.photoURL || '',
+                        isAdmin: data.isAdmin === true,
                         createdAt: data.createdAt?.toDate?.() || undefined,
                         updatedAt: data.updatedAt?.toDate?.() || undefined,
                     },

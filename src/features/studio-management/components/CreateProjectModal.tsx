@@ -150,12 +150,14 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
     };
 
     const handleDriveUpload = async (projectId: string, folders: string[]) => {
-        if (!currentUser) return;
+        const viewAsUserId = useStudioManagementStore.getState().viewAsUserId;
+        const effectiveUid = viewAsUserId || currentUser?.uid;
+        if (!effectiveUid) return;
         const uploadDriveData = httpsCallable(functions, 'uploadDriveData');
         const uploadPromises = folders.map(folderId => {
             return uploadDriveData({
                 folderId: folderId,
-                userId: currentUser.uid,
+                userId: effectiveUid,
                 projectId: projectId,
                 recursive: false
             }).catch(err => {
