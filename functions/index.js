@@ -48,12 +48,12 @@ const extractFolderId = (url) => {
 
 // Recursive function to fetch folder contents
 const fetchFolderContents = async (folderId, recursive = true) => {
-  const pageSize=1000;
+  const pageSize = 1000;
   try {
     // Fetch all files and folders in the current folder
     const query = `'${folderId}' in parents and trashed = false`;
     const fields = "nextPageToken, files(id, name, mimeType, webViewLink, thumbnailLink, modifiedTime)";
-    
+
     let allFiles = [];
     let pageToken = null;
 
@@ -68,11 +68,11 @@ const fetchFolderContents = async (folderId, recursive = true) => {
         throw new Error(`Drive API error: ${response.statusText}`);
       }
       const data = await response.json();
-      
+
       if (data.files) {
         allFiles = allFiles.concat(data.files);
       }
-      pageToken = data.nextPageToken; 
+      pageToken = data.nextPageToken;
     } while (pageToken);
 
     const files = allFiles;
@@ -116,21 +116,21 @@ const fetchFolderContents = async (folderId, recursive = true) => {
 };
 
 async function getDriveTreeFromTargetId(targetId, recursive = true) {
-    // Fetch root folder name first
-    const rootUrl = `https://www.googleapis.com/drive/v3/files/${targetId}?fields=id,name&key=${apiKey}`;
-    const rootResponse = await fetch(rootUrl);
-    
-    if (!rootResponse.ok) {
-       throw new Error(`Drive API error: ${rootResponse.statusText}`);
-    }
-    
-    const rootData = await rootResponse.json();
-    
-    const tree = await fetchFolderContents(targetId, recursive);
-    tree.name = rootData.name;
-    
-    return tree;
-  
+  // Fetch root folder name first
+  const rootUrl = `https://www.googleapis.com/drive/v3/files/${targetId}?fields=id,name&key=${apiKey}`;
+  const rootResponse = await fetch(rootUrl);
+
+  if (!rootResponse.ok) {
+    throw new Error(`Drive API error: ${rootResponse.statusText}`);
+  }
+
+  const rootData = await rootResponse.json();
+
+  const tree = await fetchFolderContents(targetId, recursive);
+  tree.name = rootData.name;
+
+  return tree;
+
 }
 
 export const getDriveTree = onCall(async (request) => {
@@ -158,7 +158,7 @@ export const getDriveTree = onCall(async (request) => {
 
 
 export const uploadDriveData = onCall(async (request) => {
-  const { url, folderId, userId,recursive = false,projectId="default" } = request.data;
+  const { url, folderId, userId, recursive = false, projectId = "default" } = request.data;
   const uid = request.auth?.uid || userId;
 
   if (!uid) {
@@ -198,14 +198,14 @@ export const uploadDriveData = onCall(async (request) => {
 
     const db = getFirestore();
     const projectRef = db.doc(`projects/${uid}/projects/${projectId}`);
-    
-    await projectRef.set({
-      [targetId]: {
-        filePath: filePath,
+
+    await projectRef.update({
+      [`syncedFolders.${targetId}`]: {
+        filePath,
         syncTime: new Date().toISOString(),
         filesCount: tree.files.length
       }
-    }, { merge: true });
+    });
 
     return { success: true, path: filePath };
 
@@ -222,7 +222,7 @@ const fetchFolderStructureRecursive = async (folderId) => {
     // Fetch only folders in the current folder
     const query = `'${folderId}' in parents and trashed = false and mimeType = 'application/vnd.google-apps.folder'`;
     const fields = "nextPageToken, files(id, name)";
-    
+
     let allFolders = [];
     let pageToken = null;
 
@@ -237,11 +237,11 @@ const fetchFolderStructureRecursive = async (folderId) => {
         throw new Error(`Drive API error: ${response.statusText}`);
       }
       const data = await response.json();
-      
+
       if (data.files) {
         allFolders = allFolders.concat(data.files);
       }
-      pageToken = data.nextPageToken; 
+      pageToken = data.nextPageToken;
     } while (pageToken);
 
     const folderData = {
@@ -279,16 +279,16 @@ export const getFolderStructure = onCall(async (request) => {
     // Fetch root folder name first
     const rootUrl = `https://www.googleapis.com/drive/v3/files/${targetId}?fields=id,name&key=${apiKey}`;
     const rootResponse = await fetch(rootUrl);
-    
+
     if (!rootResponse.ok) {
-       throw new Error(`Drive API error: ${rootResponse.statusText}`);
+      throw new Error(`Drive API error: ${rootResponse.statusText}`);
     }
-    
+
     const rootData = await rootResponse.json();
-    
+
     const tree = await fetchFolderStructureRecursive(targetId);
     tree.name = rootData.name;
-    
+
     return tree;
   } catch (error) {
     logger.error("Error in getFolderStructure:", error);

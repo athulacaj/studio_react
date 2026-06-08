@@ -207,13 +207,15 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
             <Typography variant="subtitle1" sx={{ mt: 1 }}>
                 Select Folders to Include
             </Typography>
-            {allowedFolderIds.size > 0 ? (
+            {Object.keys(project?.syncedFolders || {}).length > 0 ? (
                 <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, maxHeight: 300, overflow: 'auto' }}>
                     <FolderTree
                         folderStructure={project?.driveData}
                         selectedFolders={selectedFolders}
                         onToggleSelect={handleToggleSelect}
+                        onSelectAllChange={setSelectedFolders}
                         selectableIds={allowedFolderIds}
+                        syncedFolders={project?.syncedFolders}
                     />
                 </Box>
             ) : (

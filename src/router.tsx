@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import PhotoProofingPage from './features/photoproofing';
 import About from './pages/About';
 import NotFound from './pages/NotFound';
@@ -15,7 +15,8 @@ const AppRouter = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Routes>
-          <Route path="/" element={<PhotoProofingPage />} />
+          {/* <Route path="/" element={<PhotoProofingPage />} /> */}
+          <Route path="/" element={<Navigate to="/private/studio" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
 

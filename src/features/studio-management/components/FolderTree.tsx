@@ -12,7 +12,7 @@ import {
     Checkbox
 } from '@mui/material';
 import { ExpandLess, ExpandMore, Folder as FolderIcon } from '@mui/icons-material';
-import { DriveNode } from '../types';
+import { DriveNode, SyncedFolder } from '../types';
 
 interface FolderItemProps {
     folder: DriveNode;
@@ -21,6 +21,7 @@ interface FolderItemProps {
     level?: number;
     readOnly?: boolean;
     selectableIds?: Set<string> | null;
+    syncedFolders: Record<string, SyncedFolder>
 }
 
 const FolderItem: React.FC<FolderItemProps> = ({
@@ -29,7 +30,8 @@ const FolderItem: React.FC<FolderItemProps> = ({
     onToggleSelect,
     level = 0,
     readOnly = false,
-    selectableIds = null
+    selectableIds = null,
+    syncedFolders = {}
 }) => {
     const [open, setOpen] = useState(false);
 
@@ -38,7 +40,7 @@ const FolderItem: React.FC<FolderItemProps> = ({
 
     // If readOnly is true, everything is disabled.
     // If selectableIds is present, only allowed IDs are enabled.
-    const isDisabled = readOnly || !isSelectable;
+    const isDisabled = readOnly || !syncedFolders[folder.id];
 
     const hasSubfolders = folder.folders && Object.keys(folder.folders).length > 0;
     const isSelected = selectedFolders.has(folder.id);
@@ -92,7 +94,7 @@ const FolderItem: React.FC<FolderItemProps> = ({
                     <FolderIcon sx={{ mr: 1, color: 'action.active' }} />
                     <ListItemText
                         primary={folder.name}
-                        secondary={!isSelectable && selectableIds ? "Not synced" : null}
+                        secondary={syncedFolders[folder.id] ? `last synced: ${syncedFolders[folder.id].syncTime.toString().substring(0, 10)}` : "..."}
                     />
                 </ListItemButton>
             </ListItem>
@@ -108,6 +110,7 @@ const FolderItem: React.FC<FolderItemProps> = ({
                                 level={level + 1}
                                 readOnly={readOnly}
                                 selectableIds={selectableIds}
+                                syncedFolders={syncedFolders}
                             />
                         ))}
                     </List>
@@ -117,35 +120,123 @@ const FolderItem: React.FC<FolderItemProps> = ({
     );
 };
 
+const getAllSelectableFolderIds = (
+    node: DriveNode | undefined | null,
+    selectableIds: Set<string> | null
+): string[] => {
+    if (!node) return [];
+    const ids: string[] = [];
+
+    const traverse = (currentNode: DriveNode) => {
+        const isSelectable = !selectableIds || selectableIds.has(currentNode.id);
+        if (isSelectable) {
+            ids.push(currentNode.id);
+        }
+
+        if (currentNode.folders) {
+            Object.values(currentNode.folders).forEach(childNode => {
+                traverse(childNode);
+            });
+        }
+    };
+
+    traverse(node);
+    return ids;
+};
+
 interface FolderTreeProps {
     folderStructure?: DriveNode;
     selectedFolders: Set<string>;
     onToggleSelect: (folderId: string) => void;
+    onSelectAllChange?: (selectedIds: Set<string>) => void;
     readOnly?: boolean;
     selectableIds?: Set<string> | null;
+    syncedFolders?: Record<string, SyncedFolder>;
 }
 
 const FolderTree: React.FC<FolderTreeProps> = ({
     folderStructure,
     selectedFolders,
     onToggleSelect,
+    onSelectAllChange,
     readOnly = false,
-    selectableIds = null
+    selectableIds = null,
+    syncedFolders = {}
 }) => {
     if (!folderStructure) {
         return <Typography color="text.secondary">No folder structure available.</Typography>;
     }
 
+    const selectableFolderIds = React.useMemo(() => {
+        return getAllSelectableFolderIds(folderStructure, selectableIds);
+    }, [folderStructure, selectableIds]);
+
+    const handleSelectAllCheckboxChange = () => {
+        if (!onSelectAllChange) return;
+
+        const allSelected = selectableFolderIds.length > 0 && selectableFolderIds.every(id => selectedFolders.has(id));
+        const newSelected = new Set(selectedFolders);
+        if (allSelected) {
+            selectableFolderIds.forEach(id => newSelected.delete(id));
+        } else {
+            selectableFolderIds.forEach(id => newSelected.add(id));
+        }
+        onSelectAllChange(newSelected);
+    };
+
+    const totalSelectable = selectableFolderIds.length;
+    const selectedCount = selectableFolderIds.filter(id => selectedFolders.has(id)).length;
+
+    const isAllChecked = totalSelectable > 0 && selectedCount === totalSelectable;
+    const isIndeterminate = totalSelectable > 0 && selectedCount > 0 && selectedCount < totalSelectable;
+
     return (
-        <List>
-            <FolderItem
-                folder={folderStructure}
-                selectedFolders={selectedFolders}
-                onToggleSelect={onToggleSelect}
-                readOnly={readOnly}
-                selectableIds={selectableIds}
-            />
-        </List>
+        <Box>
+            {onSelectAllChange && totalSelectable > 0 && (
+                <ListItem
+                    disablePadding
+                    sx={{
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                        pb: 1,
+                        mb: 1,
+                        display: 'flex',
+                        alignItems: 'center'
+                    }}
+                >
+                    <ListItemButton
+                        onClick={handleSelectAllCheckboxChange}
+                        disabled={readOnly}
+                        sx={{ py: 0.5 }}
+                    >
+                        <ListItemIcon sx={{ minWidth: 40 }}>
+                            <Checkbox
+                                edge="start"
+                                checked={isAllChecked}
+                                indeterminate={isIndeterminate}
+                                tabIndex={-1}
+                                disableRipple
+                                disabled={readOnly}
+                            />
+                        </ListItemIcon>
+                        <ListItemText
+                            primary="Select All"
+                            secondary={`${selectedCount} of ${totalSelectable} folder(s) selected`}
+                        />
+                    </ListItemButton>
+                </ListItem>
+            )}
+            <List>
+                <FolderItem
+                    folder={folderStructure}
+                    selectedFolders={selectedFolders}
+                    onToggleSelect={onToggleSelect}
+                    readOnly={readOnly}
+                    selectableIds={selectableIds}
+                    syncedFolders={syncedFolders}
+                />
+            </List>
+        </Box>
     );
 };
 

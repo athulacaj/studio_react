@@ -5,9 +5,10 @@ import {
     DialogContent,
     DialogActions,
     Button,
+    Typography,
 } from '@mui/material';
 import FolderTree from './FolderTree';
-import { DriveNode } from '../types';
+import { DriveNode, SyncedFolder } from '../types';
 
 interface FolderSelectionDialogProps {
     open: boolean;
@@ -15,6 +16,7 @@ interface FolderSelectionDialogProps {
     folderStructure: DriveNode | null;
     onConfirm: (selectedFolderIds: string[]) => void;
     initialSelection?: string[];
+    syncedFolders?: Record<string, SyncedFolder>;
 }
 
 const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
@@ -22,7 +24,8 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
     onClose,
     folderStructure,
     onConfirm,
-    initialSelection = []
+    initialSelection = [],
+    syncedFolders = {}
 }) => {
     const [selectedFolders, setSelectedFolders] = useState<Set<string>>(new Set(initialSelection));
 
@@ -51,11 +54,20 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
         <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
             <DialogTitle>Select Folders to Sync</DialogTitle>
             <DialogContent dividers>
+                <Typography variant="caption" component="div">
+                    <ul style={{ margin: 0, paddingLeft: 16 }}>
+                        <li>Select only the folders that need to be re-synced.</li>
+                        <li>Avoid selecting folders that do not require synchronization.</li>
+                        <li>Re-syncing unnecessary folders may increase processing time and cloud data usage.</li>
+                    </ul>
+                </Typography>
                 {folderStructure && (
                     <FolderTree
                         folderStructure={folderStructure}
                         selectedFolders={selectedFolders}
                         onToggleSelect={handleToggleSelect}
+                        onSelectAllChange={setSelectedFolders}
+                        syncedFolders={syncedFolders}
                     />
                 )}
             </DialogContent>

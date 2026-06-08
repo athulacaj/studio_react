@@ -14,6 +14,10 @@ This document outlines the development plan for a modern, responsive photo proof
     *   `Header`, `PhotoGrid`, and `Footer` components are created.
     *   A dark theme is implemented using MUI's `createTheme`.
     *   The `PhotoGrid` displays a grid of selectable placeholder images.
+*   **Folder Tree Select All Checkbox:**
+    *   Added a "Select All / Unselect All" checkbox at the top of the `FolderTree` component.
+    *   Supports indeterminate state, displaying how many folders are currently selected.
+    *   Integrated across `FolderSelectionDialog`, `CreateShareLinkModal`, and `ManageShareLinksModal`.
 
 ### Current Development Plan
 

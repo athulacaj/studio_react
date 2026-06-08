@@ -95,7 +95,9 @@ const CreateShareLinkModal = ({ open, onClose, project }) => {
                                 folderStructure={project?.driveData}
                                 selectedFolders={selectedFolders}
                                 onToggleSelect={handleToggleSelect}
+                                onSelectAllChange={setSelectedFolders}
                                 selectableIds={allowedFolderIds}
+                                syncedFolders={project?.syncedFolders}
                             />
                         </Box>
                     ) : (

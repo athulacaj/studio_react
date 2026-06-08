@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface DriveFile {
     id: string;
     name: string;
@@ -15,6 +17,11 @@ export interface DriveNode {
     [key: string]: any;
 }
 
+export interface SelectedFolder {
+    id: string;
+    syncedAt: Timestamp;
+}
+
 export interface Project {
     id: string;
     name: string;
@@ -22,11 +29,12 @@ export interface Project {
     driveData?: DriveNode;
     source?: string;
     driveUrl?: string;
-    selectedFolders?: string[];
+    selectedFolders?: SelectedFolder[];
     createdAt?: any;
     updatedAt?: any;
     status?: string;
     [key: string]: any;
+    syncedFolders?: Record<string, SyncedFolder>;
 }
 
 export interface SharedLink {
@@ -39,3 +47,8 @@ export interface SharedLink {
     createdBy?: string;
 }
 
+export interface SyncedFolder {
+    filePath: string;
+    syncTime: Timestamp;
+    filesCount: number;
+}

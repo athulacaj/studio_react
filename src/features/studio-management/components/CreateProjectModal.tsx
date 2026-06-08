@@ -223,6 +223,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                 folderStructure={folderStructure}
                 onConfirm={handleSubmit}
                 initialSelection={selectedFolders}
+                syncedFolders={project?.syncedFolders}
             />
         </>
     );
