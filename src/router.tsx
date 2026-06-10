@@ -1,6 +1,5 @@
 import { Box } from '@mui/material';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import PhotoProofingPage from './features/photoproofing';
 import About from './pages/About';
 import NotFound from './pages/NotFound';
 import { PortfolioBuilderPage, PortfolioViewerPage } from './features/portfoliobuilder';

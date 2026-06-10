@@ -274,10 +274,12 @@ export default function usePhotoProofing(userId: string, projectId: string, link
 
             if (currentNode) {
                 // Extract files
-                const fileCount = project[currentFolderId]?.filesCount;
-                const isFolderSelected = shareLink?.includedFolders?.includes(currentFolderId);
+                const syncedFolders = project.syncedFolders ?? {}
+                const fileCount = syncedFolders[currentFolderId]?.filesCount ?? 0;
+                const isFolderSelected = true;
+                // shareLink?.includedFolders?.includes(currentFolderId);
                 if (fileCount && fileCount > 0 && !currentNode.files && isFolderSelected) {
-                    const data = await getProjectTreeData(project[currentFolderId]?.filePath);
+                    const data = await getProjectTreeData(syncedFolders[currentFolderId]?.filePath);
                     currentNode.files = data.files;
 
                 }
