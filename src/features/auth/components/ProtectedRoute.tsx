@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/authStore';
 import { useUserStore } from '../store/userStore';
 import { Box, CircularProgress } from '@mui/material';
 import UserDetailsModal from './UserDetailsModal';
+import GlobalNavbar from '../../../core/components/GlobalNavbar';
 
 const ProtectedRoute = () => {
     const { currentUser, loading: authLoading } = useAuthStore();
@@ -34,11 +35,14 @@ const ProtectedRoute = () => {
     }
 
     return (
-        <>
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
+            <GlobalNavbar />
             {/* Force user to fill name if missing */}
             <UserDetailsModal forcedMode />
-            <Outlet />
-        </>
+            <Box component="main" sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                <Outlet />
+            </Box>
+        </Box>
     );
 };
 

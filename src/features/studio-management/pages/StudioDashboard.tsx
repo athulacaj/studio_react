@@ -18,18 +18,37 @@ const StudioDashboard: React.FC = () => {
 
     return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+            <Box 
+                sx={{ 
+                    display: 'flex', 
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    justifyContent: 'space-between', 
+                    alignItems: { xs: 'flex-start', sm: 'center' }, 
+                    gap: { xs: 2, sm: 0 },
+                    mb: 4 
+                }}
+            >
                 <Typography variant="h4" component="h1" fontWeight="bold">
                     {isAdminViewing ? 'User Dashboard' : 'Studio Manager'}
                 </Typography>
                 {!isAdminViewing && (
-                    <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                    <Box 
+                        sx={{ 
+                            display: 'flex', 
+                            gap: 1.5, 
+                            alignItems: 'center',
+                            width: { xs: '100%', sm: 'auto' },
+                            flexDirection: { xs: 'row', sm: 'row' },
+                            flexWrap: 'wrap'
+                        }}
+                    >
                         {userProfile?.isAdmin && (
                             <Button
                                 variant="outlined"
                                 startIcon={<AdminIcon />}
                                 onClick={() => navigate('/private/admin')}
                                 sx={{
+                                    flex: { xs: 1, sm: 'initial' },
                                     borderRadius: 2,
                                     borderColor: (theme) => alpha(theme.palette.primary.main, 0.4),
                                     color: '#a78bfa',
@@ -60,6 +79,7 @@ const StudioDashboard: React.FC = () => {
                             startIcon={<AddIcon />}
                             onClick={() => setIsCreateModalOpen(true)}
                             sx={{
+                                flex: { xs: 1, sm: 'initial' },
                                 borderRadius: 2,
                                 background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
                                 boxShadow: '0 4px 14px rgba(99, 102, 241, 0.3)',

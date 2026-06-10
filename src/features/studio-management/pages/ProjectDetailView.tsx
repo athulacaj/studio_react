@@ -196,7 +196,7 @@ const ProjectDetailView: React.FC = () => {
                 </Box>
 
                 {/* Right side: Action buttons */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', width: { xs: '100%', sm: 'auto' }, mt: { xs: 2, sm: 0 }, justifyContent: { xs: 'space-between', sm: 'flex-start' } }}>
                     <Tooltip title="Edit project">
                         <Button
                             variant="outlined"
@@ -204,6 +204,7 @@ const ProjectDetailView: React.FC = () => {
                             onClick={() => setIsEditModalOpen(true)}
                             size="small"
                             sx={{
+                                flex: { xs: 1, sm: 'initial' },
                                 borderRadius: 2,
                                 borderColor: (theme) => alpha(theme.palette.primary.main, 0.3),
                                 '&:hover': {
@@ -224,6 +225,7 @@ const ProjectDetailView: React.FC = () => {
                             onClick={() => setIsShareModalOpen(true)}
                             size="small"
                             sx={{
+                                flex: { xs: 1, sm: 'initial' },
                                 borderRadius: 2,
                                 borderColor: (theme) => alpha(theme.palette.secondary.main, 0.3),
                                 color: 'secondary.main',
@@ -243,6 +245,7 @@ const ProjectDetailView: React.FC = () => {
                             onClick={handleCopyLink}
                             size="small"
                             sx={{
+                                flex: { xs: 'none', sm: 'initial' },
                                 backgroundColor: (theme) => alpha(theme.palette.info.main, 0.1),
                                 '&:hover': {
                                     backgroundColor: (theme) => alpha(theme.palette.info.main, 0.2),
@@ -374,7 +377,7 @@ const ProjectDetailView: React.FC = () => {
                     >
                         Quick Actions
                     </Typography>
-                    <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                    <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' }, flexWrap: 'wrap' }}>
                         <Button
                             variant="contained"
                             startIcon={<OpenInNewIcon />}
@@ -387,6 +390,7 @@ const ProjectDetailView: React.FC = () => {
                                 }
                             }}
                             sx={{
+                                flex: { xs: 1, sm: 'initial' },
                                 borderRadius: 2,
                                 background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
                                 boxShadow: '0 4px 14px rgba(99, 102, 241, 0.3)',
@@ -402,7 +406,7 @@ const ProjectDetailView: React.FC = () => {
                             variant="outlined"
                             startIcon={<CopyIcon />}
                             onClick={handleCopyLink}
-                            sx={{ borderRadius: 2 }}
+                            sx={{ flex: { xs: 1, sm: 'initial' }, borderRadius: 2 }}
                         >
                             Copy Public Link
                         </Button>
@@ -412,6 +416,7 @@ const ProjectDetailView: React.FC = () => {
                             startIcon={<ShareIcon />}
                             onClick={() => setIsShareModalOpen(true)}
                             sx={{
+                                flex: { xs: 1, sm: 'initial' },
                                 borderRadius: 2,
                                 borderColor: (theme) => alpha(theme.palette.secondary.main, 0.4),
                                 color: 'secondary.main',
