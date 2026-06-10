@@ -27,6 +27,7 @@ import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../../config/firebase';
 import FolderSelectionDialog from './FolderSelectionDialog';
 import { Project, DriveNode } from '../types';
+import { useGlobalLoader } from '../../../core/context/globalLoader';
 
 interface CreateProjectModalProps {
     open: boolean;
@@ -43,6 +44,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
     const [driveUrl, setDriveUrl] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const { setIsLoading: setGlobalLoading } = useGlobalLoader();
 
     // New state for folder selection
     const [folderSelectionOpen, setFolderSelectionOpen] = useState(false);
@@ -122,6 +124,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
 
     const handleSubmit = async (newSelectedFolders: string[] = []) => {
         setLoading(true);
+        setGlobalLoading(true);
         try {
             const foldersToSave = source === 'google_drive' ? newSelectedFolders : [];
 
@@ -146,12 +149,12 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                     await handleDriveUpload(projectId, foldersToSave);
                 }
             }
-
             handleClose();
         } catch (err: any) {
             console.error("Error saving project:", err);
             setError(err.message || 'Failed to save project. Please try again.');
         } finally {
+            setGlobalLoading(false);
             setLoading(false);
         }
     };
@@ -180,10 +183,10 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
 
     return (
         <>
-            <Dialog 
-                open={open} 
-                onClose={handleClose} 
-                maxWidth="sm" 
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                maxWidth="sm"
                 fullWidth
                 PaperProps={{
                     sx: {
@@ -252,20 +255,20 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                     </Fade>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 3, pt: 1, justifyContent: 'space-between' }}>
-                    <Button 
-                        onClick={handleClose} 
+                    <Button
+                        onClick={handleClose}
                         disabled={loading}
                         sx={{ color: 'text.secondary', fontWeight: 600, px: 3 }}
                     >
                         Cancel
                     </Button>
-                    <Button 
-                        onClick={handleInitialSubmit} 
-                        variant="contained" 
+                    <Button
+                        onClick={handleInitialSubmit}
+                        variant="contained"
                         disabled={loading}
-                        sx={{ 
-                            borderRadius: '8px', 
-                            px: 4, 
+                        sx={{
+                            borderRadius: '8px',
+                            px: 4,
                             py: 1,
                             fontWeight: 600,
                             boxShadow: 2
@@ -284,6 +287,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                 onConfirm={handleSubmit}
                 initialSelection={selectedFolders}
                 syncedFolders={project?.syncedFolders}
+                projectId={project?.id}
             />
         </>
     );

@@ -13,6 +13,7 @@ import {
 import { FolderCopyOutlined as FolderIcon } from '@mui/icons-material';
 import FolderTree from './FolderTree';
 import { DriveNode, SyncedFolder } from '../types';
+import { useStudioManagementStore } from '../store/studioManagementStore';
 
 interface FolderSelectionDialogProps {
     open: boolean;
@@ -21,6 +22,7 @@ interface FolderSelectionDialogProps {
     onConfirm: (selectedFolderIds: string[]) => void;
     initialSelection?: string[];
     syncedFolders?: Record<string, SyncedFolder>;
+    projectId?: string;
 }
 
 const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
@@ -29,9 +31,11 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
     folderStructure,
     onConfirm,
     initialSelection = [],
-    syncedFolders = {}
+    syncedFolders = {},
+    projectId
 }) => {
     const [selectedFolders, setSelectedFolders] = useState<Set<string>>(new Set(initialSelection));
+    const updateProjectLocalState = useStudioManagementStore((state) => state.updateProjectLocalState);
 
     // Reset selection when dialog opens or initialSelection changes
     useEffect(() => {
@@ -39,6 +43,12 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
             setSelectedFolders(new Set(initialSelection));
         }
     }, [open, initialSelection]);
+
+    useEffect(() => {
+        if (open && projectId) {
+            updateProjectLocalState(projectId);
+        }
+    }, [open]);
 
     const handleToggleSelect = (folderId: string) => {
         const newSelected = new Set(selectedFolders);
@@ -55,10 +65,10 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
     };
 
     return (
-        <Dialog 
-            open={open} 
-            onClose={onClose} 
-            maxWidth="md" 
+        <Dialog
+            open={open}
+            onClose={onClose}
+            maxWidth="md"
             fullWidth
             PaperProps={{
                 sx: {
@@ -83,12 +93,12 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
                         </ul>
                     </Typography>
                 </Alert>
-                
+
                 {folderStructure && (
-                    <Paper 
+                    <Paper
                         variant="outlined"
-                        sx={{ 
-                            borderRadius: 3, 
+                        sx={{
+                            borderRadius: 3,
                             overflow: 'hidden',
                             bgcolor: 'background.default',
                             borderColor: 'divider',
@@ -102,25 +112,26 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
                                 onToggleSelect={handleToggleSelect}
                                 onSelectAllChange={setSelectedFolders}
                                 syncedFolders={syncedFolders}
+                                type='edit_project_modal'
                             />
                         </Box>
                     </Paper>
                 )}
             </DialogContent>
             <DialogActions sx={{ px: 3, pb: 3, pt: 1, justifyContent: 'space-between' }}>
-                <Button 
+                <Button
                     onClick={onClose}
                     sx={{ color: 'text.secondary', fontWeight: 600, px: 3 }}
                 >
                     Cancel
                 </Button>
-                <Button 
-                    onClick={handleConfirm} 
-                    variant="contained" 
+                <Button
+                    onClick={handleConfirm}
+                    variant="contained"
                     color="primary"
-                    sx={{ 
-                        borderRadius: '8px', 
-                        px: 4, 
+                    sx={{
+                        borderRadius: '8px',
+                        px: 4,
                         py: 1,
                         fontWeight: 600,
                         boxShadow: 2

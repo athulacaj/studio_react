@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, updateDoc, deleteDoc, limit, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, updateDoc, deleteDoc, limit, startAfter, QueryDocumentSnapshot, DocumentData, getDoc } from 'firebase/firestore';
 import { useAuthStore } from '../../auth';
 import { db } from '../../../config/firebase';
 import { Project, SharedLink } from '../types';
@@ -33,6 +33,7 @@ interface StudioManagementState {
     fetchShareLinks: (projectId: string) => Promise<SharedLink[]>;
     updateShareLink: (projectId: string, linkId: string, updates: Partial<SharedLink>) => Promise<void>;
     deleteShareLink: (projectId: string, linkId: string) => Promise<void>;
+    updateProjectLocalState: (projectId: string) => Promise<void>;
 }
 
 const getCurrentUser = () => useAuthStore.getState().currentUser;
@@ -281,6 +282,28 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
         } finally {
             set({ loading: false });
         }
+    },
+    updateProjectLocalState: async (projectId: string) => {
+        const effectiveUid = getEffectiveUserId();
+
+        if (!effectiveUid) {
+            throw new Error('User ID not found');
+        }
+
+        const docSnap = await getDoc(
+            doc(db, 'projects', effectiveUid, 'projects', projectId)
+        );
+
+        const newData = docSnap.exists() ? docSnap.data() : {};
+
+        set((state) => ({
+            projects: state.projects.map(p =>
+                p.id === projectId ? { ...p, ...newData } : p
+            ),
+            error: null
+        }));
+
+        return docSnap.exists() ? docSnap.data() : null;
     },
 
     createShareLink: async (projectId: string, linkData: Omit<SharedLink, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>) => {

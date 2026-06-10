@@ -22,6 +22,7 @@ interface FolderItemProps {
     readOnly?: boolean;
     selectableIds?: Set<string> | null;
     syncedFolders: Record<string, SyncedFolder>
+    type: "edit_project_modal" | "share_link_modal";
 }
 
 const FolderItem: React.FC<FolderItemProps> = ({
@@ -31,7 +32,8 @@ const FolderItem: React.FC<FolderItemProps> = ({
     level = 0,
     readOnly = false,
     selectableIds = null,
-    syncedFolders = {}
+    syncedFolders = {},
+    type
 }) => {
     const [open, setOpen] = useState(false);
 
@@ -40,7 +42,10 @@ const FolderItem: React.FC<FolderItemProps> = ({
 
     // If readOnly is true, everything is disabled.
     // If selectableIds is present, only allowed IDs are enabled.
-    const isDisabled = readOnly || !syncedFolders[folder.id];
+    let isDisabled = false
+    if (type == "share_link_modal") {
+        isDisabled = readOnly || !syncedFolders[folder.id];
+    }
 
     const hasSubfolders = folder.folders && Object.keys(folder.folders).length > 0;
     const isSelected = selectedFolders.has(folder.id);
@@ -152,6 +157,7 @@ interface FolderTreeProps {
     readOnly?: boolean;
     selectableIds?: Set<string> | null;
     syncedFolders?: Record<string, SyncedFolder>;
+    type: "edit_project_modal" | "share_link_modal";
 }
 
 const FolderTree: React.FC<FolderTreeProps> = ({
@@ -161,7 +167,8 @@ const FolderTree: React.FC<FolderTreeProps> = ({
     onSelectAllChange,
     readOnly = false,
     selectableIds = null,
-    syncedFolders = {}
+    syncedFolders = {},
+    type = "share_link_modal"
 }) => {
     if (!folderStructure) {
         return <Typography color="text.secondary">No folder structure available.</Typography>;
@@ -234,6 +241,7 @@ const FolderTree: React.FC<FolderTreeProps> = ({
                     readOnly={readOnly}
                     selectableIds={selectableIds}
                     syncedFolders={syncedFolders}
+                    type={type}
                 />
             </List>
         </Box>
