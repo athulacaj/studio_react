@@ -12,8 +12,15 @@ import {
     MenuItem,
     Box,
     Alert,
-    SelectChangeEvent
+    SelectChangeEvent,
+    CircularProgress,
+    Fade,
+    Typography
 } from '@mui/material';
+import {
+    CreateNewFolderOutlined as CreateIcon,
+    EditOutlined as EditIcon
+} from '@mui/icons-material';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import { useAuthStore } from '../../auth';
 import { httpsCallable } from 'firebase/functions';
@@ -173,45 +180,98 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
 
     return (
         <>
-            <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-                <DialogTitle>{isEditMode ? 'Edit Project' : 'Create New Project'}</DialogTitle>
-                <DialogContent>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-                        {error && <Alert severity="error">{error}</Alert>}
-                        <TextField
-                            label="Project Name"
-                            fullWidth
-                            value={projectName}
-                            onChange={(e) => setProjectName(e.target.value)}
-                            autoFocus
-                        />
-                        <FormControl fullWidth disabled={isEditMode}>
-                            <InputLabel>Source</InputLabel>
-                            <Select
-                                value={source}
-                                label="Source"
-                                onChange={handleSourceChange}
-                            >
-                                <MenuItem value="google_photos">Google Photos</MenuItem>
-                                <MenuItem value="google_drive">Google Drive</MenuItem>
-                            </Select>
-                        </FormControl>
-                        {source === 'google_drive' && (
+            <Dialog 
+                open={open} 
+                onClose={handleClose} 
+                maxWidth="sm" 
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        borderRadius: 3,
+                        boxShadow: '0 24px 48px rgba(0,0,0,0.4)',
+                        backgroundImage: 'none',
+                        bgcolor: 'background.paper',
+                        p: 1
+                    }
+                }}
+            >
+                <DialogTitle sx={{ pb: 1, display: 'flex', alignItems: 'center', gap: 1.5, fontWeight: 600 }}>
+                    {isEditMode ? <EditIcon color="primary" /> : <CreateIcon color="primary" />}
+                    {isEditMode ? 'Edit Project' : 'Create New Project'}
+                </DialogTitle>
+                <DialogContent sx={{ p: 3 }}>
+                    <Fade in timeout={400}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
+                            {error && (
+                                <Alert severity="error" sx={{ borderRadius: 2 }}>
+                                    {error}
+                                </Alert>
+                            )}
                             <TextField
-                                label="Google Drive Public URL"
+                                label="Project Name"
+                                variant="outlined"
                                 fullWidth
-                                value={driveUrl}
-                                onChange={(e) => setDriveUrl(e.target.value)}
-                                placeholder="https://drive.google.com/..."
-                                disabled={isEditMode}
+                                value={projectName}
+                                onChange={(e) => setProjectName(e.target.value)}
+                                autoFocus
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '12px',
+                                    }
+                                }}
                             />
-                        )}
-                    </Box>
+                            <FormControl fullWidth disabled={isEditMode}>
+                                <InputLabel>Source</InputLabel>
+                                <Select
+                                    value={source}
+                                    label="Source"
+                                    onChange={handleSourceChange}
+                                    sx={{ borderRadius: '12px' }}
+                                >
+                                    <MenuItem value="google_photos">Google Photos</MenuItem>
+                                    <MenuItem value="google_drive">Google Drive</MenuItem>
+                                </Select>
+                            </FormControl>
+                            {source === 'google_drive' && (
+                                <TextField
+                                    label="Google Drive Public URL"
+                                    variant="outlined"
+                                    fullWidth
+                                    value={driveUrl}
+                                    onChange={(e) => setDriveUrl(e.target.value)}
+                                    placeholder="https://drive.google.com/..."
+                                    disabled={isEditMode}
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '12px',
+                                        }
+                                    }}
+                                />
+                            )}
+                        </Box>
+                    </Fade>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose} disabled={loading}>Cancel</Button>
-                    <Button onClick={handleInitialSubmit} variant="contained" disabled={loading}>
-                        {source === 'google_drive' ? 'Next' : (isEditMode ? 'Update Project' : 'Create Project')}
+                <DialogActions sx={{ px: 3, pb: 3, pt: 1, justifyContent: 'space-between' }}>
+                    <Button 
+                        onClick={handleClose} 
+                        disabled={loading}
+                        sx={{ color: 'text.secondary', fontWeight: 600, px: 3 }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button 
+                        onClick={handleInitialSubmit} 
+                        variant="contained" 
+                        disabled={loading}
+                        sx={{ 
+                            borderRadius: '8px', 
+                            px: 4, 
+                            py: 1,
+                            fontWeight: 600,
+                            boxShadow: 2
+                        }}
+                    >
+                        {loading ? <CircularProgress size={24} color="inherit" /> : (source === 'google_drive' ? 'Next' : (isEditMode ? 'Update Project' : 'Create Project'))}
                     </Button>
                 </DialogActions>
             </Dialog>

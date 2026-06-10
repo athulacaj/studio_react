@@ -11,16 +11,19 @@ import {
     IconButton,
     Typography,
     Box,
-    Divider,
     TextField,
     Alert,
-    CircularProgress
+    CircularProgress,
+    Paper,
+    Fade,
+    Tooltip
 } from '@mui/material';
 import {
     Add as AddIcon,
-    Delete as DeleteIcon,
-    Edit as EditIcon,
-    ContentCopy as CopyIcon
+    DeleteOutline as DeleteIcon,
+    EditOutlined as EditIcon,
+    ContentCopyOutlined as CopyIcon,
+    Link as LinkIcon
 } from '@mui/icons-material';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import FolderTree from './FolderTree';
@@ -154,97 +157,209 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
     const allowedFolderIds = project?.selectedFolders ? new Set(project.selectedFolders) : new Set<string>();
 
     const renderList = () => (
-        <>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6">Shareable Links</Typography>
-                <Button startIcon={<AddIcon />} variant="contained" size="small" onClick={handleCreateClick}>
-                    Create New Link
-                </Button>
+        <Fade in timeout={400}>
+            <Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                    <Typography variant="h5" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <LinkIcon color="primary" /> Shareable Links
+                    </Typography>
+                    <Button 
+                        startIcon={<AddIcon />} 
+                        variant="contained" 
+                        size="medium" 
+                        onClick={handleCreateClick}
+                        sx={{ borderRadius: '8px', boxShadow: 2, textTransform: 'none', fontWeight: 600 }}
+                    >
+                        Create New Link
+                    </Button>
+                </Box>
+                {links.length === 0 ? (
+                    <Paper 
+                        elevation={0} 
+                        sx={{ 
+                            py: 8, 
+                            px: 4, 
+                            textAlign: 'center', 
+                            bgcolor: 'background.default',
+                            border: '1px dashed',
+                            borderColor: 'divider',
+                            borderRadius: 3
+                        }}
+                    >
+                        <LinkIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2, opacity: 0.5 }} />
+                        <Typography variant="h6" color="text.secondary" gutterBottom>
+                            No shareable links yet
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                            Create your first link to share project folders with clients or team members.
+                        </Typography>
+                    </Paper>
+                ) : (
+                    <List sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {links.map((link) => (
+                            <Paper 
+                                key={link.id} 
+                                elevation={1} 
+                                sx={{ 
+                                    borderRadius: 2, 
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    transition: 'all 0.2s ease-in-out',
+                                    '&:hover': {
+                                        borderColor: 'primary.main',
+                                        boxShadow: 3,
+                                        transform: 'translateY(-2px)'
+                                    }
+                                }}
+                            >
+                                <ListItem sx={{ p: 2 }}>
+                                    <ListItemText
+                                        primary={<Typography variant="subtitle1" fontWeight="600">{link.name}</Typography>}
+                                        secondary={
+                                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                                                {`Created on ${link.createdAt?.toDate ? link.createdAt.toDate().toLocaleDateString() : 'Just now'}`}
+                                                {` • ${link.includedFolders?.length || 0} folder(s)`}
+                                            </Typography>
+                                        }
+                                    />
+                                    <ListItemSecondaryAction sx={{ right: 16 }}>
+                                        <Tooltip title="Copy Link" placement="top">
+                                            <IconButton edge="end" onClick={() => handleCopyLink(link.id)} sx={{ mr: 1, color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'primary.dark' } }}>
+                                                <CopyIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Edit Link" placement="top">
+                                            <IconButton edge="end" onClick={() => handleEditClick(link)} sx={{ mr: 1, color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'primary.dark' } }}>
+                                                <EditIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Delete Link" placement="top">
+                                            <IconButton edge="end" onClick={() => handleDeleteClick(link.id)} sx={{ color: 'text.secondary', '&:hover': { color: 'error.main', bgcolor: 'error.dark' } }}>
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </ListItemSecondaryAction>
+                                </ListItem>
+                            </Paper>
+                        ))}
+                    </List>
+                )}
             </Box>
-            {links.length === 0 ? (
-                <Typography color="text.secondary" align="center" sx={{ py: 4 }}>
-                    No shareable links created yet.
-                </Typography>
-            ) : (
-                <List>
-                    {links.map((link) => (
-                        <React.Fragment key={link.id}>
-                            <ListItem>
-                                <ListItemText
-                                    primary={link.name}
-                                    secondary={`Created: ${link.createdAt?.toDate ? link.createdAt.toDate().toLocaleDateString() : 'Just now'}`}
-                                />
-                                <ListItemSecondaryAction>
-                                    <IconButton edge="end" onClick={() => handleCopyLink(link.id)} title="Copy Link">
-                                        <CopyIcon />
-                                    </IconButton>
-                                    <IconButton edge="end" onClick={() => handleEditClick(link)} title="Edit">
-                                        <EditIcon />
-                                    </IconButton>
-                                    <IconButton edge="end" onClick={() => handleDeleteClick(link.id)} title="Delete">
-                                        <DeleteIcon />
-                                    </IconButton>
-                                </ListItemSecondaryAction>
-                            </ListItem>
-                            <Divider />
-                        </React.Fragment>
-                    ))}
-                </List>
-            )}
-        </>
+        </Fade>
     );
 
     const renderForm = () => (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Typography variant="h6">{view === 'create' ? 'Create New Link' : 'Edit Link'}</Typography>
-            <TextField
-                label="Link Name"
-                fullWidth
-                value={linkName}
-                onChange={(e) => setLinkName(e.target.value)}
-                placeholder="e.g., Client Review"
-            />
-            <Typography variant="subtitle1" sx={{ mt: 1 }}>
-                Select Folders to Include
-            </Typography>
-            {Object.keys(project?.syncedFolders || {}).length > 0 ? (
-                <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, maxHeight: 300, overflow: 'auto' }}>
-                    <FolderTree
-                        folderStructure={project?.driveData}
-                        selectedFolders={selectedFolders}
-                        onToggleSelect={handleToggleSelect}
-                        onSelectAllChange={setSelectedFolders}
-                        selectableIds={allowedFolderIds}
-                        syncedFolders={project?.syncedFolders}
-                    />
-                </Box>
-            ) : (
-                <Typography color="text.secondary">
-                    No synced folders available.
+        <Fade in timeout={400}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                    {view === 'create' ? 'Create New Link' : 'Edit Link'}
                 </Typography>
-            )}
-        </Box>
+                
+                <TextField
+                    label="Link Name"
+                    variant="outlined"
+                    fullWidth
+                    value={linkName}
+                    onChange={(e) => setLinkName(e.target.value)}
+                    placeholder="e.g., Client Review Batch 1"
+                    sx={{
+                        '& .MuiOutlinedInput-root': {
+                            borderRadius: '12px',
+                        }
+                    }}
+                />
+                
+                <Box>
+                    <Typography variant="subtitle1" sx={{ mb: 1.5, fontWeight: 500 }}>
+                        Select Folders to Include
+                    </Typography>
+                    {Object.keys(project?.syncedFolders || {}).length > 0 ? (
+                        <Paper 
+                            variant="outlined"
+                            sx={{ 
+                                borderRadius: 3, 
+                                overflow: 'hidden',
+                                bgcolor: 'background.default',
+                                borderColor: 'divider'
+                            }}
+                        >
+                            <Box sx={{ maxHeight: 350, overflow: 'auto', p: 1 }}>
+                                <FolderTree
+                                    folderStructure={project?.driveData}
+                                    selectedFolders={selectedFolders}
+                                    onToggleSelect={handleToggleSelect}
+                                    onSelectAllChange={setSelectedFolders}
+                                    selectableIds={allowedFolderIds}
+                                    syncedFolders={project?.syncedFolders}
+                                />
+                            </Box>
+                        </Paper>
+                    ) : (
+                        <Paper 
+                            variant="outlined" 
+                            sx={{ p: 3, textAlign: 'center', borderRadius: 3, bgcolor: 'background.default', borderColor: 'divider' }}
+                        >
+                            <Typography color="text.secondary">
+                                No synced folders available. Sync folders from the project details page first.
+                            </Typography>
+                        </Paper>
+                    )}
+                </Box>
+            </Box>
+        </Fade>
     );
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-            <DialogContent>
-                {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        <Dialog 
+            open={open} 
+            onClose={onClose} 
+            maxWidth="md" 
+            fullWidth
+            PaperProps={{
+                sx: {
+                    borderRadius: 3,
+                    boxShadow: '0 24px 48px rgba(0,0,0,0.4)',
+                    backgroundImage: 'none',
+                    bgcolor: 'background.paper',
+                    p: 1
+                }
+            }}
+        >
+            <DialogContent sx={{ p: 3 }}>
+                {error && (
+                    <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+                        {error}
+                    </Alert>
+                )}
                 {loading && view === 'list' ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
                         <CircularProgress />
                     </Box>
                 ) : (
                     view === 'list' ? renderList() : renderForm()
                 )}
             </DialogContent>
-            <DialogActions>
-                <Button onClick={view === 'list' ? onClose : () => setView('list')}>
-                    {view === 'list' ? 'Close' : 'Cancel'}
+            <DialogActions sx={{ px: 3, pb: 3, pt: 1, justifyContent: view === 'list' ? 'flex-end' : 'space-between' }}>
+                <Button 
+                    onClick={view === 'list' ? onClose : () => setView('list')}
+                    sx={{ color: 'text.secondary', fontWeight: 600, px: 3 }}
+                >
+                    {view === 'list' ? 'Close' : 'Back to List'}
                 </Button>
                 {view !== 'list' && (
-                    <Button onClick={handleSave} variant="contained" disabled={loading}>
-                        Save
+                    <Button 
+                        onClick={handleSave} 
+                        variant="contained" 
+                        disabled={loading}
+                        sx={{ 
+                            borderRadius: '8px', 
+                            px: 4, 
+                            py: 1,
+                            fontWeight: 600,
+                            boxShadow: 2
+                        }}
+                    >
+                        {loading ? <CircularProgress size={24} color="inherit" /> : 'Save Link'}
                     </Button>
                 )}
             </DialogActions>

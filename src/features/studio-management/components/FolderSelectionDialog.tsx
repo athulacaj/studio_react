@@ -6,7 +6,11 @@ import {
     DialogActions,
     Button,
     Typography,
+    Box,
+    Alert,
+    Paper
 } from '@mui/material';
+import { FolderCopyOutlined as FolderIcon } from '@mui/icons-material';
 import FolderTree from './FolderTree';
 import { DriveNode, SyncedFolder } from '../types';
 
@@ -51,29 +55,77 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-            <DialogTitle>Select Folders to Sync</DialogTitle>
-            <DialogContent dividers>
-                <Typography variant="caption" component="div">
-                    <ul style={{ margin: 0, paddingLeft: 16 }}>
-                        <li>Select only the folders that need to be re-synced.</li>
-                        <li>Avoid selecting folders that do not require synchronization.</li>
-                        <li>Re-syncing unnecessary folders may increase processing time and cloud data usage.</li>
-                    </ul>
-                </Typography>
+        <Dialog 
+            open={open} 
+            onClose={onClose} 
+            maxWidth="md" 
+            fullWidth
+            PaperProps={{
+                sx: {
+                    borderRadius: 3,
+                    boxShadow: '0 24px 48px rgba(0,0,0,0.4)',
+                    backgroundImage: 'none',
+                    bgcolor: 'background.paper',
+                    p: 1
+                }
+            }}
+        >
+            <DialogTitle sx={{ pb: 1, display: 'flex', alignItems: 'center', gap: 1.5, fontWeight: 600 }}>
+                <FolderIcon color="primary" /> Select Folders to Sync
+            </DialogTitle>
+            <DialogContent sx={{ p: 3 }}>
+                <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+                    <Typography variant="body2" component="div">
+                        <ul style={{ margin: 0, paddingLeft: 16 }}>
+                            <li>Select only the folders that need to be re-synced.</li>
+                            <li>Avoid selecting folders that do not require synchronization.</li>
+                            <li>Re-syncing unnecessary folders may increase processing time and cloud data usage.</li>
+                        </ul>
+                    </Typography>
+                </Alert>
+                
                 {folderStructure && (
-                    <FolderTree
-                        folderStructure={folderStructure}
-                        selectedFolders={selectedFolders}
-                        onToggleSelect={handleToggleSelect}
-                        onSelectAllChange={setSelectedFolders}
-                        syncedFolders={syncedFolders}
-                    />
+                    <Paper 
+                        variant="outlined"
+                        sx={{ 
+                            borderRadius: 3, 
+                            overflow: 'hidden',
+                            bgcolor: 'background.default',
+                            borderColor: 'divider',
+                            p: 1
+                        }}
+                    >
+                        <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
+                            <FolderTree
+                                folderStructure={folderStructure}
+                                selectedFolders={selectedFolders}
+                                onToggleSelect={handleToggleSelect}
+                                onSelectAllChange={setSelectedFolders}
+                                syncedFolders={syncedFolders}
+                            />
+                        </Box>
+                    </Paper>
                 )}
             </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={handleConfirm} variant="contained" color="primary">
+            <DialogActions sx={{ px: 3, pb: 3, pt: 1, justifyContent: 'space-between' }}>
+                <Button 
+                    onClick={onClose}
+                    sx={{ color: 'text.secondary', fontWeight: 600, px: 3 }}
+                >
+                    Cancel
+                </Button>
+                <Button 
+                    onClick={handleConfirm} 
+                    variant="contained" 
+                    color="primary"
+                    sx={{ 
+                        borderRadius: '8px', 
+                        px: 4, 
+                        py: 1,
+                        fontWeight: 600,
+                        boxShadow: 2
+                    }}
+                >
                     Confirm & Save
                 </Button>
             </DialogActions>
