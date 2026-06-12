@@ -6,11 +6,13 @@ import { doc, setDoc, serverTimestamp, arrayUnion, arrayRemove } from 'firebase/
 import { indexedDBService } from '../services/IndexedDBService';
 
 import { useSearchParams } from 'react-router-dom';
+import { usePhotoProofingStore } from '../store/usePhotoProofingStore';
 
 
 
 export const PhotoProofingProvider = ({ children }: { children: React.ReactNode }) => {
-
+    const {
+    } = usePhotoProofingStore()
     const [searchParams, setSearchParams] = useSearchParams();
 
     const [loading, setLoading] = useState(true);

@@ -54,7 +54,8 @@ export default function usePhotoProofing(userId: string, projectId: string, link
     const {
         loading, setLoading, setImages, setFolders,
         currentFolderId, setCurrentFolderId, breadcrumbs, setBreadcrumbs,
-        setIds, setAlbums, currentImageIndex, itemsPerPage
+        setIds, setAlbums, currentImageIndex, itemsPerPage,
+        setShareLinkData, shareLinkData
     } = usePhotoProofingStore();
 
     const breadcrumbsRef = useRef(breadcrumbs);
@@ -72,7 +73,6 @@ export default function usePhotoProofing(userId: string, projectId: string, link
     }, [userId, projectId, linkId, setIds]);
     const [error, setError] = useState<string | null>(null);
     const [project, setProject] = useState<Project | null>(null);
-    const [shareLink, setShareLink] = useState<SharedLink | null>(null);
 
     // Cache for fetched trees: { [rootFolderId]: treeData }
     const [cachedTrees, setCachedTrees] = useState<{ [key: string]: DriveNode }>({});
@@ -88,7 +88,7 @@ export default function usePhotoProofing(userId: string, projectId: string, link
         if (linkId) {
             setLoading(true);
             const linkData = await getSharedLink(userId, projectId, linkId);
-            setShareLink(linkData);
+            setShareLinkData(linkData);
 
             // Find the "roots" of the shared selection from the project's driveData
             if (projectData.driveData) {
@@ -141,8 +141,8 @@ export default function usePhotoProofing(userId: string, projectId: string, link
 
         // Handle explicit SHARED_ROOT navigation
         if (currentFolderId === 'SHARED_ROOT') {
-            if (linkId && shareLink && project.driveData) {
-                const includedIds = new Set<string>(shareLink.includedFolders || []);
+            if (linkId && shareLinkData && project.driveData) {
+                const includedIds = new Set<string>(shareLinkData.includedFolders || []);
                 const sharedRoots = findSharedRoots(project.driveData, includedIds);
                 setFolders(sharedRoots);
                 setImages([]);
@@ -217,7 +217,7 @@ export default function usePhotoProofing(userId: string, projectId: string, link
                 const syncedFolders = project.syncedFolders ?? {}
                 const fileCount = syncedFolders[currentFolderId]?.filesCount ?? 0;
                 const isFolderSelected = true;
-                // shareLink?.includedFolders?.includes(currentFolderId);
+                // shareLinkData?.includedFolders?.includes(currentFolderId);
                 if (fileCount && fileCount > 0 && !currentNode.files && isFolderSelected) {
                     const data = await getProjectTreeData(syncedFolders[currentFolderId]?.filePath);
                     currentNode.files = data.files;
@@ -268,11 +268,11 @@ export default function usePhotoProofing(userId: string, projectId: string, link
         }
     };
 
-    // Effect to fetch content when currentFolderId changes or project/shareLink loads
+    // Effect to fetch content when currentFolderId changes or project/shareLinkData loads
     useEffect(() => {
         if (!currentFolderId) return;
         fetchContent();
-    }, [currentFolderId, project, shareLink]);
+    }, [currentFolderId, project, shareLinkData]);
 
     // Effect to sync albums on page load
     useEffect(() => {
@@ -316,6 +316,6 @@ export default function usePhotoProofing(userId: string, projectId: string, link
         loading,
         error,
         project,
-        shareLink
+        shareLinkData
     };
 };

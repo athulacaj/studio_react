@@ -32,6 +32,10 @@ interface PhotoProofingState {
 
     // Image cache
     imagesCache: HTMLImageElement[];
+
+    //Share link data
+    shareLinkData: Record<string, any>;
+
 }
 
 interface PhotoProofingActions {
@@ -63,6 +67,9 @@ interface PhotoProofingActions {
     // Image cache
     setImagesCache: (cache: HTMLImageElement[] | ((prev: HTMLImageElement[]) => HTMLImageElement[])) => void;
 
+    // Share link data
+    setShareLinkData: (link: Record<string, any>) => void;
+
     // Reset
     reset: () => void;
 }
@@ -89,6 +96,7 @@ const initialState: PhotoProofingState = {
     sourceDirectoryHandle: null,
     destinationDirectoryHandle: null,
     imagesCache: [],
+    shareLinkData: {},
 };
 
 // Helper to resolve functional updaters (like React's setState callback pattern)
@@ -264,4 +272,5 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
 
     // --- Reset ---
     reset: () => set(initialState),
+    setShareLinkData: (link: Record<string, any>) => set({ shareLinkData: link }),
 }));
