@@ -45,7 +45,8 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
 
     const totalPages = Math.ceil(allDisplayedImages.length / itemsPerPage);
     const paginatedImages =
-        useMemo(() => allDisplayedImages.slice((page - 1) * itemsPerPage, page * itemsPerPage), [allDisplayedImages, page, itemsPerPage]);
+        useMemo(() => allDisplayedImages.slice((page - 1) * itemsPerPage, page * itemsPerPage),
+            [allDisplayedImages, page, itemsPerPage]);
 
 
     // useEffect(() => {

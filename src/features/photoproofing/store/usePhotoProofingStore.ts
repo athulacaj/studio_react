@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ImageObj, Folder, Album } from '../types';
+import { ImageObj, Folder, AlbumCategory } from '../types';
 import { db } from '../../../config/firebase';
 import { doc, setDoc, serverTimestamp, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { indexedDBService } from '../services/IndexedDBService';
@@ -19,7 +19,9 @@ interface PhotoProofingState {
     itemsPerPage: number;
 
     // Albums
-    albums: Record<string, Album>;
+    albums: Record<string, string[]>; // this is the saved categories to the album
+    categories: Record<string, AlbumCategory>; // this the categories from the db
+
     selectedAlbum: string;
     addToAlbumLoader: boolean;
 
@@ -35,7 +37,6 @@ interface PhotoProofingState {
 
     //Share link data
     shareLinkData: Record<string, any>;
-
 }
 
 interface PhotoProofingActions {
@@ -50,7 +51,8 @@ interface PhotoProofingActions {
     setCurrentImageIndex: (index: number | ((prev: number) => number)) => void;
 
     // Album actions
-    setAlbums: (albums: Record<string, Album> | ((prev: Record<string, Album>) => Record<string, Album>)) => void;
+    setAlbums: (albums: Record<string, string[]> | ((prev: Record<string, string[]>) => Record<string, string[]>)) => void;
+    setCategories: (categories: Record<string, AlbumCategory> | ((prev: Record<string, AlbumCategory>) => Record<string, AlbumCategory>)) => void;
     setSelectedAlbum: (album: string | ((prev: string) => string)) => void;
     handleAlbumChange: (event: React.ChangeEvent<{ value: unknown }>) => void;
     handleAddToAlbum: (albumName: string, image: ImageObj) => void;
@@ -86,11 +88,9 @@ const initialState: PhotoProofingState = {
     breadcrumbs: [],
     currentImageIndex: -1,
     itemsPerPage: 8,
-    albums: {
-        "favourites": { name: "Favourites", images: [] },
-        "custom": { name: "Custom", images: [] },
-    },
+    albums: {},
     selectedAlbum: 'all',
+    categories: {},
     addToAlbumLoader: false,
     currentFolderId: null,
     sourceDirectoryHandle: null,
@@ -139,6 +139,9 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
     setSelectedAlbum: (album) => set((state) => ({
         selectedAlbum: resolve(album, state.selectedAlbum),
     })),
+    setCategories: (categories) => set((state) => ({
+        categories: resolve(categories, state.categories),
+    })),
 
     handleAlbumChange: (event) => {
         set({ selectedAlbum: event.target.value as string });
@@ -176,15 +179,12 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
                 // Update store
                 set((state) => {
                     const currentAlbum = state.albums[albumName] || { name: albumName, images: [] };
-                    if (currentAlbum.images.includes(image.id)) return {};
+                    if (currentAlbum.includes(image.id)) return {};
 
                     return {
                         albums: {
                             ...state.albums,
-                            [albumName]: {
-                                name: albumName,
-                                images: [...currentAlbum.images, image.id],
-                            },
+                            [albumName]: [...currentAlbum, image.id],
                         },
                         addToAlbumLoader: false,
                     };
@@ -223,14 +223,11 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
 
                 // Update store
                 set((state) => {
-                    const currentAlbum = state.albums[albumName] || { name: albumName, images: [] };
+                    const currentAlbum = state.albums[albumName] || [];
                     return {
                         albums: {
                             ...state.albums,
-                            [albumName]: {
-                                name: albumName,
-                                images: currentAlbum.images.filter((id: string) => id !== image.id),
-                            },
+                            [albumName]: currentAlbum.filter((id: string) => id !== image.id),
                         },
                         addToAlbumLoader: false,
                     };

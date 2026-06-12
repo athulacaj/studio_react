@@ -7,10 +7,10 @@ import { ImageObj } from '../types';
 import { CachedImage } from '../../../shared/utils/MakeGlobalImageCache';
 
 const PhotoProofingPage = () => {
-    const { albums, selectedAlbum, handleAlbumChange, images, currentImageIndex } = usePhotoProofingStore();
+    const { albums, selectedAlbum, handleAlbumChange, images, currentImageIndex, categories } = usePhotoProofingStore();
     const allDisplayedImages = selectedAlbum === 'all'
         ? images
-        : (albums[selectedAlbum]?.images || []).map((img: string) => JSON.parse(img));
+        : (albums[selectedAlbum] || []).map((img: string) => JSON.parse(img));
 
     const [reload, setReload] = useState(true);
     useEffect(() => {
@@ -29,6 +29,7 @@ const PhotoProofingPage = () => {
                 selectedAlbum={selectedAlbum}
                 onAlbumChange={handleAlbumChange}
                 allDisplayedImages={allDisplayedImages}
+                categories={categories}
             />
             <Box sx={{ height: '50px' }} />
 

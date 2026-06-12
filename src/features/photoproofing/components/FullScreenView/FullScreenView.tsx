@@ -38,7 +38,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
     const { albums, handleAddToAlbum, addToAlbumLoader, handleRemoveFromAlbum, projectId, currentImageIndex, setCurrentImageIndex } = usePhotoProofingStore();
     const [isImageInAlbum, setIsImageInAlbum] = useState(false);
 
-    const [selectedAlbum, setSelectedAlbum] = useState('favourites');
+    const [selectedAlbum, setSelectedAlbum] = useState('');
     const [showLikeAnimation, setShowLikeAnimation] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
     const transformComponentRef = useRef<any>(null);

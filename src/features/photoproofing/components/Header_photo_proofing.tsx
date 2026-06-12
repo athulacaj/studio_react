@@ -20,18 +20,19 @@ import {
 import CameraIcon from '@mui/icons-material/Camera';
 import { CreateNewFolder, Download, Close, Menu as MenuIcon, Info as InfoIcon, PermMedia as AlbumIcon } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
-import { ImageObj } from '../types';
+import { AlbumCategory, ImageObj } from '../types';
 import { useDownloadImages } from '../hooks/useDownloadImages';
 import LocalDownloadModal from './LocalDownloadModal';
 
 interface HeaderPhotoProofingProps {
-  albums: any,
+  albums: Record<string, string[]>,
+  categories: Record<string, AlbumCategory>,
   selectedAlbum: string,
   onAlbumChange: any,
   allDisplayedImages: ImageObj[],
 }
 
-const HeaderPhotoProofing = ({ albums, selectedAlbum, onAlbumChange, allDisplayedImages }: HeaderPhotoProofingProps) => {
+const HeaderPhotoProofing = ({ albums, categories, selectedAlbum, onAlbumChange, allDisplayedImages }: HeaderPhotoProofingProps) => {
   // const theme = useTheme();
   // We use CSS breakpoints for layout hiding, but keep isMobile logic if needed for JS control
   // currently primarily handled via Sx props, but keeping the hook call is standard for future proofing or explicit logic
@@ -380,9 +381,9 @@ const HeaderPhotoProofing = ({ albums, selectedAlbum, onAlbumChange, allDisplaye
                       <AlbumIcon sx={{ fontSize: 16, color: 'rgba(255,255,255,0.7)' }} /> All Photos
                     </Box>
                   </MenuItem>
-                  {Object.keys(albums).map((albumName) => (
-                    <MenuItem key={albumName} value={albumName}>
-                      {albumName.charAt(0).toUpperCase() + albumName.slice(1)}
+                  {Object.keys(categories).map((albumKey) => (
+                    <MenuItem key={albumKey} value={albumKey}>
+                      {categories[albumKey].name}
                     </MenuItem>
                   ))}
                 </Select>

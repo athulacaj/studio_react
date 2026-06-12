@@ -18,10 +18,10 @@ export interface Folder {
     [key: string]: any;
 }
 
-export interface Album {
+export interface AlbumCategory {
     name: string;
     images: string[];
 }
 
 
-// PhotoProofingStore type is now defined in store/usePhotoProofingStore.ts
+// PhotoProofingStore type is now defined in store/usePhotoProofingStore.ts

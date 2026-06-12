@@ -4,6 +4,7 @@ import { getProject, getSharedLink, getProjectTreeData } from '../../studio-mana
 import { Project, SharedLink, DriveNode } from '../../studio-management/types';
 import { albumSyncService } from '../services/AlbumSyncService';
 import { useSearchParams } from 'react-router-dom';
+import { AlbumCategory } from '../types';
 
 // Helper to find shared roots in the drive tree
 const findSharedRoots = (folder: DriveNode, includedIds?: Set<string> | undefined, roots: DriveNode[] = []): DriveNode[] => {
@@ -55,7 +56,7 @@ export default function usePhotoProofing(userId: string, projectId: string, link
         loading, setLoading, setImages, setFolders,
         currentFolderId, setCurrentFolderId, breadcrumbs, setBreadcrumbs,
         setIds, setAlbums, currentImageIndex, itemsPerPage,
-        setShareLinkData, shareLinkData
+        setShareLinkData, shareLinkData, categories, setCategories
     } = usePhotoProofingStore();
 
     const breadcrumbsRef = useRef(breadcrumbs);
@@ -89,6 +90,11 @@ export default function usePhotoProofing(userId: string, projectId: string, link
             setLoading(true);
             const linkData = await getSharedLink(userId, projectId, linkId);
             setShareLinkData(linkData);
+            // albums example
+            // "favourites": { name: "Favourites", images: [] }
+            let categoriesObj: Record<string, AlbumCategory> = {}
+            linkData?.categories?.forEach(e => { categoriesObj[e.id] = { name: e.label, images: [] } });
+            setCategories(categoriesObj);
 
             // Find the "roots" of the shared selection from the project's driveData
             if (projectData.driveData) {
@@ -276,13 +282,13 @@ export default function usePhotoProofing(userId: string, projectId: string, link
 
     // Effect to sync albums on page load
     useEffect(() => {
-        if (userId && projectId && linkId) {
+        if (userId && projectId && linkId && Object.keys(categories).length > 0) {
             const syncAndLoad = async () => {
                 try {
                     await albumSyncService.syncAlbums(userId, projectId, linkId);
 
                     // After sync, load everything from local cache to state
-                    const localAlbums = await albumSyncService.getAggregatedAlbums(userId, projectId, linkId);
+                    const localAlbums = await albumSyncService.getAggregatedAlbums(userId, projectId, linkId, categories);
                     console.log('localAlbums', localAlbums);
                     setAlbums(prev => ({
                         ...prev,
@@ -294,7 +300,7 @@ export default function usePhotoProofing(userId: string, projectId: string, link
             };
             syncAndLoad();
         }
-    }, [userId, projectId, linkId]);
+    }, [userId, projectId, linkId, categories]);
 
 
     // cahnge page number if the user changes to the next or previous page through fullscreen autoplay or next button
