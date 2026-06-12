@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { PhotoProofingContext } from './PhotoProofingContext';
-import { ImageObj, Folder, PhotoProofingContextType } from '../types';
+import { ImageObj, Folder, PhotoProofingContextType, Album } from '../types';
 import { db } from '../../../config/firebase';
 import { doc, setDoc, serverTimestamp, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { indexedDBService } from '../services/IndexedDBService';
 
 import { useSearchParams } from 'react-router-dom';
+
+
 
 export const PhotoProofingProvider = ({ children }: { children: React.ReactNode }) => {
 
@@ -13,10 +15,15 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
 
     const [loading, setLoading] = useState(true);
 
-    const [albums, setAlbums] = useState<{ [key: string]: any }>({
-        "favourites": [],
-        "custom": [],
-        "recent": []
+    const [albums, setAlbums] = useState<{ [key: string]: Album }>({
+        "favourites": {
+            name: "Favourites",
+            images: [],
+        },
+        "custom": {
+            name: "Custom",
+            images: [],
+        }
     });
 
 
@@ -99,12 +106,15 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
                     }
                     setAlbums((prevAlbums) => {
                         const currentAlbum = prevAlbums[albumName] || [];
-                        if (currentAlbum.includes(image.id)) return prevAlbums;
+                        if (currentAlbum.images.includes(image.id)) return prevAlbums;
 
                         const newAlbums = {
                             ...prevAlbums,
-                            [albumName]: [...currentAlbum, JSON.stringify(image)],
-                        } as Record<string, string[]>;
+                            [albumName]: {
+                                name: albumName,
+                                images: [...currentAlbum.images, image.id],
+                            },
+                        } as Record<string, Album>;
 
                         return newAlbums;
                     });

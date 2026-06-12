@@ -15,7 +15,7 @@ import {
     Alert
 } from '@mui/material';
 import { FolderOpen, Folder, ArrowForward, CheckCircle, Error as ErrorIcon } from '@mui/icons-material';
-import { usePhotoProofingcontext } from '../context/PhotoProofingContext';
+import { usePhotoProofingStore } from '../store/usePhotoProofingStore';
 import { ImageObj } from '../types';
 import { useDownloadImages } from '../hooks/useDownloadImages';
 
@@ -35,7 +35,7 @@ const LocalDownloadModal: React.FC<LocalDownloadModalProps> = ({ open, onClose, 
         setSourceDirectoryHandle,
         destinationDirectoryHandle,
         setDestinationDirectoryHandle
-    } = usePhotoProofingcontext();
+    } = usePhotoProofingStore();
 
     const {
         downloading,

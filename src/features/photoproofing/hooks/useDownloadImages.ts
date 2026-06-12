@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { ImageObj } from '../types';
-import { usePhotoProofingcontext } from '../context/PhotoProofingContext';
+import { usePhotoProofingStore } from '../store/usePhotoProofingStore';
 import { delay } from '../../../shared/utils/delay';
 
 export const useDownloadImages = () => {
@@ -13,7 +13,7 @@ export const useDownloadImages = () => {
     const {
         sourceDirectoryHandle, setSourceDirectoryHandle,
         destinationDirectoryHandle, setDestinationDirectoryHandle
-    } = usePhotoProofingcontext();
+    } = usePhotoProofingStore();
 
     const cancelDownload = () => {
         if (abortControllerRef.current) {

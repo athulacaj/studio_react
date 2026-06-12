@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, Box, useTheme, useMediaQuery } from '@mui/material';
-import { ImageObj, PhotoProofingContextType } from '../../types';
+import { ImageObj } from '../../types';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
@@ -16,7 +16,7 @@ import NavigationButton from './NavigationButton';
 import ImageViewer from './ImageViewer';
 import AlbumActionButton from './AlbumActionButton';
 import FullScreenLoader from './FullScreenLoader';
-import { usePhotoProofingcontext } from '../../context/PhotoProofingContext';
+import { usePhotoProofingStore } from '../../store/usePhotoProofingStore';
 import { useSearchParams } from 'react-router-dom';
 import { Loader } from 'lucide-react';
 import { indexedDBService } from '../../services/IndexedDBService';
@@ -35,7 +35,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
     open,
     currentImage
 }) => {
-    const { albums, handleAddToAlbum, addToAlbumLoader, handleRemoveFromAlbum, projectId, currentImageIndex, setCurrentImageIndex }: PhotoProofingContextType = usePhotoProofingcontext();
+    const { albums, handleAddToAlbum, addToAlbumLoader, handleRemoveFromAlbum, projectId, currentImageIndex, setCurrentImageIndex } = usePhotoProofingStore();
     const [isImageInAlbum, setIsImageInAlbum] = useState(false);
 
     const [selectedAlbum, setSelectedAlbum] = useState('favourites');

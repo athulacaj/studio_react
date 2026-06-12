@@ -1,13 +1,12 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Typography, CircularProgress, Container, Alert, Backdrop } from '@mui/material';
-import { PhotoProofingProvider } from '../../photoproofing';
 import PhotoProofingPage from '../../photoproofing/pages/PhotoProofingPage';
 import { usePhotoProofing } from '../../photoproofing/hooks/';
 
 // Wrapper component to use the context and hook
 const ProjectViewer = ({ userId, projectId, linkId }: { userId: string, projectId: string, linkId?: string }) => {
-    // The hook handles data fetching and updates the context (PhotoProofingProvider)
+    // The hook handles data fetching and updates the store
     const { loading, error, project, shareLink } = usePhotoProofing(userId, projectId, linkId);
 
     if (loading && !project) { // Only full screen loading for initial project load
@@ -60,9 +59,7 @@ const PublicProjectView = () => {
     }
 
     return (
-        <PhotoProofingProvider>
-            <ProjectViewer userId={userId} projectId={projectId} linkId={linkId} />
-        </PhotoProofingProvider>
+        <ProjectViewer userId={userId} projectId={projectId} linkId={linkId} />
     );
 };
 

@@ -2,8 +2,8 @@ import React from 'react';
 import { Card, CardMedia, Typography, Box, IconButton, Menu, MenuItem, Fade, Tooltip } from '@mui/material';
 import { DeleteOutline, PlaylistAdd, FolderOpen } from '@mui/icons-material';
 
-import { ImageObj, PhotoProofingContextType } from '../../types';
-import { usePhotoProofingcontext } from '../../context/PhotoProofingContext';
+import { ImageObj } from '../../types';
+import { usePhotoProofingStore } from '../../store/usePhotoProofingStore';
 import { CachedImage } from '../../../../shared/utils/MakeGlobalImageCache';
 
 interface PhotoCardProps {
@@ -14,7 +14,7 @@ interface PhotoCardProps {
 
 const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScreen }) => {
 
-    const { albums, selectedAlbum, handleAddToAlbum, handleRemoveFromAlbum }: PhotoProofingContextType = usePhotoProofingcontext();
+    const { albums, selectedAlbum, handleAddToAlbum, handleRemoveFromAlbum } = usePhotoProofingStore();
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
     const open = Boolean(anchorEl);
     const image = imageObj.src || imageObj.thumbnailLink;

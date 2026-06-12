@@ -18,40 +18,10 @@ export interface Folder {
     [key: string]: any;
 }
 
-
-export interface PhotoProofingContextType {
-    albums: Record<string, string[]>;
-    selectedAlbum: string;
-    images: ImageObj[];
-    setAlbums: React.Dispatch<React.SetStateAction<Record<string, string[]>>>;
-    setSelectedAlbum: React.Dispatch<React.SetStateAction<string>>;
-    setImages: React.Dispatch<React.SetStateAction<ImageObj[]>>;
-    handleAlbumChange: (event: React.ChangeEvent<{ value: unknown }>) => void;
-    handleAddToAlbum: (albumName: string, ImageObj: ImageObj) => void;
-    handleRemoveFromAlbum: (albumName: string, ImageObj: ImageObj) => void;
-    folders: Folder[];
-    setFolders: React.Dispatch<React.SetStateAction<Folder[]>>;
-    currentFolderId: string | null;
-    setCurrentFolderId: React.Dispatch<React.SetStateAction<string | null>>;
-    breadcrumbs: { id: string; name: string }[];
-    setBreadcrumbs: React.Dispatch<React.SetStateAction<{ id: string; name: string }[]>>;
-    navigateToFolder: (folderId: string | null, folderName: string) => void;
-    loading: boolean;
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-    userId: string | null;
-    setUserId: React.Dispatch<React.SetStateAction<string | null>>;
-    projectId: string | null;
-    setProjectId: React.Dispatch<React.SetStateAction<string | null>>;
-    linkId: string | null;
-    setLinkId: React.Dispatch<React.SetStateAction<string | null>>;
-    sourceDirectoryHandle: FileSystemDirectoryHandle | null;
-    setSourceDirectoryHandle: React.Dispatch<React.SetStateAction<FileSystemDirectoryHandle | null>>;
-    destinationDirectoryHandle: FileSystemDirectoryHandle | null;
-    setDestinationDirectoryHandle: React.Dispatch<React.SetStateAction<FileSystemDirectoryHandle | null>>;
-    currentImageIndex: number;
-    setCurrentImageIndex: React.Dispatch<React.SetStateAction<number>>;
-    itemsPerPage: number;
-    imagesCache: HTMLImageElement[];
-    setImagesCache: React.Dispatch<React.SetStateAction<HTMLImageElement[]>>;
-    addToAlbumLoader: boolean;
+export interface Album {
+    name: string;
+    images: string[];
 }
+
+
+// PhotoProofingStore type is now defined in store/usePhotoProofingStore.ts

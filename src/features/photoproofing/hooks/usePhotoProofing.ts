@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { usePhotoProofingcontext } from '..';
+import { usePhotoProofingStore } from '../store/usePhotoProofingStore';
 import { getProject, getSharedLink, getProjectTreeData } from '../../studio-management/api/projectService';
 import { Project, SharedLink, DriveNode } from '../../studio-management/types';
 import { albumSyncService } from '../services/AlbumSyncService';
@@ -54,8 +54,8 @@ export default function usePhotoProofing(userId: string, projectId: string, link
     const {
         loading, setLoading, setImages, setFolders,
         currentFolderId, setCurrentFolderId, breadcrumbs, setBreadcrumbs,
-        setUserId, setProjectId, setLinkId, setAlbums, currentImageIndex, itemsPerPage
-    } = usePhotoProofingcontext();
+        setIds, setAlbums, currentImageIndex, itemsPerPage
+    } = usePhotoProofingStore();
 
     const breadcrumbsRef = useRef(breadcrumbs);
     useEffect(() => {
@@ -68,10 +68,8 @@ export default function usePhotoProofing(userId: string, projectId: string, link
     }, [currentFolderId]);
 
     useEffect(() => {
-        setUserId(userId);
-        setProjectId(projectId);
-        setLinkId(linkId || null);
-    }, [userId, projectId, linkId, setUserId, setProjectId, setLinkId]);
+        setIds(userId, projectId, linkId || null);
+    }, [userId, projectId, linkId, setIds]);
     const [error, setError] = useState<string | null>(null);
     const [project, setProject] = useState<Project | null>(null);
     const [shareLink, setShareLink] = useState<SharedLink | null>(null);
@@ -117,41 +115,6 @@ export default function usePhotoProofing(userId: string, projectId: string, link
             setProject(projectData);
             handleLinkShared(projectData);
 
-            // // 2. Handle Share Link if present
-            // if (linkId) {
-            //     const linkData = await getSharedLink(userId, projectId, linkId);
-            //     setShareLink(linkData);
-
-            //     const includedIds = new Set<string>(linkData.includedFolders || []);
-
-            //     // Find the "roots" of the shared selection from the project's driveData
-            //     if (projectData.driveData) {
-            //         const sharedRoots = findSharedRoots(projectData.driveData, includedIds);
-            //         initialFolders = sharedRoots;
-            //     }
-
-            //     initialBreadcrumbs = [{ id: 'SHARED_ROOT', name: 'Shared Files' }];
-
-            //     setCurrentFolderId(null);
-            //     setFolders(initialFolders);
-            //     setBreadcrumbs(initialBreadcrumbs);
-            //     setImages([]);
-
-            // } else {
-            //     // 3. Normal Project View - Set Initial Folder ID from Drive URL
-            //     if (projectData.source === 'google_drive' && projectData.driveUrl) {
-            //         const folderId = extractFolderId(projectData.driveUrl);
-            //         if (folderId) {
-            //             setCurrentFolderId(folderId);
-            //             setBreadcrumbs([{ id: folderId, name: 'Home' }]);
-
-            //             // Initialize root map for the main root
-            //             setFolderRootMap(prev => ({ ...prev, [folderId]: folderId }));
-            //         } else {
-            //             console.warn('Could not extract folder ID from URL:', projectData.driveUrl);
-            //         }
-            //     }
-            // }
 
         } catch (err: unknown) {
             console.error("Error loading project:", err);
@@ -212,32 +175,9 @@ export default function usePhotoProofing(userId: string, projectId: string, link
                 }
             }
 
-            //adde by me 
-            // if (tree && !tree.files) {
-            //     const { filePath, filesCount } = project[rootId];
-            //     const data = await getProjectTreeData(filePath);
-            //     setImages(data.files || []);
-            //     tree.files = data.files;
-            //     setCachedTrees(prev => ({ ...prev, [rootId]: tree as DriveNode }));
-
-            // }
-
-
-
             // If we don't have the tree, we need to fetch it.
             if (!tree && rootId && project[rootId]) {
                 const { filePath } = project[rootId];
-
-                // Show dummy files while loading
-                // if (filesCount) {
-                //     const dummyFiles = Array.from({ length: filesCount }).map((_, i) => ({
-                //         id: `dummy-${i}`,
-                //         name: 'Loading...',
-                //         mimeType: 'image/jpeg', // Assumption
-                //         isLoading: true
-                //     }));
-                //     setImages(dummyFiles);
-                // }
 
                 // Fetch from Storage
                 const data = await getProjectTreeData(filePath);
@@ -343,6 +283,7 @@ export default function usePhotoProofing(userId: string, projectId: string, link
 
                     // After sync, load everything from local cache to state
                     const localAlbums = await albumSyncService.getAggregatedAlbums(userId, projectId, linkId);
+                    console.log('localAlbums', localAlbums);
                     setAlbums(prev => ({
                         ...prev,
                         ...localAlbums

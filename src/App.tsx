@@ -50,7 +50,7 @@ const darkTheme = createTheme({
 });
 
 
-import { PhotoProofingProvider } from './features/photoproofing';
+
 import { PortfolioBuilderProvider } from './features/portfoliobuilder';
 import { AuthProvider } from './features/auth';
 import './features/studio-management/store/studioManagementStore';
@@ -62,22 +62,20 @@ function App() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <PhotoProofingProvider>
-        <PortfolioBuilderProvider>
-          <AuthProvider>
-            <>
+      <PortfolioBuilderProvider>
+        <AuthProvider>
+          <>
 
-              <AppRouter />
-              <Backdrop
-                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.tooltip + 1 }}
-                open={isLoading}
-              >
-                <CircularProgress color="inherit" />
-              </Backdrop>
-            </>
-          </AuthProvider>
-        </PortfolioBuilderProvider>
-      </PhotoProofingProvider>
+            <AppRouter />
+            <Backdrop
+              sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.tooltip + 1 }}
+              open={isLoading}
+            >
+              <CircularProgress color="inherit" />
+            </Backdrop>
+          </>
+        </AuthProvider>
+      </PortfolioBuilderProvider>
     </ThemeProvider>
   );
 }

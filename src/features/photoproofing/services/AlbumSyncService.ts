@@ -2,6 +2,7 @@
 import { db } from '../../../config/firebase';
 import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import { indexedDBService } from './IndexedDBService';
+import { Album } from '../types';
 
 export class AlbumSyncService {
     /**
@@ -75,24 +76,36 @@ export class AlbumSyncService {
     /**
      * Gets all synced data and aggregates it into the format expected by the UI
      */
-    async getAggregatedAlbums(userId: string, projectId: string, linkId: string): Promise<Record<string, string[]>> {
+    async getAggregatedAlbums(userId: string, projectId: string, linkId: string): Promise<Record<string, Album>> {
         const images = await this.getLocalImages(userId, projectId, linkId);
-        const albums: Record<string, string[]> = {
-            "favourites": [],
-            "custom": [],
-            "recent": []
+        const albums: Record<string, Album> = {
+            "favourites": {
+                name: "favourites",
+                images: []
+            },
+            "custom": {
+                name: "custom",
+                images: []
+            },
+            "recent": {
+                name: "recent",
+                images: []
+            }
         };
 
         images.forEach((img: any) => {
             if (img.selections && Array.isArray(img.selections)) {
                 img.selections.forEach((albumName: string) => {
                     if (!albums[albumName]) {
-                        albums[albumName] = [];
+                        albums[albumName] = {
+                            name: albumName,
+                            images: []
+                        };
                     }
                     if (img.image) {
-                        albums[albumName].push(img.image);
+                        albums[albumName].images.push(img.image);
                     } else {
-                        albums[albumName].push(JSON.stringify(img));
+                        albums[albumName].images.push(JSON.stringify(img));
                     }
                 });
             }

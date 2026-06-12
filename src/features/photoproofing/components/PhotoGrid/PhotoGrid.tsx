@@ -5,14 +5,14 @@ import { useSearchParams } from 'react-router-dom';
 import PhotoCard from './PhotoCard';
 import EmptyState from './EmptyState';
 import FullScreenView from '../FullScreenView';
-import { usePhotoProofingcontext } from '../../context/PhotoProofingContext';
-import { PhotoProofingContextType, ImageObj } from '../../types';
+import { usePhotoProofingStore } from '../../store/usePhotoProofingStore';
+import { ImageObj } from '../../types';
 import { globalImageCache } from '../../../../shared/utils/MakeGlobalImageCache';
 
 const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) => {
     const { albums, selectedAlbum, images, itemsPerPage,
         folders, navigateToFolder, breadcrumbs, currentFolderId,
-        imagesCache, setImagesCache, }: PhotoProofingContextType = usePhotoProofingcontext();
+        imagesCache, setImagesCache } = usePhotoProofingStore();
     const [fullScreenOpen, setFullScreenOpen] = useState(false);
     const [currentImage, setCurrentImage] = useState<ImageObj | null>(null);
 
@@ -161,7 +161,8 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
                     }}>
                         {paginatedImages.map((imageObj) => {
                             const originalIndex = images.indexOf(imageObj);
-                            const isLiked = (albums['favourites'] || []).includes(imageObj.id);
+                            const isLiked = false;
+                            // (albums['favourites'] || []).includes(imageObj.id);
 
                             return (
                                 <PhotoCard
