@@ -42,6 +42,7 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
     const createShareLink = useStudioManagementStore((state) => state.createShareLink);
     const updateShareLink = useStudioManagementStore((state) => state.updateShareLink);
     const deleteShareLink = useStudioManagementStore((state) => state.deleteShareLink);
+    const updateProjectLocalState = useStudioManagementStore((state) => state.updateProjectLocalState);
     const [links, setLinks] = useState<SharedLink[]>([]);
     const [loading, setLoading] = useState(false);
     const [view, setView] = useState<ViewMode>('list');
@@ -51,6 +52,12 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
     // Form state
     const [linkName, setLinkName] = useState('');
     const [selectedFolders, setSelectedFolders] = useState<Set<string>>(new Set());
+    useEffect(() => {
+        if (open && project?.id) {
+            updateProjectLocalState(project?.id);
+        }
+    }, [open]);
+
 
     useEffect(() => {
         if (open && project) {
@@ -163,10 +170,10 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                     <Typography variant="h5" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                         <LinkIcon color="primary" /> Shareable Links
                     </Typography>
-                    <Button 
-                        startIcon={<AddIcon />} 
-                        variant="contained" 
-                        size="medium" 
+                    <Button
+                        startIcon={<AddIcon />}
+                        variant="contained"
+                        size="medium"
                         onClick={handleCreateClick}
                         sx={{ borderRadius: '8px', boxShadow: 2, textTransform: 'none', fontWeight: 600 }}
                     >
@@ -174,12 +181,12 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                     </Button>
                 </Box>
                 {links.length === 0 ? (
-                    <Paper 
-                        elevation={0} 
-                        sx={{ 
-                            py: 8, 
-                            px: 4, 
-                            textAlign: 'center', 
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            py: 8,
+                            px: 4,
+                            textAlign: 'center',
                             bgcolor: 'background.default',
                             border: '1px dashed',
                             borderColor: 'divider',
@@ -197,11 +204,11 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                 ) : (
                     <List sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                         {links.map((link) => (
-                            <Paper 
-                                key={link.id} 
-                                elevation={1} 
-                                sx={{ 
-                                    borderRadius: 2, 
+                            <Paper
+                                key={link.id}
+                                elevation={1}
+                                sx={{
+                                    borderRadius: 2,
                                     border: '1px solid',
                                     borderColor: 'divider',
                                     transition: 'all 0.2s ease-in-out',
@@ -254,7 +261,7 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                 <Typography variant="h5" sx={{ fontWeight: 600 }}>
                     {view === 'create' ? 'Create New Link' : 'Edit Link'}
                 </Typography>
-                
+
                 <TextField
                     label="Link Name"
                     variant="outlined"
@@ -268,16 +275,16 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                         }
                     }}
                 />
-                
+
                 <Box>
                     <Typography variant="subtitle1" sx={{ mb: 1.5, fontWeight: 500 }}>
                         Select Folders to Include
                     </Typography>
                     {Object.keys(project?.syncedFolders || {}).length > 0 ? (
-                        <Paper 
+                        <Paper
                             variant="outlined"
-                            sx={{ 
-                                borderRadius: 3, 
+                            sx={{
+                                borderRadius: 3,
                                 overflow: 'hidden',
                                 bgcolor: 'background.default',
                                 borderColor: 'divider'
@@ -295,8 +302,8 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                             </Box>
                         </Paper>
                     ) : (
-                        <Paper 
-                            variant="outlined" 
+                        <Paper
+                            variant="outlined"
                             sx={{ p: 3, textAlign: 'center', borderRadius: 3, bgcolor: 'background.default', borderColor: 'divider' }}
                         >
                             <Typography color="text.secondary">
@@ -310,10 +317,10 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
     );
 
     return (
-        <Dialog 
-            open={open} 
-            onClose={onClose} 
-            maxWidth="md" 
+        <Dialog
+            open={open}
+            onClose={onClose}
+            maxWidth="md"
             fullWidth
             PaperProps={{
                 sx: {
@@ -340,20 +347,20 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                 )}
             </DialogContent>
             <DialogActions sx={{ px: 3, pb: 3, pt: 1, justifyContent: view === 'list' ? 'flex-end' : 'space-between' }}>
-                <Button 
+                <Button
                     onClick={view === 'list' ? onClose : () => setView('list')}
                     sx={{ color: 'text.secondary', fontWeight: 600, px: 3 }}
                 >
                     {view === 'list' ? 'Close' : 'Back to List'}
                 </Button>
                 {view !== 'list' && (
-                    <Button 
-                        onClick={handleSave} 
-                        variant="contained" 
+                    <Button
+                        onClick={handleSave}
+                        variant="contained"
                         disabled={loading}
-                        sx={{ 
-                            borderRadius: '8px', 
-                            px: 4, 
+                        sx={{
+                            borderRadius: '8px',
+                            px: 4,
                             py: 1,
                             fontWeight: 600,
                             boxShadow: 2

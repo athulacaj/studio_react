@@ -122,6 +122,25 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
         }
     };
 
+    const handleReload = async () => {
+        if (!driveUrl) return;
+        try {
+            const getFolderStructure = httpsCallable(functions, 'getFolderStructure');
+            const result = await getFolderStructure({ url: driveUrl });
+            const newFolderStructure = result.data as DriveNode;
+            setFolderStructure(newFolderStructure);
+            
+            if (isEditMode && project) {
+                await updateProject(project.id, {
+                    driveData: newFolderStructure
+                });
+            }
+        } catch (err: any) {
+            console.error("Error fetching folder structure:", err);
+            setError(err.message || 'Failed to fetch folder structure. Please try again.');
+        }
+    };
+
     const handleSubmit = async (newSelectedFolders: string[] = []) => {
         setLoading(true);
         setGlobalLoading(true);
@@ -288,6 +307,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                 initialSelection={selectedFolders}
                 syncedFolders={project?.syncedFolders}
                 projectId={project?.id}
+                onReload={source === 'google_drive' ? handleReload : undefined}
             />
         </>
     );

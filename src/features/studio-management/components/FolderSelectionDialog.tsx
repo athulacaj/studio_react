@@ -8,9 +8,12 @@ import {
     Typography,
     Box,
     Alert,
-    Paper
+    Paper,
+    IconButton,
+    Tooltip,
+    CircularProgress
 } from '@mui/material';
-import { FolderCopyOutlined as FolderIcon } from '@mui/icons-material';
+import { FolderCopyOutlined as FolderIcon, Sync as SyncIcon } from '@mui/icons-material';
 import FolderTree from './FolderTree';
 import { DriveNode, SyncedFolder } from '../types';
 import { useStudioManagementStore } from '../store/studioManagementStore';
@@ -23,6 +26,7 @@ interface FolderSelectionDialogProps {
     initialSelection?: string[];
     syncedFolders?: Record<string, SyncedFolder>;
     projectId?: string;
+    onReload?: () => Promise<void>;
 }
 
 const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
@@ -32,9 +36,12 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
     onConfirm,
     initialSelection = [],
     syncedFolders = {},
-    projectId
+    projectId,
+    onReload
 }) => {
     const [selectedFolders, setSelectedFolders] = useState<Set<string>>(new Set(initialSelection));
+    const [confirmReloadOpen, setConfirmReloadOpen] = useState(false);
+    const [isReloading, setIsReloading] = useState(false);
     const updateProjectLocalState = useStudioManagementStore((state) => state.updateProjectLocalState);
 
     // Reset selection when dialog opens or initialSelection changes
@@ -80,8 +87,17 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
                 }
             }}
         >
-            <DialogTitle sx={{ pb: 1, display: 'flex', alignItems: 'center', gap: 1.5, fontWeight: 600 }}>
-                <FolderIcon color="primary" /> Select Folders to Sync
+            <DialogTitle sx={{ pb: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1.5, fontWeight: 600 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <FolderIcon color="primary" /> Select Folders to Sync
+                </Box>
+                {onReload && (
+                    <Tooltip title="Reload folders">
+                        <IconButton onClick={() => setConfirmReloadOpen(true)} disabled={isReloading}>
+                            {isReloading ? <CircularProgress size={24} /> : <SyncIcon />}
+                        </IconButton>
+                    </Tooltip>
+                )}
             </DialogTitle>
             <DialogContent sx={{ p: 3 }}>
                 <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
@@ -140,6 +156,37 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
                     Confirm & Save
                 </Button>
             </DialogActions>
+
+            {/* Confirm Reload Dialog */}
+            <Dialog open={confirmReloadOpen} onClose={() => setConfirmReloadOpen(false)}>
+                <DialogTitle>Confirm Resync</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        You are going to resync folders. Do it only if new folders are added in the google drive.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setConfirmReloadOpen(false)} sx={{ color: 'text.secondary' }}>
+                        Cancel
+                    </Button>
+                    <Button 
+                        onClick={async () => {
+                            setConfirmReloadOpen(false);
+                            setIsReloading(true);
+                            try {
+                                await onReload?.();
+                            } finally {
+                                setIsReloading(false);
+                            }
+                        }} 
+                        variant="contained" 
+                        color="primary"
+                        sx={{ borderRadius: '8px' }}
+                    >
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Dialog>
     );
 };
