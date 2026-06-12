@@ -190,7 +190,7 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
     const renderList = () => (
         <Fade in timeout={400}>
             <Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: 2, mb: 3 }}>
                     <Typography variant="h5" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                         <LinkIcon color="primary" /> Shareable Links
                     </Typography>
@@ -243,8 +243,9 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                                     }
                                 }}
                             >
-                                <ListItem sx={{ p: 2 }}>
+                                <ListItem sx={{ p: 2, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, gap: { xs: 1.5, sm: 2 } }}>
                                     <ListItemText
+                                        sx={{ m: 0, flex: 1, width: '100%', wordBreak: 'break-word' }}
                                         primary={<Typography variant="subtitle1" fontWeight="600">{link.name}</Typography>}
                                         secondary={
                                             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
@@ -253,23 +254,23 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                                             </Typography>
                                         }
                                     />
-                                    <ListItemSecondaryAction sx={{ right: 16 }}>
+                                    <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' }, justifyContent: { xs: 'flex-end', sm: 'flex-start' } }}>
                                         <Tooltip title="Copy Link" placement="top">
-                                            <IconButton edge="end" onClick={() => handleCopyLink(link.id)} sx={{ mr: 1, color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'primary.dark' } }}>
+                                            <IconButton size="small" onClick={() => handleCopyLink(link.id)} sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'primary.dark' } }}>
                                                 <CopyIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>
                                         <Tooltip title="Edit Link" placement="top">
-                                            <IconButton edge="end" onClick={() => handleEditClick(link)} sx={{ mr: 1, color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'primary.dark' } }}>
+                                            <IconButton size="small" onClick={() => handleEditClick(link)} sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'primary.dark' } }}>
                                                 <EditIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>
                                         <Tooltip title="Delete Link" placement="top">
-                                            <IconButton edge="end" onClick={() => handleDeleteClick(link.id)} sx={{ color: 'text.secondary', '&:hover': { color: 'error.main', bgcolor: 'error.dark' } }}>
+                                            <IconButton size="small" onClick={() => handleDeleteClick(link.id)} sx={{ color: 'text.secondary', '&:hover': { color: 'error.main', bgcolor: 'error.dark' } }}>
                                                 <DeleteIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>
-                                    </ListItemSecondaryAction>
+                                    </Box>
                                 </ListItem>
                             </Paper>
                         ))}
@@ -513,7 +514,7 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                 }
             }}
         >
-            <DialogContent sx={{ p: 3 }}>
+            <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
                 {error && (
                     <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
                         {error}

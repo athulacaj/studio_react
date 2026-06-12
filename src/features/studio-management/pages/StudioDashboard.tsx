@@ -98,10 +98,12 @@ const StudioDashboard: React.FC = () => {
                 sx={{
                     p: 3,
                     mb: 4,
-                    backgroundColor: 'background.paper',
-                    borderRadius: 3,
+                    background: (theme) => `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.6)} 0%, ${alpha(theme.palette.background.paper, 0.3)} 100%)`,
+                    backdropFilter: 'blur(12px)',
+                    borderRadius: 4,
                     border: '1px solid',
-                    borderColor: (theme) => alpha(theme.palette.divider, 0.1),
+                    borderColor: (theme) => alpha(theme.palette.common.white, 0.05),
+                    boxShadow: (theme) => `0 8px 32px 0 ${alpha(theme.palette.common.black, 0.2)}`,
                 }}
                 elevation={0}
             >

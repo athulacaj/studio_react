@@ -51,19 +51,24 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                 position: 'relative',
                 overflow: 'hidden',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                borderRadius: 4,
+                background: (theme) => `linear-gradient(180deg, ${alpha(theme.palette.background.paper, 0.4)} 0%, ${alpha(theme.palette.background.paper, 0.8)} 100%)`,
+                backdropFilter: 'blur(8px)',
                 border: '1px solid',
-                borderColor: (theme) => alpha(theme.palette.divider, 0.08),
+                borderColor: (theme) => alpha(theme.palette.common.white, 0.08),
+                boxShadow: (theme) => `0 4px 12px ${alpha(theme.palette.common.black, 0.1)}`,
                 '&:hover': {
                     transform: 'translateY(-4px)',
                     boxShadow: (theme) =>
-                        `0 12px 28px ${alpha(theme.palette.primary.main, 0.15)}, 0 4px 10px ${alpha(theme.palette.common.black, 0.2)}`,
-                    borderColor: (theme) => alpha(theme.palette.primary.main, 0.3),
+                        `0 16px 32px ${alpha(theme.palette.primary.main, 0.15)}, 0 4px 12px ${alpha(theme.palette.common.black, 0.3)}`,
+                    borderColor: (theme) => alpha(theme.palette.primary.main, 0.4),
+                    background: (theme) => `linear-gradient(180deg, ${alpha(theme.palette.background.paper, 0.6)} 0%, ${alpha(theme.palette.background.paper, 0.9)} 100%)`,
                     '& .arrow-icon': {
                         opacity: 1,
                         transform: 'translateX(0)',
                     },
                     '& .project-name': {
-                        color: 'primary.main',
+                        color: 'primary.light',
                     },
                     '& .gradient-accent': {
                         opacity: 1,
@@ -124,7 +129,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                     </Box>
 
                     {/* Tags */}
-                    <Box sx={{ display: 'flex', gap: 0.75, mb: 2, flexWrap: 'wrap' }}>
+                    <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
                         <Chip
                             label={
                                 project.source === 'google_photos'
@@ -132,27 +137,54 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                                     : 'Google Drive'
                             }
                             size="small"
-                            variant="outlined"
-                            sx={{ borderRadius: 2, fontSize: '0.7rem', height: 24 }}
+                            sx={{ 
+                                borderRadius: 1.5, 
+                                fontSize: '0.7rem', 
+                                height: 24,
+                                backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.15),
+                                color: (theme) => theme.palette.primary.light,
+                                fontWeight: 600,
+                                border: '1px solid',
+                                borderColor: (theme) => alpha(theme.palette.primary.main, 0.2),
+                            }}
                         />
                         <Chip
                             label={project.status}
                             size="small"
-                            color={project.status === 'active' ? 'success' : 'default'}
-                            sx={{ borderRadius: 2, fontSize: '0.7rem', height: 24 }}
+                            sx={{ 
+                                borderRadius: 1.5, 
+                                fontSize: '0.7rem', 
+                                height: 24,
+                                backgroundColor: (theme) => project.status === 'active' 
+                                    ? alpha(theme.palette.success.main, 0.15) 
+                                    : alpha(theme.palette.text.secondary, 0.15),
+                                color: (theme) => project.status === 'active' 
+                                    ? theme.palette.success.light 
+                                    : theme.palette.text.secondary,
+                                fontWeight: 600,
+                                border: '1px solid',
+                                borderColor: (theme) => project.status === 'active' 
+                                    ? alpha(theme.palette.success.main, 0.2) 
+                                    : alpha(theme.palette.text.secondary, 0.2),
+                            }}
                         />
                         {folderCount > 0 && (
                             <Chip
-                                icon={<FolderIcon sx={{ fontSize: '14px !important' }} />}
+                                icon={<FolderIcon sx={{ fontSize: '14px !important', color: 'inherit' }} />}
                                 label={`${folderCount} folder${folderCount !== 1 ? 's' : ''}`}
                                 size="small"
-                                variant="outlined"
                                 sx={{
-                                    borderRadius: 2,
+                                    borderRadius: 1.5,
                                     fontSize: '0.7rem',
                                     height: 24,
-                                    borderColor: (theme) => alpha(theme.palette.info.main, 0.3),
-                                    color: 'info.main',
+                                    backgroundColor: (theme) => alpha(theme.palette.info.main, 0.15),
+                                    color: (theme) => theme.palette.info.light,
+                                    fontWeight: 600,
+                                    border: '1px solid',
+                                    borderColor: (theme) => alpha(theme.palette.info.main, 0.2),
+                                    '& .MuiChip-icon': {
+                                        color: 'inherit'
+                                    }
                                 }}
                             />
                         )}
