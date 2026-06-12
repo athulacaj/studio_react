@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Box, Pagination, Breadcrumbs, Link, Typography, Card } from '@mui/material';
 import { Folder as FolderIcon } from '@mui/icons-material';
 import { useSearchParams } from 'react-router-dom';
@@ -21,7 +21,20 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
     const page = parseInt(searchParams.get('page') || '1', 10);
 
     // Reset page to 1 when album or folder changes
+    const prevAlbumRef = useRef(selectedAlbum);
+    const prevFolderRef = useRef(currentFolderId);
 
+    useEffect(() => {
+        if (prevAlbumRef.current !== selectedAlbum || prevFolderRef.current !== currentFolderId) {
+            setSearchParams(prev => {
+                const newParams = new URLSearchParams(prev);
+                newParams.set('page', '1');
+                return newParams;
+            });
+            prevAlbumRef.current = selectedAlbum;
+            prevFolderRef.current = currentFolderId;
+        }
+    }, [selectedAlbum, currentFolderId, setSearchParams]);
 
     const handleOpenFullScreen = (imageObj: ImageObj) => {
         setCurrentImage(imageObj);

@@ -145,6 +145,7 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
 
     handleAlbumChange: (event) => {
         set({ selectedAlbum: event.target.value as string });
+
     },
 
     handleAddToAlbum: async (albumName, image) => {
