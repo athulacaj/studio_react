@@ -22,6 +22,12 @@ export interface SelectedFolder {
     syncedAt: Timestamp;
 }
 
+export interface LinkCategory {
+    id: string;
+    label: string;
+    isHidden?: boolean;
+}
+
 export interface Project {
     id: string;
     name: string;
@@ -41,6 +47,7 @@ export interface SharedLink {
     id: string;
     name: string;
     includedFolders: string[];
+    categories?: LinkCategory[];
     sourceProjectId: string;
     createdAt?: any;
     updatedAt?: any;

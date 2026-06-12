@@ -16,24 +16,36 @@ import {
     CircularProgress,
     Paper,
     Fade,
-    Tooltip
+    Tooltip,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+
+    Chip
 } from '@mui/material';
 import {
     Add as AddIcon,
     DeleteOutline as DeleteIcon,
     EditOutlined as EditIcon,
     ContentCopyOutlined as CopyIcon,
-    Link as LinkIcon
+    Link as LinkIcon,
+    VisibilityOff as HideIcon,
+    Visibility as ShowIcon
 } from '@mui/icons-material';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import FolderTree from './FolderTree';
-import { Project, SharedLink } from '../types';
+import { Project, SharedLink, LinkCategory } from '../types';
 
 interface ManageShareLinksModalProps {
     open: boolean;
     onClose: () => void;
     project: Project | null;
 }
+
+const SUGGESTED_CATEGORIES = ['Favourites', 'Album', 'Selected'];
 
 type ViewMode = 'list' | 'create' | 'edit';
 
@@ -46,12 +58,15 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
     const [links, setLinks] = useState<SharedLink[]>([]);
     const [loading, setLoading] = useState(false);
     const [view, setView] = useState<ViewMode>('list');
+
     const [currentLink, setCurrentLink] = useState<SharedLink | null>(null);
     const [error, setError] = useState('');
 
     // Form state
     const [linkName, setLinkName] = useState('');
     const [selectedFolders, setSelectedFolders] = useState<Set<string>>(new Set());
+    const [localCategories, setLocalCategories] = useState<LinkCategory[]>([]);
+    const [newCategoryLabel, setNewCategoryLabel] = useState('');
     useEffect(() => {
         if (open && project?.id) {
             updateProjectLocalState(project?.id);
@@ -84,6 +99,8 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
     const handleCreateClick = () => {
         setLinkName('');
         setSelectedFolders(new Set());
+        setLocalCategories([]);
+        setNewCategoryLabel('');
         setView('create');
         setError('');
     };
@@ -91,6 +108,8 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
     const handleEditClick = (link: SharedLink) => {
         setLinkName(link.name);
         setSelectedFolders(new Set(link.includedFolders || []));
+        setLocalCategories(link.categories || []);
+        setNewCategoryLabel('');
         setCurrentLink(link);
         setView('edit');
         setError('');
@@ -132,6 +151,10 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
             setError('Link name is required');
             return;
         }
+        if (localCategories.filter(c => !c.isHidden).length === 0) {
+            setError('Please add at least one visible category');
+            return;
+        }
         if (selectedFolders.size === 0) {
             setError('Please select at least one folder');
             return;
@@ -142,6 +165,7 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
             const linkData = {
                 name: linkName,
                 includedFolders: Array.from(selectedFolders),
+                categories: localCategories,
                 sourceProjectId: project.id
             };
 
@@ -255,6 +279,35 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
         </Fade>
     );
 
+    const handleAddCategory = () => {
+        const trimmed = newCategoryLabel.trim();
+        if (!trimmed) return;
+        const exists = localCategories.some(c => c.label.toLowerCase() === trimmed.toLowerCase());
+        if (exists) return;
+        const newCat: LinkCategory = { id: `cat_${Date.now()}`, label: trimmed, isHidden: false };
+        setLocalCategories(prev => [...prev, newCat]);
+        setNewCategoryLabel('');
+    };
+
+    const handleToggleCategoryVisibility = (catId: string) => {
+        setLocalCategories(prev => prev.map(c =>
+            c.id === catId ? { ...c, isHidden: !c.isHidden } : c
+        ));
+    };
+
+    const handleCategoryLabelChange = (catId: string, newLabel: string) => {
+        setLocalCategories(prev => prev.map(c =>
+            c.id === catId ? { ...c, label: newLabel } : c
+        ));
+    };
+
+    const handleAddSuggestion = (label: string) => {
+        const exists = localCategories.some(c => c.label.toLowerCase() === label.toLowerCase());
+        if (exists) return;
+        const newCat: LinkCategory = { id: `cat_${Date.now()}`, label, isHidden: false };
+        setLocalCategories(prev => [...prev, newCat]);
+    };
+
     const renderForm = () => (
         <Fade in timeout={400}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -276,6 +329,132 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                     }}
                 />
 
+                <Box>
+                    <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 500 }}>
+                        Categories *
+                    </Typography>
+                    {/* Suggestions */}
+                    <Box sx={{ display: 'flex', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
+                        <Typography variant="caption" color="text.secondary" sx={{ alignSelf: 'center', mr: 0.5 }}>
+                            Suggestions:
+                        </Typography>
+                        {SUGGESTED_CATEGORIES
+                            .filter(s => !localCategories.some(c => c.label.toLowerCase() === s.toLowerCase()))
+                            .map(suggestion => (
+                                <Chip
+                                    key={suggestion}
+                                    label={suggestion}
+                                    size="small"
+                                    variant="outlined"
+                                    icon={<AddIcon />}
+                                    onClick={() => handleAddSuggestion(suggestion)}
+                                    sx={{
+                                        cursor: 'pointer',
+                                        borderStyle: 'dashed',
+                                        '&:hover': { borderStyle: 'solid', bgcolor: 'action.hover' },
+                                        transition: 'all 0.2s',
+                                    }}
+                                />
+                            ))}
+                        {SUGGESTED_CATEGORIES.every(s => localCategories.some(c => c.label.toLowerCase() === s.toLowerCase())) && (
+                            <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                                All suggestions added
+                            </Typography>
+                        )}
+                    </Box>
+                    <TableContainer
+                        component={Paper}
+                        variant="outlined"
+                        sx={{ borderRadius: 3, borderColor: 'divider', bgcolor: 'background.default' }}
+                    >
+                        <Table size="small">
+                            <TableHead>
+                                <TableRow sx={{ '& th': { fontWeight: 600, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' } }}>
+                                    <TableCell>Label</TableCell>
+                                    <TableCell align="center" sx={{ width: 100 }}>Status</TableCell>
+                                    <TableCell align="center" sx={{ width: 80 }}>Action</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {localCategories.map(cat => (
+                                    <TableRow
+                                        key={cat.id}
+                                        sx={{
+                                            opacity: cat.isHidden ? 0.5 : 1,
+                                            transition: 'opacity 0.2s',
+                                            '&:last-child td, &:last-child th': { border: 0 },
+                                        }}
+                                    >
+                                        <TableCell>
+                                            <TextField
+                                                variant="standard"
+                                                value={cat.label}
+                                                onChange={(e) => handleCategoryLabelChange(cat.id, e.target.value)}
+                                                InputProps={{ disableUnderline: true, sx: { fontSize: '0.875rem' } }}
+                                                fullWidth
+                                                size="small"
+                                            />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <Chip
+                                                label={cat.isHidden ? 'Hidden' : 'Visible'}
+                                                size="small"
+                                                color={cat.isHidden ? 'default' : 'success'}
+                                                variant="outlined"
+                                                sx={{ fontSize: '0.7rem', height: 24 }}
+                                            />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <Tooltip title={cat.isHidden ? 'Show category' : 'Hide category'} placement="top">
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => handleToggleCategoryVisibility(cat.id)}
+                                                    sx={{ color: 'text.secondary' }}
+                                                >
+                                                    {cat.isHidden ? <ShowIcon fontSize="small" /> : <HideIcon fontSize="small" />}
+                                                </IconButton>
+                                            </Tooltip>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                                {/* Add new category row */}
+                                <TableRow>
+
+                                    <TableCell>
+                                        <TextField
+                                            variant="standard"
+                                            placeholder="Type new category name..."
+                                            value={newCategoryLabel}
+                                            onChange={(e) => setNewCategoryLabel(e.target.value)}
+                                            onKeyDown={(e) => { if (e.key === 'Enter') handleAddCategory(); }}
+                                            InputProps={{ disableUnderline: true, sx: { fontSize: '0.875rem' } }}
+                                            fullWidth
+                                            size="small"
+                                        />
+                                    </TableCell>
+                                    <TableCell colSpan={2} align="center">
+                                        <Button
+                                            size="small"
+                                            startIcon={<AddIcon />}
+                                            onClick={handleAddCategory}
+                                            disabled={!newCategoryLabel.trim()}
+                                            sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.75rem' }}
+                                        >
+                                            Add
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    {localCategories.length === 0 && (
+                        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                            No categories yet. Add one above.
+                        </Typography>
+                    )}
+                </Box>
+
+                {/* Folders Section */}
                 <Box>
                     <Typography variant="subtitle1" sx={{ mb: 1.5, fontWeight: 500 }}>
                         Select Folders to Include
@@ -315,6 +494,8 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
             </Box>
         </Fade>
     );
+
+
 
     return (
         <Dialog
