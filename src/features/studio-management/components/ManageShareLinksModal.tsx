@@ -366,7 +366,7 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                     <TableContainer
                         component={Paper}
                         variant="outlined"
-                        sx={{ borderRadius: 3, borderColor: 'divider', bgcolor: 'background.default' }}
+                        sx={{ borderRadius: 3, p: 3, borderColor: 'divider', bgcolor: 'background.default' }}
                     >
                         <Table size="small">
                             <TableHead>

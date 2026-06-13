@@ -21,6 +21,7 @@ import {
     Folder as FolderIcon,
     NavigateBefore as NavigateBeforeIcon,
     NavigateNext as NavigateNextIcon,
+    CameraAlt as CameraAltIcon,
 } from '@mui/icons-material';
 import { Project } from '../types';
 
@@ -51,24 +52,22 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                 position: 'relative',
                 overflow: 'hidden',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                borderRadius: 4,
-                background: (theme) => `linear-gradient(180deg, ${alpha(theme.palette.background.paper, 0.4)} 0%, ${alpha(theme.palette.background.paper, 0.8)} 100%)`,
-                backdropFilter: 'blur(8px)',
-                border: '1px solid',
-                borderColor: (theme) => alpha(theme.palette.common.white, 0.08),
-                boxShadow: (theme) => `0 4px 12px ${alpha(theme.palette.common.black, 0.1)}`,
+                borderRadius: '24px',
+                background: 'rgba(15, 26, 46, 0.55)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
                 '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: (theme) =>
-                        `0 16px 32px ${alpha(theme.palette.primary.main, 0.15)}, 0 4px 12px ${alpha(theme.palette.common.black, 0.3)}`,
-                    borderColor: (theme) => alpha(theme.palette.primary.main, 0.4),
-                    background: (theme) => `linear-gradient(180deg, ${alpha(theme.palette.background.paper, 0.6)} 0%, ${alpha(theme.palette.background.paper, 0.9)} 100%)`,
+                    transform: 'translateY(-4px) scale(1.02)',
+                    boxShadow: '0 16px 48px rgba(157, 78, 221, 0.2), 0 8px 24px rgba(0,0,0,0.3)',
+                    borderColor: 'rgba(157, 78, 221, 0.35)',
+                    background: 'rgba(15, 26, 46, 0.72)',
                     '& .arrow-icon': {
                         opacity: 1,
                         transform: 'translateX(0)',
                     },
                     '& .project-name': {
-                        color: 'primary.light',
+                        color: '#C084FC',
                     },
                     '& .gradient-accent': {
                         opacity: 1,
@@ -85,7 +84,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                     left: 0,
                     right: 0,
                     height: 3,
-                    background: 'linear-gradient(90deg, #6366f1 0%, #a855f7 100%)',
+                    background: 'linear-gradient(90deg, #7C3AED 0%, #A855F7 50%, #C084FC 100%)',
                     opacity: 0,
                     transition: 'opacity 0.3s ease',
                 }}
@@ -105,9 +104,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                     p: 0,
                 }}
             >
-                <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
+                <CardContent sx={{ flexGrow: 1, p: 3 }}>
                     {/* Header: Name + Source Icon */}
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2.5 }}>
                         <Typography
                             className="project-name"
                             variant="h6"
@@ -116,20 +115,37 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                             sx={{
                                 maxWidth: '80%',
                                 fontWeight: 600,
-                                transition: 'color 0.2s ease',
+                                fontSize: '1.1rem',
+                                transition: 'color 0.25s ease',
+                                color: '#F8FAFC',
                             }}
                         >
                             {project.name}
                         </Typography>
-                        {project.source === 'google_photos' ? (
-                            <GoogleIcon color="primary" sx={{ fontSize: 22, opacity: 0.7 }} />
-                        ) : (
-                            <CloudIcon color="secondary" sx={{ fontSize: 22, opacity: 0.7 }} />
-                        )}
+                        <Box
+                            sx={{
+                                width: 36,
+                                height: 36,
+                                borderRadius: '12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                background: project.source === 'google_photos'
+                                    ? 'rgba(157, 78, 221, 0.12)'
+                                    : 'rgba(56, 189, 248, 0.12)',
+                                flexShrink: 0,
+                            }}
+                        >
+                            {project.source === 'google_photos' ? (
+                                <GoogleIcon sx={{ fontSize: 18, color: '#C084FC' }} />
+                            ) : (
+                                <CloudIcon sx={{ fontSize: 18, color: '#38BDF8' }} />
+                            )}
+                        </Box>
                     </Box>
 
                     {/* Tags */}
-                    <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                    <Box sx={{ display: 'flex', gap: 0.75, mb: 2.5, flexWrap: 'wrap' }}>
                         <Chip
                             label={
                                 project.source === 'google_photos'
@@ -137,35 +153,34 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                                     : 'Google Drive'
                             }
                             size="small"
-                            sx={{ 
-                                borderRadius: 1.5, 
-                                fontSize: '0.7rem', 
-                                height: 24,
-                                backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.15),
-                                color: (theme) => theme.palette.primary.light,
+                            sx={{
+                                borderRadius: '999px',
+                                fontSize: '0.7rem',
+                                height: 26,
+                                backgroundColor: 'rgba(157, 78, 221, 0.12)',
+                                color: '#C084FC',
                                 fontWeight: 600,
-                                border: '1px solid',
-                                borderColor: (theme) => alpha(theme.palette.primary.main, 0.2),
+                                border: '1px solid rgba(157, 78, 221, 0.2)',
                             }}
                         />
                         <Chip
                             label={project.status}
                             size="small"
-                            sx={{ 
-                                borderRadius: 1.5, 
-                                fontSize: '0.7rem', 
-                                height: 24,
-                                backgroundColor: (theme) => project.status === 'active' 
-                                    ? alpha(theme.palette.success.main, 0.15) 
-                                    : alpha(theme.palette.text.secondary, 0.15),
-                                color: (theme) => project.status === 'active' 
-                                    ? theme.palette.success.light 
-                                    : theme.palette.text.secondary,
+                            sx={{
+                                borderRadius: '999px',
+                                fontSize: '0.7rem',
+                                height: 26,
+                                backgroundColor: project.status === 'active'
+                                    ? 'rgba(34, 197, 94, 0.12)'
+                                    : 'rgba(148, 163, 184, 0.12)',
+                                color: project.status === 'active'
+                                    ? '#22C55E'
+                                    : '#94A3B8',
                                 fontWeight: 600,
                                 border: '1px solid',
-                                borderColor: (theme) => project.status === 'active' 
-                                    ? alpha(theme.palette.success.main, 0.2) 
-                                    : alpha(theme.palette.text.secondary, 0.2),
+                                borderColor: project.status === 'active'
+                                    ? 'rgba(34, 197, 94, 0.2)'
+                                    : 'rgba(148, 163, 184, 0.15)',
                             }}
                         />
                         {folderCount > 0 && (
@@ -174,14 +189,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                                 label={`${folderCount} folder${folderCount !== 1 ? 's' : ''}`}
                                 size="small"
                                 sx={{
-                                    borderRadius: 1.5,
+                                    borderRadius: '999px',
                                     fontSize: '0.7rem',
-                                    height: 24,
-                                    backgroundColor: (theme) => alpha(theme.palette.info.main, 0.15),
-                                    color: (theme) => theme.palette.info.light,
+                                    height: 26,
+                                    backgroundColor: 'rgba(56, 189, 248, 0.12)',
+                                    color: '#38BDF8',
                                     fontWeight: 600,
-                                    border: '1px solid',
-                                    borderColor: (theme) => alpha(theme.palette.info.main, 0.2),
+                                    border: '1px solid rgba(56, 189, 248, 0.2)',
                                     '& .MuiChip-icon': {
                                         color: 'inherit'
                                     }
@@ -197,19 +211,18 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                             justifyContent: 'space-between',
                             alignItems: 'center',
                             mt: 'auto',
-                            pt: 1.5,
-                            borderTop: '1px solid',
-                            borderColor: (theme) => alpha(theme.palette.divider, 0.08),
+                            pt: 2,
+                            borderTop: '1px solid rgba(255,255,255,0.05)',
                         }}
                     >
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.75rem' }}>
                             {formattedDate}
                         </Typography>
                         <ArrowForwardIcon
                             className="arrow-icon"
                             sx={{
                                 fontSize: 18,
-                                color: 'primary.main',
+                                color: '#9D4EDD',
                                 opacity: 0,
                                 transform: 'translateX(-8px)',
                                 transition: 'all 0.3s ease',
@@ -228,21 +241,23 @@ const ProjectCardSkeleton: React.FC = () => (
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            border: '1px solid',
-            borderColor: (theme) => alpha(theme.palette.divider, 0.08),
+            borderRadius: '24px',
+            background: 'rgba(15, 26, 46, 0.4)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.05)',
         }}
     >
-        <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Skeleton variant="text" width="65%" height={32} />
-                <Skeleton variant="circular" width={22} height={22} />
+        <CardContent sx={{ flexGrow: 1, p: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2.5 }}>
+                <Skeleton variant="text" width="65%" height={32} sx={{ bgcolor: 'rgba(255,255,255,0.06)' }} />
+                <Skeleton variant="rounded" width={36} height={36} sx={{ borderRadius: '12px', bgcolor: 'rgba(255,255,255,0.06)' }} />
             </Box>
-            <Box sx={{ display: 'flex', gap: 0.75, mb: 2 }}>
-                <Skeleton variant="rounded" width={90} height={24} sx={{ borderRadius: 2 }} />
-                <Skeleton variant="rounded" width={60} height={24} sx={{ borderRadius: 2 }} />
+            <Box sx={{ display: 'flex', gap: 0.75, mb: 2.5 }}>
+                <Skeleton variant="rounded" width={90} height={26} sx={{ borderRadius: '999px', bgcolor: 'rgba(255,255,255,0.06)' }} />
+                <Skeleton variant="rounded" width={60} height={26} sx={{ borderRadius: '999px', bgcolor: 'rgba(255,255,255,0.06)' }} />
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 1.5, borderTop: '1px solid', borderColor: (theme) => alpha(theme.palette.divider, 0.08) }}>
-                <Skeleton variant="text" width={80} height={20} />
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 2, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <Skeleton variant="text" width={80} height={20} sx={{ bgcolor: 'rgba(255,255,255,0.06)' }} />
             </Box>
         </CardContent>
     </Card>
@@ -274,14 +289,33 @@ const ProjectList: React.FC = () => {
             <Box
                 sx={{
                     textAlign: 'center',
-                    py: 6,
-                    color: 'text.secondary',
+                    py: 8,
+                    borderRadius: '24px',
+                    background: 'rgba(15, 26, 46, 0.35)',
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(255,255,255,0.05)',
                 }}
             >
-                <FolderIcon sx={{ fontSize: 48, opacity: 0.3, mb: 2 }} />
-                <Typography variant="h6">No projects found</Typography>
-                <Typography variant="body2" sx={{ mt: 0.5 }}>
-                    Create a new project to get started
+                <Box
+                    sx={{
+                        width: 72,
+                        height: 72,
+                        borderRadius: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'rgba(157, 78, 221, 0.1)',
+                        mx: 'auto',
+                        mb: 3,
+                    }}
+                >
+                    <CameraAltIcon sx={{ fontSize: 36, color: '#9D4EDD', opacity: 0.6 }} />
+                </Box>
+                <Typography variant="h6" sx={{ color: '#F8FAFC', fontWeight: 600, mb: 1 }}>
+                    No projects yet
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#64748B', maxWidth: 320, mx: 'auto' }}>
+                    Create your first project to start managing your wedding photography.
                 </Typography>
             </Box>
         );
@@ -299,13 +333,13 @@ const ProjectList: React.FC = () => {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            backgroundColor: (theme) => alpha(theme.palette.background.paper, 0.7),
+                            backgroundColor: 'rgba(3, 9, 18, 0.7)',
                             zIndex: 2,
-                            borderRadius: 2,
+                            borderRadius: '24px',
                             backdropFilter: 'blur(4px)',
                         }}
                     >
-                        <CircularProgress size={36} sx={{ color: '#6366f1' }} />
+                        <CircularProgress size={36} sx={{ color: '#9D4EDD' }} />
                     </Box>
                 )}
                 <Grid container spacing={3}>
@@ -325,10 +359,9 @@ const ProjectList: React.FC = () => {
                         justifyContent: 'center',
                         alignItems: 'center',
                         gap: 2,
-                        mt: 4,
-                        pt: 3,
-                        borderTop: '1px solid',
-                        borderColor: (theme) => alpha(theme.palette.divider, 0.1),
+                        mt: 5,
+                        pt: 4,
+                        borderTop: '1px solid rgba(255,255,255,0.05)',
                     }}
                 >
                     <Button
@@ -338,17 +371,22 @@ const ProjectList: React.FC = () => {
                         onClick={fetchPreviousPage}
                         disabled={!hasPreviousPage || loading}
                         sx={{
-                            borderRadius: 2,
+                            borderRadius: '16px',
                             textTransform: 'none',
                             px: 2.5,
-                            borderColor: (theme) => alpha(theme.palette.primary.main, 0.3),
+                            borderColor: 'rgba(157, 78, 221, 0.25)',
+                            color: '#C084FC',
+                            background: 'rgba(157, 78, 221, 0.04)',
                             '&:hover': {
-                                borderColor: 'primary.main',
-                                backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.04),
+                                borderColor: '#9D4EDD',
+                                backgroundColor: 'rgba(157, 78, 221, 0.1)',
+                                boxShadow: '0 0 20px rgba(157, 78, 221, 0.15)',
                             },
                             '&.Mui-disabled': {
-                                borderColor: (theme) => alpha(theme.palette.divider, 0.15),
+                                borderColor: 'rgba(255,255,255,0.05)',
+                                color: '#64748B',
                             },
+                            transition: 'all 0.25s ease',
                         }}
                     >
                         Previous
@@ -359,14 +397,14 @@ const ProjectList: React.FC = () => {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            minWidth: 40,
-                            height: 36,
-                            borderRadius: 2,
-                            background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                            minWidth: 44,
+                            height: 40,
+                            borderRadius: '14px',
+                            background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)',
                             color: '#fff',
-                            fontWeight: 600,
-                            fontSize: '0.875rem',
-                            boxShadow: '0 2px 8px rgba(99, 102, 241, 0.25)',
+                            fontWeight: 700,
+                            fontSize: '0.9rem',
+                            boxShadow: '0 0 24px rgba(157, 78, 221, 0.3)',
                         }}
                     >
                         {currentPage}
@@ -379,17 +417,22 @@ const ProjectList: React.FC = () => {
                         onClick={fetchNextPage}
                         disabled={!hasNextPage || loading}
                         sx={{
-                            borderRadius: 2,
+                            borderRadius: '16px',
                             textTransform: 'none',
                             px: 2.5,
-                            borderColor: (theme) => alpha(theme.palette.primary.main, 0.3),
+                            borderColor: 'rgba(157, 78, 221, 0.25)',
+                            color: '#C084FC',
+                            background: 'rgba(157, 78, 221, 0.04)',
                             '&:hover': {
-                                borderColor: 'primary.main',
-                                backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.04),
+                                borderColor: '#9D4EDD',
+                                backgroundColor: 'rgba(157, 78, 221, 0.1)',
+                                boxShadow: '0 0 20px rgba(157, 78, 221, 0.15)',
                             },
                             '&.Mui-disabled': {
-                                borderColor: (theme) => alpha(theme.palette.divider, 0.15),
+                                borderColor: 'rgba(255,255,255,0.05)',
+                                color: '#64748B',
                             },
+                            transition: 'all 0.25s ease',
                         }}
                     >
                         Next

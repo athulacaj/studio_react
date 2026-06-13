@@ -17,7 +17,7 @@ import {
   Stack,
   Divider,
 } from '@mui/material';
-import CameraIcon from '@mui/icons-material/Camera';
+
 import { CreateNewFolder, Download, Close, Menu as MenuIcon, Info as InfoIcon, PermMedia as AlbumIcon } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { AlbumCategory, ImageObj } from '../types';
@@ -210,36 +210,26 @@ const HeaderPhotoProofing = ({ albums, categories, selectedAlbum, onAlbumChange,
             to="/"
             sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer', textDecoration: 'none' }}
           >
-            <CameraIcon sx={{ color: '#a855f7', fontSize: { xs: 28, md: 32 } }} />
+            <Box component="img" src="/images/logo_small.png" alt="mizhiv logo" sx={{ height: { xs: 28, md: 32 }, width: 'auto', borderRadius: '8px' }} />
             <Typography
               variant="h6"
               component="div"
               sx={{
                 fontWeight: 700,
                 letterSpacing: '-0.025em',
-                background: 'linear-gradient(to right, #fff, #cbd5e1)',
+                background: 'linear-gradient(135deg, #F8FAFC 0%, #C084FC 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 fontSize: { xs: '1.1rem', md: '1.25rem' }
               }}
             >
-              Studio<span style={{ color: '#a855f7', WebkitTextFillColor: '#a855f7' }}>React</span>
+              mizhiv
             </Typography>
           </Box>
 
           {/* Desktop Controls */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2 }}>
-            <Button
-              component={Link}
-              to="/about"
-              sx={{
-                color: 'rgba(255,255,255,0.7)',
-                fontWeight: 500,
-                '&:hover': { color: 'white', bgcolor: 'rgba(255,255,255,0.05)' }
-              }}
-            >
-              About
-            </Button>
+
 
             <DownloadButton
               downloading={downloading}
@@ -336,8 +326,17 @@ const HeaderPhotoProofing = ({ albums, categories, selectedAlbum, onAlbumChange,
           {/* Drawer Header */}
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <CameraIcon sx={{ color: '#a855f7' }} />
-              Studio<span style={{ color: '#a855f7' }}>React</span>
+              <Box component="img" src="/images/logo_small.png" alt="mizhiv logo" sx={{ height: 28, width: 'auto', borderRadius: '8px' }} />
+              <Box
+                component="span"
+                sx={{
+                  background: 'linear-gradient(135deg, #F8FAFC 0%, #C084FC 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                mizhiv
+              </Box>
             </Typography>
             <IconButton onClick={toggleMobileMenu(false)} sx={{ color: 'rgba(255,255,255,0.5)' }}>
               <Close />
@@ -406,25 +405,7 @@ const HeaderPhotoProofing = ({ albums, categories, selectedAlbum, onAlbumChange,
                   onLocalCopy={handleLocalCopy}
                 />
 
-                <Button
-                  component={Link}
-                  to="/about"
-                  fullWidth
-                  variant="outlined"
-                  startIcon={<InfoIcon />}
-                  onClick={toggleMobileMenu(false)}
-                  sx={{
-                    justifyContent: 'flex-start',
-                    color: 'white',
-                    borderColor: 'rgba(255,255,255,0.2)',
-                    borderRadius: '12px',
-                    textTransform: 'none',
-                    py: 1,
-                    '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.05)' }
-                  }}
-                >
-                  About
-                </Button>
+
               </Stack>
             </Box>
           </Stack>
