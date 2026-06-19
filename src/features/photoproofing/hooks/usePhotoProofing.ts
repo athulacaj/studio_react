@@ -93,7 +93,7 @@ export default function usePhotoProofing(userId: string, projectId: string, link
             // albums example
             // "favourites": { name: "Favourites", images: [] }
             let categoriesObj: Record<string, AlbumCategory> = {}
-            linkData?.categories?.forEach(e => { categoriesObj[e.id] = { name: e.label, images: [] } });
+            linkData?.categories?.forEach(e => { categoriesObj[e.id] = { name: e.label, images: [], id: e.id } });
             setCategories(categoriesObj);
 
             // Find the "roots" of the shared selection from the project's driveData

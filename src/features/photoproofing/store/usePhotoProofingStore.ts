@@ -23,7 +23,10 @@ interface PhotoProofingState {
     categories: Record<string, AlbumCategory>; // this the categories from the db
 
     selectedAlbum: string;
+    toAddWhichAlbum: string | null;
+
     addToAlbumLoader: boolean;
+
 
     // Folder Navigation (synced with URL via useUrlSync hook)
     currentFolderId: string | null;
@@ -52,9 +55,10 @@ interface PhotoProofingActions {
 
     // Album actions
     setAlbums: (albums: Record<string, string[]> | ((prev: Record<string, string[]>) => Record<string, string[]>)) => void;
+    setToAddWhichAlbum: (album: string | null | ((prev: string | null) => string | null)) => void;
     setCategories: (categories: Record<string, AlbumCategory> | ((prev: Record<string, AlbumCategory>) => Record<string, AlbumCategory>)) => void;
     setSelectedAlbum: (album: string | ((prev: string) => string)) => void;
-    handleAlbumChange: (event: React.ChangeEvent<{ value: unknown }>) => void;
+    handleAlbumChange: (album: AlbumCategory) => void;
     handleAddToAlbum: (albumName: string, image: ImageObj) => void;
     handleRemoveFromAlbum: (albumName: string, image: ImageObj) => void;
 
@@ -90,6 +94,7 @@ const initialState: PhotoProofingState = {
     itemsPerPage: 8,
     albums: {},
     selectedAlbum: 'all',
+    toAddWhichAlbum: localStorage?.getItem('toAddWhichAlbum'),
     categories: {},
     addToAlbumLoader: false,
     currentFolderId: null,
@@ -143,10 +148,15 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
         categories: resolve(categories, state.categories),
     })),
 
-    handleAlbumChange: (event) => {
-        set({ selectedAlbum: event.target.value as string });
-
+    handleAlbumChange: (category: AlbumCategory) => {
+        set({ selectedAlbum: category.id });
     },
+    setToAddWhichAlbum: (album: string | null | ((prev: string | null) => string | null)) => set((state) => {
+        localStorage.setItem('toAddWhichAlbum', album as string ?? '');
+        return {
+            toAddWhichAlbum: resolve(album, state.toAddWhichAlbum),
+        }
+    }),
 
     handleAddToAlbum: async (albumName, image) => {
         const { userId, projectId, linkId, breadcrumbs } = get();

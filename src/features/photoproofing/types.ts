@@ -21,6 +21,7 @@ export interface Folder {
 export interface AlbumCategory {
     name: string;
     images: string[];
+    id: string;
 }
 
 

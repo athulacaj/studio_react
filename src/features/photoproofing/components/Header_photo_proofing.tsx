@@ -23,20 +23,22 @@ import { Link } from 'react-router-dom';
 import { AlbumCategory, ImageObj } from '../types';
 import { useDownloadImages } from '../hooks/useDownloadImages';
 import LocalDownloadModal from './LocalDownloadModal';
+import AlbumSelector from './AlbumSelector';
+import { usePhotoProofingStore } from '../store/usePhotoProofingStore';
 
 interface HeaderPhotoProofingProps {
   albums: Record<string, string[]>,
   categories: Record<string, AlbumCategory>,
   selectedAlbum: string,
-  onAlbumChange: any,
   allDisplayedImages: ImageObj[],
 }
 
-const HeaderPhotoProofing = ({ albums, categories, selectedAlbum, onAlbumChange, allDisplayedImages }: HeaderPhotoProofingProps) => {
+const HeaderPhotoProofing = ({ allDisplayedImages }: HeaderPhotoProofingProps) => {
   // const theme = useTheme();
   // We use CSS breakpoints for layout hiding, but keep isMobile logic if needed for JS control
   // currently primarily handled via Sx props, but keeping the hook call is standard for future proofing or explicit logic
   // const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { albums, selectedAlbum, handleAlbumChange, images, currentImageIndex, categories } = usePhotoProofingStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [localDownloadModalOpen, setLocalDownloadModalOpen] = useState(false);
@@ -240,58 +242,18 @@ const HeaderPhotoProofing = ({ albums, categories, selectedAlbum, onAlbumChange,
               onLocalCopy={handleLocalCopy}
             />
 
-            <FormControl sx={{ m: 1, minWidth: 150 }} size="small">
-              <Select
-                labelId="album-select-label"
-                id="album-select"
-                value={selectedAlbum}
-                onChange={onAlbumChange}
-                displayEmpty
-                sx={{
-                  color: 'white',
-                  '.MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'rgba(255, 255, 255, 0.2)',
-                    transition: 'border-color 0.2s'
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'rgba(255, 255, 255, 0.5)',
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#a855f7',
-                  },
-                  '.MuiSvgIcon-root': {
-                    color: 'white',
-                  },
-                  borderRadius: '20px',
-                  height: '40px',
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      bgcolor: '#1e293b',
-                      color: 'white',
-                      '& .MuiMenuItem-root': {
-                        '&:hover': { bgcolor: 'rgba(168, 85, 247, 0.2)' },
-                        '&.Mui-selected': {
-                          bgcolor: 'rgba(168, 85, 247, 0.3)',
-                          '&:hover': { bgcolor: 'rgba(168, 85, 247, 0.4)' },
-                        },
-                      },
-                    },
-                  },
-                }}
-              >
-                <MenuItem value="all">All Photos</MenuItem>
-                {Object.keys(albums).map((albumName) => (
-                  <MenuItem key={albumName} value={albumName}>
-                    {albumName.charAt(0).toUpperCase() + albumName.slice(1)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <AlbumSelector
+              onAlbumChange={handleAlbumChange}
+            />
           </Box>
 
           {/* Mobile Menu Button */}
+          <Box sx={{ display: { xs: 'flex', md: 'none' }, ml: "auto" }}>
+            <AlbumSelector
+              onAlbumChange={handleAlbumChange}
+              hideAll={true}
+            />
+          </Box>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -351,42 +313,7 @@ const HeaderPhotoProofing = ({ albums, categories, selectedAlbum, onAlbumChange,
               <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600, mb: 1, display: 'block' }}>
                 Current Album
               </Typography>
-              <FormControl fullWidth size="small">
-                <Select
-                  value={selectedAlbum}
-                  onChange={(e) => {
-                    onAlbumChange(e);
-                  }}
-                  displayEmpty
-                  sx={{
-                    color: 'white',
-                    bgcolor: 'rgba(255,255,255,0.05)',
-                    '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#a855f7' },
-                    '.MuiSvgIcon-root': { color: 'white' },
-                    borderRadius: '12px',
-                  }}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: {
-                        bgcolor: '#1e293b',
-                        color: 'white',
-                      }
-                    }
-                  }}
-                >
-                  <MenuItem value="all">
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <AlbumIcon sx={{ fontSize: 16, color: 'rgba(255,255,255,0.7)' }} /> All Photos
-                    </Box>
-                  </MenuItem>
-                  {Object.keys(categories).map((albumKey) => (
-                    <MenuItem key={albumKey} value={albumKey}>
-                      {categories[albumKey].name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+
             </Box>
 
             {/* Actions */}

@@ -165,7 +165,7 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
                     <Box sx={{
                         display: 'grid',
                         gridTemplateColumns: {
-                            xs: '1fr',
+                            xs: 'repeat(2, 1fr)',
                             sm: 'repeat(2, 1fr)',
                             md: 'repeat(3, 1fr)',
                             lg: 'repeat(4, 1fr)'

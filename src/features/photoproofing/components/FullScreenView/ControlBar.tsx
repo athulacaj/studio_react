@@ -2,8 +2,8 @@ import React from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Box, Slide } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ZoomControls from './ZoomControls';
-import AlbumSelector from './AlbumSelector';
 import SlideshowControls from './SlideshowControls';
+import AlbumSelector from '../AlbumSelector';
 
 interface ControlBarProps {
     controlsVisible: boolean;
@@ -84,12 +84,10 @@ const ControlBar: React.FC<ControlBarProps> = ({
                             </>
                         )}
 
-                        <AlbumSelector
-                            selectedAlbum={selectedAlbum}
+                        {/* <ToAddWhichAlbumSelector
                             onAlbumChange={onAlbumChange}
-                            albums={albums}
-                            isMobile={isMobile}
-                        />
+                            hideAll={true}
+                        /> */}
 
                         <SlideshowControls
                             slideshowPlaying={slideshowPlaying}

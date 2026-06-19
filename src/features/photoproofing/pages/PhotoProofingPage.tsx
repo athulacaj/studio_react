@@ -5,6 +5,7 @@ import { usePhotoProofingStore } from '../store/usePhotoProofingStore';
 import HeaderPhotoProofing from '../components/Header_photo_proofing';
 import { ImageObj } from '../types';
 import { CachedImage } from '../../../shared/utils/MakeGlobalImageCache';
+import CategoryTabs from '../components/CategoryTabs';
 
 const PhotoProofingPage = () => {
     const { albums, selectedAlbum, handleAlbumChange, images, currentImageIndex, categories } = usePhotoProofingStore();
@@ -31,7 +32,10 @@ const PhotoProofingPage = () => {
                 allDisplayedImages={allDisplayedImages}
                 categories={categories}
             />
-            <Box sx={{ height: '50px' }} />
+            <Box sx={{ height: '70px' }} />
+            <Box sx={{ px: { xs: 1, sm: 2 }, mb: 1 }}>
+                <CategoryTabs handleAlbumChange={handleAlbumChange} />
+            </Box>
 
             {!reload && <PhotoGrid allDisplayedImages={allDisplayedImages} />}
         </Box>
