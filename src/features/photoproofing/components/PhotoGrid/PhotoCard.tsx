@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardMedia, Typography, Box, IconButton, Menu, MenuItem, Fade, Tooltip } from '@mui/material';
-import { DeleteOutline, PlaylistAdd, FolderOpen } from '@mui/icons-material';
+import { DeleteOutline, PlaylistAdd, FolderOpen, Fullscreen, AddPhotoAlternate, CheckCircle, RemoveCircle } from '@mui/icons-material';
 
 import { ImageObj } from '../../types';
 import { usePhotoProofingStore } from '../../store/usePhotoProofingStore';
@@ -15,9 +15,24 @@ interface PhotoCardProps {
 const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScreen }) => {
 
     const { albums, selectedAlbum, handleAddToAlbum, handleRemoveFromAlbum } = usePhotoProofingStore();
+    const { toAddWhichAlbum } = usePhotoProofingStore();
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+    const [isHovered, setIsHovered] = React.useState(false);
+    const [isAdded, setIsAdded] = React.useState(false);
     const open = Boolean(anchorEl);
     const image = imageObj.src || imageObj.thumbnailLink;
+
+    // Is this image already in the selected target album?
+    // Album entries are always JSON.stringify(imageObj), so we parse to compare by id.
+    const isInAlbum = !!(toAddWhichAlbum && albums[toAddWhichAlbum]?.some((entry: string) => {
+        try { return JSON.parse(entry).id === imageObj.id; } catch { return entry === imageObj.id; }
+    }));
+
+
+    const flashAdded = () => {
+        setIsAdded(true);
+        setTimeout(() => setIsAdded(false), 1500);
+    };
 
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
@@ -39,10 +54,44 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
         event.stopPropagation();
         handleRemoveFromAlbum(selectedAlbum, imageObj);
     };
+
+    const handleDoubleClick = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
+        if (toAddWhichAlbum) {
+            if (isInAlbum) {
+                handleRemoveFromAlbum(toAddWhichAlbum, imageObj);
+            } else {
+                handleAddToAlbum(toAddWhichAlbum, imageObj);
+                flashAdded();
+            }
+        }
+    };
+
+    const handleFullScreenClick = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
+        onOpenFullScreen(imageObj);
+    };
+
+    const handleAddToAlbumClick = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
+        if (toAddWhichAlbum) {
+            handleAddToAlbum(toAddWhichAlbum, imageObj);
+            flashAdded();
+        }
+    };
+
+    const handleRemoveFromTargetAlbumClick = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
+        if (toAddWhichAlbum) {
+            handleRemoveFromAlbum(toAddWhichAlbum, imageObj);
+        }
+    };
     return (
         <Box>
             <Card
-                onClick={() => onOpenFullScreen(imageObj)}
+                onDoubleClick={handleDoubleClick}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
                 sx={{
                     cursor: 'pointer',
                     borderRadius: '20px',
@@ -50,25 +99,8 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
                     position: 'relative',
                     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                     bgcolor: 'transparent',
-                    boxShadow: 'none',
-                    '&:hover': {
-                        transform: 'translateY(-8px)',
-                        boxShadow: '0 20px 40px -5px rgba(0, 0, 0, 0.3)',
-                        '& .MuiCardMedia-root': {
-                            transform: 'scale(1.1)',
-                        },
-                        '& .overlay': {
-                            opacity: 1,
-                        },
-                        '& .info-bar': {
-                            transform: 'translateY(0)',
-                            opacity: 1,
-                        },
-                        '& .action-btn': {
-                            opacity: 1,
-                            transform: 'translateY(0)',
-                        }
-                    }
+                    boxShadow: isHovered ? '0 20px 40px -5px rgba(0,0,0,0.3)' : 'none',
+                    transform: isHovered ? 'translateY(-8px)' : 'translateY(0)',
                 }}
             >
                 <Box sx={{ position: 'relative', overflow: 'hidden', paddingTop: '75%' }}>
@@ -85,6 +117,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
                             height: '100%',
                             objectFit: 'cover',
                             transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                            transform: isHovered ? 'scale(1.1)' : 'scale(1)',
                         }}
                     />
                     {/* <CardMedia
@@ -103,35 +136,104 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
                         }}
                     /> */}
 
-                    {/* Gradient Overlay */}
+                    {/* Gradient Overlay — hidden and non-interactive when not hovered */}
                     <Box
                         className="overlay"
                         sx={{
                             position: 'absolute',
                             inset: 0,
                             background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%)',
-                            opacity: 0,
+                            opacity: isHovered ? 1 : 0,
+                            pointerEvents: isHovered ? 'auto' : 'none',
                             transition: 'opacity 0.3s ease',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
+                            gap: 1.5,
+                            zIndex: 5,
                         }}
                     >
-                        <Box
-                            sx={{
-                                width: 50,
-                                height: 50,
-                                borderRadius: '50%',
-                                bgcolor: 'rgba(255,255,255,0.2)',
-                                backdropFilter: 'blur(4px)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: 'white'
-                            }}
-                        >
-                            <Typography variant="button">View</Typography>
-                        </Box>
+                        {/* Fullscreen Button */}
+                        <Tooltip title="View Full Screen" arrow>
+                            <IconButton
+                                onClick={handleFullScreenClick}
+                                sx={{
+                                    bgcolor: 'rgba(255,255,255,0.2)',
+                                    backdropFilter: 'blur(8px)',
+                                    color: 'white',
+                                    '&:hover': {
+                                        bgcolor: 'rgba(255,255,255,0.35)',
+                                        transform: 'scale(1.15)',
+                                    },
+                                    width: 46,
+                                    height: 46,
+                                    transition: 'all 0.2s ease',
+                                    boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+                                }}
+                            >
+                                <Fullscreen />
+                            </IconButton>
+                        </Tooltip>
+
+                        {/* Add / Remove from target Album Button */}
+                        {toAddWhichAlbum && (
+                            isInAlbum ? (
+                                // Already in album — show Remove button
+                                <Tooltip title={`Remove from "${toAddWhichAlbum}"`} arrow>
+                                    <IconButton
+                                        onClick={handleRemoveFromTargetAlbumClick}
+                                        sx={{
+                                            bgcolor: 'rgba(239,68,68,0.3)',
+                                            backdropFilter: 'blur(8px)',
+                                            color: 'white',
+                                            '&:hover': {
+                                                bgcolor: 'rgba(239,68,68,0.55)',
+                                                transform: 'scale(1.15)',
+                                                boxShadow: '0 0 18px rgba(239,68,68,0.6)',
+                                            },
+                                            width: 46,
+                                            height: 46,
+                                            transition: 'all 0.3s ease',
+                                            boxShadow: '0 0 12px rgba(239,68,68,0.4)',
+                                            border: '1px solid rgba(239,68,68,0.5)',
+                                        }}
+                                    >
+                                        <RemoveCircle sx={{ color: '#fca5a5' }} />
+                                    </IconButton>
+                                </Tooltip>
+                            ) : (
+                                // Not in album — show Add button
+                                <Tooltip title={isAdded ? `Added to "${toAddWhichAlbum}"!` : `Add to "${toAddWhichAlbum}"`} arrow>
+                                    <IconButton
+                                        onClick={handleAddToAlbumClick}
+                                        sx={{
+                                            bgcolor: isAdded ? 'rgba(34,197,94,0.35)' : 'rgba(167,139,250,0.3)',
+                                            backdropFilter: 'blur(8px)',
+                                            color: 'white',
+                                            '&:hover': {
+                                                bgcolor: isAdded ? 'rgba(34,197,94,0.5)' : 'rgba(167,139,250,0.55)',
+                                                transform: 'scale(1.15)',
+                                                boxShadow: isAdded
+                                                    ? '0 0 18px rgba(34,197,94,0.6)'
+                                                    : '0 0 16px rgba(167,139,250,0.5)',
+                                            },
+                                            width: 46,
+                                            height: 46,
+                                            transition: 'all 0.3s ease',
+                                            boxShadow: isAdded
+                                                ? '0 0 14px rgba(34,197,94,0.55)'
+                                                : '0 4px 16px rgba(0,0,0,0.3)',
+                                            border: isAdded
+                                                ? '1px solid rgba(34,197,94,0.6)'
+                                                : '1px solid rgba(167,139,250,0.4)',
+                                            transform: isAdded ? 'scale(1.12)' : 'scale(1)',
+                                        }}
+                                    >
+                                        {isAdded ? <CheckCircle sx={{ color: '#4ade80' }} /> : <AddPhotoAlternate />}
+                                    </IconButton>
+                                </Tooltip>
+                            )
+                        )}
                     </Box>
 
                     {/* Action Button (Add/Remove) */}
@@ -149,7 +251,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
                     >
                         {selectedAlbum === 'all' ? (
                             <>
-                                <Tooltip title="Add to Album" arrow>
+                                {/* <Tooltip title="Add to Album" arrow>
                                     <IconButton
                                         onClick={handleMenuOpen}
                                         sx={{
@@ -168,7 +270,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
                                     >
                                         <PlaylistAdd />
                                     </IconButton>
-                                </Tooltip>
+                                </Tooltip> */}
                                 <Menu
                                     anchorEl={anchorEl}
                                     open={open}

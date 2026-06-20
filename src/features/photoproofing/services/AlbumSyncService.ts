@@ -84,12 +84,11 @@ export class AlbumSyncService {
             if (img.selections && Array.isArray(img.selections)) {
                 img.selections.forEach((albumKey: string) => {
                     if (!result[albumKey]) {
-                        result[albumKey] = []
+                        result[albumKey] = [];
                     }
+                    // img.image is JSON.stringify(imageObj) saved by handleAddToAlbum — store it directly.
                     if (img.image) {
                         result[albumKey].push(img.image);
-                    } else {
-                        result[albumKey].push(JSON.stringify(img));
                     }
                 });
             }
@@ -97,6 +96,7 @@ export class AlbumSyncService {
 
         return result;
     }
+
 }
 
 export const albumSyncService = new AlbumSyncService();

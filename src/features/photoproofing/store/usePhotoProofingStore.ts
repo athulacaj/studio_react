@@ -189,13 +189,17 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
 
                 // Update store
                 set((state) => {
-                    const currentAlbum = state.albums[albumName] || { name: albumName, images: [] };
-                    if (currentAlbum.includes(image.id)) return {};
+                    const currentAlbum = state.albums[albumName] || [];
+                    // Duplicate check: parse each entry to compare by id
+                    const alreadyIn = currentAlbum.some((entry: string) => {
+                        try { return JSON.parse(entry).id === image.id; } catch { return entry === image.id; }
+                    });
+                    if (alreadyIn) return {};
 
                     return {
                         albums: {
                             ...state.albums,
-                            [albumName]: [...currentAlbum, image.id],
+                            [albumName]: [...currentAlbum, JSON.stringify(image)],
                         },
                         addToAlbumLoader: false,
                     };
@@ -238,7 +242,10 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
                     return {
                         albums: {
                             ...state.albums,
-                            [albumName]: currentAlbum.filter((id: string) => id !== image.id),
+                            // Filter by parsing each entry's id — entries are always JSON.stringify(imageObj)
+                            [albumName]: currentAlbum.filter((entry: string) => {
+                                try { return JSON.parse(entry).id !== image.id; } catch { return entry !== image.id; }
+                            }),
                         },
                         addToAlbumLoader: false,
                     };

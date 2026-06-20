@@ -9,9 +9,14 @@ import CategoryTabs from '../components/CategoryTabs';
 
 const PhotoProofingPage = () => {
     const { albums, selectedAlbum, handleAlbumChange, images, currentImageIndex, categories } = usePhotoProofingStore();
-    const allDisplayedImages = selectedAlbum === 'all'
+    const allDisplayedImages: ImageObj[] = selectedAlbum === 'all'
         ? images
-        : (albums[selectedAlbum] || []).map((img: string) => JSON.parse(img));
+        : (albums[selectedAlbum] || [])
+            .map((entry: string) => {
+                try { return JSON.parse(entry) as ImageObj; } catch { return null; }
+            })
+            .filter((img): img is ImageObj => img !== null);
+
 
     const [reload, setReload] = useState(true);
     useEffect(() => {
