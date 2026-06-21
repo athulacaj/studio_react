@@ -11,8 +11,8 @@ import { globalImageCache } from '../../../../shared/utils/MakeGlobalImageCache'
 
 const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) => {
     const { albums, selectedAlbum, images, itemsPerPage,
-        folders, navigateToFolder, breadcrumbs, currentFolderId,
-        imagesCache, setImagesCache } = usePhotoProofingStore();
+        folders, navigateToFolder, breadcrumbs, currentFolderId, setBreadcrumbs,
+        imagesCache } = usePhotoProofingStore();
     const [fullScreenOpen, setFullScreenOpen] = useState(false);
     const [currentImage, setCurrentImage] = useState<ImageObj | null>(null);
 
@@ -20,7 +20,7 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
 
     const page = parseInt(searchParams.get('page') || '1', 10);
     const [jumpPage, setJumpPage] = useState(page.toString());
-    
+
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -36,11 +36,24 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
         if (prevAlbumRef.current !== selectedAlbum || prevFolderRef.current !== currentFolderId) {
             setSearchParams(prev => {
                 const newParams = new URLSearchParams(prev);
-                newParams.set('page', '1');
+                // newParams.set('page', '1');
+                if (currentFolderId) {
+                    newParams.set('folderId', currentFolderId);
+                }
+                const encodedBreadcrumbs = btoa(JSON.stringify(breadcrumbs));
+                newParams.set('breadcrumbs', encodedBreadcrumbs);
                 return newParams;
             });
             prevAlbumRef.current = selectedAlbum;
             prevFolderRef.current = currentFolderId;
+        } else {
+            if (searchParams.get('folderId')) {
+                navigateToFolder(searchParams.get('folderId')!, "")
+            }
+            if (searchParams.get('breadcrumbs')) {
+                const decodedBreadcrumbs = atob(searchParams.get('breadcrumbs')!);
+                setBreadcrumbs(JSON.parse(decodedBreadcrumbs));
+            }
         }
     }, [selectedAlbum, currentFolderId, setSearchParams]);
 
@@ -199,11 +212,11 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
                     </Box>
 
                     {totalPages > 1 && (
-                        <Box sx={{ 
-                            display: 'flex', 
+                        <Box sx={{
+                            display: 'flex',
                             flexDirection: 'row',
                             alignItems: 'center',
-                            justifyContent: 'center', 
+                            justifyContent: 'center',
                             gap: { xs: 1, sm: 2, md: 3 },
                             mt: 5,
                             mb: 2,
@@ -256,7 +269,7 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
                                             setJumpPage(page.toString());
                                         }
                                     }}
-                                    sx={{ 
+                                    sx={{
                                         width: isMobile ? '50px' : '70px',
                                         '& .MuiOutlinedInput-root': {
                                             borderRadius: '8px',
