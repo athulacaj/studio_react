@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Tabs, Tab, Box, useMediaQuery, useTheme } from '@mui/material';
 import { usePhotoProofingStore } from '../store/usePhotoProofingStore';
 import { AlbumCategory } from '../types';
+import { useSearchParams } from 'react-router-dom';
 
 interface CategoryTabsProps {
     handleAlbumChange?: (category: AlbumCategory) => void;
 }
 
 const CategoryTabs = ({ handleAlbumChange }: CategoryTabsProps) => {
-    const { categories: categories1 } = usePhotoProofingStore();
+    const { categories: categories1, selectedAlbum } = usePhotoProofingStore();
+    const [searchParams] = useSearchParams();
+
     const categories: Record<string, AlbumCategory> = {
         "all": { name: "All Photos", images: [], id: "all" },
         ...categories1
@@ -19,11 +22,27 @@ const CategoryTabs = ({ handleAlbumChange }: CategoryTabsProps) => {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const [activeTab, setActiveTab] = useState<string>(categoryKeys[0] ?? '');
+    const onlyCalledOnceRef = useRef(false);
+
+    useEffect(() => {
+        if (!onlyCalledOnceRef.current) {
+            const selectedAlbumFromUrl = searchParams.get('selectedAlbum');
+            if (selectedAlbumFromUrl) {
+                setActiveTab(selectedAlbumFromUrl);
+            }
+            onlyCalledOnceRef.current = true;
+        }
+    }, [selectedAlbum])
+
+
 
     const handleChange = (_event: React.SyntheticEvent, newValue: string) => {
         setActiveTab(newValue);
+        console.log(selectedAlbum)
         handleAlbumChange?.(categories[newValue]);
     };
+
+    useEffect(() => { })
 
     if (categoryKeys.length === 0) return null;
 

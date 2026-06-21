@@ -56,7 +56,7 @@ export default function usePhotoProofing(userId: string, projectId: string, link
         loading, setLoading, setImages, setFolders,
         currentFolderId, setCurrentFolderId, breadcrumbs, setBreadcrumbs,
         setIds, setAlbums, currentImageIndex, itemsPerPage,
-        setShareLinkData, shareLinkData, categories, setCategories
+        setShareLinkData, shareLinkData, categories, setCategories, selectedAlbum
     } = usePhotoProofingStore();
 
     const breadcrumbsRef = useRef(breadcrumbs);
@@ -311,7 +311,7 @@ export default function usePhotoProofing(userId: string, projectId: string, link
             const newPage = Math.ceil((currentImageIndex + 1) / itemsPerPage);
             setSearchParams(prev => {
                 const newParams = new URLSearchParams(prev);
-                newParams.set('page', newPage.toString());
+                newParams.set(selectedAlbum + '__page', newPage.toString());
                 return newParams;
             });
         }

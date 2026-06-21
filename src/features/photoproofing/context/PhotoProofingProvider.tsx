@@ -46,7 +46,6 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
             } else {
                 newParams.delete('album');
             }
-            newParams.set('page', '1');
             return newParams;
         });
     };
@@ -61,7 +60,6 @@ export const PhotoProofingProvider = ({ children }: { children: React.ReactNode 
             } else {
                 newParams.delete('folderId');
             }
-            newParams.set('page', '1');
             return newParams;
         });
     };

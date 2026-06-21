@@ -11,14 +11,14 @@ import { globalImageCache } from '../../../../shared/utils/MakeGlobalImageCache'
 
 const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) => {
     const { albums, selectedAlbum, images, itemsPerPage,
-        folders, navigateToFolder, breadcrumbs, currentFolderId, setBreadcrumbs,
+        folders, navigateToFolder, breadcrumbs, currentFolderId, setBreadcrumbs, setSelectedAlbum,
         imagesCache } = usePhotoProofingStore();
     const [fullScreenOpen, setFullScreenOpen] = useState(false);
     const [currentImage, setCurrentImage] = useState<ImageObj | null>(null);
 
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const page = parseInt(searchParams.get('page') || '1', 10);
+    const page = parseInt(searchParams.get(selectedAlbum + '__page') || '1', 10);
     const [jumpPage, setJumpPage] = useState(page.toString());
 
     const theme = useTheme();
@@ -40,6 +40,7 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
                 if (currentFolderId) {
                     newParams.set('folderId', currentFolderId);
                 }
+                newParams.set("selectedAlbum", selectedAlbum);
                 const encodedBreadcrumbs = btoa(JSON.stringify(breadcrumbs));
                 newParams.set('breadcrumbs', encodedBreadcrumbs);
                 return newParams;
@@ -53,6 +54,9 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
             if (searchParams.get('breadcrumbs')) {
                 const decodedBreadcrumbs = atob(searchParams.get('breadcrumbs')!);
                 setBreadcrumbs(JSON.parse(decodedBreadcrumbs));
+            }
+            if (searchParams.get("selectedAlbum")) {
+                setSelectedAlbum(searchParams.get("selectedAlbum")!);
             }
         }
     }, [selectedAlbum, currentFolderId, setSearchParams]);
@@ -69,7 +73,7 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
     const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
         setSearchParams(prev => {
             const newParams = new URLSearchParams(prev);
-            newParams.set('page', value.toString());
+            newParams.set(selectedAlbum + '__page', value.toString());
             return newParams;
         });
         window.scrollTo({ top: 0, behavior: 'smooth' });
