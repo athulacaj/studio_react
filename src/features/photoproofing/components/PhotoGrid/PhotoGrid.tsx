@@ -98,7 +98,7 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
         )
     }
     return (
-        <Box sx={{ p: 4, minHeight: '60vh' }}>
+        <Box sx={{ p: { xs: 2, sm: 4 }, minHeight: '60vh' }}>
             {/* Breadcrumbs */}
             {selectedAlbum === 'all' && breadcrumbs.length > 0 && (
                 <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
@@ -170,7 +170,7 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
                             md: 'repeat(3, 1fr)',
                             lg: 'repeat(4, 1fr)'
                         },
-                        gap: 3,
+                        gap: { xs: 2, sm: 3 },
                         mb: 4
                     }}>
                         {paginatedImages.map((imageObj) => {

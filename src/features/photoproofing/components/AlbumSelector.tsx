@@ -5,12 +5,11 @@ import { AlbumCategory } from '../types';
 import { usePhotoProofingStore } from '../store/usePhotoProofingStore';
 
 interface AlbumSelectorProps {
-    onAlbumChange: (event: any) => void;
     [key: string]: any;
     hideAll?: boolean;
 }
 
-const AlbumSelector = ({ onAlbumChange, hideAll = false, ...rest }: AlbumSelectorProps) => {
+const AlbumSelector = ({ hideAll = false, ...rest }: AlbumSelectorProps) => {
     const [tooltipOpen, setTooltipOpen] = useState(false);
     const { toAddWhichAlbum, setToAddWhichAlbum, categories } = usePhotoProofingStore();
     const theme = useTheme();

@@ -38,7 +38,7 @@ const HeaderPhotoProofing = ({ allDisplayedImages }: HeaderPhotoProofingProps) =
   // We use CSS breakpoints for layout hiding, but keep isMobile logic if needed for JS control
   // currently primarily handled via Sx props, but keeping the hook call is standard for future proofing or explicit logic
   // const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const { albums, selectedAlbum, handleAlbumChange, images, currentImageIndex, categories } = usePhotoProofingStore();
+  const { albums, selectedAlbum, images, currentImageIndex, categories } = usePhotoProofingStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [localDownloadModalOpen, setLocalDownloadModalOpen] = useState(false);
@@ -242,15 +242,12 @@ const HeaderPhotoProofing = ({ allDisplayedImages }: HeaderPhotoProofingProps) =
               onLocalCopy={handleLocalCopy}
             />
 
-            <AlbumSelector
-              onAlbumChange={handleAlbumChange}
-            />
+            <AlbumSelector />
           </Box>
 
           {/* Mobile Menu Button */}
           <Box sx={{ display: { xs: 'flex', md: 'none' }, ml: "auto" }}>
             <AlbumSelector
-              onAlbumChange={handleAlbumChange}
               hideAll={true}
             />
           </Box>

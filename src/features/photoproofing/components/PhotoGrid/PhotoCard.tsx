@@ -17,10 +17,14 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
     const { albums, selectedAlbum, handleAddToAlbum, handleRemoveFromAlbum } = usePhotoProofingStore();
     const { toAddWhichAlbum } = usePhotoProofingStore();
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-    const [isHovered, setIsHovered] = React.useState(false);
     const [isAdded, setIsAdded] = React.useState(false);
     const open = Boolean(anchorEl);
     const image = imageObj.src || imageObj.thumbnailLink;
+
+    // Guard: record when the card first enters hover so we can ignore
+    // button clicks that fire in the same tap (mobile touch quirk).
+    const hoverStartRef = React.useRef<number>(0);
+    const isSameTapAsHover = () => Date.now() - hoverStartRef.current < 350;
 
     // Is this image already in the selected target album?
     // Album entries are always JSON.stringify(imageObj), so we parse to compare by id.
@@ -69,11 +73,13 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
 
     const handleFullScreenClick = (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
+        if (isSameTapAsHover()) return;
         onOpenFullScreen(imageObj);
     };
 
     const handleAddToAlbumClick = (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
+        if (isSameTapAsHover()) return;
         if (toAddWhichAlbum) {
             handleAddToAlbum(toAddWhichAlbum, imageObj);
             flashAdded();
@@ -82,6 +88,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
 
     const handleRemoveFromTargetAlbumClick = (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
+        if (isSameTapAsHover()) return;
         if (toAddWhichAlbum) {
             handleRemoveFromAlbum(toAddWhichAlbum, imageObj);
         }
@@ -90,8 +97,9 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
         <Box>
             <Card
                 onDoubleClick={handleDoubleClick}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
+                onClick={() => {}} // Allows mobile Safari to treat the card as clickable to apply hover
+                onMouseEnter={() => { hoverStartRef.current = Date.now(); }}
+                onMouseLeave={() => { hoverStartRef.current = 0; }}
                 sx={{
                     cursor: 'pointer',
                     borderRadius: '20px',
@@ -99,8 +107,27 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
                     position: 'relative',
                     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                     bgcolor: 'transparent',
-                    boxShadow: isHovered ? '0 20px 40px -5px rgba(0,0,0,0.3)' : 'none',
-                    transform: isHovered ? 'translateY(-8px)' : 'translateY(0)',
+                    boxShadow: 'none',
+                    transform: 'translateY(0)',
+                    '&:hover, &:focus-within': {
+                        transform: 'translateY(-8px)',
+                        boxShadow: '0 20px 40px -5px rgba(0,0,0,0.3)',
+                        '& .MuiCardMedia-root': {
+                            transform: 'scale(1.1) !important',
+                        },
+                        '& .overlay': {
+                            opacity: 1,
+                            pointerEvents: 'auto',
+                        },
+                        '& .action-btn': {
+                            opacity: 1,
+                            transform: 'translateY(0)',
+                        },
+                        '& .info-bar': {
+                            opacity: 1,
+                            transform: 'translateY(0)',
+                        }
+                    }
                 }}
             >
                 <Box sx={{ position: 'relative', overflow: 'hidden', paddingTop: '75%' }}>
@@ -117,7 +144,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
                             height: '100%',
                             objectFit: 'cover',
                             transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-                            transform: isHovered ? 'scale(1.1)' : 'scale(1)',
+                            transform: 'scale(1)',
                         }}
                     />
                     {/* <CardMedia
@@ -143,8 +170,8 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
                             position: 'absolute',
                             inset: 0,
                             background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%)',
-                            opacity: isHovered ? 1 : 0,
-                            pointerEvents: isHovered ? 'auto' : 'none',
+                            opacity: 0,
+                            pointerEvents: 'none',
                             transition: 'opacity 0.3s ease',
                             display: 'flex',
                             alignItems: 'center',

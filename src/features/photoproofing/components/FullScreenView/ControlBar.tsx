@@ -14,7 +14,6 @@ interface ControlBarProps {
     totalImages: number;
     transformRef: React.RefObject<any>;
     selectedAlbum: string;
-    onAlbumChange: (album: string) => void;
     albums: Record<string, string[]>;
     slideshowPlaying: boolean;
     onToggleSlideshow: () => void;
@@ -33,8 +32,6 @@ const ControlBar: React.FC<ControlBarProps> = ({
     currentIndex,
     totalImages,
     transformRef,
-    selectedAlbum,
-    onAlbumChange,
     albums,
     slideshowPlaying,
     onToggleSlideshow,
@@ -84,10 +81,7 @@ const ControlBar: React.FC<ControlBarProps> = ({
                             </>
                         )}
 
-                        {/* <ToAddWhichAlbumSelector
-                            onAlbumChange={onAlbumChange}
-                            hideAll={true}
-                        /> */}
+                        <AlbumSelector hideAll={true} />
 
                         <SlideshowControls
                             slideshowPlaying={slideshowPlaying}

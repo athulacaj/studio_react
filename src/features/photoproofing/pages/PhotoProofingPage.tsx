@@ -37,8 +37,17 @@ const PhotoProofingPage = () => {
                 allDisplayedImages={allDisplayedImages}
                 categories={categories}
             />
-            <Box sx={{ height: '70px' }} />
-            <Box sx={{ px: { xs: 1, sm: 2 }, mb: 1 }}>
+            <Box sx={{ height: { xs: '56px', sm: '64px' } }} />
+            <Box sx={{
+                px: { xs: 1, sm: 2 },
+                py: 1,
+                position: 'sticky',
+                top: { xs: '56px', sm: '64px' },
+                zIndex: 10,
+                background: 'rgba(15, 23, 42, 0.9)',
+                backdropFilter: 'blur(12px)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+            }}>
                 <CategoryTabs handleAlbumChange={handleAlbumChange} />
             </Box>
 

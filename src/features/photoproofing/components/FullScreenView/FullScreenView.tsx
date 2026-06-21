@@ -35,10 +35,9 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
     open,
     currentImage
 }) => {
-    const { albums, handleAddToAlbum, addToAlbumLoader, handleRemoveFromAlbum, projectId, currentImageIndex, setCurrentImageIndex } = usePhotoProofingStore();
+    const { albums, toAddWhichAlbum, handleAddToAlbum, addToAlbumLoader, handleRemoveFromAlbum, projectId, currentImageIndex, setCurrentImageIndex } = usePhotoProofingStore();
     const [isImageInAlbum, setIsImageInAlbum] = useState(false);
 
-    const [selectedAlbum, setSelectedAlbum] = useState('');
     const [showLikeAnimation, setShowLikeAnimation] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
     const transformComponentRef = useRef<any>(null);
@@ -95,7 +94,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
             try {
                 const imageRecord = await indexedDBService.getImageById(projectId, images[currentImageIndex].id);
                 if (imageRecord && imageRecord.selections) {
-                    setIsImageInAlbum(imageRecord.selections.includes(selectedAlbum));
+                    setIsImageInAlbum(imageRecord.selections.includes(toAddWhichAlbum));
                 } else {
                     setIsImageInAlbum(false);
                 }
@@ -108,13 +107,16 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
         if (currentImageIndex >= 0) {
             checkAlbumStatus();
         }
-    }, [projectId, currentImageIndex, selectedAlbum, albums, addToAlbumLoader]);
+    }, [projectId, currentImageIndex, toAddWhichAlbum, albums, addToAlbumLoader]);
 
     const onhandleAddToAlbum = () => {
+        if (!toAddWhichAlbum) {
+            return;
+        }
         if (isImageInAlbum) {
-            handleRemoveFromAlbum(selectedAlbum, images[currentImageIndex]);
+            handleRemoveFromAlbum(toAddWhichAlbum, images[currentImageIndex]);
         } else {
-            handleAddToAlbum(selectedAlbum, images[currentImageIndex]);
+            handleAddToAlbum(toAddWhichAlbum, images[currentImageIndex]);
             setShowLikeAnimation(true);
             setTimeout(() => setShowLikeAnimation(false), 2000);
         }
@@ -268,25 +270,26 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                 )}
 
                 {/* Top Control Bar */}
-                <ControlBar
-                    controlsVisible={controlsVisible}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                    onClose={onClose}
-                    currentIndex={currentImageIndex}
-                    totalImages={images.length}
-                    transformRef={transformComponentRef}
-                    selectedAlbum={selectedAlbum}
-                    onAlbumChange={setSelectedAlbum}
-                    albums={albums}
-                    slideshowPlaying={slideshowPlaying}
-                    onToggleSlideshow={toggleSlideshow}
-                    slideshowSpeed={slideshowSpeed}
-                    onSpeedChange={setSlideshowSpeed}
-                    isFullscreen={isFullscreen}
-                    onToggleFullscreen={toggleFullscreen}
-                    isMobile={isMobile}
-                />
+                {toAddWhichAlbum &&
+                    <ControlBar
+                        controlsVisible={controlsVisible}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                        onClose={onClose}
+                        currentIndex={currentImageIndex}
+                        totalImages={images.length}
+                        transformRef={transformComponentRef}
+                        selectedAlbum={toAddWhichAlbum}
+                        albums={albums}
+                        slideshowPlaying={slideshowPlaying}
+                        onToggleSlideshow={toggleSlideshow}
+                        slideshowSpeed={slideshowSpeed}
+                        onSpeedChange={setSlideshowSpeed}
+                        isFullscreen={isFullscreen}
+                        onToggleFullscreen={toggleFullscreen}
+                        isMobile={isMobile}
+                    />
+                }
 
                 {/* Main Image Area */}
                 <Box
@@ -331,17 +334,17 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                 </Box>
 
                 {/* Bottom Album Action Button */}
-                <AlbumActionButton
+                {toAddWhichAlbum && <AlbumActionButton
                     controlsVisible={controlsVisible}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                     isImageInAlbum={isImageInAlbum}
-                    selectedAlbum={selectedAlbum}
+                    selectedAlbum={toAddWhichAlbum}
                     onAction={onhandleAddToAlbum}
                     addToAlbumLoader={addToAlbumLoader}
                     slideshowPlaying={slideshowPlaying}
                     isMobile={isMobile}
-                />
+                />}
             </Box>
         </Dialog>
 
