@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Box, Pagination, Breadcrumbs, Link, Typography, Card } from '@mui/material';
+import { Box, Pagination, Breadcrumbs, Link, Typography, Card, TextField, useTheme, useMediaQuery } from '@mui/material';
 import { Folder as FolderIcon } from '@mui/icons-material';
 import { useSearchParams } from 'react-router-dom';
 import PhotoCard from './PhotoCard';
@@ -19,6 +19,14 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
     const [searchParams, setSearchParams] = useSearchParams();
 
     const page = parseInt(searchParams.get('page') || '1', 10);
+    const [jumpPage, setJumpPage] = useState(page.toString());
+    
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+    useEffect(() => {
+        setJumpPage(page.toString());
+    }, [page]);
 
     // Reset page to 1 when album or folder changes
     const prevAlbumRef = useRef(selectedAlbum);
@@ -191,16 +199,74 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
                     </Box>
 
                     {totalPages > 1 && (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                        <Box sx={{ 
+                            display: 'flex', 
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center', 
+                            gap: { xs: 1, sm: 2, md: 3 },
+                            mt: 5,
+                            mb: 2,
+                            width: '100%',
+                            p: { xs: 1.5, md: 3 },
+                            bgcolor: 'background.paper',
+                            borderRadius: 3,
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                            overflowX: 'auto',
+                            whiteSpace: 'nowrap'
+                        }}>
                             <Pagination
                                 count={totalPages}
                                 page={page}
                                 onChange={handlePageChange}
                                 color="primary"
-                                size="large"
-                                showFirstButton
-                                showLastButton
+                                size={isMobile ? "small" : "large"}
+                                siblingCount={isMobile ? 0 : 1}
+                                boundaryCount={isMobile ? 1 : 2}
+                                showFirstButton={!isMobile}
+                                showLastButton={!isMobile}
                             />
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1.5 } }}>
+                                {!isMobile && (
+                                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                                        Go to:
+                                    </Typography>
+                                )}
+                                <TextField
+                                    size="small"
+                                    type="number"
+                                    inputProps={{ min: 1, max: totalPages, style: { textAlign: 'center', padding: isMobile ? '6px' : '8px' } }}
+                                    value={jumpPage}
+                                    onChange={(e) => setJumpPage(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            const val = parseInt(jumpPage, 10);
+                                            if (!isNaN(val) && val >= 1 && val <= totalPages) {
+                                                handlePageChange(e as any, val);
+                                            } else {
+                                                setJumpPage(page.toString());
+                                            }
+                                        }
+                                    }}
+                                    onBlur={(e) => {
+                                        const val = parseInt(jumpPage, 10);
+                                        if (!isNaN(val) && val >= 1 && val <= totalPages && val !== page) {
+                                            handlePageChange(e as any, val);
+                                        } else {
+                                            setJumpPage(page.toString());
+                                        }
+                                    }}
+                                    sx={{ 
+                                        width: isMobile ? '50px' : '70px',
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '8px',
+                                        }
+                                    }}
+                                />
+                                <Typography variant="body2" color="text.secondary">
+                                    / {totalPages}
+                                </Typography>
+                            </Box>
                         </Box>
                     )}
                 </>
