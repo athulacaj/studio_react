@@ -14,7 +14,7 @@ interface PhotoCardProps {
 
 const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScreen }) => {
 
-    const { albums, selectedAlbum, handleAddToAlbum, handleRemoveFromAlbum } = usePhotoProofingStore();
+    const { albums, selectedAlbum, handleAddToAlbum, handleRemoveFromAlbum, categories } = usePhotoProofingStore();
     const { toAddWhichAlbum } = usePhotoProofingStore();
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
     const [isAdded, setIsAdded] = React.useState(false);
@@ -97,7 +97,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
         <Box>
             <Card
                 onDoubleClick={handleDoubleClick}
-                onClick={() => {}} // Allows mobile Safari to treat the card as clickable to apply hover
+                onClick={() => { }} // Allows mobile Safari to treat the card as clickable to apply hover
                 onMouseEnter={() => { hoverStartRef.current = Date.now(); }}
                 onMouseLeave={() => { hoverStartRef.current = 0; }}
                 sx={{
@@ -206,7 +206,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
                         {toAddWhichAlbum && (
                             isInAlbum ? (
                                 // Already in album — show Remove button
-                                <Tooltip title={`Remove from "${toAddWhichAlbum}"`} arrow>
+                                <Tooltip title={`Remove from "${categories[toAddWhichAlbum].name}"`} arrow>
                                     <IconButton
                                         onClick={handleRemoveFromTargetAlbumClick}
                                         sx={{
@@ -230,7 +230,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
                                 </Tooltip>
                             ) : (
                                 // Not in album — show Add button
-                                <Tooltip title={isAdded ? `Added to "${toAddWhichAlbum}"!` : `Add to "${toAddWhichAlbum}"`} arrow>
+                                <Tooltip title={isAdded ? `Added to "${categories[toAddWhichAlbum].name}"!` : `Add to "${categories[toAddWhichAlbum].name}"`} arrow>
                                     <IconButton
                                         onClick={handleAddToAlbumClick}
                                         sx={{

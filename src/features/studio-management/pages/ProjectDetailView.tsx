@@ -108,18 +108,18 @@ const ProjectDetailView: React.FC = () => {
 
     const formattedDate = project.createdAt?.toDate
         ? project.createdAt.toDate().toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-          })
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        })
         : 'Just now';
 
     const formattedUpdatedDate = project.updatedAt?.toDate
         ? project.updatedAt.toDate().toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-          })
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        })
         : null;
 
     return (
@@ -378,38 +378,7 @@ const ProjectDetailView: React.FC = () => {
                         Quick Actions
                     </Typography>
                     <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' }, flexWrap: 'wrap' }}>
-                        <Button
-                            variant="contained"
-                            startIcon={<OpenInNewIcon />}
-                            onClick={() => {
-                                if (effectiveUserId) {
-                                    window.open(
-                                        `/view/${effectiveUserId}/${project.id}`,
-                                        '_blank'
-                                    );
-                                }
-                            }}
-                            sx={{
-                                flex: { xs: 1, sm: 'initial' },
-                                borderRadius: 2,
-                                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-                                boxShadow: '0 4px 14px rgba(99, 102, 241, 0.3)',
-                                '&:hover': {
-                                    boxShadow: '0 6px 20px rgba(99, 102, 241, 0.45)',
-                                },
-                            }}
-                        >
-                            View Project
-                        </Button>
 
-                        <Button
-                            variant="outlined"
-                            startIcon={<CopyIcon />}
-                            onClick={handleCopyLink}
-                            sx={{ flex: { xs: 1, sm: 'initial' }, borderRadius: 2 }}
-                        >
-                            Copy Public Link
-                        </Button>
 
                         <Button
                             variant="outlined"

@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, Box, Slide, CircularProgress } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { usePhotoProofingStore } from '../../store/usePhotoProofingStore';
 
 interface AlbumActionButtonProps {
     controlsVisible: boolean;
@@ -28,6 +29,8 @@ const AlbumActionButton: React.FC<AlbumActionButtonProps> = ({
     isMobile
 }) => {
     if (slideshowPlaying) return null;
+    const { categories } = usePhotoProofingStore();
+
 
     return (
         <Slide appear={false} direction="up" in={controlsVisible}>
@@ -86,7 +89,7 @@ const AlbumActionButton: React.FC<AlbumActionButtonProps> = ({
                         }
                     }}
                 >
-                    {addToAlbumLoader ? 'Processing...' : isImageInAlbum ? (isMobile ? 'Remove' : `Remove from ${selectedAlbum}`) : (isMobile ? 'Add' : `Add to ${selectedAlbum}`)}
+                    {addToAlbumLoader ? 'Processing...' : isImageInAlbum ? (isMobile ? 'Remove' : `Remove from ${categories[selectedAlbum].name}`) : (isMobile ? 'Add' : `Add to ${categories[selectedAlbum].name}`)}
                 </Button>
             </Box>
         </Slide>

@@ -44,7 +44,7 @@ const AlbumSelector = ({ hideAll = false, ...rest }: AlbumSelectorProps) => {
             </FormControl>
             <ClickAwayListener onClickAway={() => setTooltipOpen(false)}>
                 <Tooltip
-                    title="Photos you double-tap or like will be added to this album"
+                    title="Photos you add options from the image be added to this album"
                     arrow
                     placement="top"
                     open={tooltipOpen}
