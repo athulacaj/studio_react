@@ -5,6 +5,7 @@ import { DeleteOutline, PlaylistAdd, FolderOpen, Fullscreen, AddPhotoAlternate, 
 import { ImageObj } from '../../types';
 import { usePhotoProofingStore } from '../../store/usePhotoProofingStore';
 import { CachedImage } from '../../../../shared/utils/MakeGlobalImageCache';
+import { useToastStore } from '../../../../shared/hooks/useToastStore';
 
 interface PhotoCardProps {
     imageObj: ImageObj;
@@ -20,6 +21,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
     const [isAdded, setIsAdded] = React.useState(false);
     const open = Boolean(anchorEl);
     const image = imageObj.src || imageObj.thumbnailLink;
+    const showToast = useToastStore((state) => state.showToast);
 
     // Guard: record when the card first enters hover so we can ignore
     // button clicks that fire in the same tap (mobile touch quirk).
@@ -82,6 +84,10 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
         if (isSameTapAsHover()) return;
         if (toAddWhichAlbum) {
             handleAddToAlbum(toAddWhichAlbum, imageObj);
+            showToast(
+                `Added to category '${categories[toAddWhichAlbum].name}'`,
+                'success'
+            );
             flashAdded();
         }
     };
@@ -90,6 +96,10 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
         event.stopPropagation();
         if (isSameTapAsHover()) return;
         if (toAddWhichAlbum) {
+            showToast(
+                `Removed from category '${categories[toAddWhichAlbum].name}'`,
+                'success'
+            );
             handleRemoveFromAlbum(toAddWhichAlbum, imageObj);
         }
     };
@@ -203,7 +213,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
                         </Tooltip>
 
                         {/* Add / Remove from target Album Button */}
-                        {toAddWhichAlbum && (
+                        {toAddWhichAlbum && selectedAlbum == 'all' && (
                             isInAlbum ? (
                                 // Already in album — show Remove button
                                 <Tooltip title={`Remove from "${categories[toAddWhichAlbum].name}"`} arrow>

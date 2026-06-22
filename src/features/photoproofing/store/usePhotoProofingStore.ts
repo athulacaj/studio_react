@@ -94,7 +94,7 @@ const initialState: PhotoProofingState = {
     itemsPerPage: 8,
     albums: {},
     selectedAlbum: 'all',
-    toAddWhichAlbum: localStorage?.getItem('toAddWhichAlbum'),
+    toAddWhichAlbum: '',
     categories: {},
     addToAlbumLoader: false,
     currentFolderId: null,

@@ -3,6 +3,7 @@ import { Box, ClickAwayListener, FormControl, Select, MenuItem, Tooltip, useMedi
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { AlbumCategory } from '../types';
 import { usePhotoProofingStore } from '../store/usePhotoProofingStore';
+import { useToastStore } from '../../../shared/hooks/useToastStore';
 
 interface AlbumSelectorProps {
     [key: string]: any;
@@ -14,9 +15,13 @@ const AlbumSelector = ({ hideAll = false, ...rest }: AlbumSelectorProps) => {
     const { toAddWhichAlbum, setToAddWhichAlbum, categories } = usePhotoProofingStore();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const showToast = useToastStore((state) => state.showToast);
 
     useEffect(() => {
-        if (Object.keys(categories).length > 0 && !toAddWhichAlbum) {
+        const local = localStorage?.getItem('toAddWhichAlbum')
+        if (local && Object.keys(categories).includes(local)) {
+            setToAddWhichAlbum(local);
+        } else if (Object.keys(categories).length > 0 && !toAddWhichAlbum) {
             setToAddWhichAlbum(Object.keys(categories)[0]);
         }
     }, [categories])
@@ -26,7 +31,13 @@ const AlbumSelector = ({ hideAll = false, ...rest }: AlbumSelectorProps) => {
             <FormControl {...rest} size="small" variant="standard" sx={{ minWidth: isMobile ? 80 : 200 }}>
                 <Select
                     value={toAddWhichAlbum}
-                    onChange={(e) => setToAddWhichAlbum(e.target.value as string)}
+                    onChange={(e) => {
+                        showToast(
+                            `Image will be added to category '${categories[e.target.value as string].name}'`,
+                            "success"
+                        );
+                        setToAddWhichAlbum(e.target.value as string);
+                    }}
                     disableUnderline
                     sx={{
                         color: "white",

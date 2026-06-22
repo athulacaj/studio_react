@@ -115,6 +115,7 @@ import { AuthProvider } from './features/auth';
 import './features/studio-management/store/studioManagementStore';
 import './features/auth/store/userStore';
 import { useGlobalLoader } from './core/context/globalLoader';
+import GlobalToast from './shared/components/GlobalToast';
 
 function App() {
   const { isLoading } = useGlobalLoader();
@@ -132,6 +133,7 @@ function App() {
             >
               <CircularProgress color="inherit" />
             </Backdrop>
+            <GlobalToast />
           </>
         </AuthProvider>
       </PortfolioBuilderProvider>

@@ -38,6 +38,7 @@ import {
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import FolderTree from './FolderTree';
 import { Project, SharedLink, LinkCategory } from '../types';
+import { useToastStore } from '../../../shared/hooks/useToastStore';
 
 interface ManageShareLinksModalProps {
     open: boolean;
@@ -67,6 +68,8 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
     const [selectedFolders, setSelectedFolders] = useState<Set<string>>(new Set());
     const [localCategories, setLocalCategories] = useState<LinkCategory[]>([]);
     const [newCategoryLabel, setNewCategoryLabel] = useState('');
+    const showToast = useToastStore((state) => state.showToast);
+
     useEffect(() => {
         if (open && project?.id) {
             updateProjectLocalState(project?.id);
@@ -133,7 +136,8 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
         const userId = project.userId;
         const url = `${window.location.origin}/share/${userId}/${project.id}/${linkId}`;
         navigator.clipboard.writeText(url);
-        alert("Link copied to clipboard!");
+        showToast('Project link copied to clipboard!', 'success');
+
     };
 
     const handleToggleSelect = (folderId: string) => {

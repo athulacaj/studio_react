@@ -32,6 +32,7 @@ import { useAuthStore } from '../../auth';
 import { useUserStore } from '../../auth';
 import CreateProjectModal from '../components/CreateProjectModal';
 import ManageShareLinksModal from '../components/ManageShareLinksModal';
+import { useToastStore } from '../../../shared/hooks/useToastStore';
 
 const ProjectDetailView: React.FC = () => {
     const { projectId } = useParams<{ projectId: string }>();
@@ -48,8 +49,7 @@ const ProjectDetailView: React.FC = () => {
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const showToast = useToastStore((state) => state.showToast);
 
     const project = useMemo(
         () => projects.find((p) => p.id === projectId) || null,
@@ -60,8 +60,7 @@ const ProjectDetailView: React.FC = () => {
         if (!effectiveUserId || !project) return;
         const link = `${window.location.origin}/view/${effectiveUserId}/${project.id}`;
         navigator.clipboard.writeText(link);
-        setSnackbarMessage('Project link copied to clipboard!');
-        setSnackbarOpen(true);
+        showToast('Project link copied to clipboard!', 'success');
     };
 
     const handleOpenDriveUrl = () => {
@@ -414,17 +413,6 @@ const ProjectDetailView: React.FC = () => {
                 onClose={() => setIsShareModalOpen(false)}
                 project={project}
             />
-
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={3000}
-                onClose={() => setSnackbarOpen(false)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            >
-                <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%' }}>
-                    {snackbarMessage}
-                </Alert>
-            </Snackbar>
         </Container>
     );
 };
