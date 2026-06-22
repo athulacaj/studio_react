@@ -17,8 +17,6 @@ import ImageViewer from './ImageViewer';
 import AlbumActionButton from './AlbumActionButton';
 import FullScreenLoader from './FullScreenLoader';
 import { usePhotoProofingStore } from '../../store/usePhotoProofingStore';
-import { useSearchParams } from 'react-router-dom';
-import { Loader } from 'lucide-react';
 import { indexedDBService } from '../../services/IndexedDBService';
 import { CachedImage } from '../../../../shared/utils/MakeGlobalImageCache';
 
@@ -308,11 +306,14 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                     <LikeAnimation show={showLikeAnimation} />
 
                     {/* Previous Button */}
-                    <NavigationButton
-                        onClick={handlePrev}
-                        icon={ArrowBackIosNewIcon}
-                        position="left"
-                    />
+                    {
+                        controlsVisible &&
+                        <NavigationButton
+                            onClick={handlePrev}
+                            icon={ArrowBackIosNewIcon}
+                            position="left"
+                        />
+                    }
 
                     {/* Image Viewer with Zoom */}
                     <ImageViewer
@@ -326,11 +327,14 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                     <FullScreenLoader show={loader} />
 
                     {/* Next Button */}
-                    <NavigationButton
-                        onClick={handleNext}
-                        icon={ArrowForwardIosIcon}
-                        position="right"
-                    />
+                    {
+                        controlsVisible &&
+                        <NavigationButton
+                            onClick={handleNext}
+                            icon={ArrowForwardIosIcon}
+                            position="right"
+                        />
+                    }
                 </Box>
 
                 {/* Bottom Album Action Button */}

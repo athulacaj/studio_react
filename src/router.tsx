@@ -1,21 +1,23 @@
 import { Box } from '@mui/material';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import About from './pages/About';
+import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import { PortfolioBuilderPage, PortfolioViewerPage } from './features/portfoliobuilder';
 import { LoginPage, SignupPage, ProtectedRoute } from './features/auth';
 import { StudioDashboard, ProjectDetailView, PublicProjectView, SuperAdminDashboard, AdminUserView, AdminProjectDetailWrapper } from './features/studio-management';
 import Footer from './core/components/Footer';
+import GlobalNavbar from './core/components/GlobalNavbar';
 
 const AppRouter = () => {
   const location = useLocation();
+  const isPublicRoute = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/about' || location.pathname.includes('/portfolio');
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Routes>
-          {/* <Route path="/" element={<PhotoProofingPage />} /> */}
-          <Route path="/" element={<Navigate to="/private/studio" replace />} />
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
 
