@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardMedia, Typography, Box, IconButton, Menu, MenuItem, Fade, Tooltip } from '@mui/material';
+import { Card, CardMedia, Typography, Box, IconButton, Menu, MenuItem, Fade, Tooltip, Skeleton } from '@mui/material';
 import { DeleteOutline, PlaylistAdd, FolderOpen, Fullscreen, AddPhotoAlternate, CheckCircle, RemoveCircle } from '@mui/icons-material';
 
 import { ImageObj } from '../../types';
@@ -19,6 +19,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
     const { toAddWhichAlbum } = usePhotoProofingStore();
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
     const [isAdded, setIsAdded] = React.useState(false);
+    const [imageLoaded, setImageLoaded] = React.useState(false);
     const open = Boolean(anchorEl);
     const image = imageObj.src || imageObj.thumbnailLink;
     const showToast = useToastStore((state) => state.showToast);
@@ -141,11 +142,33 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
                 }}
             >
                 <Box sx={{ position: 'relative', overflow: 'hidden', paddingTop: '75%' }}>
+                    {/* Skeleton Loader */}
+                    <Skeleton
+                        variant="rectangular"
+                        animation="wave"
+                        sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            bgcolor: 'rgba(255,255,255,0.06)',
+                            borderRadius: '20px',
+                            opacity: imageLoaded ? 0 : 1,
+                            transition: 'opacity 0.4s ease-in-out',
+                            pointerEvents: imageLoaded ? 'none' : 'auto',
+                            zIndex: 3,
+                            '&::after': {
+                                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)',
+                            },
+                        }}
+                    />
                     <CachedImage
                         src={image}
                         alt={imageObj.name}
                         loading="lazy"
                         className="MuiCardMedia-root"
+                        onLoad={() => setImageLoaded(true)}
                         style={{
                             position: 'absolute',
                             top: 0,
@@ -157,21 +180,6 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
                             transform: 'scale(1)',
                         }}
                     />
-                    {/* <CardMedia
-                        component="img"
-                        image={image}
-                        alt={imageObj.name}
-                        loading="lazy"
-                        sx={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-                        }}
-                    /> */}
 
                     {/* Gradient Overlay — hidden and non-interactive when not hovered */}
                     <Box
