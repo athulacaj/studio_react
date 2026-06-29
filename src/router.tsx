@@ -8,10 +8,11 @@ import { StudioDashboard, ProjectDetailView, PublicProjectView, SuperAdminDashbo
 import Footer from './core/components/Footer';
 import GlobalNavbar from './core/components/GlobalNavbar';
 import EventPageViewer from './features/portfoliobuilder/pages/EventPageViewer';
+import EventPortfolioBuilder from './features/portfoliobuilder/pages/EventPortfolioBuilder';
 
 const AppRouter = () => {
   const location = useLocation();
-  const isPublicRoute = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/about' || location.pathname.includes('/portfolio');
+  const isPublicRoute = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/about' || location.pathname.includes('/portfolio') || location.pathname.includes('/p/');
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -28,6 +29,7 @@ const AppRouter = () => {
             <Route path="admin" element={<SuperAdminDashboard />} />
             <Route path="admin/user/:userId" element={<AdminUserView />} />
             <Route path="admin/user/:userId/studio/:projectId" element={<AdminProjectDetailWrapper />} />
+            <Route path="portfolio/builder" element={<EventPortfolioBuilder />} />
           </Route>
 
 

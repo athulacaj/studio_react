@@ -302,163 +302,100 @@
     </script>
 
     <script>
-        const weddingData = {
-            eventType: "wedding",
-            data: {
-                name1: "Alan",
-                name2: "Celsete",
-                heroImage: {
-                    url: "https://lh3.googleusercontent.com/d/1kOiThRa1Ebfnb0d-0SESU0DhT2ZA9Woj=w1920?authuser=0",
-                },
-                mainDate: "Saturday, June 21, 2025",
-                story: "Celsete and Alan met in college and instantly clicked. They bonded over their shared love of adventure and travel, and soon found themselves inseparable. After graduation, they embarked on a journey to explore the world together, creating memories that would last a lifetime.",
-                invitationHeading: "We invite you to celebrate our union",
-                invitationDescription: "In the presence of family and friends, join us as we exchange vows and begin our new chapter together in the heart of Napa Valley.",
-                details: [
-                    {
-                        type: "ceremony",
-                        time: "4:00 PM",
-                        location: {
-                            name: "The Glass House<br />123 Orchard Lane, Napa Valley",
-                            url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.8427684627375!2d76.3275993751923!3d10.042023890009202!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d326bf7e74f%3A0xf39975a981f18bbc!2sSt.%20Antony's%20Church%2C%20Thirumeni!5e0!3m2!1sen!2sin!4v1764235192436!5m2!1sen!2sin",
-                            desc: "The Glass House is located nestled among the rolling hills of Napa. We recommend arriving 20 minutes early to enjoy the garden view before the ceremony begins.",
-                        }
-                    },
-                    {
-                        type: "reception",
-                        time: "5:30 PM",
-                        location: {
-                            name: "Kokkadvu",
-                            url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.8427684627375!2d76.3275993751923!3d10.042023890009202!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d326bf7e74f%3A0xf39975a981f18bbc!2sSt.%20Antony's%20Church%2C%20Thirumeni!5e0!3m2!1sen!2sin!4v1764235192436!5m2!1sen!2sin",
-                            desc: "Kokkadvu is located nestled among the rolling hills of Napa. We recommend arriving 20 minutes early to enjoy the garden view before the ceremony begins.",
-                        }
-                    }
-                ],
-                gallery: [
-                    {
-                        url: "https://lh3.googleusercontent.com/d/1m3ljRYn4ld2nY4B-ivO5D7701u28P4WG=w1920?authuser=0"
-                    },
-                    {
-                        url: "https://lh3.googleusercontent.com/d/1Y_NiBM0KYCuYQoEO18MyhVbUyYCwDc3m=w1920?authuser=0"
-                    },
-                    {
-                        url: "https://lh3.googleusercontent.com/d/1tUSIOnBxwkEY0XqVbLmo4Nsudli98ny5=w1920?authuser=0"
-                    }
-                ]
-            }
+        function renderPage(data) {
+            document.title = `${data.name1} & ${data.name2} | Wedding Celebration`;
+            document.getElementById("mainImage").style.backgroundImage = `url(${data.heroImage.url})`;
+            document.getElementById("mainImage").style.backgroundPosition = `50% 20%`;
+            document.getElementById("nav_logo").innerHTML = `${data.name1[0]} &amp; ${data.name2[0]}`;
+            document.getElementById("footer_logo").innerHTML = `${data.name1[0]} &amp; ${data.name2[0]}`;
+            document.getElementById("header_name").innerHTML = `${data.name1} &amp; ${data.name2}`;
+            document.getElementById("header_main_date").innerHTML = data.mainDate;
+            document.getElementById("invitation_heading").innerHTML = data.invitationHeading;
+            document.getElementById("invitation_description").innerHTML = data.invitationDescription;
 
-        }
-        data = weddingData.data;
+            // Clear dynamic sections
+            document.getElementById("details").innerHTML = '';
+            document.getElementById("location").innerHTML = '';
+            document.getElementById("gallery_grid").innerHTML = '';
 
+            data.details.forEach((detail, index) => {
+                const link = document.createElement("a");
+                link.href = `#location_${index}`;
+                link.className = "block";
+                link.innerHTML = `
+                <div class="relative bg-surface-container-low border-t-2 border-secondary-fixed p-10 flex flex-col items-center text-center group hover:bg-surface-container hover:scale-[1.02] hover:shadow-lg transition-all duration-300 cursor-pointer">
+                    <span class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-primary text-xl">→</span>
+                    <p class="font-label-caps text-label-caps text-secondary mb-2">${detail.type.toUpperCase()}</p>
+                    <h3 class="font-headline-md text-headline-md text-primary mb-4">${detail.time}</h3>
+                    <p class="font-body-md text-on-surface-variant">${detail.location.name}</p>
+                    <p class="mt-4 text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">Click to view</p>
+                </div>`;
+                document.getElementById("details").appendChild(link);
+            });
 
-        document.title = `${data.name1} &amp; ${data.name2} | Wedding Celebration`
-        document.getElementById("mainImage").style.backgroundImage = `url(${data.heroImage.url})`
-        document.getElementById("mainImage").style.backgroundPosition = `50% 20%`
-        document.getElementById("nav_logo").innerHTML = `${data.name1[0]} &amp; ${data.name2[0]}`
-        document.getElementById("footer_logo").innerHTML = `${data.name1[0]} &amp; ${data.name2[0]}`
-        document.getElementById("title").value = `${data.name1} &amp; ${data.name2} | Wedding Celebration`
-        document.getElementById("header_name").innerHTML = `${data.name1} &amp; ${data.name2}`
-        document.getElementById("header_main_date").innerHTML = data.mainDate
-        document.getElementById("invitation_heading").innerHTML = data.invitationHeading
-        document.getElementById("invitation_description").innerHTML = data.invitationDescription
-
-        data.details.forEach((detail, index) => {
-            const link = document.createElement("a")
-            link.href = `#location_${index}`
-            link.className = "block"
-
-            link.innerHTML = `
-        <div class="
-            relative
-            bg-surface-container-low
-            border-t-2 border-secondary-fixed
-            p-10
-            flex flex-col items-center text-center
-            group
-            hover:bg-surface-container
-            hover:scale-[1.02]
-            hover:shadow-lg
-            transition-all duration-300
-            cursor-pointer
-        ">
-            <span class="
-                absolute top-4 right-4
-                opacity-0 group-hover:opacity-100
-                transition-opacity duration-300
-                text-primary text-xl
-            ">
-                →
-            </span>
-
-            <p class="font-label-caps text-label-caps text-secondary mb-2">
-                ${detail.type.toUpperCase()}
-            </p>
-
-            <h3 class="font-headline-md text-headline-md text-primary mb-4">
-                ${detail.time}
-            </h3>
-
-            <p class="font-body-md text-on-surface-variant">
-                ${detail.location.name}
-            </p>
-
-            <p class="
-                mt-4 text-sm text-primary
-                opacity-0 group-hover:opacity-100
-                transition-opacity duration-300
-            ">
-                Click to view
-            </p>
-        </div>
-    `
-
-            document.getElementById("details").appendChild(link)
-        })
-
-        data.details.forEach((detail, index) => {
-            const node = document.createElement("div")
-            node.id = `location_${index}`
-            node.innerHTML = `
-         <div
-                class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl overflow-hidden shadow-sm flex flex-col md:flex-row mb-12">
-                <div class="md:w-1/2 h-[300px] md:h-auto bg-surface-container-high relative overflow-hidden">
-                    <iframe class="maps-ifrmae"
-                        src="${detail.location.url}"
-                        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy">
-                    </iframe>
-
-                </div>
-                <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-                    <h2 class="font-headline-md text-headline-md text-primary mb-4">Getting There</h2>
-                    <p class="font-body-md text-on-surface-variant mb-stack-md">
-                        ${detail.location.desc}
-                    </p>
-                    </a>
-                    
+            data.details.forEach((detail, index) => {
+                const node = document.createElement("div");
+                node.id = `location_${index}`;
+                node.innerHTML = `
+                <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl overflow-hidden shadow-sm flex flex-col md:flex-row mb-12">
+                    <div class="md:w-1/2 h-[300px] md:h-auto bg-surface-container-high relative overflow-hidden">
+                        <iframe class="maps-ifrmae" src="${detail.location.url}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                     </div>
-                    </div>`
-            // <a class="inline-flex items-center gap-2 text-primary border-b border-primary/30 pb-1 font-label-caps text-label-caps tracking-widest hover:text-secondary hover:border-secondary transition-all w-fit"
-            //     href="#">
-            //     OPEN IN GOOGLE MAPS
-            //     <span class="material-symbols-outlined text-sm">open_in_new</span>
-            document.getElementById("location").appendChild(node)
-        })
+                    <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+                        <h2 class="font-headline-md text-headline-md text-primary mb-4">Getting There</h2>
+                        <p class="font-body-md text-on-surface-variant mb-stack-md">${detail.location.desc}</p>
+                    </div>
+                </div>`;
+                document.getElementById("location").appendChild(node);
+            });
 
-        // galler grid
-        data.gallery.forEach(photo => {
-            const node = document.createElement("div")
+            data.gallery.forEach(photo => {
+                const node = document.createElement("div");
+                node.innerHTML = `
+                <div class="overflow-hidden rounded-xl group">
+                    <img alt="Wedding photo" class="w-full h-[400px] object-cover transition-transform duration-700 group-hover:scale-105" src="${photo.url}" />
+                </div>`;
+                document.getElementById("gallery_grid").appendChild(node);
+            });
 
-            node.innerHTML = `
-            <div class="overflow-hidden rounded-xl group">
-                <img
-                    alt="Wedding rings"
-                    class="w-full h-[400px] object-cover transition-transform duration-700 group-hover:scale-105"
-                    src="${photo.url}"
-                />
-            </div>
-            `
-            document.getElementById("gallery_grid").appendChild(node)
-        })
+            // Re-observe new fade-in sections
+            document.querySelectorAll('.fade-in-section').forEach(section => {
+                observer.observe(section);
+            });
+        }
+
+        // Listen for data from parent (builder iframe communication)
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'UPDATE_DATA') {
+                renderPage(event.data.data);
+            }
+        });
+
+        // Default data for standalone viewing
+        const defaultData = {
+            name1: "Alan",
+            name2: "Celeste",
+            heroImage: { url: "https://lh3.googleusercontent.com/d/1kOiThRa1Ebfnb0d-0SESU0DhT2ZA9Woj=w1920?authuser=0" },
+            mainDate: "Saturday, June 21, 2025",
+            story: "",
+            invitationHeading: "We invite you to celebrate our union",
+            invitationDescription: "In the presence of family and friends, join us as we exchange vows and begin our new chapter together in the heart of Napa Valley.",
+            details: [
+                { type: "ceremony", time: "4:00 PM", location: { name: "The Glass House<br />123 Orchard Lane, Napa Valley", url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.8427684627375!2d76.3275993751923!3d10.042023890009202!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d326bf7e74f%3A0xf39975a981f18bbc!2sSt.%20Antony's%20Church%2C%20Thirumeni!5e0!3m2!1sen!2sin!4v1764235192436!5m2!1sen!2sin", desc: "The Glass House is located nestled among the rolling hills of Napa." } },
+                { type: "reception", time: "5:30 PM", location: { name: "Kokkadvu", url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.8427684627375!2d76.3275993751923!3d10.042023890009202!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d326bf7e74f%3A0xf39975a981f18bbc!2sSt.%20Antony's%20Church%2C%20Thirumeni!5e0!3m2!1sen!2sin!4v1764235192436!5m2!1sen!2sin", desc: "Kokkadvu is located nestled among the rolling hills of Napa." } }
+            ],
+            gallery: [
+                { url: "https://lh3.googleusercontent.com/d/1m3ljRYn4ld2nY4B-ivO5D7701u28P4WG=w1920?authuser=0" },
+                { url: "https://lh3.googleusercontent.com/d/1Y_NiBM0KYCuYQoEO18MyhVbUyYCwDc3m=w1920?authuser=0" },
+                { url: "https://lh3.googleusercontent.com/d/1tUSIOnBxwkEY0XqVbLmo4Nsudli98ny5=w1920?authuser=0" }
+            ]
+        };
+        renderPage(defaultData);
+
+        // Notify parent that template is ready
+        if (window.parent !== window) {
+            window.parent.postMessage({ type: 'TEMPLATE_READY' }, '*');
+        }
     </script>
 </body>
 
