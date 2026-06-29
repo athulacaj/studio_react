@@ -30,10 +30,11 @@ const AppRouter = () => {
             <Route path="admin/user/:userId/studio/:projectId" element={<AdminProjectDetailWrapper />} />
           </Route>
 
+
           <Route path="/view/:userId/:projectId" element={<PublicProjectView />} />
           <Route path="/share/:userId/:projectId/:linkId" element={<PublicProjectView />} />
           <Route path="/about" element={<About />} />
-          <Route path="/event-page-viewer" element={<EventPageViewer />} />
+          <Route path="/p/:eventpath" element={<EventPageViewer />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Box>

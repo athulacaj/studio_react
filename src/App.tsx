@@ -1,5 +1,10 @@
 import { createTheme, ThemeProvider, CssBaseline, Backdrop, CircularProgress } from '@mui/material';
 import AppRouter from './router';
+import { AuthProvider } from './features/auth';
+import './features/studio-management/store/studioManagementStore';
+import './features/auth/store/userStore';
+import { useGlobalLoader } from './core/context/globalLoader';
+import GlobalToast from './shared/components/GlobalToast';
 
 
 const mizhivTheme = createTheme({
@@ -110,33 +115,25 @@ const mizhivTheme = createTheme({
 
 
 
-import { PortfolioBuilderProvider } from './features/portfoliobuilder';
-import { AuthProvider } from './features/auth';
-import './features/studio-management/store/studioManagementStore';
-import './features/auth/store/userStore';
-import { useGlobalLoader } from './core/context/globalLoader';
-import GlobalToast from './shared/components/GlobalToast';
 
 function App() {
   const { isLoading } = useGlobalLoader();
   return (
     <ThemeProvider theme={mizhivTheme}>
       <CssBaseline />
-      <PortfolioBuilderProvider>
-        <AuthProvider>
-          <>
+      <AuthProvider>
+        <>
 
-            <AppRouter />
-            <Backdrop
-              sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.tooltip + 1 }}
-              open={isLoading}
-            >
-              <CircularProgress color="inherit" />
-            </Backdrop>
-            <GlobalToast />
-          </>
-        </AuthProvider>
-      </PortfolioBuilderProvider>
+          <AppRouter />
+          <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.tooltip + 1 }}
+            open={isLoading}
+          >
+            <CircularProgress color="inherit" />
+          </Backdrop>
+          <GlobalToast />
+        </>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

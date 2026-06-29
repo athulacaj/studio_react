@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title id="title"></title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind Configuration -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#0f1a2e",
+                        "on-primary": "#f4e8dc",
+                        "primary-container": "#1a2940",
+                        "on-primary-container": "#c9a87c",
+                        "secondary": "#c9a87c",
+                        "on-secondary": "#0f1a2e",
+                        "secondary-container": "rgba(201,168,124,0.15)",
+                        "on-secondary-container": "#c9a87c",
+                        "tertiary": "#8b6f4e",
+                        "on-tertiary": "#ffffff",
+                        "background": "#0b1120",
+                        "on-background": "#e8ddd0",
+                        "surface": "#0f1729",
+                        "on-surface": "#e8ddd0",
+                        "surface-variant": "#1a2540",
+                        "on-surface-variant": "#a09484",
+                        "surface-container-lowest": "#080d18",
+                        "surface-container-low": "#0d1525",
+                        "surface-container": "#121d33",
+                        "surface-container-high": "#1a2840",
+                        "surface-container-highest": "#22334d",
+                        "surface-bright": "#1e2d47",
+                        "surface-dim": "#0a0f1a",
+                        "outline": "#4a5568",
+                        "outline-variant": "rgba(201,168,124,0.2)",
+                        "inverse-surface": "#e8ddd0",
+                        "inverse-on-surface": "#0f1a2e",
+                        "inverse-primary": "#8b6f4e",
+                        "error": "#cf6679",
+                        "on-error": "#0f1a2e",
+                        "error-container": "#93000a",
+                        "on-error-container": "#ffdad6",
+                        "surface-tint": "#c9a87c",
+                        "secondary-fixed": "#f0e0c8",
+                        "secondary-fixed-dim": "#d3c5ad",
+                        "on-secondary-fixed": "#221b0b",
+                        "on-secondary-fixed-variant": "#4f4533",
+                        "primary-fixed": "#c9a87c",
+                        "primary-fixed-dim": "#a68a60",
+                        "on-primary-fixed": "#0f1a2e",
+                        "on-primary-fixed-variant": "#1a2940",
+                        "tertiary-container": "#3d2e1a",
+                        "on-tertiary-container": "#d4b896",
+                        "on-tertiary-fixed": "#1a0f00",
+                        "on-tertiary-fixed-variant": "#5d4201",
+                        "tertiary-fixed": "#ffdea5",
+                        "tertiary-fixed-dim": "#e9c176"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-lg": "48px",
+                        "stack-sm": "8px",
+                        "section-padding-desktop": "120px",
+                        "section-padding-mobile": "64px",
+                        "container-max": "1120px",
+                        "stack-md": "24px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "display": ["Cormorant Garamond", "serif"],
+                        "headline": ["Cormorant Garamond", "serif"],
+                        "body": ["DM Sans", "sans-serif"],
+                        "label": ["DM Sans", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "display-xl": ["80px", { "lineHeight": "1.05", "letterSpacing": "-0.03em", "fontWeight": "300" }],
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300" }],
+                        "display-md": ["48px", { "lineHeight": "1.15", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "display-sm": ["36px", { "lineHeight": "1.2", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "400" }],
+                        "headline-md": ["28px", { "lineHeight": "1.35", "fontWeight": "400" }],
+                        "headline-sm": ["24px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.7", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-lg": ["14px", { "lineHeight": "1.0", "letterSpacing": "0.15em", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.12em", "fontWeight": "600" }],
+                        "label-sm": ["10px", { "lineHeight": "1.0", "letterSpacing": "0.15em", "fontWeight": "500" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .maps-iframe {
+            filter: grayscale(80%) brightness(0.6) contrast(1.1);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s cubic-bezier(0.22, 1, 0.36, 1), transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .fade-in-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hero-parallax {
+            will-change: transform;
+        }
+
+        .gold-divider {
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #c9a87c, transparent);
+        }
+
+        .gold-divider-vertical {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(180deg, transparent, #c9a87c, transparent);
+        }
+
+        .card-glow:hover {
+            box-shadow: 0 0 40px rgba(201, 168, 124, 0.08), 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .gallery-item {
+            transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.7s ease;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.03);
+        }
+
+        .gallery-grid .gallery-item:not(:hover) {
+            filter: brightness(0.7);
+        }
+
+        .gallery-grid:not(:hover) .gallery-item {
+            filter: brightness(1);
+        }
+
+        .text-gold-gradient {
+            background: linear-gradient(135deg, #c9a87c, #e8d5b5, #c9a87c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .border-gold-gradient {
+            border-image: linear-gradient(135deg, transparent, #c9a87c, transparent) 1;
+        }
+
+        /* Subtle noise texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            z-index: 0;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+        }
+
+        body > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        ::selection {
+            background: rgba(201, 168, 124, 0.3);
+            color: #f4e8dc;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b1120;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(201, 168, 124, 0.3);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(201, 168, 124, 0.5);
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-background font-body">
+
+    <!-- Top Navigation Bar -->
+    <nav class="fixed top-0 w-full z-50 backdrop-blur-xl bg-background/70 border-b border-outline-variant flex justify-between items-center px-gutter h-16">
+        <div class="flex items-center gap-4">
+            <button aria-label="Menu" class="text-secondary hover:text-on-primary transition-colors duration-300">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </div>
+        <div class="font-display text-headline-sm text-secondary tracking-[0.3em] uppercase" id="nav_logo"></div>
+        <div class="flex items-center gap-4">
+            <button aria-label="Favorite" class="text-secondary hover:text-on-primary transition-colors duration-300">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative h-screen w-full flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <div id="mainImage" class="hero-parallax w-full h-full bg-cover bg-center scale-110">
+                <div class="absolute inset-0 bg-gradient-to-b from-background/40 via-background/20 to-background"></div>
+            </div>
+        </div>
+        <div class="relative z-10 text-center px-gutter">
+            <div class="gold-divider mx-auto mb-8"></div>
+            <p class="font-label text-label-md tracking-[0.4em] mb-6 text-secondary uppercase">
+                THE WEDDING OF
+            </p>
+            <h1 class="font-display text-display-sm md:text-display-xl mb-6 text-gold-gradient" id="header_name"></h1>
+            <div class="gold-divider mx-auto mb-8"></div>
+            <p class="font-display text-headline-sm md:text-headline-md italic text-on-surface-variant" id="header_main_date"></p>
+        </div>
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
+            <div class="flex flex-col items-center gap-2 animate-bounce">
+                <div class="gold-divider-vertical"></div>
+                <span class="material-symbols-outlined text-secondary opacity-60">expand_more</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1120px] mx-auto px-gutter py-section-padding-mobile md:py-section-padding-desktop space-y-section-padding-mobile md:space-y-section-padding-desktop">
+
+        <!-- The Invitation -->
+        <section class="fade-in-section text-center max-w-2xl mx-auto" id="invitation">
+            <div class="flex flex-col items-center">
+                <div class="relative mb-stack-lg">
+                    <div class="absolute inset-0 rounded-full border border-secondary/30 scale-110"></div>
+                    <img alt="Wedding details close-up"
+                        class="w-36 h-36 md:w-52 md:h-52 object-cover rounded-full border border-secondary/20 p-1 grayscale hover:grayscale-0 transition-all duration-1000"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQPg8Gxh_dQsmHYbXAtIGrFZGvgKLQpOSzAPyO9BsRR2z9fDF93QMyrTrai9UaWruMW1kkw_3pFnqCMirJbEE9JZJu5-0gwKy5mnFLPlNfWAYT79Wpv30fGP86LBtzqjRg1kegxUw4uHtTAunfKS8_HR1lMWqfVanvZYWKpkpuO7yU3EhqSHjP5o3g7p88V9AT4y60F8otgtS7AYebNKJj7tzVJEXAD2aZVa5XGTH_1vaCq4kzCDRFvvY9aF315xCZ_MKe_VACM-FK" />
+                </div>
+                <p class="font-label text-label-md text-secondary tracking-[0.2em] mb-stack-sm uppercase">SAVE THE DATE</p>
+                <h2 class="font-display text-display-sm md:text-display-md text-on-primary mb-stack-md leading-tight" id="invitation_heading"></h2>
+                <div class="gold-divider mx-auto mb-stack-md"></div>
+                <p class="font-body text-body-lg text-on-surface-variant max-w-lg" id="invitation_description"></p>
+            </div>
+        </section>
+
+        <!-- When & Where -->
+        <section class="fade-in-section grid grid-cols-1 md:grid-cols-2 gap-stack-md" id="details"></section>
+
+        <!-- Location -->
+        <section class="fade-in-section" id="location"></section>
+
+        <!-- Gallery -->
+        <section class="fade-in-section space-y-stack-md" id="gallery">
+            <div class="text-center mb-stack-lg">
+                <p class="font-label text-label-md text-secondary tracking-[0.2em] mb-3 uppercase">GALLERY</p>
+                <h2 class="font-display text-display-sm md:text-display-md text-on-primary">Our Moments</h2>
+                <div class="gold-divider mx-auto mt-6"></div>
+            </div>
+            <div class="gallery-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="gallery_grid"></div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container-low py-20 px-gutter text-center border-t border-outline-variant">
+        <div class="gold-divider mx-auto mb-8"></div>
+        <h2 class="font-display text-headline-lg text-secondary mb-4 tracking-[0.3em] uppercase" id="footer_logo"></h2>
+        <p class="font-body text-body-md text-on-surface-variant mb-8">We can't wait to celebrate with you.</p>
+        <div class="flex justify-center gap-6 text-secondary/40">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+        </div>
+    </footer>
+
+    <!-- Bottom Navigation (Mobile Only) -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 bg-surface/90 backdrop-blur-xl flex justify-around items-center px-4 py-3 pb-safe border-t border-outline-variant">
+        <a class="flex flex-col items-center justify-center bg-secondary/15 text-secondary rounded-full px-4 py-1.5" href="#">
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">home</span>
+            <span class="font-label text-label-sm mt-1">HOME</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors duration-300" href="#details">
+            <span class="material-symbols-outlined text-[20px]">event_note</span>
+            <span class="font-label text-label-sm mt-1">DETAILS</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors duration-300" href="#rsvp">
+            <span class="material-symbols-outlined text-[20px]">mail</span>
+            <span class="font-label text-label-sm mt-1">RSVP</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors duration-300" href="#gallery">
+            <span class="material-symbols-outlined text-[20px]">photo_library</span>
+            <span class="font-label text-label-sm mt-1">GALLERY</span>
+        </a>
+    </nav>
+
+    <script>
+        // Intersection Observer for scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in-section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+
+    <script>
+        const data = {
+            name1: "Alan",
+            name2: "Celeste",
+            heroImage: {
+                url: "https://lh3.googleusercontent.com/d/1kOiThRa1Ebfnb0d-0SESU0DhT2ZA9Woj=w1920?authuser=0",
+            },
+            mainDate: "Saturday, June 21, 2025",
+            story: "Celeste and Alan met in college and instantly clicked. They bonded over their shared love of adventure and travel, and soon found themselves inseparable.",
+            invitationHeading: "We invite you to celebrate our union",
+            invitationDescription: "In the presence of family and friends, join us as we exchange vows and begin our new chapter together in the heart of Napa Valley.",
+            details: [
+                {
+                    type: "ceremony",
+                    time: "4:00 PM",
+                    location: {
+                        name: "The Glass House<br />123 Orchard Lane, Napa Valley",
+                        url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.8427684627375!2d76.3275993751923!3d10.042023890009202!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d326bf7e74f%3A0xf39975a981f18bbc!2sSt.%20Antony's%20Church%2C%20Thirumeni!5e0!3m2!1sen!2sin!4v1764235192436!5m2!1sen!2sin",
+                        desc: "The Glass House is located nestled among the rolling hills of Napa. We recommend arriving 20 minutes early to enjoy the garden view before the ceremony begins.",
+                    }
+                },
+                {
+                    type: "reception",
+                    time: "5:30 PM",
+                    location: {
+                        name: "Kokkadvu",
+                        url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.8427684627375!2d76.3275993751923!3d10.042023890009202!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d326bf7e74f%3A0xf39975a981f18bbc!2sSt.%20Antony's%20Church%2C%20Thirumeni!5e0!3m2!1sen!2sin!4v1764235192436!5m2!1sen!2sin",
+                        desc: "Kokkadvu is located nestled among the rolling hills of Napa. We recommend arriving 20 minutes early to enjoy the garden view before the ceremony begins.",
+                    }
+                }
+            ],
+            gallery: [
+                {
+                    url: "https://lh3.googleusercontent.com/d/1m3ljRYn4ld2nY4B-ivO5D7701u28P4WG=w1920?authuser=0"
+                },
+                {
+                    url: "https://lh3.googleusercontent.com/d/1Y_NiBM0KYCuYQoEO18MyhVbUyYCwDc3m=w1920?authuser=0"
+                }
+            ]
+        }
+
+        // Icon map for event types
+        const iconMap = {
+            ceremony: "church",
+            reception: "celebration",
+            party: "nightlife",
+            dinner: "restaurant"
+        };
+
+        // Populate page
+        document.title = `${data.name1} & ${data.name2} | Wedding Celebration`
+        document.getElementById("mainImage").style.backgroundImage = `url(${data.heroImage.url})`
+        document.getElementById("mainImage").style.backgroundPosition = `50% 20%`
+        document.getElementById("nav_logo").innerHTML = `${data.name1[0]} &amp; ${data.name2[0]}`
+        document.getElementById("footer_logo").innerHTML = `${data.name1[0]} &amp; ${data.name2[0]}`
+        document.getElementById("header_name").innerHTML = `${data.name1} &amp; ${data.name2}`
+        document.getElementById("header_main_date").innerHTML = data.mainDate
+        document.getElementById("invitation_heading").innerHTML = data.invitationHeading
+        document.getElementById("invitation_description").innerHTML = data.invitationDescription
+
+        // Details cards
+        data.details.forEach((detail, index) => {
+            const link = document.createElement("a")
+            link.href = `#location_${index}`
+            link.className = "block"
+
+            const icon = iconMap[detail.type] || "event";
+
+            link.innerHTML = `
+        <div class="
+            relative
+            bg-surface-container
+            border border-outline-variant
+            p-10
+            flex flex-col items-center text-center
+            group
+            hover:bg-surface-container-high
+            hover:border-secondary/30
+            card-glow
+            transition-all duration-500
+            cursor-pointer
+            rounded-xl
+        ">
+            <span class="
+                absolute top-4 right-4
+                opacity-0 group-hover:opacity-100
+                transition-all duration-500
+                text-secondary text-lg
+                translate-x-[-4px] group-hover:translate-x-0
+            ">
+                →
+            </span>
+
+            <span class="material-symbols-outlined text-secondary mb-5 text-4xl" style="font-variation-settings: 'FILL' 0, 'wght' 200;">${icon}</span>
+
+            <p class="font-label text-label-md text-secondary tracking-[0.2em] mb-3 uppercase">
+                ${detail.type.toUpperCase()}
+            </p>
+
+            <h3 class="font-display text-headline-lg text-on-primary mb-4">
+                ${detail.time}
+            </h3>
+
+            <p class="font-body text-body-md text-on-surface-variant">
+                ${detail.location.name}
+            </p>
+
+            <p class="
+                mt-5 text-body-sm text-secondary/60
+                opacity-0 group-hover:opacity-100
+                translate-y-2 group-hover:translate-y-0
+                transition-all duration-500
+            ">
+                Tap to view location
+            </p>
+        </div>
+    `
+
+            document.getElementById("details").appendChild(link)
+        })
+
+        // Location sections
+        data.details.forEach((detail, index) => {
+            const node = document.createElement("div")
+            node.id = `location_${index}`
+            node.innerHTML = `
+         <div class="bg-surface-container border border-outline-variant rounded-xl overflow-hidden flex flex-col md:flex-row mb-12">
+                <div class="md:w-1/2 h-[300px] md:h-auto relative overflow-hidden">
+                    <iframe class="maps-iframe"
+                        src="${detail.location.url}"
+                        width="100%" height="100%" style="border:0; min-height: 300px;" allowfullscreen="" loading="lazy">
+                    </iframe>
+                </div>
+                <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+                    <p class="font-label text-label-md text-secondary tracking-[0.2em] mb-3 uppercase">${detail.type.toUpperCase()}</p>
+                    <h2 class="font-display text-headline-lg text-on-primary mb-4">Getting There</h2>
+                    <div class="gold-divider mb-6"></div>
+                    <p class="font-body text-body-md text-on-surface-variant mb-6">
+                        ${detail.location.desc}
+                    </p>
+                </div>
+            </div>`
+            document.getElementById("location").appendChild(node)
+        })
+
+        // Gallery grid
+        data.gallery.forEach(photo => {
+            const node = document.createElement("div")
+            node.innerHTML = `
+            <div class="overflow-hidden rounded-xl gallery-item cursor-pointer">
+                <img
+                    alt="Wedding photo"
+                    class="w-full h-[400px] object-cover"
+                    src="${photo.url}"
+                />
+            </div>
+            `
+            document.getElementById("gallery_grid").appendChild(node)
+        })
+    </script>
+</body>
+
+</html>
