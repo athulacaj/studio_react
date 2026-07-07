@@ -166,8 +166,10 @@
         <div class="relative z-10 text-center text-white px-gutter">
             <p class="font-label-caps text-label-caps tracking-[0.3em] mb-stack-sm text-surface-container-lowest">THE
                 WEDDING OF</p>
-            <h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-4"
-                id="header_name"></h1>
+            <h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-4">
+                <span id="header_name1"></span>
+                <span id="header_name2"></span>
+            </h1>
             <div class="w-12 h-[1px] bg-white/60 mx-auto mb-6"></div>
             <p class="font-headline-sm text-headline-sm-mobile md:text-headline-sm italic" id="header_main_date">
                 Saturday, June 21, 2025</p>
@@ -302,16 +304,29 @@
     </script>
 
     <script>
+        function renderInnerHTml(id, data, options = {}) {
+            const { prefix = '', suffix = '' } = options;
+            const html = `${prefix}${data.value}${suffix}`;
+            document.getElementById(id).innerHTML = html;
+            console.log("style ", data.style)
+            if (data.style) {
+                if (data.style.color) {
+                    document.getElementById(id).style.color = data.style.color;
+                }
+            }
+        }
+
         function renderPage(data) {
-            document.title = `${data.name1} & ${data.name2} | Wedding Celebration`;
+            document.title = `${data.name1.value} & ${data.name2.value} | Wedding Celebration`;
             document.getElementById("mainImage").style.backgroundImage = `url(${data.heroImage.url})`;
             document.getElementById("mainImage").style.backgroundPosition = `50% 20%`;
-            document.getElementById("nav_logo").innerHTML = `${data.name1[0]} &amp; ${data.name2[0]}`;
-            document.getElementById("footer_logo").innerHTML = `${data.name1[0]} &amp; ${data.name2[0]}`;
-            document.getElementById("header_name").innerHTML = `${data.name1} &amp; ${data.name2}`;
-            document.getElementById("header_main_date").innerHTML = data.mainDate;
-            document.getElementById("invitation_heading").innerHTML = data.invitationHeading;
-            document.getElementById("invitation_description").innerHTML = data.invitationDescription;
+            renderInnerHTml("nav_logo", data.nav_logo);
+            renderInnerHTml("footer_logo", data.nav_logo);
+            renderInnerHTml("header_name1", data.name1, { suffix: " & " });
+            renderInnerHTml("header_name2", data.name2);
+            renderInnerHTml("header_main_date", data.mainDate);
+            renderInnerHTml("invitation_heading", data.invitationHeading);
+            renderInnerHTml("invitation_description", data.invitationDescription);
 
             // Clear dynamic sections
             document.getElementById("details").innerHTML = '';
@@ -365,7 +380,7 @@
         }
 
         // Listen for data from parent (builder iframe communication)
-        window.addEventListener('message', function(event) {
+        window.addEventListener('message', function (event) {
             if (event.data && event.data.type === 'UPDATE_DATA') {
                 renderPage(event.data.data);
             }
@@ -373,13 +388,14 @@
 
         // Default data for standalone viewing
         const defaultData = {
-            name1: "Alan",
-            name2: "Celeste",
+            nav_logo: { value: "A & C", style: { color: "#0f1a2e" } },
+            name1: { value: "Alan", style: { color: "#0f1a2e" } },
+            name2: { value: "Celeste", style: { color: "#0f1a2e" } },
             heroImage: { url: "https://lh3.googleusercontent.com/d/1kOiThRa1Ebfnb0d-0SESU0DhT2ZA9Woj=w1920?authuser=0" },
-            mainDate: "Saturday, June 21, 2025",
-            story: "",
-            invitationHeading: "We invite you to celebrate our union",
-            invitationDescription: "In the presence of family and friends, join us as we exchange vows and begin our new chapter together in the heart of Napa Valley.",
+            mainDate: { value: "Saturday, June 21, 2025", style: { color: "#0f1a2e" } },
+            story: { value: "" },
+            invitationHeading: { value: "We invite you to celebrate our union", style: { color: "#0f1a2e" } },
+            invitationDescription: { value: "In the presence of family and friends, join us as we exchange vows and begin our new chapter together in the heart of Napa Valley.", style: { color: "#0f1a2e" } },
             details: [
                 { type: "ceremony", time: "4:00 PM", location: { name: "The Glass House<br />123 Orchard Lane, Napa Valley", url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.8427684627375!2d76.3275993751923!3d10.042023890009202!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d326bf7e74f%3A0xf39975a981f18bbc!2sSt.%20Antony's%20Church%2C%20Thirumeni!5e0!3m2!1sen!2sin!4v1764235192436!5m2!1sen!2sin", desc: "The Glass House is located nestled among the rolling hills of Napa." } },
                 { type: "reception", time: "5:30 PM", location: { name: "Kokkadvu", url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.8427684627375!2d76.3275993751923!3d10.042023890009202!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d326bf7e74f%3A0xf39975a981f18bbc!2sSt.%20Antony's%20Church%2C%20Thirumeni!5e0!3m2!1sen!2sin!4v1764235192436!5m2!1sen!2sin", desc: "Kokkadvu is located nestled among the rolling hills of Napa." } }
@@ -390,7 +406,7 @@
                 { url: "https://lh3.googleusercontent.com/d/1tUSIOnBxwkEY0XqVbLmo4Nsudli98ny5=w1920?authuser=0" }
             ]
         };
-        renderPage(defaultData);
+        // renderPage(defaultData);
 
         // Notify parent that template is ready
         if (window.parent !== window) {

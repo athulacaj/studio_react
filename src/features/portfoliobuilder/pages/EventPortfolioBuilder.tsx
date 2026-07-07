@@ -29,13 +29,42 @@ import {
   People as PeopleIcon,
   Description as DescriptionIcon,
   Link as LinkIcon,
+  OpenInNew as OpenInNewIcon,
+  Clear as ClearIcon,
 } from '@mui/icons-material';
 import { usePortfolioBuilderStore } from '../store/portfolioBuilderStore';
 import { TEMPLATES } from '../types/types';
-import { savePortfolio, publishPortfolio } from '../services/portfolioService';
+import { savePortfolio, publishPortfolio, getPortfolioByProjectId } from '../services/portfolioService';
 import { auth } from '../../../config/firebase';
+import { useParams } from 'react-router-dom';
+
+
+const PriviewUrl = ({ user, eventPath }: { user: any, eventPath: string }) => {
+  if (!(eventPath && user?.uid)) {
+    return <div />;
+  }
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      <Typography variant="caption" color="text.secondary">
+        /p/{user.uid}/{eventPath}
+      </Typography>
+      <IconButton
+        size="small"
+        component="a"
+        href={`/p/${auth.currentUser!.uid}/${eventPath}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Open in new tab"
+        sx={{ p: 0.5 }}
+      >
+        <OpenInNewIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+      </IconButton>
+    </Box>
+  )
+}
 
 const EventPortfolioBuilder: React.FC = () => {
+  const { projectId } = useParams<{ projectId: string }>();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [snackbar, setSnackbar] = React.useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
@@ -50,11 +79,15 @@ const EventPortfolioBuilder: React.FC = () => {
     eventPath,
     isSaving,
     portfolioId,
+    isExisting,
     setFormData,
+    setFullFormData,
     setTemplate,
     setEventPath,
     setIsSaving,
     setPortfolioId,
+    setProjectId,
+    setIsExisting,
     updateDetail,
     addDetail,
     removeDetail,
@@ -62,6 +95,40 @@ const EventPortfolioBuilder: React.FC = () => {
     addGalleryItem,
     removeGalleryItem,
   } = usePortfolioBuilderStore();
+
+  // Fetch existing portfolio on mount
+  useEffect(() => {
+    const fetchPortfolio = async () => {
+      const user = auth.currentUser;
+      if (!user || !projectId) return;
+
+      setProjectId(projectId);
+
+      try {
+        const existingPortfolio = await getPortfolioByProjectId(user.uid, projectId);
+        if (existingPortfolio) {
+          setFullFormData(existingPortfolio.data);
+          setTemplate(existingPortfolio.templateId);
+          setEventPath(existingPortfolio.eventPath);
+          setPortfolioId(existingPortfolio.id || existingPortfolio.eventPath);
+          setIsExisting(true);
+        } else {
+          setIsExisting(false);
+        }
+      } catch (error) {
+        console.error("Error fetching existing portfolio:", error);
+      }
+    };
+
+    // Give Firebase Auth a moment to initialize if needed
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        fetchPortfolio();
+      }
+    });
+
+    return () => unsubscribe();
+  }, [projectId, setProjectId, setFullFormData, setTemplate, setEventPath, setPortfolioId, setIsExisting]);
 
   // Send data to iframe whenever formData changes (debounced)
   const sendDataToIframe = useCallback(() => {
@@ -108,17 +175,23 @@ const EventPortfolioBuilder: React.FC = () => {
     try {
       const id = await savePortfolio(user.uid, {
         id: portfolioId || undefined,
+        projectId: projectId || undefined,
         eventType: 'wedding',
         eventPath: eventPath.trim(),
         templateId: selectedTemplate,
         data: formData,
         published: false,
-      });
+      }, !isExisting);
       setPortfolioId(id);
+      setIsExisting(true); // After saving once, it is existing
       setSnackbar({ open: true, message: 'Draft saved successfully!', severity: 'success' });
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setSnackbar({ open: true, message: 'Failed to save draft', severity: 'error' });
+      if (err.message === 'URL already taken') {
+        setSnackbar({ open: true, message: 'URL slug is already taken. Please choose another.', severity: 'error' });
+      } else {
+        setSnackbar({ open: true, message: 'Failed to save draft', severity: 'error' });
+      }
     } finally {
       setIsSaving(false);
     }
@@ -139,18 +212,24 @@ const EventPortfolioBuilder: React.FC = () => {
       // Save first, then publish
       const id = await savePortfolio(user.uid, {
         id: portfolioId || undefined,
+        projectId: projectId || undefined,
         eventType: 'wedding',
         eventPath: eventPath.trim(),
         templateId: selectedTemplate,
         data: formData,
         published: true,
-      });
+      }, !isExisting);
       setPortfolioId(id);
-      await publishPortfolio(id);
-      setSnackbar({ open: true, message: `Published! View at /p/${eventPath.trim()}`, severity: 'success' });
-    } catch (err) {
+      setIsExisting(true); // After saving once, it is existing
+      await publishPortfolio(user.uid, id);
+      setSnackbar({ open: true, message: `Published! View at /p/${user.uid}/${eventPath.trim()}`, severity: 'success' });
+    } catch (err: any) {
       console.error(err);
-      setSnackbar({ open: true, message: 'Failed to publish', severity: 'error' });
+      if (err.message === 'URL already taken') {
+        setSnackbar({ open: true, message: 'URL slug is already taken. Please choose another.', severity: 'error' });
+      } else {
+        setSnackbar({ open: true, message: 'Failed to publish', severity: 'error' });
+      }
     } finally {
       setIsSaving(false);
     }
@@ -240,11 +319,13 @@ const EventPortfolioBuilder: React.FC = () => {
             placeholder="my-wedding"
             value={eventPath}
             onChange={(e) => setEventPath(e.target.value.replace(/[^a-z0-9-]/g, ''))}
-            helperText={eventPath ? `Preview: /p/${eventPath}` : 'Enter a unique URL slug'}
+            disabled={isExisting}
+            helperText={eventPath ? `` : 'Enter a unique URL slug'}
             InputProps={{
               startAdornment: <Typography sx={{ mr: 1, color: 'text.secondary', fontSize: '0.85rem' }}>/p/</Typography>,
             }}
           />
+          <PriviewUrl user={auth.currentUser} eventPath={eventPath} />
         </Box>
 
         {/* Template Selector */}
@@ -280,6 +361,40 @@ const EventPortfolioBuilder: React.FC = () => {
           </Box>
         </Box>
 
+        {/* Nav Logo */}
+        <Box sx={sectionStyle}>
+          <Box sx={sectionHeaderStyle}>
+            <Typography variant="subtitle2" fontWeight={600}>Nav Logo</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1.5 }}>
+            <TextField
+              fullWidth
+              size="small"
+              label="Nav Logo Text"
+              value={formData.nav_logo?.value || ''}
+              onChange={(e) => setFormData({ nav_logo: { ...formData.nav_logo, value: e.target.value } })}
+            />
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <TextField
+                type="color"
+                size="small"
+                label="Color"
+                value={formData.nav_logo?.style?.color || '#000000'}
+                onChange={(e) => setFormData({ nav_logo: { ...formData.nav_logo, style: { ...formData.nav_logo?.style, color: e.target.value } } })}
+                sx={{ width: 100 }}
+              />
+              <IconButton 
+                size="small" 
+                onClick={() => setFormData({ nav_logo: { ...formData.nav_logo, style: { ...formData.nav_logo?.style, color: undefined } } })}
+                disabled={!formData.nav_logo?.style?.color}
+                title="Clear Color"
+              >
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          </Box>
+        </Box>
+
         {/* Couple Info */}
         <Box sx={sectionStyle}>
           <Box sx={sectionHeaderStyle}>
@@ -287,29 +402,90 @@ const EventPortfolioBuilder: React.FC = () => {
             <Typography variant="subtitle2" fontWeight={600}>Couple Info</Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 1.5, mb: 2 }}>
-            <TextField
-              fullWidth
-              size="small"
-              label="Name 1"
-              value={formData.name1}
-              onChange={(e) => setFormData({ name1: e.target.value })}
-            />
-            <TextField
-              fullWidth
-              size="small"
-              label="Name 2"
-              value={formData.name2}
-              onChange={(e) => setFormData({ name2: e.target.value })}
-            />
+            <Box sx={{ display: 'flex', gap: 1, flex: 1 }}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Name 1"
+                value={formData.name1?.value || ''}
+                onChange={(e) => setFormData({ name1: { ...formData.name1, value: e.target.value } })}
+              />
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <TextField
+                  type="color"
+                  size="small"
+                  value={formData.name1?.style?.color || '#000000'}
+                  onChange={(e) => setFormData({ name1: { ...formData.name1, style: { ...formData.name1?.style, color: e.target.value } } })}
+                  sx={{ width: 60 }}
+                />
+                <IconButton 
+                  size="small" 
+                  onClick={() => setFormData({ name1: { ...formData.name1, style: { ...formData.name1?.style, color: undefined } } })}
+                  disabled={!formData.name1?.style?.color}
+                  title="Clear Color"
+                  sx={{ ml: 0.5 }}
+                >
+                  <ClearIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 1, flex: 1 }}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Name 2"
+                value={formData.name2?.value || ''}
+                onChange={(e) => setFormData({ name2: { ...formData.name2, value: e.target.value } })}
+              />
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <TextField
+                  type="color"
+                  size="small"
+                  value={formData.name2?.style?.color || '#000000'}
+                  onChange={(e) => setFormData({ name2: { ...formData.name2, style: { ...formData.name2?.style, color: e.target.value } } })}
+                  sx={{ width: 60 }}
+                />
+                <IconButton 
+                  size="small" 
+                  onClick={() => setFormData({ name2: { ...formData.name2, style: { ...formData.name2?.style, color: undefined } } })}
+                  disabled={!formData.name2?.style?.color}
+                  title="Clear Color"
+                  sx={{ ml: 0.5 }}
+                >
+                  <ClearIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            </Box>
           </Box>
-          <TextField
-            fullWidth
-            size="small"
-            label="Wedding Date"
-            value={formData.mainDate}
-            onChange={(e) => setFormData({ mainDate: e.target.value })}
-            placeholder="Saturday, June 21, 2025"
-          />
+
+          <Box sx={{ display: 'flex', gap: 1.5 }}>
+            <TextField
+              fullWidth
+              size="small"
+              label="Wedding Date"
+              value={formData.mainDate?.value || ''}
+              onChange={(e) => setFormData({ mainDate: { ...formData.mainDate, value: e.target.value } })}
+              placeholder="Saturday, June 21, 2025"
+            />
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <TextField
+                type="color"
+                size="small"
+                label="Color"
+                value={formData.mainDate?.style?.color || '#000000'}
+                onChange={(e) => setFormData({ mainDate: { ...formData.mainDate, style: { ...formData.mainDate?.style, color: e.target.value } } })}
+                sx={{ width: 100 }}
+              />
+              <IconButton 
+                size="small" 
+                onClick={() => setFormData({ mainDate: { ...formData.mainDate, style: { ...formData.mainDate?.style, color: undefined } } })}
+                disabled={!formData.mainDate?.style?.color}
+                title="Clear Color"
+              >
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          </Box>
         </Box>
 
         {/* Hero Image */}
@@ -357,8 +533,8 @@ const EventPortfolioBuilder: React.FC = () => {
             multiline
             rows={3}
             label="Your Love Story"
-            value={formData.story}
-            onChange={(e) => setFormData({ story: e.target.value })}
+            value={formData.story?.value || ''}
+            onChange={(e) => setFormData({ story: { ...formData.story, value: e.target.value } })}
           />
         </Box>
 
@@ -368,23 +544,62 @@ const EventPortfolioBuilder: React.FC = () => {
             <EventIcon fontSize="small" />
             <Typography variant="subtitle2" fontWeight={600}>Invitation</Typography>
           </Box>
-          <TextField
-            fullWidth
-            size="small"
-            label="Heading"
-            value={formData.invitationHeading}
-            onChange={(e) => setFormData({ invitationHeading: e.target.value })}
-            sx={{ mb: 1.5 }}
-          />
-          <TextField
-            fullWidth
-            size="small"
-            multiline
-            rows={2}
-            label="Description"
-            value={formData.invitationDescription}
-            onChange={(e) => setFormData({ invitationDescription: e.target.value })}
-          />
+          <Box sx={{ display: 'flex', gap: 1.5, mb: 1.5 }}>
+            <TextField
+              fullWidth
+              size="small"
+              label="Heading"
+              value={formData.invitationHeading?.value || ''}
+              onChange={(e) => setFormData({ invitationHeading: { ...formData.invitationHeading, value: e.target.value } })}
+            />
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <TextField
+                type="color"
+                size="small"
+                label="Color"
+                value={formData.invitationHeading?.style?.color || '#000000'}
+                onChange={(e) => setFormData({ invitationHeading: { ...formData.invitationHeading, style: { ...formData.invitationHeading?.style, color: e.target.value } } })}
+                sx={{ width: 100 }}
+              />
+              <IconButton 
+                size="small" 
+                onClick={() => setFormData({ invitationHeading: { ...formData.invitationHeading, style: { ...formData.invitationHeading?.style, color: undefined } } })}
+                disabled={!formData.invitationHeading?.style?.color}
+                title="Clear Color"
+              >
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1.5 }}>
+            <TextField
+              fullWidth
+              size="small"
+              multiline
+              rows={2}
+              label="Description"
+              value={formData.invitationDescription?.value || ''}
+              onChange={(e) => setFormData({ invitationDescription: { ...formData.invitationDescription, value: e.target.value } })}
+            />
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <TextField
+                type="color"
+                size="small"
+                label="Color"
+                value={formData.invitationDescription?.style?.color || '#000000'}
+                onChange={(e) => setFormData({ invitationDescription: { ...formData.invitationDescription, style: { ...formData.invitationDescription?.style, color: e.target.value } } })}
+                sx={{ width: 100 }}
+              />
+              <IconButton 
+                size="small" 
+                onClick={() => setFormData({ invitationDescription: { ...formData.invitationDescription, style: { ...formData.invitationDescription?.style, color: undefined } } })}
+                disabled={!formData.invitationDescription?.style?.color}
+                title="Clear Color"
+              >
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          </Box>
         </Box>
 
         {/* Event Details */}
@@ -577,11 +792,7 @@ const EventPortfolioBuilder: React.FC = () => {
               sx={{ fontSize: '0.7rem', height: 22 }}
             />
           </Box>
-          {eventPath && (
-            <Typography variant="caption" color="text.secondary">
-              /p/{eventPath}
-            </Typography>
-          )}
+          <PriviewUrl user={auth.currentUser} eventPath={eventPath} />
         </Box>
 
         {/* iframe Preview */}

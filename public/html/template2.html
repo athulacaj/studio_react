@@ -10,8 +10,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@400;500;600&display=swap"
         rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
     <!-- Tailwind Configuration -->
     <script id="tailwind-config">
@@ -190,7 +189,7 @@
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
         }
 
-        body > * {
+        body>* {
             position: relative;
             z-index: 1;
         }
@@ -204,13 +203,16 @@
         ::-webkit-scrollbar {
             width: 6px;
         }
+
         ::-webkit-scrollbar-track {
             background: #0b1120;
         }
+
         ::-webkit-scrollbar-thumb {
             background: rgba(201, 168, 124, 0.3);
             border-radius: 3px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(201, 168, 124, 0.5);
         }
@@ -220,7 +222,8 @@
 <body class="bg-background text-on-background font-body">
 
     <!-- Top Navigation Bar -->
-    <nav class="fixed top-0 w-full z-50 backdrop-blur-xl bg-background/70 border-b border-outline-variant flex justify-between items-center px-gutter h-16">
+    <nav
+        class="fixed top-0 w-full z-50 backdrop-blur-xl bg-background/70 border-b border-outline-variant flex justify-between items-center px-gutter h-16">
         <div class="flex items-center gap-4">
             <button aria-label="Menu" class="text-secondary hover:text-on-primary transition-colors duration-300">
                 <span class="material-symbols-outlined">menu</span>
@@ -248,7 +251,8 @@
             </p>
             <h1 class="font-display text-display-sm md:text-display-xl mb-6 text-gold-gradient" id="header_name"></h1>
             <div class="gold-divider mx-auto mb-8"></div>
-            <p class="font-display text-headline-sm md:text-headline-md italic text-on-surface-variant" id="header_main_date"></p>
+            <p class="font-display text-headline-sm md:text-headline-md italic text-on-surface-variant"
+                id="header_main_date"></p>
         </div>
         <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
             <div class="flex flex-col items-center gap-2 animate-bounce">
@@ -258,7 +262,8 @@
         </div>
     </header>
 
-    <main class="max-w-[1120px] mx-auto px-gutter py-section-padding-mobile md:py-section-padding-desktop space-y-section-padding-mobile md:space-y-section-padding-desktop">
+    <main
+        class="max-w-[1120px] mx-auto px-gutter py-section-padding-mobile md:py-section-padding-desktop space-y-section-padding-mobile md:space-y-section-padding-desktop">
 
         <!-- The Invitation -->
         <section class="fade-in-section text-center max-w-2xl mx-auto" id="invitation">
@@ -269,8 +274,10 @@
                         class="w-36 h-36 md:w-52 md:h-52 object-cover rounded-full border border-secondary/20 p-1 grayscale hover:grayscale-0 transition-all duration-1000"
                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQPg8Gxh_dQsmHYbXAtIGrFZGvgKLQpOSzAPyO9BsRR2z9fDF93QMyrTrai9UaWruMW1kkw_3pFnqCMirJbEE9JZJu5-0gwKy5mnFLPlNfWAYT79Wpv30fGP86LBtzqjRg1kegxUw4uHtTAunfKS8_HR1lMWqfVanvZYWKpkpuO7yU3EhqSHjP5o3g7p88V9AT4y60F8otgtS7AYebNKJj7tzVJEXAD2aZVa5XGTH_1vaCq4kzCDRFvvY9aF315xCZ_MKe_VACM-FK" />
                 </div>
-                <p class="font-label text-label-md text-secondary tracking-[0.2em] mb-stack-sm uppercase">SAVE THE DATE</p>
-                <h2 class="font-display text-display-sm md:text-display-md text-on-primary mb-stack-md leading-tight" id="invitation_heading"></h2>
+                <p class="font-label text-label-md text-secondary tracking-[0.2em] mb-stack-sm uppercase">SAVE THE DATE
+                </p>
+                <h2 class="font-display text-display-sm md:text-display-md text-on-primary mb-stack-md leading-tight"
+                    id="invitation_heading"></h2>
                 <div class="gold-divider mx-auto mb-stack-md"></div>
                 <p class="font-body text-body-lg text-on-surface-variant max-w-lg" id="invitation_description"></p>
             </div>
@@ -305,20 +312,25 @@
     </footer>
 
     <!-- Bottom Navigation (Mobile Only) -->
-    <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 bg-surface/90 backdrop-blur-xl flex justify-around items-center px-4 py-3 pb-safe border-t border-outline-variant">
-        <a class="flex flex-col items-center justify-center bg-secondary/15 text-secondary rounded-full px-4 py-1.5" href="#">
+    <nav
+        class="md:hidden fixed bottom-0 left-0 w-full z-50 bg-surface/90 backdrop-blur-xl flex justify-around items-center px-4 py-3 pb-safe border-t border-outline-variant">
+        <a class="flex flex-col items-center justify-center bg-secondary/15 text-secondary rounded-full px-4 py-1.5"
+            href="#">
             <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">home</span>
             <span class="font-label text-label-sm mt-1">HOME</span>
         </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors duration-300" href="#details">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors duration-300"
+            href="#details">
             <span class="material-symbols-outlined text-[20px]">event_note</span>
             <span class="font-label text-label-sm mt-1">DETAILS</span>
         </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors duration-300" href="#rsvp">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors duration-300"
+            href="#rsvp">
             <span class="material-symbols-outlined text-[20px]">mail</span>
             <span class="font-label text-label-sm mt-1">RSVP</span>
         </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors duration-300" href="#gallery">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors duration-300"
+            href="#gallery">
             <span class="material-symbols-outlined text-[20px]">photo_library</span>
             <span class="font-label text-label-sm mt-1">GALLERY</span>
         </a>
@@ -429,7 +441,7 @@
         }
 
         // Listen for data from parent (builder iframe communication)
-        window.addEventListener('message', function(event) {
+        window.addEventListener('message', function (event) {
             if (event.data && event.data.type === 'UPDATE_DATA') {
                 renderPage(event.data.data);
             }

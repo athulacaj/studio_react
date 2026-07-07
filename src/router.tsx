@@ -29,14 +29,14 @@ const AppRouter = () => {
             <Route path="admin" element={<SuperAdminDashboard />} />
             <Route path="admin/user/:userId" element={<AdminUserView />} />
             <Route path="admin/user/:userId/studio/:projectId" element={<AdminProjectDetailWrapper />} />
-            <Route path="portfolio/builder" element={<EventPortfolioBuilder />} />
+            <Route path="portfolio/builder/:projectId" element={<EventPortfolioBuilder />} />
           </Route>
 
 
           <Route path="/view/:userId/:projectId" element={<PublicProjectView />} />
           <Route path="/share/:userId/:projectId/:linkId" element={<PublicProjectView />} />
           <Route path="/about" element={<About />} />
-          <Route path="/p/:eventpath" element={<EventPageViewer />} />
+          <Route path="/p/:userId/:eventpath" element={<EventPageViewer />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Box>

@@ -7,6 +7,8 @@ interface PortfolioBuilderState {
   eventPath: string;
   isSaving: boolean;
   portfolioId: string | null;
+  projectId: string | null;
+  isExisting: boolean;
 
   // Actions
   setFormData: (data: Partial<WeddingFormData>) => void;
@@ -15,6 +17,8 @@ interface PortfolioBuilderState {
   setEventPath: (path: string) => void;
   setIsSaving: (saving: boolean) => void;
   setPortfolioId: (id: string) => void;
+  setProjectId: (id: string | null) => void;
+  setIsExisting: (existing: boolean) => void;
   updateDetail: (index: number, detail: Partial<WeddingFormData['details'][0]>) => void;
   addDetail: () => void;
   removeDetail: (index: number) => void;
@@ -30,6 +34,8 @@ export const usePortfolioBuilderStore = create<PortfolioBuilderState>((set, get)
   eventPath: '',
   isSaving: false,
   portfolioId: null,
+  projectId: null,
+  isExisting: false,
 
   setFormData: (data) =>
     set((state) => ({
@@ -45,6 +51,10 @@ export const usePortfolioBuilderStore = create<PortfolioBuilderState>((set, get)
   setIsSaving: (saving) => set({ isSaving: saving }),
 
   setPortfolioId: (id) => set({ portfolioId: id }),
+
+  setProjectId: (id) => set({ projectId: id }),
+
+  setIsExisting: (existing) => set({ isExisting: existing }),
 
   updateDetail: (index, detail) =>
     set((state) => {
@@ -113,5 +123,7 @@ export const usePortfolioBuilderStore = create<PortfolioBuilderState>((set, get)
       eventPath: '',
       isSaving: false,
       portfolioId: null,
+      projectId: null,
+      isExisting: false,
     }),
 }));

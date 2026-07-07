@@ -524,7 +524,7 @@
         }
 
         // Listen for data from parent (builder iframe communication)
-        window.addEventListener('message', function(event) {
+        window.addEventListener('message', function (event) {
             if (event.data && event.data.type === 'UPDATE_DATA') {
                 renderPage(event.data.data);
             }

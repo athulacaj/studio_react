@@ -5,7 +5,7 @@ import { getPublishedPortfolio } from '../services/portfolioService';
 import { EventPortfolio } from '../types/types';
 
 const EventPageViewer: React.FC = () => {
-  const { eventpath } = useParams<{ eventpath: string }>();
+  const { userId, eventpath } = useParams<{ userId: string; eventpath: string }>();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [portfolio, setPortfolio] = useState<EventPortfolio | null>(null);
   const [loading, setLoading] = useState(true);
@@ -14,9 +14,9 @@ const EventPageViewer: React.FC = () => {
   // Fetch published portfolio data
   useEffect(() => {
     const fetchData = async () => {
-      if (!eventpath) return;
+      if (!userId || !eventpath) return;
       try {
-        const data = await getPublishedPortfolio(eventpath);
+        const data = await getPublishedPortfolio(userId, eventpath);
         if (data) {
           setPortfolio(data);
         } else {

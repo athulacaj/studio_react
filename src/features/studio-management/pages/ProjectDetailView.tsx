@@ -26,6 +26,7 @@ import {
     CalendarToday as CalendarIcon,
     Folder as FolderIcon,
     Link as LinkIcon,
+    Article as ArticleIcon,
 } from '@mui/icons-material';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import { useAuthStore } from '../../auth';
@@ -396,6 +397,24 @@ const ProjectDetailView: React.FC = () => {
                             }}
                         >
                             Manage Share Links
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            startIcon={<ArticleIcon />}
+                            onClick={() => navigate(`/private/portfolio/builder/${projectId}`)}
+                            sx={{
+                                flex: { xs: 1, sm: 'initial' },
+                                borderRadius: 2,
+                                borderColor: (theme) => alpha(theme.palette.primary.main, 0.4),
+                                color: 'primary.main',
+                                '&:hover': {
+                                    borderColor: 'primary.main',
+                                    backgroundColor: (theme) =>
+                                        alpha(theme.palette.primary.main, 0.08),
+                                },
+                            }}
+                        >
+                            Manage Portfolio
                         </Button>
                     </Box>
                 </Paper>
