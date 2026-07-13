@@ -28,8 +28,8 @@ const AlbumActionButton: React.FC<AlbumActionButtonProps> = ({
     addToAlbumLoader,
     isMobile
 }) => {
-    if (slideshowPlaying) return null;
     const { categories } = usePhotoProofingStore();
+    if (slideshowPlaying) return null;
 
 
     return (

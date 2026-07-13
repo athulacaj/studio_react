@@ -116,6 +116,7 @@ const FolderItem: React.FC<FolderItemProps> = ({
                                 readOnly={readOnly}
                                 selectableIds={selectableIds}
                                 syncedFolders={syncedFolders}
+                                type={type}
                             />
                         ))}
                     </List>
@@ -170,13 +171,13 @@ const FolderTree: React.FC<FolderTreeProps> = ({
     syncedFolders = {},
     type = "share_link_modal"
 }) => {
-    if (!folderStructure) {
-        return <Typography color="text.secondary">No folder structure available.</Typography>;
-    }
-
     const selectableFolderIds = React.useMemo(() => {
         return getAllSelectableFolderIds(folderStructure, selectableIds);
     }, [folderStructure, selectableIds]);
+
+    if (!folderStructure) {
+        return <Typography color="text.secondary">No folder structure available.</Typography>;
+    }
 
     const handleSelectAllCheckboxChange = () => {
         if (!onSelectAllChange) return;
