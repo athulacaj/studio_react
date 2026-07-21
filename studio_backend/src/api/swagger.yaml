@@ -1,0 +1,95 @@
+openapi: 3.0.0
+info:
+  title: Studio Backend API
+  version: 1.0.0
+  description: API for managing project files metadata
+servers:
+  - url: http://localhost:3000
+paths:
+  /projects/{projectId}/files:
+    post:
+      summary: Upsert a single file
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertFile'
+      responses:
+        '200':
+          description: OK
+    get:
+      summary: Get files for a project
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: updatedSince
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: OK
+  /projects/{projectId}/files/bulk:
+    post:
+      summary: Upsert multiple files
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkUpsertFiles'
+      responses:
+        '200':
+          description: OK
+  /health:
+    get:
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: OK
+
+components:
+  schemas:
+    UpsertFile:
+      type: object
+      required:
+        - name
+        - relativePath
+        - updatedAt
+      properties:
+        name:
+          type: string
+        relativePath:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+          default: false
+    BulkUpsertFiles:
+      type: object
+      required:
+        - files
+      properties:
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpsertFile'

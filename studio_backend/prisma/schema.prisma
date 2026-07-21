@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model File {
+  id           String
+  projectId    String
+  name         String
+  relativePath String
+  updatedAt    DateTime
+  deleted      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  modifiedAt   DateTime @updatedAt
+
+  @@id([projectId, id])
+  @@index([projectId])
+  @@index([projectId, updatedAt])
+  @@index([projectId, deleted])
+}
