@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     Container,
@@ -27,6 +27,8 @@ import {
     Folder as FolderIcon,
     Link as LinkIcon,
     Article as ArticleIcon,
+    CheckCircle as CheckCircleIcon,
+    Cancel as CancelIcon,
 } from '@mui/icons-material';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import { useAuthStore } from '../../auth';
@@ -34,6 +36,7 @@ import { useUserStore } from '../../auth';
 import CreateProjectModal from '../components/CreateProjectModal';
 import ManageShareLinksModal from '../components/ManageShareLinksModal';
 import { useToastStore } from '../../../shared/hooks/useToastStore';
+import { DriveFileBrowser, useDriveIntegrationStore } from '../../drive-integration';
 
 const ProjectDetailView: React.FC = () => {
     const { projectId } = useParams<{ projectId: string }>();
@@ -50,12 +53,25 @@ const ProjectDetailView: React.FC = () => {
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+    const [driveConnectLinkCopied, setDriveConnectLinkCopied] = useState(false);
     const showToast = useToastStore((state) => state.showToast);
+
+    // Drive connection state
+    const activeConnection = useDriveIntegrationStore((state) => state.activeConnection);
+    const driveLoading = useDriveIntegrationStore((state) => state.loading);
+    const fetchConnection = useDriveIntegrationStore((state) => state.fetchConnection);
 
     const project = useMemo(
         () => projects.find((p) => p.id === projectId) || null,
         [projects, projectId]
     );
+
+    // Fetch Drive connection for google_photos projects
+    useEffect(() => {
+        if (project?.source === 'google_photos' && effectiveUserId && project.id) {
+            fetchConnection(effectiveUserId, project.id);
+        }
+    }, [project?.source, project?.id, effectiveUserId, fetchConnection]);
 
     const handleCopyLink = () => {
         if (!effectiveUserId || !project) return;
@@ -357,6 +373,89 @@ const ProjectDetailView: React.FC = () => {
                             </Box>
                         </>
                     )}
+
+                    {/* Google Drive Connection Status (for google_photos source) */}
+                    {project.source === 'google_photos' && (
+                        <>
+                            <Divider sx={{ my: 2.5 }} />
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                <GoogleIcon sx={{ color: activeConnection ? '#22C55E' : 'text.secondary', fontSize: 20 }} />
+                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                    <Typography variant="caption" color="text.secondary">
+                                        Google Drive Connection
+                                    </Typography>
+                                    {driveLoading ? (
+                                        <Skeleton variant="text" width={180} />
+                                    ) : activeConnection ? (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <CheckCircleIcon sx={{ fontSize: 16, color: '#22C55E' }} />
+                                            <Typography variant="body2" fontWeight={500} sx={{ color: '#22C55E' }}>
+                                                Connected
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ color: 'text.secondary', ml: 0.5 }}>
+                                                — {activeConnection.googleEmail}
+                                            </Typography>
+                                        </Box>
+                                    ) : (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <CancelIcon sx={{ fontSize: 16, color: '#94A3B8' }} />
+                                            <Typography variant="body2" fontWeight={500} sx={{ color: '#94A3B8' }}>
+                                                Not Connected
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </Box>
+                            </Box>
+                            {/* Show copyable Drive connect link when NOT connected */}
+                            {!driveLoading && !activeConnection && effectiveUserId && (
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 1,
+                                        mt: 2,
+                                        p: 1,
+                                        pl: 2,
+                                        borderRadius: 2,
+                                        background: (theme) => alpha(theme.palette.primary.main, 0.04),
+                                        border: '1px solid',
+                                        borderColor: (theme) => alpha(theme.palette.divider, 0.08),
+                                    }}
+                                >
+                                    <LinkIcon sx={{ fontSize: 18, color: 'text.secondary', flexShrink: 0 }} />
+                                    <Typography
+                                        variant="body2"
+                                        sx={{
+                                            color: 'text.secondary',
+                                            fontSize: '12px',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap',
+                                            flex: 1,
+                                            userSelect: 'all',
+                                        }}
+                                    >
+                                        {`${window.location.origin}/drive/connect/${effectiveUserId}/${project.id}`}
+                                    </Typography>
+                                    <Tooltip title={driveConnectLinkCopied ? 'Copied!' : 'Copy Drive connect link'}>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(
+                                                    `${window.location.origin}/drive/connect/${effectiveUserId}/${project.id}`
+                                                );
+                                                setDriveConnectLinkCopied(true);
+                                                showToast('Drive connect link copied!', 'success');
+                                                setTimeout(() => setDriveConnectLinkCopied(false), 2500);
+                                            }}
+                                        >
+                                            <CopyIcon fontSize="small" />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Box>
+                            )}
+                        </>
+                    )}
                 </Paper>
 
                 {/* Quick Actions */}
@@ -418,6 +517,16 @@ const ProjectDetailView: React.FC = () => {
                         </Button>
                     </Box>
                 </Paper>
+                
+                {/* Drive Integration (for Google Photos source) */}
+                {project.source === 'google_photos' && (
+                    <Box sx={{ mt: 2 }}>
+                        <DriveFileBrowser 
+                            studioUserId={effectiveUserId!} 
+                            projectId={project.id} 
+                        />
+                    </Box>
+                )}
             </Box>
 
             {/* ── Modals ── */}

@@ -41,6 +41,7 @@ export interface Project {
     status?: string;
     [key: string]: any;
     syncedFolders?: Record<string, SyncedFolder>;
+    driveConnectionId?: string;
 }
 
 export interface SharedLink {

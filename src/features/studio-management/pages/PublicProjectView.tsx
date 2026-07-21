@@ -16,6 +16,7 @@ import {
 } from '@mui/icons-material';
 import PhotoProofingPage from '../../photoproofing/pages/PhotoProofingPage';
 import { usePhotoProofing } from '../../photoproofing/hooks/';
+import { DriveConnectPrompt } from '../../drive-integration';
 
 // ─── Premium Loading Screen ────────────────────────────────────────────────────
 const PremiumLoadingScreen = () => (
@@ -362,7 +363,15 @@ const ProjectViewer = ({ userId, projectId, linkId }: { userId: string, projectI
                 position: 'relative',
             }}
         >
-            <PhotoProofingPage />
+            {project.source === 'google_photos' && !project.driveConnectionId ? (
+                <DriveConnectPrompt 
+                    userId={userId} 
+                    projectId={projectId} 
+                    projectName={project.name || 'this project'} 
+                />
+            ) : (
+                <PhotoProofingPage />
+            )}
             <Backdrop
                 sx={{
                     color: '#C084FC',

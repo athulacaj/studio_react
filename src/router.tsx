@@ -9,6 +9,7 @@ import Footer from './core/components/Footer';
 import GlobalNavbar from './core/components/GlobalNavbar';
 import EventPageViewer from './features/portfoliobuilder/pages/EventPageViewer';
 import EventPortfolioBuilder from './features/portfoliobuilder/pages/EventPortfolioBuilder';
+import { DriveConnectPage, DriveSuccessPage } from './features/drive-integration';
 
 const AppRouter = () => {
   const location = useLocation();
@@ -33,6 +34,8 @@ const AppRouter = () => {
           </Route>
 
 
+          <Route path="/drive/connect/:userId/:projectId" element={<DriveConnectPage />} />
+          <Route path="/drive/success" element={<DriveSuccessPage />} />
           <Route path="/view/:userId/:projectId" element={<PublicProjectView />} />
           <Route path="/share/:userId/:projectId/:linkId" element={<PublicProjectView />} />
           <Route path="/about" element={<About />} />

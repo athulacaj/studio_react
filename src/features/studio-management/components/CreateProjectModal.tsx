@@ -156,13 +156,19 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                     await handleDriveUpload(project.id, foldersToSave);
                 }
             } else {
-                const projectId = await addProject({
+                const newProjectData: any = {
                     name: projectName,
                     source,
-                    driveUrl: source === 'google_drive' ? driveUrl : undefined,
-                    driveData: folderStructure || undefined, // Save the full structure
-                    selectedFolders: foldersToSave, // Save selected IDs
-                });
+                    selectedFolders: foldersToSave,
+                };
+                if (source === 'google_drive' && driveUrl) {
+                    newProjectData.driveUrl = driveUrl;
+                }
+                if (folderStructure) {
+                    newProjectData.driveData = folderStructure;
+                }
+                
+                const projectId = await addProject(newProjectData);
 
                 if (projectId && source === 'google_drive' && foldersToSave.length > 0) {
                     await handleDriveUpload(projectId, foldersToSave);

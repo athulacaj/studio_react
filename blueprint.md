@@ -61,3 +61,16 @@ This document outlines the development plan for a modern, responsive photo proof
     *   Responsive font sizes for the logo.
     *   Blur-backed App Bar for a modern, glassmorphism feel on both mobile and desktop.
 
+#### Iteration 5: Google Drive Client Integration
+
+1.  **Architecture:**
+    *   Implemented a dedicated `drive-integration` feature following the 3-layer architecture (`api/`, `store/`, `components/`).
+    *   For a detailed technical breakdown, see `docs/google_drive_integration.md`.
+2.  **Client Flow:**
+    *   Embedded a connection prompt (`DriveConnectPrompt`) in `PublicProjectView` for unlinked projects sourced from Google Photos.
+    *   Created an OAuth callback page (`DriveConnectPage`) to handle token exchange and user redirection.
+3.  **Admin UI:**
+    *   Added a `DriveFileBrowser` component to `ProjectDetailView` allowing admins to view, create folders, and upload photos directly to the client's connected Google Drive.
+4.  **Backend Security:**
+    *   Tokens are securely encrypted in Firestore using `AES-256-CBC` within Firebase Cloud Functions.
+    *   Added Cloud Functions to handle all Drive API requests (folder creation, file listing, Base64 multipart file uploads, token revocation).
