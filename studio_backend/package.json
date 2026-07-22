@@ -32,7 +32,13 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0"
+    "@prisma/client": "^5.22.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pino-http": "^11.0.0",
+    "swagger-ui-express": "^5.0.1",
+    "yaml": "^2.9.0"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

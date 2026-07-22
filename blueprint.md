@@ -74,3 +74,12 @@ This document outlines the development plan for a modern, responsive photo proof
 4.  **Backend Security:**
     *   Tokens are securely encrypted in Firestore using `AES-256-CBC` within Firebase Cloud Functions.
     *   Added Cloud Functions to handle all Drive API requests (folder creation, file listing, Base64 multipart file uploads, token revocation).
+
+#### Iteration 6: Axios API Client Handler
+
+1.  **Axios Client Wrapper:**
+    *   Created `src/services/apiClient.ts` using `axios`.
+    *   Configured base URL directly from `import.meta.env.VITE_API_URL`.
+    *   Exposed intuitive utility methods (`get`, `post`, `put`, `delete`).
+    *   Supports passing generic response types, custom headers, query params, request bodies, and full Axios configuration.
+
