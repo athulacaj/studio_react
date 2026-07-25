@@ -19,7 +19,6 @@ import {
     InsertDriveFile as FileIcon,
     Image as ImageIcon,
     CreateNewFolder as NewFolderIcon,
-    CloudUpload as UploadIcon,
     DriveFolderUpload as FolderUploadIcon,
     Refresh as RefreshIcon,
     NavigateNext as NavNextIcon,
@@ -31,8 +30,7 @@ import {
 import { useDriveIntegrationStore } from '../store/driveIntegrationStore';
 import type { DriveFileItem } from '../types';
 import CreateDriveFolderDialog from './CreateDriveFolderDialog';
-import DriveUploadDialog from './DriveUploadDialog';
-import DriveFolderUploadDialog from './DriveFolderUploadDialog';
+import ProjectFolderUpload from './ProjectFolderUpload';
 
 interface DriveFileBrowserProps {
     studioUserId: string;
@@ -61,7 +59,6 @@ const DriveFileBrowser: React.FC<DriveFileBrowserProps> = ({ studioUserId, proje
     } = useDriveIntegrationStore();
 
     const [createFolderOpen, setCreateFolderOpen] = useState(false);
-    const [uploadOpen, setUploadOpen] = useState(false);
     const [folderUploadOpen, setFolderUploadOpen] = useState(false);
     const [confirmUnlink, setConfirmUnlink] = useState(false);
     const [linkCopied, setLinkCopied] = useState(false);
@@ -274,16 +271,7 @@ const DriveFileBrowser: React.FC<DriveFileBrowserProps> = ({ studioUserId, proje
                             <NewFolderIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Upload Photos">
-                        <IconButton
-                            size="small"
-                            onClick={() => setUploadOpen(true)}
-                            sx={{ color: '#94A3B8', '&:hover': { color: '#C084FC' } }}
-                        >
-                            <UploadIcon fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Upload Folder">
+                    <Tooltip title="Upload from Folder">
                         <IconButton
                             size="small"
                             onClick={() => setFolderUploadOpen(true)}
@@ -410,20 +398,6 @@ const DriveFileBrowser: React.FC<DriveFileBrowserProps> = ({ studioUserId, proje
                             <Button
                                 size="small"
                                 variant="outlined"
-                                startIcon={<UploadIcon />}
-                                onClick={() => setUploadOpen(true)}
-                                sx={{
-                                    borderRadius: '12px',
-                                    borderColor: 'rgba(255,255,255,0.1)',
-                                    color: '#C084FC',
-                                    fontSize: '12px',
-                                }}
-                            >
-                                Upload Photos
-                            </Button>
-                            <Button
-                                size="small"
-                                variant="outlined"
                                 startIcon={<FolderUploadIcon />}
                                 onClick={() => setFolderUploadOpen(true)}
                                 sx={{
@@ -433,7 +407,7 @@ const DriveFileBrowser: React.FC<DriveFileBrowserProps> = ({ studioUserId, proje
                                     fontSize: '12px',
                                 }}
                             >
-                                Upload Folder
+                                Upload from Folder
                             </Button>
                         </Box>
                     </Box>
@@ -589,16 +563,12 @@ const DriveFileBrowser: React.FC<DriveFileBrowserProps> = ({ studioUserId, proje
                         connectionId={activeConnection.id}
                         parentFolderId={currentFolderId}
                     />
-                    <DriveUploadDialog
-                        open={uploadOpen}
-                        onClose={() => setUploadOpen(false)}
-                        connectionId={activeConnection.id}
-                        folderId={currentFolderId}
-                    />
-                    <DriveFolderUploadDialog
+                    <ProjectFolderUpload
                         open={folderUploadOpen}
                         onClose={() => setFolderUploadOpen(false)}
                         connectionId={activeConnection.id}
+                        studioUserId={activeConnection.studioUserId}
+                        projectId={projectId}
                         baseFolderId={currentFolderId}
                     />
                 </>

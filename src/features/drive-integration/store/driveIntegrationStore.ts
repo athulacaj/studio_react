@@ -14,8 +14,14 @@ import type {
     DriveFileItem,
     DriveIntegrationState,
     SyncedFileRecord,
+    UploadQueueItem,
+    FolderUploadProgress,
+    ScanProgress,
 } from '../types';
 import { fileRelPath, dirOfPath, guessMimeType } from '../utils';
+import { indexFolder, runUploadTask, refreshFolderSync } from '../services/uploadTaskManager';
+import { driveIndexedDBService } from '../services/driveIndexedDBService';
+import { updateProjectSyncFolder } from '../../studio-management/api/projectService';
 
 /** Convert a File to a base64 string (data part only). */
 const fileToBase64 = (file: File): Promise<string> => {
@@ -43,6 +49,12 @@ const initialState = {
     syncProgress: null as DriveIntegrationState['syncProgress'],
     syncedFiles: [] as SyncedFileRecord[],
     error: null as string | null,
+    // Folder-based upload state
+    indexedFiles: [] as UploadQueueItem[],
+    folderUploadProgress: null as FolderUploadProgress | null,
+    scanning: false,
+    scanProgress: null as ScanProgress | null,
+    selectedFolderName: null as string | null,
 };
 
 export const useDriveIntegrationStore = create<DriveIntegrationState>((set, get) => ({
@@ -267,5 +279,168 @@ export const useDriveIntegrationStore = create<DriveIntegrationState>((set, get)
 
     reset: () => {
         set(initialState);
+    },
+
+    // ── Folder-Based Upload Actions ──────────────────────────────────────
+
+    selectProjectFolder: async (studioUserId: string, projectId: string, _connectionId: string) => {
+        set({ scanning: true, error: null, indexedFiles: [], selectedFolderName: null, scanProgress: null });
+        try {
+            const { folderName, queueItems } = await indexFolder(projectId, {
+                onScanProgress: (found, currentDir) => {
+                    set({ scanProgress: { found, currentDir } });
+                },
+                onIndexProgress: (indexed, total) => {
+                    set({ scanProgress: { found: total, currentDir: `Saving… ${indexed}/${total}` } });
+                },
+            });
+            
+            // Persist the selected folder name to Firestore for resume capabilities across sessions
+            await updateProjectSyncFolder(studioUserId, projectId, folderName);
+
+            set({
+                scanning: false,
+                scanProgress: null,
+                selectedFolderName: folderName,
+                indexedFiles: queueItems,
+            });
+        } catch (err: any) {
+            console.error('Error selecting project folder:', err);
+            set({
+                scanning: false,
+                scanProgress: null,
+                error: err?.message || 'Failed to scan the folder.',
+            });
+        }
+    },
+
+    refreshProjectFolder: async (projectId: string) => {
+        set({ scanning: true, error: null, scanProgress: null });
+        try {
+            const { queueItems } = await refreshFolderSync(projectId, {
+                onScanProgress: (found, currentDir) => {
+                    set({ scanProgress: { found, currentDir } });
+                },
+                onIndexProgress: (indexed, total) => {
+                    set({ scanProgress: { found: total, currentDir: `Saving Delta… ${indexed}/${total}` } });
+                },
+            });
+            set({
+                scanning: false,
+                scanProgress: null,
+                indexedFiles: queueItems,
+            });
+        } catch (err: any) {
+            console.error('Error refreshing project folder:', err);
+            set({
+                scanning: false,
+                scanProgress: null,
+                error: err?.message || 'Failed to refresh the folder.',
+            });
+        }
+    },
+
+    startUploadTask: async (
+        projectId: string,
+        connectionId: string,
+        baseFolderId: string
+    ) => {
+        set({
+            syncing: true,
+            error: null,
+            folderUploadProgress: { total: 0, completed: 0, failed: 0, currentFile: '' },
+        });
+
+        try {
+            // We keep a reference to the live indexed entries from the store
+            // so the task manager can use their FileSystemFileHandles.
+            // Note: handles are NOT in queueItems — the task manager re-reads
+            // from the persisted directory handle internally.
+            const result = await runUploadTask(
+                projectId,
+                connectionId,
+                baseFolderId,
+                undefined, // resume from IDB handle
+                {
+                    onProgress: (progress) => {
+                        set({ folderUploadProgress: progress });
+                    },
+                    onFileComplete: (item) => {
+                        set((s) => {
+                            const updated = s.indexedFiles.map((f) =>
+                                f.id === item.id ? { ...f, status: item.status, url: item.url, error: item.error } : f
+                            );
+                            return { indexedFiles: updated };
+                        });
+                    },
+                }
+            );
+
+            set({ syncing: false });
+
+            // Refresh the Drive browser
+            const conn = get().activeConnection;
+            if (conn && baseFolderId) {
+                await get().listContents(conn.id, baseFolderId);
+            }
+
+            return result;
+        } catch (err: any) {
+            console.error('Error during upload task:', err);
+            set({ syncing: false, error: err?.message || 'Upload task failed.' });
+            throw err;
+        }
+    },
+
+    resumeUploadTask: async (
+        projectId: string,
+        connectionId: string,
+        baseFolderId: string
+    ) => {
+        set({
+            syncing: true,
+            error: null,
+            folderUploadProgress: { total: 0, completed: 0, failed: 0, currentFile: '' },
+        });
+
+        try {
+            // Load cached items from IndexedDB to show in the UI
+            const cached = await driveIndexedDBService.getAllFiles(projectId);
+            set({ indexedFiles: cached });
+
+            const result = await runUploadTask(
+                projectId,
+                connectionId,
+                baseFolderId,
+                undefined, // re-scan from persisted handle
+                {
+                    onProgress: (progress) => {
+                        set({ folderUploadProgress: progress });
+                    },
+                    onFileComplete: (item) => {
+                        set((s) => {
+                            const updated = s.indexedFiles.map((f) =>
+                                f.id === item.id ? { ...f, status: item.status, url: item.url, error: item.error } : f
+                            );
+                            return { indexedFiles: updated };
+                        });
+                    },
+                }
+            );
+
+            set({ syncing: false });
+
+            // Refresh the Drive browser
+            const conn = get().activeConnection;
+            if (conn && baseFolderId) {
+                await get().listContents(conn.id, baseFolderId);
+            }
+
+            return result;
+        } catch (err: any) {
+            console.error('Error resuming upload task:', err);
+            set({ syncing: false, error: err?.message || 'Resume upload failed.' });
+            throw err;
+        }
     },
 }));

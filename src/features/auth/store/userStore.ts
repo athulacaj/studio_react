@@ -22,14 +22,14 @@ const getCurrentUser = () => useAuthStore.getState().currentUser;
 
 export const useUserStore = create<UserState>((set, get) => ({
     userProfile: null,
-    loading: false,
+    loading: true,
     error: null,
     initialized: false,
 
     fetchUserProfile: async () => {
         const currentUser = getCurrentUser();
         if (!currentUser) {
-            set({ userProfile: null, initialized: true, loading: false });
+            set({ userProfile: null, initialized: true, loading: true });
             return;
         }
 
@@ -51,6 +51,7 @@ export const useUserStore = create<UserState>((set, get) => ({
                         updatedAt: data.updatedAt?.toDate?.() || undefined,
                     },
                     initialized: true,
+                    loading: false
                 });
             } else {
                 // Document doesn't exist yet — set profile with empty name
@@ -62,13 +63,14 @@ export const useUserStore = create<UserState>((set, get) => ({
                         photoURL: currentUser.photoURL || '',
                     },
                     initialized: true,
+                    loading: false
                 });
             }
         } catch (err: any) {
             console.error('Error fetching user profile:', err);
             set({ error: err.message, initialized: true });
         } finally {
-            set({ loading: false });
+            // set({ loading: false });
         }
     },
 

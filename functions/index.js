@@ -1073,3 +1073,26 @@ export const recordDriveUploads = onCall({ timeoutSeconds: 120 }, async (request
     throw new HttpsError("internal", "Failed to record Drive uploads");
   }
 });
+
+/**
+ * Return a short-lived Google Drive access token to the client.
+ * The client uses this token to upload files directly to Google Drive
+ * without passing the payload through the Firebase Function.
+ */
+export const getDriveAccessToken = onCall(async (request) => {
+  const { connectionId } = request.data;
+
+  if (!connectionId) {
+    throw new HttpsError("invalid-argument", "connectionId is required");
+  }
+
+  try {
+    const connDoc = await getActiveConnectionDoc(connectionId);
+    const accessToken = await getValidAccessToken(connDoc);
+    return { accessToken };
+  } catch (error) {
+    logger.error("Error in getDriveAccessToken:", error);
+    if (error instanceof HttpsError) throw error;
+    throw new HttpsError("internal", "Failed to retrieve access token");
+  }
+});

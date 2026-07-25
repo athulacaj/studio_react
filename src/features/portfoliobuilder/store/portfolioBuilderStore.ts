@@ -23,8 +23,10 @@ interface PortfolioBuilderState {
   addDetail: () => void;
   removeDetail: (index: number) => void;
   updateGalleryItem: (index: number, url: string) => void;
+  updateGalleryItemStyles: (index: number, styles: Record<string, string>) => void;
   addGalleryItem: () => void;
   removeGalleryItem: (index: number) => void;
+  updateComponentStyles: (componentKey: string, styles: Record<string, string>) => void;
   reset: () => void;
 }
 
@@ -96,7 +98,14 @@ export const usePortfolioBuilderStore = create<PortfolioBuilderState>((set, get)
   updateGalleryItem: (index, url) =>
     set((state) => {
       const gallery = [...state.formData.gallery];
-      gallery[index] = { url };
+      gallery[index] = { ...gallery[index], url };
+      return { formData: { ...state.formData, gallery } };
+    }),
+
+  updateGalleryItemStyles: (index, styles) =>
+    set((state) => {
+      const gallery = [...state.formData.gallery];
+      gallery[index] = { ...gallery[index], styles };
       return { formData: { ...state.formData, gallery } };
     }),
 
@@ -104,7 +113,7 @@ export const usePortfolioBuilderStore = create<PortfolioBuilderState>((set, get)
     set((state) => ({
       formData: {
         ...state.formData,
-        gallery: [...state.formData.gallery, { url: '' }],
+        gallery: [...state.formData.gallery, { url: '', styles: {} }],
       },
     })),
 
@@ -115,6 +124,18 @@ export const usePortfolioBuilderStore = create<PortfolioBuilderState>((set, get)
         gallery: state.formData.gallery.filter((_, i) => i !== index),
       },
     })),
+
+  updateComponentStyles: (componentKey, styles) =>
+    set((state) => {
+      const current = (state.formData as any)[componentKey];
+      if (!current) return state;
+      return {
+        formData: {
+          ...state.formData,
+          [componentKey]: { ...current, styles },
+        },
+      };
+    }),
 
   reset: () =>
     set({
@@ -127,3 +148,4 @@ export const usePortfolioBuilderStore = create<PortfolioBuilderState>((set, get)
       isExisting: false,
     }),
 }));
+

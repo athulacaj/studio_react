@@ -6,7 +6,7 @@ export class FileController {
 
   upsertFile = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { projectId } = req.params;
+      const projectId = req.params.projectId as string;
       const data = req.body;
       const result = await this.fileService.upsertFile(projectId, data);
       res.status(200).json(result);
@@ -17,7 +17,7 @@ export class FileController {
 
   bulkUpsertFiles = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { projectId } = req.params;
+      const projectId = req.params.projectId as string;
       const data = req.body;
       await this.fileService.bulkUpsertFiles(projectId, data);
       res.status(200).json({ success: true });
@@ -28,7 +28,7 @@ export class FileController {
 
   getFiles = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { projectId } = req.params;
+      const projectId = req.params.projectId as string;
       const { updatedSince } = req.query as { updatedSince?: string };
       const result = await this.fileService.getFiles(projectId, updatedSince);
       res.status(200).json(result);

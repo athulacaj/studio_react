@@ -84,6 +84,12 @@ components:
         deleted:
           type: boolean
           default: false
+        status:
+          type: string
+          default: NOT_UPLOADED
+        url:
+          type: string
+          nullable: true
     BulkUpsertFiles:
       type: object
       required:

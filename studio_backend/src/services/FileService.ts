@@ -16,6 +16,8 @@ export class FileService {
       relativePath: data.relativePath,
       updatedAt: new Date(data.updatedAt),
       deleted: data.deleted,
+      status: data.status,
+      url: data.url ?? null,
     };
 
     return this.fileRepository.upsert(input);
@@ -29,6 +31,8 @@ export class FileService {
       relativePath: file.relativePath,
       updatedAt: new Date(file.updatedAt),
       deleted: file.deleted,
+      status: file.status,
+      url: file.url ?? null,
     }));
 
     return this.fileRepository.bulkUpsert(inputs);

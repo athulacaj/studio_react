@@ -20,6 +20,8 @@ describe('FileRepository', () => {
         relativePath: 'test/path',
         updatedAt: new Date(),
         deleted: false,
+        status: 'UPLOADED',
+        url: 'https://example.com/file.txt',
       };
 
       await repository.upsert(input);
@@ -36,6 +38,8 @@ describe('FileRepository', () => {
           relativePath: input.relativePath,
           updatedAt: input.updatedAt,
           deleted: input.deleted,
+          status: input.status,
+          url: input.url,
         },
         create: input,
       });

@@ -1,4 +1,4 @@
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { db } from '../../../config/firebase';
 import { Project, SharedLink, DriveNode } from '../types';
@@ -21,6 +21,23 @@ export const getProject = async (userId: string, projectId: string): Promise<Pro
         return projectSnap.data() as Project;
     } catch (error) {
         console.error("Error fetching project:", error);
+        throw error;
+    }
+};
+
+/**
+ * Updates the project document with the currently selected local sync folder name.
+ */
+export const updateProjectSyncFolder = async (
+    userId: string,
+    projectId: string,
+    folderName: string | null
+): Promise<void> => {
+    try {
+        const projectRef = doc(db, 'projects', userId, 'projects', projectId);
+        await updateDoc(projectRef, { localSyncFolderName: folderName });
+    } catch (error) {
+        console.error("Error updating project sync folder:", error);
         throw error;
     }
 };

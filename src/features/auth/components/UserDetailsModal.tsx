@@ -75,6 +75,8 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
 
     const canDismiss = !forcedMode || (userProfile?.name && userProfile.name.trim() !== '');
 
+    if (loading) return <div> loading... check internet connection</div>;
+
     return (
         <Dialog
             open={isOpen}

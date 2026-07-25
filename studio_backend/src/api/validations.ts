@@ -5,6 +5,8 @@ export const upsertFileSchema = z.object({
   relativePath: z.string(),
   updatedAt: z.string().datetime(),
   deleted: z.boolean().default(false),
+  status: z.string().optional().default('NOT_UPLOADED'),
+  url: z.string().optional().nullable(),
 });
 
 export const bulkUpsertFilesSchema = z.object({

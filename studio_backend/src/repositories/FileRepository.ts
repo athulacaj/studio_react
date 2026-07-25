@@ -21,6 +21,8 @@ export class FileRepository {
         relativePath: data.relativePath,
         updatedAt: data.updatedAt,
         deleted: data.deleted,
+        status: data.status,
+        url: data.url,
         // modifiedAt is automatically updated by Prisma @updatedAt
       },
       create: data,
@@ -43,6 +45,8 @@ export class FileRepository {
           relativePath: file.relativePath,
           updatedAt: file.updatedAt,
           deleted: file.deleted,
+          status: file.status,
+          url: file.url,
         },
         create: file,
       })

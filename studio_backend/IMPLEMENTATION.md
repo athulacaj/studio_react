@@ -33,6 +33,8 @@ We use SQLite via Prisma.
 | `relativePath` | String | | The path excluding the filename. |
 | `updatedAt` | DateTime | Indexed | Client-provided timestamp of when the file was last updated. |
 | `deleted` | Boolean | Indexed, Default: false | Soft deletion flag. |
+| `status` | String | Default: `"NOT_UPLOADED"` | Upload status (e.g. `UPLOADED` / `NOT_UPLOADED`). |
+| `url` | String | Nullable | Public/access URL for the file once uploaded. |
 | `createdAt` | DateTime | Default: `now()` | Database insertion time. |
 | `modifiedAt` | DateTime | `@updatedAt` | Database auto-updated timestamp on any row modification. |
 
@@ -54,7 +56,9 @@ Inserts a new file or updates an existing file if `(projectId, id)` already exis
       "name": "photo.jpg",
       "relativePath": "Vacation/Beach",
       "updatedAt": "2026-07-22T08:45:00Z",
-      "deleted": false
+      "deleted": false,
+      "status": "UPLOADED",
+      "url": "https://storage.example.com/photo.jpg"
   }
   ```
 - **Process**: Generated `id` becomes `Vacation/Beach/photo.jpg`. The service checks the DB, updating the record natively via Prisma's `upsert` mechanism.
@@ -93,6 +97,15 @@ Retrieves files for a project. Supports delta sync.
 ## Performance Optimization
 - **N+1 Avoided**: Uses native array aggregations and transactions instead of looping standalone SQL queries.
 - **Database Indexes**: Created indexes on `projectId`, `(projectId, updatedAt)`, and `(projectId, deleted)` to ensure fast lookups on filtered sync requests.
+
+## Folder-Based Upload Architecture (50k Scale)
+To support syncing large project folders (up to ~50,000 images) directly to Google Drive without overwhelming the browser or backend, the system implements a robust client-side indexing flow:
+
+1. **Native Folder Access**: The client uses the Chrome File System Access API (`showDirectoryPicker`) to recursively scan local directories. 
+2. **Memory-Efficient Scanning**: The scanner avoids deep recursive array spreads (`[...spread]`), instead mutating a single flat array to prevent memory allocation crashes.
+3. **Chunked API Upserts**: The client chunks the metadata into batches of `500` records before calling `POST /projects/:projectId/files/bulk`. This prevents Express/body-parser payload size errors and avoids keeping Prisma SQLite transactions open for too long.
+4. **Chunked IndexedDB Caching**: Local UI caching (IndexedDB) is sliced into transactions of `1000` records to prevent freezing the browser's main UI thread.
+5. **Sequential Uploads**: Actual file contents are read from disk lazily via `FileSystemFileHandle` and uploaded to Drive sequentially, with status updates hitting the backend incrementally.
 
 ## Containerization
 The project includes a multi-stage `Dockerfile` to optimize the final image size, running the compiled JavaScript in a lightweight Node.js Alpine container. A `docker-compose.yml` is configured to spin up the API on port `3000`.

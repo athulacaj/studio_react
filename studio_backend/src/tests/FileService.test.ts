@@ -21,6 +21,8 @@ describe('FileService', () => {
         relativePath: 'docs',
         updatedAt: '2026-07-22T08:45:00Z',
         deleted: false,
+        status: 'UPLOADED',
+        url: 'https://example.com/test.txt',
       };
 
       await fileService.upsertFile(projectId, input);
@@ -32,6 +34,8 @@ describe('FileService', () => {
         relativePath: input.relativePath,
         updatedAt: new Date(input.updatedAt),
         deleted: input.deleted,
+        status: input.status,
+        url: input.url,
       });
     });
   });
@@ -46,12 +50,16 @@ describe('FileService', () => {
             relativePath: 'docs',
             updatedAt: '2026-07-22T08:45:00Z',
             deleted: false,
+            status: 'UPLOADED',
+            url: 'https://example.com/test1.txt',
           },
           {
             name: 'test2.txt',
             relativePath: 'docs/sub',
             updatedAt: '2026-07-22T08:45:00Z',
             deleted: true,
+            status: 'NOT_UPLOADED',
+            url: null,
           },
         ],
       };
@@ -66,6 +74,8 @@ describe('FileService', () => {
           relativePath: file.relativePath,
           updatedAt: new Date(file.updatedAt),
           deleted: file.deleted,
+          status: file.status,
+          url: file.url ?? null,
         }))
       );
     });

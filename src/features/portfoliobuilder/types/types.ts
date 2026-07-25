@@ -12,10 +12,12 @@ export interface EventDetail {
 
 export interface GalleryItem {
   url: string;
+  styles?: Record<string, string>;
 }
 
 export interface HeroImage {
   url: string;
+  styles?: Record<string, string>;
 }
 
 export interface TextWithStyle {
@@ -23,6 +25,7 @@ export interface TextWithStyle {
   style?: {
     color?: string;
   };
+  styles?: Record<string, string>;
 }
 
 export interface WeddingFormData {
@@ -57,12 +60,22 @@ export const TEMPLATES = [
   { id: 'template3', name: 'Garden Romance', description: 'A botanical-inspired warm theme with blush tones' },
 ] as const;
 
+/**
+ * Default CSS styles per component key.
+ * These are shown by default in the styles editor and merged with user overrides.
+ * For heroImage, background-position is mandatory.
+ */
+export const DEFAULT_COMPONENT_STYLES: Record<string, Record<string, string>> = {
+  heroImage: { 'background-position': '50% 50%' },
+};
+
 export const DEFAULT_WEDDING_DATA: WeddingFormData = {
   nav_logo: { value: 'A & C', style: { color: '#0f1a2e' } },
   name1: { value: 'Alan', style: { color: '#0f1a2e' } },
   name2: { value: 'Celeste', style: { color: '#0f1a2e' } },
   heroImage: {
     url: 'https://lh3.googleusercontent.com/d/1kOiThRa1Ebfnb0d-0SESU0DhT2ZA9Woj=w1920?authuser=0',
+    styles: { 'background-position': '50% 50%' },
   },
   mainDate: { value: 'Saturday, June 21, 2025', style: { color: '#0f1a2e' } },
   story: { value: '' },

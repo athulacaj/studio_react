@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Box,
   Typography,
@@ -15,6 +15,10 @@ import {
   Alert,
   Snackbar,
   Paper,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Tooltip,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -31,9 +35,11 @@ import {
   Link as LinkIcon,
   OpenInNew as OpenInNewIcon,
   Clear as ClearIcon,
+  Style as StyleIcon,
+  ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import { usePortfolioBuilderStore } from '../store/portfolioBuilderStore';
-import { TEMPLATES, DEFAULT_WEDDING_DATA } from '../types/types';
+import { TEMPLATES, DEFAULT_WEDDING_DATA, DEFAULT_COMPONENT_STYLES } from '../types/types';
 import { savePortfolio, publishPortfolio, getPortfolioByProjectId } from '../services/portfolioService';
 import { auth } from '../../../config/firebase';
 import { useParams } from 'react-router-dom';
@@ -62,6 +68,165 @@ const PriviewUrl = ({ user, eventPath }: { user: any, eventPath: string }) => {
     </Box>
   )
 }
+
+/**
+ * Reusable Styles Editor – displays CSS key-value pairs with add/edit/delete.
+ * `defaultStyles` are mandatory defaults that reset to if cleared.
+ */
+interface StylesEditorProps {
+  styles: Record<string, string>;
+  defaultStyles?: Record<string, string>;
+  onChange: (styles: Record<string, string>) => void;
+  label?: string;
+}
+
+const StylesEditor: React.FC<StylesEditorProps> = ({ styles, defaultStyles = {}, onChange, label = 'Custom Styles' }) => {
+  const [newProp, setNewProp] = useState('');
+  const [newValue, setNewValue] = useState('');
+
+  // Merge defaults with current styles (defaults act as fallback)
+  const mergedStyles = { ...defaultStyles, ...styles };
+
+  const handleAdd = () => {
+    const prop = newProp.trim();
+    const val = newValue.trim();
+    if (!prop || !val) return;
+    onChange({ ...mergedStyles, [prop]: val });
+    setNewProp('');
+    setNewValue('');
+  };
+
+  const handleRemove = (prop: string) => {
+    const updated = { ...mergedStyles };
+    delete updated[prop];
+    // If it's a default style, reset to default value instead of removing
+    if (defaultStyles[prop]) {
+      updated[prop] = defaultStyles[prop];
+    }
+    onChange(updated);
+  };
+
+  const handleValueChange = (prop: string, value: string) => {
+    onChange({ ...mergedStyles, [prop]: value });
+  };
+
+  const isDefault = (prop: string) => !!defaultStyles[prop];
+
+  return (
+    <Accordion
+      disableGutters
+      elevation={0}
+      sx={{
+        bgcolor: 'transparent',
+        '&:before': { display: 'none' },
+        border: '1px solid rgba(255,255,255,0.06)',
+        borderRadius: '8px !important',
+        mt: 1.5,
+      }}
+    >
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+        sx={{
+          minHeight: 36,
+          px: 1.5,
+          '& .MuiAccordionSummary-content': { my: 0.5 },
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+          <StyleIcon sx={{ fontSize: 16, color: 'primary.light' }} />
+          <Typography variant="caption" fontWeight={600} color="text.secondary">
+            {label}
+          </Typography>
+          {Object.keys(mergedStyles).length > 0 && (
+            <Chip
+              label={Object.keys(mergedStyles).length}
+              size="small"
+              color="primary"
+              sx={{ height: 18, fontSize: '0.6rem', ml: 0.5 }}
+            />
+          )}
+        </Box>
+      </AccordionSummary>
+      <AccordionDetails sx={{ px: 1.5, pb: 1.5, pt: 0 }}>
+        {/* Existing styles */}
+        {Object.entries(mergedStyles).map(([prop, value]) => (
+          <Box key={prop} sx={{ display: 'flex', gap: 0.75, mb: 1, alignItems: 'center' }}>
+            <Tooltip title={isDefault(prop) ? 'Default style (required)' : 'Custom style'} arrow placement="top">
+              <TextField
+                size="small"
+                value={prop}
+                disabled
+                sx={{
+                  flex: 1,
+                  '& .MuiInputBase-input': { fontSize: '0.75rem', py: 0.75 },
+                  '& .Mui-disabled': {
+                    color: isDefault(prop) ? 'primary.light' : 'text.secondary',
+                    WebkitTextFillColor: isDefault(prop) ? 'inherit' : undefined,
+                  },
+                }}
+              />
+            </Tooltip>
+            <TextField
+              size="small"
+              value={value}
+              onChange={(e) => handleValueChange(prop, e.target.value)}
+              placeholder="value"
+              sx={{
+                flex: 1,
+                '& .MuiInputBase-input': { fontSize: '0.75rem', py: 0.75 },
+              }}
+            />
+            <IconButton
+              size="small"
+              onClick={() => handleRemove(prop)}
+              disabled={isDefault(prop)}
+              sx={{ p: 0.5 }}
+              title={isDefault(prop) ? 'Cannot remove default style' : 'Remove style'}
+            >
+              <DeleteIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          </Box>
+        ))}
+
+        {/* Add new style */}
+        <Box sx={{ display: 'flex', gap: 0.75, alignItems: 'center', mt: 0.5 }}>
+          <TextField
+            size="small"
+            value={newProp}
+            onChange={(e) => setNewProp(e.target.value)}
+            placeholder="CSS property"
+            sx={{
+              flex: 1,
+              '& .MuiInputBase-input': { fontSize: '0.75rem', py: 0.75 },
+            }}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleAdd(); }}
+          />
+          <TextField
+            size="small"
+            value={newValue}
+            onChange={(e) => setNewValue(e.target.value)}
+            placeholder="value"
+            sx={{
+              flex: 1,
+              '& .MuiInputBase-input': { fontSize: '0.75rem', py: 0.75 },
+            }}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleAdd(); }}
+          />
+          <IconButton
+            size="small"
+            onClick={handleAdd}
+            color="primary"
+            disabled={!newProp.trim() || !newValue.trim()}
+            sx={{ p: 0.5 }}
+            title="Add style"
+          >
+            <AddIcon sx={{ fontSize: 16 }} />
+          </IconButton>
+        </Box>
+      </AccordionDetails>
+    </Accordion>
+  );
+};
 
 const EventPortfolioBuilder: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -92,8 +257,10 @@ const EventPortfolioBuilder: React.FC = () => {
     addDetail,
     removeDetail,
     updateGalleryItem,
+    updateGalleryItemStyles,
     addGalleryItem,
     removeGalleryItem,
+    updateComponentStyles,
   } = usePortfolioBuilderStore();
 
   // Fetch existing portfolio on mount
@@ -499,7 +666,7 @@ const EventPortfolioBuilder: React.FC = () => {
             size="small"
             label="Image URL"
             value={formData.heroImage.url}
-            onChange={(e) => setFormData({ heroImage: { url: e.target.value } })}
+            onChange={(e) => setFormData({ heroImage: { ...formData.heroImage, url: e.target.value } })}
           />
           {formData.heroImage.url && (
             <Box
@@ -519,6 +686,12 @@ const EventPortfolioBuilder: React.FC = () => {
               />
             </Box>
           )}
+          <StylesEditor
+            styles={formData.heroImage.styles || {}}
+            defaultStyles={DEFAULT_COMPONENT_STYLES.heroImage}
+            onChange={(styles) => updateComponentStyles('heroImage', styles)}
+            label="Hero Image Styles"
+          />
         </Box>
 
         {/* Story */}
@@ -715,50 +888,64 @@ const EventPortfolioBuilder: React.FC = () => {
           </Box>
 
           {formData.gallery.map((item, idx) => (
-            <Box
+            <Paper
               key={idx}
               sx={{
-                display: 'flex',
-                gap: 1,
+                p: 1.5,
                 mb: 1.5,
-                alignItems: 'center',
+                bgcolor: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: 2,
               }}
             >
-              {item.url && (
-                <Box
-                  sx={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 1.5,
-                    overflow: 'hidden',
-                    flexShrink: 0,
-                    border: '1px solid rgba(255,255,255,0.08)',
-                  }}
-                >
-                  <img
-                    src={item.url}
-                    alt={`Gallery ${idx + 1}`}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                  />
-                </Box>
-              )}
-              <TextField
-                fullWidth
-                size="small"
-                label={`Image ${idx + 1} URL`}
-                value={item.url}
-                onChange={(e) => updateGalleryItem(idx, e.target.value)}
-              />
-              <IconButton
-                size="small"
-                onClick={() => removeGalleryItem(idx)}
-                color="error"
-                disabled={formData.gallery.length <= 1}
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 1,
+                  alignItems: 'center',
+                }}
               >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Box>
+                {item.url && (
+                  <Box
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 1.5,
+                      overflow: 'hidden',
+                      flexShrink: 0,
+                      border: '1px solid rgba(255,255,255,0.08)',
+                    }}
+                  >
+                    <img
+                      src={item.url}
+                      alt={`Gallery ${idx + 1}`}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
+                  </Box>
+                )}
+                <TextField
+                  fullWidth
+                  size="small"
+                  label={`Image ${idx + 1} URL`}
+                  value={item.url}
+                  onChange={(e) => updateGalleryItem(idx, e.target.value)}
+                />
+                <IconButton
+                  size="small"
+                  onClick={() => removeGalleryItem(idx)}
+                  color="error"
+                  disabled={formData.gallery.length <= 1}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Box>
+              <StylesEditor
+                styles={item.styles || {}}
+                onChange={(styles) => updateGalleryItemStyles(idx, styles)}
+                label={`Image ${idx + 1} Styles`}
+              />
+            </Paper>
           ))}
         </Box>
 

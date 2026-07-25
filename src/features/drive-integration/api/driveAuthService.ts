@@ -1,5 +1,6 @@
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
-import { db } from '../../../config/firebase';
+import { httpsCallable } from 'firebase/functions';
+import { db, functions } from '../../../config/firebase';
 import type { DriveConnection } from '../types';
 
 /**
@@ -26,6 +27,18 @@ export const fetchDriveConnection = async (
         console.error('Error fetching Drive connection:', error);
         throw error;
     }
+};
+
+/**
+ * Get a short-lived Google Drive access token for the client to use.
+ */
+export const getDriveAccessToken = async (connectionId: string): Promise<string> => {
+    const getAccessTokenFn = httpsCallable<{ connectionId: string }, { accessToken: string }>(
+        functions,
+        'getDriveAccessToken'
+    );
+    const result = await getAccessTokenFn({ connectionId });
+    return result.data.accessToken;
 };
 
 /**
