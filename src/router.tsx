@@ -5,7 +5,7 @@ import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import VividView from './pages/VividView';
 import { LoginPage, SignupPage, ProtectedRoute } from './features/auth';
-import { StudioDashboard, ProjectDetailView, PublicProjectView, SuperAdminDashboard, AdminUserView, AdminProjectDetailWrapper, ManagePortfolioView } from './features/studio-management';
+import { StudioDashboard, ProjectDetailView, PublicProjectView, SuperAdminDashboard, AdminUserView, AdminProjectDetailWrapper, ManageStudioPortfolioView } from './features/studio-management';
 import Footer from './core/components/Footer';
 import GlobalNavbar from './core/components/GlobalNavbar';
 import EventPageViewer from './features/events-portfoliobuilder/pages/EventPageViewer';
@@ -32,7 +32,7 @@ const AppRouter = () => {
             <Route path="admin/user/:userId" element={<AdminUserView />} />
             <Route path="admin/user/:userId/studio/:projectId" element={<AdminProjectDetailWrapper />} />
             <Route path="portfolio/builder/:projectId" element={<EventPortfolioBuilder />} />
-            <Route path="studio/portfolio/manage" element={<ManagePortfolioView />} />
+            <Route path="studio/portfolio/manage" element={<ManageStudioPortfolioView />} />
           </Route>
 
 

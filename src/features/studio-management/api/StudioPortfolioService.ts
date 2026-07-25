@@ -1,4 +1,5 @@
 import { StudioApiClient } from "../../../services/ApiInitalizer";
+import axios from "axios";
 
 export interface FileUploadDetail {
     fileName: string;
@@ -10,13 +11,10 @@ export interface UploadUrlsRequest {
     files: FileUploadDetail[];
 }
 
-export interface UploadUrlsResponse {
-    urls: {
-        fileName: string;
-        uploadUrl: string;
-        fileKey: string;
-    }[];
-}
+export type UploadUrlsResponse = {
+    key: string;
+    uploadUrl: string;
+}[];
 
 /**
  * Gets presigned URLs for uploading files to R2.
@@ -38,19 +36,19 @@ export interface UploadFileInfo {
 /**
  * Uploads a file directly to Cloudflare R2 using a presigned URL.
  */
-export const uploadFileToR2 = async (info: UploadFileInfo, file: File): Promise<void> => {
+export const uploadFileToR2 = async (info: UploadFileInfo, file: File, onProgress?: (progress: number) => void): Promise<void> => {
     try {
-        const response = await fetch(info.uploadUrl, {
-            method: 'PUT',
-            body: file,
+        await axios.put(info.uploadUrl, file, {
             headers: {
                 'Content-Type': file.type,
             },
+            onUploadProgress: (progressEvent) => {
+                if (progressEvent.total && onProgress) {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    onProgress(percentCompleted);
+                }
+            }
         });
-
-        if (!response.ok) {
-            throw new Error(`Failed to upload file to R2: ${response.statusText}`);
-        }
     } catch (error) {
         console.error("Error uploading file to R2:", error);
         throw error;
