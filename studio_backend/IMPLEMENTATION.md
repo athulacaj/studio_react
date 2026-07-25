@@ -114,3 +114,17 @@ The project includes a multi-stage `Dockerfile` to optimize the final image size
 Unit tests are written using **Jest** (`src/tests`).
 - Repositories are tested with mocked Prisma calls (`jest-mock-extended`).
 - Services are tested by passing mocked instances of repositories via Dependency Injection, ensuring isolated logic testing.
+
+
+#architecture example
+
+Controller
+      │
+      ▼
+CloudflareService
+      │
+      ▼
+CloudflareRepository
+      │
+      ▼
+Cloudflare R2

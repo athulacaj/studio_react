@@ -9,6 +9,7 @@ const startServer = async () => {
     logger.info('Connected to database');
 
     const server = app.listen(config.PORT, () => {
+      logger.info(`Docs available at: http://localhost:${config.PORT}/docs`);
       logger.info(`Server is running on port ${config.PORT} in ${config.NODE_ENV} mode`);
     });
 

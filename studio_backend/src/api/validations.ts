@@ -17,6 +17,13 @@ export const getFilesQuerySchema = z.object({
   updatedSince: z.string().datetime().optional(),
 });
 
+export const getUploadUrlSchema = z.object({
+  folder: z.string().min(1, 'Folder is required'),
+  fileName: z.string().min(1, 'FileName is required'),
+  contentType: z.string().optional(),
+});
+
 export type UpsertFileDTO = z.infer<typeof upsertFileSchema>;
 export type BulkUpsertFilesDTO = z.infer<typeof bulkUpsertFilesSchema>;
 export type GetFilesQueryDTO = z.infer<typeof getFilesQuerySchema>;
+export type GetUploadUrlDTO = z.infer<typeof getUploadUrlSchema>;

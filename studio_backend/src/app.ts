@@ -2,12 +2,11 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import pinoHttp from 'pino-http';
 import swaggerUi from 'swagger-ui-express';
-import yaml from 'yaml';
-import fs from 'fs';
-import path from 'path';
+import swaggerJsdoc from 'swagger-jsdoc';
 import { logger } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import routes from './routes';
+import { config } from './config/env';
 
 const app = express();
 
@@ -16,11 +15,35 @@ app.use(express.json({ limit: '50mb' }));
 app.use(pinoHttp({ logger }));
 
 // Swagger setup
-const swaggerFile = fs.readFileSync(path.join(__dirname, 'api', 'swagger.yaml'), 'utf8');
-const swaggerDocument = yaml.parse(swaggerFile);
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Studio Backend API',
+      version: '1.0.0',
+      description: 'API for managing project files metadata',
+    },
+    servers: [
+      {
+        url: `http://localhost:${config.PORT}`,
+      },
+    ],
+  },
+  apis: ['./src/routes/*.ts', './src/app.ts'], 
+};
 
-// Health check
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'ok' });
 });
