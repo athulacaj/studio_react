@@ -30,7 +30,7 @@ interface PortfolioBuilderState {
   reset: () => void;
 }
 
-export const usePortfolioBuilderStore = create<PortfolioBuilderState>((set, get) => ({
+export const usePortfolioBuilderStore = create<PortfolioBuilderState>((set) => ({
   formData: { ...DEFAULT_WEDDING_DATA },
   selectedTemplate: 'template1',
   eventPath: '',

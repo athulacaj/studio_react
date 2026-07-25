@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vividframes | Wedding Company</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        ::selection {
+            background-color: rgba(6, 182, 212, 0.3);
+            /* cyan-500/30 */
+            color: #cffafe;
+            /* cyan-100 */
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #22d3ee;
+            /* cyan-400 */
+        }
+
+        /* Intersection Observer Animation Classes */
+        .reveal {
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.fade-up {
+            transform: translateY(50px);
+        }
+
+        .reveal.fade-down {
+            transform: translateY(-50px);
+        }
+
+        .reveal.fade-left {
+            transform: translateX(50px);
+        }
+
+        .reveal.fade-right {
+            transform: translateX(-50px);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translate(0, 0);
+        }
+
+        /* Delays for staggered animations */
+        .delay-100 {
+            transition-delay: 100ms;
+        }
+
+        .delay-200 {
+            transition-delay: 200ms;
+        }
+
+        .delay-300 {
+            transition-delay: 300ms;
+        }
+
+        .delay-400 {
+            transition-delay: 400ms;
+        }
+
+        .delay-500 {
+            transition-delay: 500ms;
+        }
+
+        /* Testimonial slider transitions */
+        .testimonial-slide {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .testimonial-slide.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            position: relative;
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-cyan-500/30 selection:text-cyan-100">
+
+    <div id="app">
+        <!-- Navigation Container -->
+        <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-transparent py-6"></nav>
+
+        <!-- Mobile Menu Overlay Container -->
+        <div id="mobile-menu"
+            class="fixed inset-0 z-40 bg-black/95 backdrop-blur-xl flex-col items-center justify-center h-screen w-full transition-all duration-500 opacity-0 pointer-events-none flex"
+            style="transform: translateY(-10px);">
+        </div>
+
+        <main>
+            <!-- Sections will be injected here via JavaScript -->
+            <section id="hero-section"
+                class="relative h-screen flex items-center justify-center overflow-hidden bg-black"></section>
+
+            <section id="about-section" class="py-24 bg-black relative overflow-hidden"></section>
+
+            <section id="services-section" class="py-24 bg-[#0a0a0a] relative"></section>
+
+            <section id="portfolio-section" class="py-24 bg-black"></section>
+
+            <section id="testimonials-section" class="py-24 bg-[#0a0a0a] relative overflow-hidden"></section>
+        </main>
+
+        <footer id="footer-section" class="bg-black pt-24 pb-12 border-t border-white/5 relative"></footer>
+    </div>
+
+    <script>
+        // Data Configuration (Matching the React version)
+        let portfolioData = {
+            brand: {
+                name: "vividframes",
+                subtitle: "WEDDING COMPANY",
+                logoSrc: "images/logo.png",
+                theme: {
+                    primaryGradient: "from-cyan-400 to-green-400",
+                    textGradient: "text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-green-400",
+                    accentBorder: "border-red-600"
+                }
+            },
+            hero: {
+                title: "Capturing Your Eternal Moments",
+                description: "We craft cinematic wedding stories with a touch of magic, preserving your most cherished memories for a lifetime.",
+                ctaText: "Explore Our Work",
+                bgImage: "https://i.wfolio.com/x/cXPZPmu9lCw5tkRNat7JtyHjrPiZiclN/VJgIrluFLtZWGwzaT5FJ07DuSK__bTQA/Yv2tERyzp6MTRnPc5Usn3XTbt_NHPbvB/vXbHFqaDbDz9sMW8XGC7sC8K-_dhp-2O/cJMSzGdZlX3iS3lRooAriw.jpg"
+            },
+            about: {
+                title: "The Art of Storytelling",
+                content: "At Vividframes, we believe every love story is unique. Our passion lies in capturing the authentic emotions, the fleeting glances, and the joyous celebrations that make your wedding day truly yours. With a blend of cinematic videography and evocative photography, we create timeless heirlooms you'll treasure forever.",
+                stats: [
+                    { label: "Weddings", value: "500+" },
+                    { label: "Awards", value: "15" },
+                    { label: "Years Exp", value: "10+" }
+                ],
+                image: "https://i.wfolio.com/x/cXPZPmu9lCw5tkRNat7JtyHjrPiZiclN/VJgIrluFLtZWGwzaT5FJ07DuSK__bTQA/D3h8WYREhnFmtfhrGWGQE6L8lr45UFOc/rVnjVf20SD_5ZE4-y3sHGb9Pg6Mz8DqN/m9ekmOpoW4eD-nnd6HWmxA.jpg"
+            },
+            services: [
+                {
+                    id: "photography",
+                    title: "Wedding Photography",
+                    description: "Candid, emotional, and stunning still imagery capturing the essence of your day.",
+                    icon: "camera",
+                    image: "https://i.wfolio.com/x/cXPZPmu9lCw5tkRNat7JtyHjrPiZiclN/VJgIrluFLtZWGwzaT5FJ07DuSK__bTQA/5--Vp500N9sYn1Jm9nkHNSiG1Cp5pZ3p/NhIV3xXRywpq6wuHFAw1HhAUXQdnC6K3/eEsKPX_0saupVfhdaRCmxA.jpg"
+                },
+                {
+                    id: "videography",
+                    title: "Cinematic Films",
+                    description: "Breathtaking wedding films edited with a narrative focus to tell your love story.",
+                    icon: "video",
+                    image: "https://i.wfolio.com/x/9-LqBwQodHl93umLe1sQ3NDwKm3Z7tSS/jEXx3H5Lea0893N-VvdS86WGGmcmGL7a/yNYRKuFos-fwq-7AQLu3pSwOGvJJ-Guw/fpQ7ECB6AT7QRO9Bk_BBiH40Nn0vTxBH/LjyP84wFznNT6Ff20OIUXcUU-ceAPNtD/6YY8ZlWPJaY.jpg"
+                },
+                {
+                    id: "prewedding",
+                    title: "Pre-Wedding Shoots",
+                    description: "Creative and intimate sessions to celebrate your engagement before the big day.",
+                    icon: "star",
+                    image: "https://i.wfolio.com/x/cXPZPmu9lCw5tkRNat7JtyHjrPiZiclN/VJgIrluFLtZWGwzaT5FJ07DuSK__bTQA/MYEz22wdRdfdiOfg-_PGyCdBbasSpbPU/wg_IkAebdz56Mn4I0hjTnMm1DqAgyzhU/LJEzUlasI9kQXT4WcDYnLw.jpg"
+                }
+            ],
+            gallery: [
+                { id: 1, title: "Golden Hour Vows", category: "Photography", src: "https://i.wfolio.com/x/cXPZPmu9lCw5tkRNat7JtyHjrPiZiclN/VJgIrluFLtZWGwzaT5FJ07DuSK__bTQA/BMiC_WvgJNVLL3yuR2t7AzqZm62vmNA9/gedrQOXlo--LEO5aU3WZ79nOFRdLd6Ff/SfuJ57Yz286XL_1HqIUcRg.jpg", span: "md:col-span-2 md:row-span-2" },
+                { id: 2, title: "The First Dance", category: "Videography", src: "https://i.wfolio.com/x/OHwDIKNLLWfUtKnQxIukknkvB5gHz_Jb/8QdFZZ547cUv9ZIViz6DRGHvF7ZKHACb/Kc5zCh1SJ5587Y-92fvcU3qB28Xpx11k/nuxS7akAVoG1C5HRSLlukMyaxNwL8aKJ/6hszH_Eu2HCdmoCmsI62LkTnXCgQUcFr/-ghzLMk2e7OAQdjsu3Z5UCSNdytBcVgq.jpg", span: "col-span-1" },
+                { id: 3, title: "Bridal Details", category: "Photography", src: "https://i.wfolio.com/x/cXPZPmu9lCw5tkRNat7JtyHjrPiZiclN/VJgIrluFLtZWGwzaT5FJ07DuSK__bTQA/K4Nxn9aj6Q5mJXXvg4qPtdFMmy3UZqJF/gCfuFWHC16TgddTAj_rre0N6yzHd8BD1/J0dklN6bc6dvlvTwrVsxrQ.jpg", span: "col-span-1" },
+                { id: 4, title: "Sunset Romance", category: "Pre-Wedding", src: "https://i.wfolio.com/x/cXPZPmu9lCw5tkRNat7JtyHjrPiZiclN/VJgIrluFLtZWGwzaT5FJ07DuSK__bTQA/2ShlSyJqI2f4Vv68p6AFetAmqbFe8Fyl/ERM6ranbRcK2rMDCqn42AKQJQiXfT4cp/LYzfA8KBWSlvmuSj8KQoZQ.jpg", span: "col-span-1" },
+                { id: 5, title: "Joyful Celebration", category: "Photography", src: "https://i.wfolio.com/x/SgQC0REpsytNVjBMMkBL4-kM4ZTfhHhk/6jzQ_IwiEnQlI1ed19sC6IEYqgGuF0Ic/XPAz-ZoICV5MD6BQfK5RnG4moJR7wx7g/hEC10pKYPLpp5QO8iWM2upH-TZatpJUe/sr3hUpzHbVhIop1OwYibG0l1PCzbrYv5/JoLqH-X19GI.jpg", span: "md:col-span-2" }
+            ],
+            testimonials: [
+                {
+                    id: 1,
+                    name: "Sarah & James",
+                    text: "Vividframes didn't just take photos; they captured the soul of our wedding. Every time we look at the album, we relive the magic.",
+                    role: "Married in Tuscany"
+                },
+                {
+                    id: 2,
+                    name: "Emily & David",
+                    text: "The cinematic video they produced looks like a Hollywood movie. They are incredibly talented and made us feel so comfortable.",
+                    role: "Married in New York"
+                }
+            ],
+            contact: {
+                address: "123 Creative Studio Blvd, Art District",
+                phone: "+1 (555) 123-4567",
+                email: "hello@vividframes.com",
+                socials: {
+                    instagram: "https://instagram.com",
+                    facebook: "https://facebook.com",
+                    twitter: "https://twitter.com"
+                }
+            }
+        };
+
+        if (window.parent !== window) {
+            window.parent.postMessage({ type: 'TEMPLATE_READY' }, '*');
+        }
+        window.addEventListener('message', function (event) {
+            if (event.data && event.data.type === 'UPDATE_DATA') {
+                renderPage(event.data.data);
+            }
+        });
+
+        function renderDataAll(data) {
+            if (data) {
+                portfolioData = data;
+            }
+            // Render all components
+            renderNavbar();
+            renderHero();
+            renderAbout();
+            renderServices();
+            renderPortfolio();
+            renderTestimonials();
+            renderFooter();
+
+            // Initialize Lucide Icons
+            lucide.createIcons();
+
+            // Initialize Scroll Animations
+            initScrollAnimations();
+        }
+
+        const navLinks = [
+            { name: 'Home', href: '#home' },
+            { name: 'About', href: '#about-section' },
+            { name: 'Services', href: '#services-section' },
+            { name: 'Portfolio', href: '#portfolio-section' },
+            { name: 'Contact', href: '#footer-section' }
+        ];
+
+
+
+        function renderNavbar() {
+            const nav = document.getElementById('navbar');
+            const { brand } = portfolioData;
+
+            nav.innerHTML = `
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center">
+                        <!-- Brand Logo -->
+                        <a href="#home" class="flex flex-col items-center group">
+                            <div class="relative w-12 h-12 flex items-center justify-center mb-1">
+                              
+                                <img src="${brand.logoSrc}" alt="${brand.name} Logo" class="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(0,255,255,0.5)] z-10" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                                <span class="hidden text-2xl">🕊️</span>
+                            </div>
+                            <div class="text-center leading-tight">
+                                <span class="text-xl font-bold tracking-widest lowercase ${brand.theme.textGradient}">${brand.name}</span>
+                                <p class="text-[0.5rem] tracking-[0.2em] text-gray-300 font-light mt-1">${brand.subtitle}</p>
+                            </div>
+                        </a>
+
+                        <!-- Desktop Nav -->
+                        <div class="hidden md:flex space-x-8 items-center">
+                            ${navLinks.map(link => `
+                                <a href="${link.href}" class="text-gray-300 hover:text-white text-sm font-medium tracking-wide transition-colors relative group">
+                                    ${link.name}
+                                    <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-gradient-to-r ${brand.theme.primaryGradient} transition-all duration-300 group-hover:w-full"></span>
+                                </a>
+                            `).join('')}
+                            <a href="#footer-section" class="px-5 py-2 rounded-full border border-gray-600 hover:border-transparent text-sm font-medium transition-all duration-300 hover:shadow-[0_0_15px_rgba(0,255,255,0.4)] relative overflow-hidden group">
+                                <span class="relative z-10 text-white">Book Now</span>
+                                <div class="absolute inset-0 bg-gradient-to-r ${brand.theme.primaryGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </a>
+                        </div>
+
+                        <!-- Mobile Menu Button -->
+                        <div class="md:hidden z-50">
+                            <button id="mobile-menu-btn" class="text-white p-2 focus:outline-none">
+                                <i data-lucide="menu"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Mobile Menu Rendering
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full space-y-8 pb-20 w-full">
+                    ${navLinks.map((link, idx) => `
+                        <a href="${link.href}" class="mobile-link text-2xl font-light tracking-widest hover:${brand.theme.textGradient} reveal fade-up delay-${(idx + 1) * 100}">
+                            ${link.name}
+                        </a>
+                    `).join('')}
+                </div>
+            `;
+
+            // Mobile Menu Logic
+            const btn = document.getElementById('mobile-menu-btn');
+            let isMenuOpen = false;
+
+            btn.addEventListener('click', () => {
+                isMenuOpen = !isMenuOpen;
+                if (isMenuOpen) {
+                    btn.innerHTML = '<i data-lucide="x"></i>';
+                    mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
+                    mobileMenu.classList.add('opacity-100', 'pointer-events-auto');
+                    mobileMenu.style.transform = 'translateY(0)';
+
+                    // Trigger animations for links
+                    setTimeout(() => {
+                        document.querySelectorAll('.mobile-link').forEach(link => link.classList.add('active'));
+                    }, 100);
+                } else {
+                    closeMobileMenu();
+                }
+                lucide.createIcons();
+            });
+
+            document.querySelectorAll('.mobile-link').forEach(link => {
+                link.addEventListener('click', closeMobileMenu);
+            });
+
+            function closeMobileMenu() {
+                isMenuOpen = false;
+                btn.innerHTML = '<i data-lucide="menu"></i>';
+                lucide.createIcons();
+                mobileMenu.classList.remove('opacity-100', 'pointer-events-auto');
+                mobileMenu.classList.add('opacity-0', 'pointer-events-none');
+                mobileMenu.style.transform = 'translateY(-10px)';
+                document.querySelectorAll('.mobile-link').forEach(link => link.classList.remove('active'));
+            }
+
+            // Navbar Scroll Effect
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    nav.classList.add('bg-black/90', 'backdrop-blur-md', 'shadow-[0_4px_30px_rgba(0,255,255,0.1)]');
+                    nav.classList.remove('bg-transparent', 'py-6');
+                    nav.classList.add('py-3');
+                } else {
+                    nav.classList.remove('bg-black/90', 'backdrop-blur-md', 'shadow-[0_4px_30px_rgba(0,255,255,0.1)]', 'py-3');
+                    nav.classList.add('bg-transparent', 'py-6');
+                }
+            });
+        }
+
+        function renderHero() {
+            const hero = document.getElementById('hero-section');
+            const { hero: data, brand } = portfolioData;
+
+            hero.innerHTML = `
+                <!-- Parallax Background -->
+                <div id="parallax-bg" class="absolute inset-0 z-0">
+                    <div id="parallax-overlay" class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black z-10 transition-opacity"></div>
+                    <img src="${data.bgImage}" alt="Wedding Background" class="w-full h-full object-cover object-center opacity-60" style="object-position: 50% 0%;" />
+                </div>
+
+                <!-- Content -->
+                <div class="relative z-10 text-center px-4 max-w-5xl mx-auto mt-20" id="home">
+                    <div class="reveal active" style="transition-duration: 1.5s;">
+                        <div class="inline-block mb-6 relative">
+                            <div class="absolute inset-0 border border-white/20 -m-4 rounded-sm"></div>
+                            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold text-white tracking-tighter leading-tight drop-shadow-2xl">
+                                Capturing Your <br />
+                                <span class="italic font-light ${brand.theme.textGradient}" style="padding-right:10px">Eternal</span> Moments
+                            </h1>
+                        </div>
+                    </div>
+
+                    <p class="reveal active delay-300 text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto font-light leading-relaxed" style="transition-duration: 1s;">
+                        ${data.description}
+                    </p>
+
+                    <div class="reveal active delay-500" style="transition-duration: 1s;">
+                        <a href="#portfolio-section" class="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-transparent border border-white/30 rounded-full hover:border-transparent overflow-hidden">
+                            <span class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
+                            <span class="absolute inset-0 w-full h-full bg-gradient-to-r ${brand.theme.primaryGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out"></span>
+                            <span class="relative flex items-center gap-2">
+                                ${data.ctaText}
+                                <i data-lucide="chevron-right" class="group-hover:translate-x-1 transition-transform w-5 h-5"></i>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Scroll Indicator -->
+                <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 animate-bounce">
+                    <span class="text-xs tracking-widest text-gray-400 uppercase">Scroll</span>
+                    <div class="w-[1px] h-12 bg-gradient-to-b from-white/50 to-transparent"></div>
+                </div>
+            `;
+
+            // Parallax effect logic
+            window.addEventListener('scroll', () => {
+                const scrolled = window.scrollY;
+                const bg = document.getElementById('parallax-bg');
+                const overlay = document.getElementById('parallax-overlay');
+
+                if (scrolled < 1000) {
+                    // translateY matching Framer motion [0, 1000] -> [0, 400]
+                    bg.style.transform = `translateY(${scrolled * 0.4}px)`;
+                }
+                if (scrolled < 500) {
+                    // opacity matching Framer motion [0, 500] -> [1, 0]
+                    overlay.style.opacity = Math.max(0, 1 - (scrolled / 500));
+                }
+            });
+        }
+
+        function renderAbout() {
+            const about = document.getElementById('about-section');
+            const { about: data, brand } = portfolioData;
+
+            about.innerHTML = `
+                <div class="absolute top-0 right-0 w-96 h-96 bg-cyan-900/20 rounded-full blur-[100px] pointer-events-none"></div>
+                
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                        
+                        <!-- Image Column -->
+                        <div class="reveal fade-right relative group">
+                            <div class="absolute -inset-2 bg-gradient-to-r ${brand.theme.primaryGradient} rounded-lg opacity-20 group-hover:opacity-40 blur transition duration-1000"></div>
+                            <div class="relative aspect-[4/5] rounded-lg overflow-hidden border border-white/10">
+                                <img src="${data.image}" alt="About Vividframes" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                            </div>
+                            
+                            <!-- Corner accents -->
+                            <div class="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 ${brand.theme.accentBorder} z-20"></div>
+                            <div class="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 ${brand.theme.accentBorder} z-20"></div>
+                        </div>
+
+                        <!-- Text Column -->
+                        <div class="reveal fade-left">
+                            <h2 class="text-sm font-bold tracking-[0.3em] uppercase text-gray-400 mb-2">Our Story</h2>
+                            <h3 class="text-4xl md:text-5xl font-bold mb-6 ${brand.theme.textGradient}">${data.title}</h3>
+                            <p class="text-gray-300 text-lg mb-10 font-light leading-relaxed">${data.content}</p>
+                            
+                            <div class="grid grid-cols-3 gap-6 pt-8 border-t border-white/10">
+                                ${data.stats.map(stat => `
+                                    <div class="text-center">
+                                        <div class="text-3xl font-bold text-white mb-1">${stat.value}</div>
+                                        <div class="text-xs text-gray-400 uppercase tracking-wider">${stat.label}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderServices() {
+            const services = document.getElementById('services-section');
+            const { services: data, brand } = portfolioData;
+
+            let servicesHtml = `
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="reveal fade-up text-center max-w-3xl mx-auto mb-20">
+                        <h2 class="text-sm font-bold tracking-[0.3em] uppercase text-gray-400 mb-2">Expertise</h2>
+                        <h3 class="text-4xl md:text-5xl font-bold ${brand.theme.textGradient}">Our Services</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            `;
+
+            data.forEach((service, idx) => {
+                servicesHtml += `
+                    <div class="reveal fade-up delay-${(idx + 1) * 200} group relative h-[450px] rounded-2xl overflow-hidden cursor-pointer">
+                        <div class="absolute inset-0">
+                            <img src="${service.image}" alt="${service.title}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
+                        </div>
+
+                        <div class="absolute inset-0 p-8 flex flex-col justify-end">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center bg-black/50 backdrop-blur-sm border border-white/10 mb-4 group-hover:border-cyan-400/50 transition-colors">
+                                <i data-lucide="${service.icon}" class="text-cyan-400 w-6 h-6"></i>
+                            </div>
+                            <h4 class="text-2xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors">${service.title}</h4>
+                            <p class="text-gray-300 text-sm opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                                ${service.description}
+                            </p>
+                        </div>
+                        
+                        <div class="absolute inset-0 border-2 border-transparent group-hover:border-cyan-400/30 rounded-2xl transition-colors pointer-events-none"></div>
+                    </div>
+                `;
+            });
+
+            servicesHtml += `
+                    </div>
+                </div>
+            `;
+            services.innerHTML = servicesHtml;
+        }
+
+        function renderPortfolio() {
+            const portfolio = document.getElementById('portfolio-section');
+            const { gallery: data, brand } = portfolioData;
+
+            let portfolioHtml = `
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="reveal fade-up flex flex-col md:flex-row justify-between items-end mb-16">
+                        <div>
+                            <h2 class="text-sm font-bold tracking-[0.3em] uppercase text-gray-400 mb-2">Featured Work</h2>
+                            <h3 class="text-4xl md:text-5xl font-bold ${brand.theme.textGradient}">Our Portfolio</h3>
+                        </div>
+                        <a href="#" class="hidden md:flex items-center gap-2 text-white hover:text-cyan-400 transition-colors group">
+                            View All Work <i data-lucide="chevron-right" class="group-hover:translate-x-1 transition-transform w-4 h-4"></i>
+                        </a>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 auto-rows-[300px] gap-4">
+            `;
+
+            data.forEach((item, idx) => {
+                portfolioHtml += `
+                    <div class="reveal fade-up delay-${(idx % 3 + 1) * 100} group relative overflow-hidden rounded-xl ${item.span || 'col-span-1'}">
+                        <img src="${item.src}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                        
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-center p-6 backdrop-blur-[2px]">
+                            <span class="px-3 py-1 text-xs font-medium uppercase tracking-wider text-black bg-gradient-to-r ${brand.theme.primaryGradient} rounded-full mb-3 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                ${item.category}
+                            </span>
+                            <h4 class="text-xl font-bold text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                                ${item.title}
+                            </h4>
+                        </div>
+                    </div>
+                `;
+            });
+
+            portfolioHtml += `
+                    </div>
+                    
+                    <div class="mt-12 text-center md:hidden">
+                        <a href="#" class="inline-flex items-center gap-2 text-white border border-white/20 px-6 py-3 rounded-full hover:bg-white/5 transition-colors">
+                            View All Work
+                        </a>
+                    </div>
+                </div>
+            `;
+            portfolio.innerHTML = portfolioHtml;
+        }
+
+        function renderTestimonials() {
+            const testimonialsSection = document.getElementById('testimonials-section');
+            const { testimonials: data, brand } = portfolioData;
+
+            const quoteIconSvg = `<svg viewBox="0 0 24 24" fill="currentColor" class="mx-auto w-12 h-12 text-gray-600 mb-8"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z" /></svg>`;
+
+            let html = `
+                <div class="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+                
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal fade-up">
+                    ${quoteIconSvg}
+                    
+                    <div class="relative h-64 md:h-48" id="testimonial-container">
+            `;
+
+            data.forEach((item, idx) => {
+                html += `
+                    <div class="testimonial-slide ${idx === 0 ? 'active' : ''} flex flex-col items-center justify-center h-full">
+                        <p class="text-xl md:text-3xl font-light text-white italic mb-8 leading-relaxed">
+                            "${item.text}"
+                        </p>
+                        <div>
+                            <h4 class="text-lg font-bold text-white">${item.name}</h4>
+                            <p class="text-sm ${brand.theme.textGradient}">${item.role}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                    <div class="flex justify-center gap-2 mt-8" id="testimonial-indicators">
+            `;
+
+            data.forEach((_, idx) => {
+                html += `
+                    <button class="indicator-btn w-2 h-2 rounded-full transition-all duration-300 ${idx === 0 ? 'w-8 bg-cyan-400' : 'bg-gray-600'}" data-index="${idx}" aria-label="Go to testimonial ${idx + 1}"></button>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            testimonialsSection.innerHTML = html;
+
+            // Slider Logic
+            let currentIndex = 0;
+            const slides = testimonialsSection.querySelectorAll('.testimonial-slide');
+            const indicators = testimonialsSection.querySelectorAll('.indicator-btn');
+
+            function goToSlide(index) {
+                slides[currentIndex].classList.remove('active');
+                indicators[currentIndex].classList.remove('w-8', 'bg-cyan-400');
+                indicators[currentIndex].classList.add('bg-gray-600');
+
+                currentIndex = index;
+
+                slides[currentIndex].classList.add('active');
+                indicators[currentIndex].classList.add('w-8', 'bg-cyan-400');
+                indicators[currentIndex].classList.remove('bg-gray-600');
+            }
+
+            indicators.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.getAttribute('data-index'));
+                    goToSlide(index);
+                    resetInterval();
+                });
+            });
+
+            let slideInterval = setInterval(() => {
+                goToSlide((currentIndex + 1) % data.length);
+            }, 5000);
+
+            function resetInterval() {
+                clearInterval(slideInterval);
+                slideInterval = setInterval(() => {
+                    goToSlide((currentIndex + 1) % data.length);
+                }, 5000);
+            }
+        }
+
+        function renderFooter() {
+            const footer = document.getElementById('footer-section');
+            const { contact: data, brand } = portfolioData;
+
+            footer.innerHTML = `
+                <div class="absolute right-0 bottom-0 opacity-5 pointer-events-none overflow-hidden w-96 h-96">
+                    <img src="${brand.logoSrc}" alt="" class="w-full h-full object-cover scale-150 translate-x-1/4 translate-y-1/4" />
+                </div>
+
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16 reveal fade-up">
+                        
+                        <!-- Brand Col -->
+                        <div class="lg:col-span-1">
+                            <div class="flex items-center gap-2 mb-6">
+                                <div class="relative w-8 h-8 flex items-center justify-center">
+                                    <img src="${brand.logoSrc}" alt="Logo" class="w-full h-full object-contain" onerror="this.style.display='none'" />
+                                </div>
+                                <span class="text-xl font-bold tracking-widest lowercase ${brand.theme.textGradient}">${brand.name}</span>
+                            </div>
+                            <p class="text-gray-400 text-sm mb-6 leading-relaxed">
+                                Preserving your timeless moments with cinematic artistry and emotional storytelling.
+                            </p>
+                            <div class="flex space-x-4">
+                                <a href="${data.socials.instagram}" class="text-gray-400 hover:text-cyan-400 transition-colors">
+                                    <i data-lucide="instagram" class="w-5 h-5"></i>
+                                </a>
+                                <a href="${data.socials.facebook}" class="text-gray-400 hover:text-cyan-400 transition-colors">
+                                    <i data-lucide="facebook" class="w-5 h-5"></i>
+                                </a>
+                                <a href="${data.socials.twitter}" class="text-gray-400 hover:text-cyan-400 transition-colors">
+                                    <i data-lucide="twitter" class="w-5 h-5"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Quick Links -->
+                        <div>
+                            <h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Explore</h4>
+                            <ul class="space-y-3">
+                                ${['Home', 'About Us', 'Portfolio', 'Services', 'Contact'].map(item => `
+                                    <li>
+                                        <a href="#${item.toLowerCase().replace(' ', '')}" class="text-gray-400 hover:text-white transition-colors text-sm">
+                                            ${item}
+                                        </a>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+
+                        <!-- Contact Info -->
+                        <div class="lg:col-span-2">
+                            <h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Get in Touch</h4>
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-4 text-gray-400">
+                                    <i data-lucide="map-pin" class="mt-1 text-cyan-400 shrink-0 w-4 h-4"></i>
+                                    <span class="text-sm">${data.address}</span>
+                                </div>
+                                <div class="flex items-center gap-4 text-gray-400">
+                                    <i data-lucide="phone" class="text-cyan-400 shrink-0 w-4 h-4"></i>
+                                    <span class="text-sm">${data.phone}</span>
+                                </div>
+                                <div class="flex items-center gap-4 text-gray-400">
+                                    <i data-lucide="mail" class="text-cyan-400 shrink-0 w-4 h-4"></i>
+                                    <span class="text-sm">${data.email}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 reveal fade-up delay-200">
+                        <p class="text-gray-500 text-xs">
+                            © ${new Date().getFullYear()} ${brand.name} ${brand.subtitle}. All rights reserved.
+                        </p>
+                        <div class="flex gap-4 text-xs text-gray-500">
+                            <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                            <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initScrollAnimations() {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Optional: Stop observing once animated if we only want it once
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDataAll()
+
+        });
+    </script>
+</body>
+
+</html>

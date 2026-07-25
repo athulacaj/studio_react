@@ -38,9 +38,9 @@ import {
   Style as StyleIcon,
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
-import { usePortfolioBuilderStore } from '../store/portfolioBuilderStore';
+import { usePortfolioBuilderStore } from '../store/EventportfolioBuilderStore';
 import { TEMPLATES, DEFAULT_WEDDING_DATA, DEFAULT_COMPONENT_STYLES } from '../types/types';
-import { savePortfolio, publishPortfolio, getPortfolioByProjectId } from '../services/portfolioService';
+import { savePortfolio, publishPortfolio, getPortfolioByProjectId } from '../services/EventportfolioService';
 import { auth } from '../../../config/firebase';
 import { useParams } from 'react-router-dom';
 
@@ -550,8 +550,8 @@ const EventPortfolioBuilder: React.FC = () => {
                 onChange={(e) => setFormData({ nav_logo: { ...formData.nav_logo, style: { ...formData.nav_logo?.style, color: e.target.value } } })}
                 sx={{ width: 100 }}
               />
-              <IconButton 
-                size="small" 
+              <IconButton
+                size="small"
                 onClick={() => setFormData({ nav_logo: { ...formData.nav_logo, style: { ...formData.nav_logo?.style, color: DEFAULT_WEDDING_DATA.nav_logo.style?.color } } })}
                 disabled={!formData.nav_logo?.style?.color || formData.nav_logo?.style?.color === DEFAULT_WEDDING_DATA.nav_logo.style?.color}
                 title="Clear Color"
@@ -585,8 +585,8 @@ const EventPortfolioBuilder: React.FC = () => {
                   onChange={(e) => setFormData({ name1: { ...formData.name1, style: { ...formData.name1?.style, color: e.target.value } } })}
                   sx={{ width: 60 }}
                 />
-                <IconButton 
-                  size="small" 
+                <IconButton
+                  size="small"
                   onClick={() => setFormData({ name1: { ...formData.name1, style: { ...formData.name1?.style, color: DEFAULT_WEDDING_DATA.name1.style?.color } } })}
                   disabled={!formData.name1?.style?.color || formData.name1?.style?.color === DEFAULT_WEDDING_DATA.name1.style?.color}
                   title="Clear Color"
@@ -612,8 +612,8 @@ const EventPortfolioBuilder: React.FC = () => {
                   onChange={(e) => setFormData({ name2: { ...formData.name2, style: { ...formData.name2?.style, color: e.target.value } } })}
                   sx={{ width: 60 }}
                 />
-                <IconButton 
-                  size="small" 
+                <IconButton
+                  size="small"
                   onClick={() => setFormData({ name2: { ...formData.name2, style: { ...formData.name2?.style, color: DEFAULT_WEDDING_DATA.name2.style?.color } } })}
                   disabled={!formData.name2?.style?.color || formData.name2?.style?.color === DEFAULT_WEDDING_DATA.name2.style?.color}
                   title="Clear Color"
@@ -643,8 +643,8 @@ const EventPortfolioBuilder: React.FC = () => {
                 onChange={(e) => setFormData({ mainDate: { ...formData.mainDate, style: { ...formData.mainDate?.style, color: e.target.value } } })}
                 sx={{ width: 100 }}
               />
-              <IconButton 
-                size="small" 
+              <IconButton
+                size="small"
                 onClick={() => setFormData({ mainDate: { ...formData.mainDate, style: { ...formData.mainDate?.style, color: DEFAULT_WEDDING_DATA.mainDate.style?.color } } })}
                 disabled={!formData.mainDate?.style?.color || formData.mainDate?.style?.color === DEFAULT_WEDDING_DATA.mainDate.style?.color}
                 title="Clear Color"
@@ -734,8 +734,8 @@ const EventPortfolioBuilder: React.FC = () => {
                 onChange={(e) => setFormData({ invitationHeading: { ...formData.invitationHeading, style: { ...formData.invitationHeading?.style, color: e.target.value } } })}
                 sx={{ width: 100 }}
               />
-              <IconButton 
-                size="small" 
+              <IconButton
+                size="small"
                 onClick={() => setFormData({ invitationHeading: { ...formData.invitationHeading, style: { ...formData.invitationHeading?.style, color: DEFAULT_WEDDING_DATA.invitationHeading.style?.color } } })}
                 disabled={!formData.invitationHeading?.style?.color || formData.invitationHeading?.style?.color === DEFAULT_WEDDING_DATA.invitationHeading.style?.color}
                 title="Clear Color"
@@ -763,8 +763,8 @@ const EventPortfolioBuilder: React.FC = () => {
                 onChange={(e) => setFormData({ invitationDescription: { ...formData.invitationDescription, style: { ...formData.invitationDescription?.style, color: e.target.value } } })}
                 sx={{ width: 100 }}
               />
-              <IconButton 
-                size="small" 
+              <IconButton
+                size="small"
                 onClick={() => setFormData({ invitationDescription: { ...formData.invitationDescription, style: { ...formData.invitationDescription?.style, color: DEFAULT_WEDDING_DATA.invitationDescription.style?.color } } })}
                 disabled={!formData.invitationDescription?.style?.color || formData.invitationDescription?.style?.color === DEFAULT_WEDDING_DATA.invitationDescription.style?.color}
                 title="Clear Color"

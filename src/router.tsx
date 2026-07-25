@@ -3,17 +3,18 @@ import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import About from './pages/About';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
+import VividView from './pages/VividView';
 import { LoginPage, SignupPage, ProtectedRoute } from './features/auth';
 import { StudioDashboard, ProjectDetailView, PublicProjectView, SuperAdminDashboard, AdminUserView, AdminProjectDetailWrapper } from './features/studio-management';
 import Footer from './core/components/Footer';
 import GlobalNavbar from './core/components/GlobalNavbar';
-import EventPageViewer from './features/portfoliobuilder/pages/EventPageViewer';
-import EventPortfolioBuilder from './features/portfoliobuilder/pages/EventPortfolioBuilder';
+import EventPageViewer from './features/events-portfoliobuilder/pages/EventPageViewer';
+import EventPortfolioBuilder from './features/events-portfoliobuilder/pages/EventPortfolioBuilder';
 import { DriveConnectPage, DriveSuccessPage } from './features/drive-integration';
 
 const AppRouter = () => {
   const location = useLocation();
-  const isPublicRoute = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/about' || location.pathname.includes('/portfolio') || location.pathname.includes('/p/');
+  // const isPublicRoute = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/about' || location.pathname.includes('/portfolio') || location.pathname.includes('/p/');
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -36,6 +37,7 @@ const AppRouter = () => {
 
           <Route path="/drive/connect/:userId/:projectId" element={<DriveConnectPage />} />
           <Route path="/drive/success" element={<DriveSuccessPage />} />
+          <Route path="/view/vivid/vivid" element={<VividView />} />
           <Route path="/view/:userId/:projectId" element={<PublicProjectView />} />
           <Route path="/share/:userId/:projectId/:linkId" element={<PublicProjectView />} />
           <Route path="/about" element={<About />} />
@@ -43,7 +45,7 @@ const AppRouter = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Box>
-      {!location.pathname.includes('/portfolio') && <Footer />}
+      {!location.pathname.includes('/portfolio') && !location.pathname.includes('/view/vivid/vivid') && <Footer />}
     </Box>
   );
 };

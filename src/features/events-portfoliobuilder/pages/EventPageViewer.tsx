@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, CircularProgress } from '@mui/material';
-import { getPublishedPortfolio } from '../services/portfolioService';
+import { getPublishedPortfolio } from '../services/EventportfolioService';
 import { EventPortfolio } from '../types/types';
 
 const EventPageViewer: React.FC = () => {
