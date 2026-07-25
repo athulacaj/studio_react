@@ -2,6 +2,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { db } from '../../../config/firebase';
 import { Project, SharedLink, DriveNode } from '../types';
+import { StudioApiClient } from '../../../services/ApiInitalizer';
 
 /**
  * Fetches project details from Firestore.

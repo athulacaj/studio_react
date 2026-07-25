@@ -8,7 +8,7 @@
  * into batches of BULK_CHUNK_SIZE to avoid HTTP payload limits and
  * backend transaction timeouts.
  */
-import { apiClient } from '../../../services/apiClient';
+import { StudioApiClient } from '../../../services/ApiInitalizer';
 import type { BackendFileRecord } from '../types';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ export const indexFiles = async (
 
     for (const batch of chunks) {
         const payload: BulkUpsertPayload = { files: batch };
-        await apiClient.post(`/projects/${projectId}/files/bulk`, payload);
+        await StudioApiClient.post(`/projects/${projectId}/files/bulk`, payload);
         completed += batch.length;
         onChunkComplete?.(completed, files.length);
     }
@@ -83,7 +83,7 @@ export const upsertFile = async (
     projectId: string,
     file: UpsertFilePayload
 ): Promise<void> => {
-    await apiClient.post(`/projects/${projectId}/files`, file);
+    await StudioApiClient.post(`/projects/${projectId}/files`, file);
 };
 
 /**
@@ -96,5 +96,5 @@ export const getFiles = async (
 ): Promise<GetFilesResponse> => {
     const params: Record<string, unknown> = {};
     if (updatedSince) params.updatedSince = updatedSince;
-    return apiClient.get<GetFilesResponse>(`/projects/${projectId}/files`, { params });
+    return StudioApiClient.get<GetFilesResponse>(`/projects/${projectId}/files`, { params });
 };
