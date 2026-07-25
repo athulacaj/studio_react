@@ -233,7 +233,7 @@
         }
         window.addEventListener('message', function (event) {
             if (event.data && event.data.type === 'UPDATE_DATA') {
-                renderPage(event.data.data);
+                renderDataAll(event.data.data);
             }
         });
 

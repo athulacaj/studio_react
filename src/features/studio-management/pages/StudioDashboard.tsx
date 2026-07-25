@@ -27,6 +27,7 @@ const StudioDashboard: React.FC = () => {
     const totalFolders = projects.reduce((acc, p) => acc + (p.selectedFolders?.length || 0), 0);
     const activeProjects = projects.filter(p => p.status === 'active').length;
 
+
     return (
         <Box
             sx={{
@@ -165,6 +166,29 @@ const StudioDashboard: React.FC = () => {
                                         Admin Panel
                                     </Button>
                                 )}
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => navigate('/private/studio/portfolio/manage')}
+                                    sx={{
+                                        flex: { xs: 1, sm: 'initial' },
+                                        borderRadius: '16px',
+                                        borderColor: 'rgba(56, 189, 248, 0.3)',
+                                        color: '#38BDF8',
+                                        fontWeight: 600,
+                                        background: 'rgba(56, 189, 248, 0.06)',
+                                        backdropFilter: 'blur(8px)',
+                                        px: 3,
+                                        '&:hover': {
+                                            borderColor: '#38BDF8',
+                                            background: 'rgba(56, 189, 248, 0.12)',
+                                            boxShadow: '0 0 24px rgba(56, 189, 248, 0.2)',
+                                            transform: 'translateY(-2px)',
+                                        },
+                                        transition: 'all 0.25s ease',
+                                    }}
+                                >
+                                    Manage Portfolio
+                                </Button>
                                 <Button
                                     variant="contained"
                                     startIcon={<AddIcon />}
