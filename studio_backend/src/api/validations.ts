@@ -23,7 +23,18 @@ export const getUploadUrlSchema = z.object({
   contentType: z.string().optional(),
 });
 
+export const getMultipleUploadUrlsSchema = z.object({
+  folder: z.string().min(1, 'Folder is required'),
+  files: z.array(
+    z.object({
+      fileName: z.string().min(1, 'FileName is required'),
+      contentType: z.string().optional(),
+    })
+  ).min(1, 'At least one file is required'),
+});
+
 export type UpsertFileDTO = z.infer<typeof upsertFileSchema>;
 export type BulkUpsertFilesDTO = z.infer<typeof bulkUpsertFilesSchema>;
 export type GetFilesQueryDTO = z.infer<typeof getFilesQuerySchema>;
 export type GetUploadUrlDTO = z.infer<typeof getUploadUrlSchema>;
+export type GetMultipleUploadUrlsDTO = z.infer<typeof getMultipleUploadUrlsSchema>;

@@ -41,4 +41,15 @@ export default class CloudflareService {
             uploadUrl: url,
         };
     }
+
+    async createMultipleUploadUrls(
+        folder: string,
+        files: { fileName: string; contentType?: string }[]
+    ) {
+        return Promise.all(
+            files.map((file) =>
+                this.createUploadUrl(folder, file.fileName, file.contentType)
+            )
+        );
+    }
 }

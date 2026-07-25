@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { StudioController } from '../controllers/StudioContoller';
 import { validate } from '../middleware/validate';
-import { getUploadUrlSchema } from '../api/validations';
+import { getUploadUrlSchema, getMultipleUploadUrlsSchema } from '../api/validations';
 
 const router = Router({ mergeParams: true });
 const studioController = new StudioController();
@@ -49,5 +49,58 @@ const studioController = new StudioController();
  *         description: Validation error
  */
 router.post('/upload-url', validate(getUploadUrlSchema, 'body'), studioController.getUploadUrl.bind(studioController));
+
+/**
+ * @swagger
+ * /studio/upload-urls:
+ *   post:
+ *     summary: Generate multiple signed upload URLs for Cloudflare R2
+ *     tags: [Studio]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - folder
+ *               - files
+ *             properties:
+ *               folder:
+ *                 type: string
+ *                 description: The folder to upload the files into (e.g., 'images')
+ *               files:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   required:
+ *                     - fileName
+ *                   properties:
+ *                     fileName:
+ *                       type: string
+ *                       description: The name of the file to be uploaded
+ *                     contentType:
+ *                       type: string
+ *                       description: The MIME type of the file (e.g., 'image/png')
+ *     responses:
+ *       200:
+ *         description: Successfully generated upload URLs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   key:
+ *                     type: string
+ *                     description: The generated object key (path) in the bucket
+ *                   uploadUrl:
+ *                     type: string
+ *                     description: The signed URL to use for uploading the file
+ *       400:
+ *         description: Validation error
+ */
+router.post('/upload-urls', validate(getMultipleUploadUrlsSchema, 'body'), studioController.getMultipleUploadUrls.bind(studioController));
 
 export default router;

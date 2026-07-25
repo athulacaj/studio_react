@@ -14,4 +14,14 @@ export class StudioController {
         res.json(result);
     }
 
+    async getMultipleUploadUrls(req: Request, res: Response) {
+        const { folder, files } = req.body;
+
+        const result = await cloudflareService.createMultipleUploadUrls(
+            folder,
+            files
+        );
+
+        res.json(result);
+    }
 }
