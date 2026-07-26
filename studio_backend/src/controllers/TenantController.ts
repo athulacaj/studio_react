@@ -3,7 +3,9 @@ import path from "path";
 
 const CACHE_DIR = path.join(process.cwd(), "cache", "portfolios");
 
-
+const tenantMap = {
+    "vividframes": "https://pub-a7316f52d933481ead6be42bab1311b3.r2.dev/portfolios/1785054781596-index.html"
+}
 
 
 export class TenantController {

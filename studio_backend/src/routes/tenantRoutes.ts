@@ -6,6 +6,8 @@ const router = Router();
 const tenantController = new TenantController();
 
 router.get("/", async (req, res) => {
+    console.log("hostname", req.hostname);
+
     try {
 
         const html = await tenantController.getPortfolioHtml(
