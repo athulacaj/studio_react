@@ -97,4 +97,26 @@ tenantRoutes.post("/", (req, res) => tenantController.create(req, res));
  */
 tenantRoutes.put("/:id", (req, res) => tenantController.update(req, res));
 
+/**
+ * @swagger
+ * /tenant/{id}:
+ *   get:
+ *     summary: Get a tenant by ID
+ *     tags: [Tenants]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: OK
+ *       404:
+ *         description: Tenant not found
+ *       500:
+ *         description: Internal Server Error
+ */
+tenantRoutes.get("/:id", (req, res) => tenantController.get(req, res));
+
 export { baseRoutes, tenantRoutes };

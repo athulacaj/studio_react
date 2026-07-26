@@ -67,4 +67,20 @@ export class TenantController {
         }
     }
 
+    async get(req: Request, res: Response) {
+        try {
+            const id = req.params.id as string;
+            const { getTenantById } = await import("../services/tenantService");
+            const tenant = await getTenantById(parseInt(id, 10));
+
+            if (!tenant) {
+                return res.status(404).json({ success: false, error: "Tenant not found" });
+            }
+
+            res.status(200).json({ success: true, data: tenant });
+        } catch (error: any) {
+            console.error("Error fetching tenant:", error);
+            res.status(500).json({ success: false, error: error.message });
+        }
+    }
 }

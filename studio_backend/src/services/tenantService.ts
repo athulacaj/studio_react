@@ -12,6 +12,10 @@ export async function getTenant(host: string): Promise<Studio | undefined> {
     return await TenantRepository.findBySlugOrDomain(identifier);
 }
 
+export async function getTenantById(id: number): Promise<Studio | undefined> {
+    return await TenantRepository.findById(id);
+}
+
 export async function createTenant(data: NewStudio): Promise<Studio> {
     return await TenantRepository.create(data);
 }
