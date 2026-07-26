@@ -3,10 +3,10 @@ import { create } from 'zustand';
 interface PortfolioState {
     htmlContent: string;
     portfolioData: any;
-    uploadedImages: { id: string; file: File; url: string; compressed: boolean; fileKey?: string }[];
+    uploadedImages: { id: string; file?: File; url: string; compressed: boolean; fileKey?: string }[];
     setHtmlContent: (html: string) => void;
     setPortfolioData: (data: any) => void;
-    addUploadedImages: (images: { id: string; file: File; url: string; compressed: boolean; fileKey?: string }[]) => void;
+    addUploadedImages: (images: { id: string; file?: File; url: string; compressed: boolean; fileKey?: string }[]) => void;
     removeUploadedImage: (id: string) => void;
 }
 

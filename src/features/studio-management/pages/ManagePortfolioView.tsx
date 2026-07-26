@@ -16,7 +16,11 @@ import {
     ListItemText,
     ListItemSecondaryAction,
     CircularProgress,
-    LinearProgress
+    LinearProgress,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel
 } from '@mui/material';
 import {
     CloudUpload as UploadIcon,
@@ -33,6 +37,9 @@ import UploadDialogComponent from '../../../shared/components/UploadDialogCompon
 import { usePortfolioStore } from '../store/portfolioStore';
 import imageCompression from 'browser-image-compression';
 import { getUploadUrls, uploadFileToR2 } from '../api/StudioportfolioService';
+import { doc, setDoc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { db } from '../../../config/firebase';
+import { useAuthStore } from '../../auth/store/authStore';
 
 const ManageStudioPortfolioView: React.FC = () => {
     const navigate = useNavigate();
@@ -41,9 +48,16 @@ const ManageStudioPortfolioView: React.FC = () => {
 
     // Global Store State
     const { htmlContent, setHtmlContent, portfolioData, setPortfolioData, uploadedImages, addUploadedImages, removeUploadedImage } = usePortfolioStore();
+    const { currentUser } = useAuthStore();
 
     const [blobUrl, setBlobUrl] = useState<string | null>(null);
     const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
+
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [isPublishing, setIsPublishing] = useState(false);
+
+    const [versions, setVersions] = useState<{path: string, publishedAt: string}[]>([]);
+    const [selectedVersionPath, setSelectedVersionPath] = useState<string>('');
 
     // State for tabs
     const [activeTab, setActiveTab] = useState(0);
@@ -79,6 +93,77 @@ const ManageStudioPortfolioView: React.FC = () => {
             document.removeEventListener('mouseup', handleMouseUp);
         };
     }, [isDragging]);
+
+    const loadPortfolioFromPath = async (path: string, assetsToLoad?: any[]) => {
+        try {
+            setIsInitialLoading(true);
+            const r2BaseUrl = import.meta.env.VITE_R2_BASEURL;
+            const response = await fetch(`${r2BaseUrl}/${path}`);
+            
+            if (response.ok) {
+                const htmlText = await response.text();
+                setHtmlContent(htmlText);
+                
+                const match = htmlText.match(/let\s+portfolioData\s*=\s*(\{[\s\S]*?\});/);
+                if (match && match[1]) {
+                    // eslint-disable-next-line no-new-func
+                    const parsedData = new Function('return ' + match[1])();
+                    setPortfolioData(parsedData);
+                }
+                
+                if (assetsToLoad && assetsToLoad.length > 0) {
+                    addUploadedImages(assetsToLoad.map((asset: any) => ({
+                        id: asset.id,
+                        url: `${r2BaseUrl}/${asset.fileKey}`,
+                        compressed: asset.compressed,
+                        fileKey: asset.fileKey,
+                        file: new File([], asset.fileName || "asset", { type: asset.contentType || "image/webp" })
+                    })));
+                }
+                
+                setStep(2);
+            }
+        } catch (error) {
+            console.error("Error fetching portfolio HTML:", error);
+        } finally {
+            setIsInitialLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const fetchPortfolio = async () => {
+            if (!currentUser) {
+                setIsInitialLoading(false);
+                return;
+            }
+
+            try {
+                const docRef = doc(db, 'portfolios', currentUser.uid);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.versions) {
+                        setVersions(data.versions);
+                    }
+                    if (data.currentPath) {
+                        setSelectedVersionPath(data.currentPath);
+                        await loadPortfolioFromPath(data.currentPath, data.assets);
+                    } else {
+                        setIsInitialLoading(false);
+                    }
+                } else {
+                    setIsInitialLoading(false);
+                }
+            } catch (error) {
+                console.error("Error fetching portfolio:", error);
+                setIsInitialLoading(false);
+            }
+        };
+
+        fetchPortfolio();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentUser]);
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         setError(null);
@@ -204,6 +289,83 @@ const ManageStudioPortfolioView: React.FC = () => {
             setTimeout(() => setUploadProgress(0), 1000);
         }
     };
+
+    const handlePublish = async () => {
+        if (!currentUser) return;
+        setIsPublishing(true);
+        try {
+            const updatedHtml = htmlContent.replace(
+                /let\s+portfolioData\s*=\s*\{[\s\S]*?\};/,
+                `let portfolioData = ${JSON.stringify(portfolioData, null, 2)};`
+            );
+            
+            const file = new File([updatedHtml], "index.html", { type: "text/html" });
+            
+            const urlsResponse = await getUploadUrls({ 
+                folder: 'portfolios', 
+                files: [{ fileName: 'index.html', contentType: 'text/html' }] 
+            });
+            
+            const urlInfo = urlsResponse[0];
+            if (urlInfo) {
+                await uploadFileToR2({ key: urlInfo.key, uploadUrl: urlInfo.uploadUrl }, file);
+                
+                const docRef = doc(db, 'portfolios', currentUser.uid);
+                const docSnap = await getDoc(docRef);
+                
+                const assetsMetadata = uploadedImages.map(img => ({
+                    id: img.id,
+                    fileKey: img.fileKey,
+                    compressed: img.compressed,
+                    fileName: img.file?.name || 'asset',
+                    contentType: img.file?.type || 'image/webp'
+                }));
+                
+                const versionData = {
+                    path: urlInfo.key,
+                    publishedAt: new Date().toISOString()
+                };
+                
+                if (docSnap.exists()) {
+                    await updateDoc(docRef, {
+                        currentPath: urlInfo.key,
+                        assets: assetsMetadata,
+                        versions: arrayUnion(versionData)
+                    });
+                    setVersions(prev => [...prev, versionData]);
+                } else {
+                    await setDoc(docRef, {
+                        currentPath: urlInfo.key,
+                        r2BaseUrl: import.meta.env.VITE_R2_BASEURL,
+                        assets: assetsMetadata,
+                        versions: [versionData]
+                    });
+                    setVersions([versionData]);
+                }
+                setSelectedVersionPath(urlInfo.key);
+                alert('Portfolio published successfully!');
+            }
+        } catch (err) {
+            console.error("Error publishing portfolio:", err);
+            alert('Failed to publish portfolio.');
+        } finally {
+            setIsPublishing(false);
+        }
+    };
+
+    const handleVersionChange = async (event: any) => {
+        const path = event.target.value;
+        setSelectedVersionPath(path);
+        await loadPortfolioFromPath(path);
+    };
+
+    if (isInitialLoading) {
+        return (
+            <Box sx={{ display: 'flex', height: '100vh', bgcolor: '#030912', alignItems: 'center', justifyContent: 'center' }}>
+                <CircularProgress sx={{ color: '#C084FC' }} />
+            </Box>
+        );
+    }
 
     if (step === 1) {
         return (
@@ -400,7 +562,7 @@ const ManageStudioPortfolioView: React.FC = () => {
                                         >
                                             <ListItemAvatar>
                                                 <Avatar sx={{ bgcolor: 'transparent', width: 48, height: 48, mr: 2, borderRadius: 1 }}>
-                                                    {img.file.type.startsWith('image/') ? (
+                                                    {img.file?.type.startsWith('image/') || img.url.endsWith('.webp') ? (
                                                         <img src={img.url} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                     ) : (
                                                         <FileIcon sx={{ color: '#94A3B8' }} />
@@ -408,8 +570,8 @@ const ManageStudioPortfolioView: React.FC = () => {
                                                 </Avatar>
                                             </ListItemAvatar>
                                             <ListItemText
-                                                primary={img.file.name}
-                                                secondary={`${(img.file.size / 1024).toFixed(2)} KB ${img.compressed ? '(Compressed)' : ''}`}
+                                                primary={img.file?.name || 'Uploaded Asset'}
+                                                secondary={`${img.file && img.file.size > 0 ? (img.file.size / 1024).toFixed(2) + ' KB ' : ''}${img.compressed ? '(Compressed)' : ''}`}
                                                 primaryTypographyProps={{ color: '#fff', noWrap: true }}
                                                 secondaryTypographyProps={{ color: '#94A3B8' }}
                                             />
@@ -433,9 +595,141 @@ const ManageStudioPortfolioView: React.FC = () => {
                         </Box>
                     )}
                     {activeTab === 2 && (
-                        <Box sx={{ textAlign: 'center', py: 8 }}>
-                            <Typography variant="h6" sx={{ color: '#fff' }}>Settings</Typography>
-                            <Typography variant="body2" sx={{ color: '#94A3B8' }}>Portfolio settings coming soon.</Typography>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                            {/* Publish Card */}
+                            <Paper sx={{ 
+                                p: 4, 
+                                borderRadius: 4, 
+                                bgcolor: 'rgba(124, 58, 237, 0.05)', 
+                                border: '1px solid rgba(124, 58, 237, 0.2)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'flex-start',
+                                position: 'relative',
+                                overflow: 'hidden'
+                            }}>
+                                <Box sx={{ 
+                                    position: 'absolute', 
+                                    top: -50, 
+                                    right: -50, 
+                                    width: 150, 
+                                    height: 150, 
+                                    bgcolor: 'rgba(124, 58, 237, 0.1)', 
+                                    borderRadius: '50%',
+                                    filter: 'blur(40px)',
+                                    pointerEvents: 'none'
+                                }} />
+                                
+                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                    <Avatar sx={{ bgcolor: 'rgba(124, 58, 237, 0.2)', color: '#C084FC', mr: 2 }}>
+                                        <UploadIcon />
+                                    </Avatar>
+                                    <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600 }}>Publish Portfolio</Typography>
+                                </Box>
+                                
+                                <Typography variant="body2" sx={{ color: '#94A3B8', mb: 4, lineHeight: 1.6, maxWidth: '90%' }}>
+                                    Make your portfolio live and accessible to the world. Publishing will securely save your current configuration, images, and layout, generating a new snapshot in your version history.
+                                </Typography>
+                                
+                                <Button
+                                    variant="contained"
+                                    onClick={handlePublish}
+                                    disabled={isPublishing}
+                                    startIcon={isPublishing ? <CircularProgress size={20} color="inherit" /> : <UploadIcon />}
+                                    sx={{
+                                        borderRadius: '12px',
+                                        background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)',
+                                        px: 4,
+                                        py: 1.5,
+                                        fontWeight: 600,
+                                        boxShadow: '0 8px 16px rgba(124, 58, 237, 0.25)',
+                                        transition: 'all 0.3s ease',
+                                        '&:hover': {
+                                            transform: 'translateY(-2px)',
+                                            boxShadow: '0 12px 20px rgba(124, 58, 237, 0.4)',
+                                        },
+                                        '&.Mui-disabled': {
+                                            background: 'rgba(255,255,255,0.05)',
+                                            color: '#64748B',
+                                            boxShadow: 'none'
+                                        }
+                                    }}
+                                >
+                                    {isPublishing ? 'Publishing...' : 'Publish Now'}
+                                </Button>
+                            </Paper>
+
+                            {/* Version History Card */}
+                            {versions.length > 0 && (
+                                <Paper sx={{ 
+                                    p: 4, 
+                                    borderRadius: 4, 
+                                    bgcolor: 'rgba(15, 26, 46, 0.6)', 
+                                    backdropFilter: 'blur(12px)',
+                                    border: '1px solid rgba(255,255,255,0.05)'
+                                }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                        <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#94A3B8', mr: 2 }}>
+                                            <FileIcon />
+                                        </Avatar>
+                                        <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600 }}>Version History</Typography>
+                                    </Box>
+                                    
+                                    <Typography variant="body2" sx={{ color: '#94A3B8', mb: 4, lineHeight: 1.6 }}>
+                                        Easily roll back to previous versions of your portfolio. Selecting a past version will instantly load its layout and configuration into the editor.
+                                    </Typography>
+                                    
+                                    <FormControl fullWidth variant="outlined" sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            color: '#fff',
+                                            bgcolor: 'rgba(0,0,0,0.2)',
+                                            borderRadius: '12px',
+                                            transition: 'all 0.2s ease',
+                                            '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                                            '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                                            '&.Mui-focused fieldset': { borderColor: '#C084FC', borderWidth: '1px' }
+                                        },
+                                        '& .MuiInputLabel-root': { color: '#64748B' },
+                                        '& .MuiInputLabel-root.Mui-focused': { color: '#C084FC' },
+                                        '& .MuiSvgIcon-root': { color: '#94A3B8' }
+                                    }}>
+                                        <InputLabel id="version-select-label">Load Version</InputLabel>
+                                        <Select
+                                            labelId="version-select-label"
+                                            value={selectedVersionPath}
+                                            onChange={handleVersionChange}
+                                            label="Load Version"
+                                            MenuProps={{
+                                                PaperProps: {
+                                                    sx: {
+                                                        bgcolor: '#0f172a',
+                                                        border: '1px solid rgba(255,255,255,0.1)',
+                                                        '& .MuiMenuItem-root': {
+                                                            color: '#e2e8f0',
+                                                            '&:hover': { bgcolor: 'rgba(192,132,252,0.1)' },
+                                                            '&.Mui-selected': { bgcolor: 'rgba(192,132,252,0.2)', color: '#C084FC' },
+                                                            '&.Mui-selected:hover': { bgcolor: 'rgba(192,132,252,0.3)' }
+                                                        }
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            {versions.map((v, index) => {
+                                                const d = new Date(v.publishedAt);
+                                                const day = String(d.getDate()).padStart(2, '0');
+                                                const month = String(d.getMonth() + 1).padStart(2, '0');
+                                                const year = String(d.getFullYear()).slice(-2);
+                                                
+                                                return (
+                                                    <MenuItem key={v.path} value={v.path} sx={{ py: 1.5 }}>
+                                                        {`${index + 1} - ${day}/${month}/${year}`}
+                                                    </MenuItem>
+                                                );
+                                            })}
+                                        </Select>
+                                    </FormControl>
+                                </Paper>
+                            )}
                         </Box>
                     )}
                 </Box>

@@ -1,4 +1,4 @@
-import { S3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 export const cloudflareS3Client = new S3Client({
     region: "auto",
@@ -8,6 +8,21 @@ export const cloudflareS3Client = new S3Client({
         secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY!,
     },
 });
+
+
+// async function test() {
+//     try {
+//         await cloudflareS3Client.send(
+//             new PutObjectCommand({
+//                 Bucket: "studio",
+//                 Key: "test.txt",
+//                 Body: "hello",
+//             })
+//         );
+//     } catch (e) {
+//         console.log(e)
+//     }
+// }
 
 export const cloudflareBucket =
     process.env.CLOUDFLARE_R2_BUCKET_NAME!;
