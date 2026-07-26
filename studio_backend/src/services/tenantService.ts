@@ -1,35 +1,21 @@
-export interface Tenant {
-    id: string;
-    name: string;
-    slug: string;
-    customDomain?: string;
-}
+import TenantRepository, { NewStudio, Studio } from "../repositories/TenantRepository";
 
-const tenants: Tenant[] = [
-    {
-        id: "1",
-        name: "Vivid Frames",
-        slug: "vividframes",
-        customDomain: "vividframes.in",
-    },
-];
-
-export async function getTenant(host: string): Promise<Tenant | null> {
-
+export async function getTenant(host: string): Promise<Studio | undefined> {
     host = host.toLowerCase();
 
-    // custom domain
-    const custom = tenants.find(t => t.customDomain === host);
-
-    if (custom) return custom;
-
+    let identifier = host;
     // subdomain
     if (host.endsWith(".mizhiv.com")) {
-
-        const slug = host.replace(".mizhiv.com", "");
-
-        return tenants.find(t => t.slug === slug) ?? null;
+        identifier = host.replace(".mizhiv.com", "");
     }
 
-    return null;
+    return await TenantRepository.findBySlugOrDomain(identifier);
+}
+
+export async function createTenant(data: NewStudio): Promise<Studio> {
+    return await TenantRepository.create(data);
+}
+
+export async function updateTenant(id: number, data: Partial<NewStudio>): Promise<Studio | undefined> {
+    return await TenantRepository.update(id, data);
 }

@@ -1,5 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
+import { Request, Response } from "express";
+import { createTenant, updateTenant } from "../services/tenantService";
 
 const CACHE_DIR = path.join(process.cwd(), "cache", "portfolios");
 
@@ -35,6 +37,34 @@ export class TenantController {
         await fs.writeFile(localPath, html);
 
         return html;
+    }
+
+    async create(req: Request, res: Response) {
+        try {
+            const data = req.body;
+            const newTenant = await createTenant(data);
+            res.status(201).json({ success: true, data: newTenant });
+        } catch (error: any) {
+            console.error("Error creating tenant:", error);
+            res.status(500).json({ success: false, error: error.message });
+        }
+    }
+
+    async update(req: Request, res: Response) {
+        try {
+            const id = req.params.id as string;
+            const data = req.body;
+            const updatedTenant = await updateTenant(parseInt(id, 10), data);
+            
+            if (!updatedTenant) {
+                return res.status(404).json({ success: false, error: "Tenant not found" });
+            }
+
+            res.status(200).json({ success: true, data: updatedTenant });
+        } catch (error: any) {
+            console.error("Error updating tenant:", error);
+            res.status(500).json({ success: false, error: error.message });
+        }
     }
 
 }

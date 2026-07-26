@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { TenantController } from '../controllers/TenantController';
 
-const router = Router();
+const baseRoutes = Router();
+const tenantRoutes = Router();
 
 const tenantController = new TenantController();
 
-router.get("/", async (req, res) => {
+baseRoutes.get("/", async (req, res) => {
     console.log("hostname", req.hostname);
 
     try {
@@ -21,4 +22,79 @@ router.get("/", async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
-export default router;
+
+/**
+ * @swagger
+ * /tenant:
+ *   post:
+ *     summary: Create a new tenant
+ *     tags: [Tenants]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - ownerUserId
+ *               - name
+ *               - slug
+ *             properties:
+ *               ownerUserId:
+ *                 type: integer
+ *               name:
+ *                 type: string
+ *               slug:
+ *                 type: string
+ *               customDomain:
+ *                 type: string
+ *               isActive:
+ *                 type: boolean
+ *     responses:
+ *       201:
+ *         description: Created
+ *       500:
+ *         description: Internal Server Error
+ */
+tenantRoutes.post("/", (req, res) => tenantController.create(req, res));
+
+/**
+ * @swagger
+ * /tenant/{id}:
+ *   put:
+ *     summary: Update an existing tenant
+ *     tags: [Tenants]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ownerUserId:
+ *                 type: integer
+ *               name:
+ *                 type: string
+ *               slug:
+ *                 type: string
+ *               customDomain:
+ *                 type: string
+ *               isActive:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: OK
+ *       404:
+ *         description: Tenant not found
+ *       500:
+ *         description: Internal Server Error
+ */
+tenantRoutes.put("/:id", (req, res) => tenantController.update(req, res));
+
+export { baseRoutes, tenantRoutes };
