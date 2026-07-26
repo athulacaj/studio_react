@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -9,13 +9,26 @@ import {
   Button,
   IconButton,
   Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemAvatar,
+  Avatar,
+  ListItemText
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
   Delete as DeleteIcon,
   Add as AddIcon,
+  Image as ImageIcon,
+  InsertDriveFile as FileIcon
 } from '@mui/icons-material';
 import { useConfigStore } from '../../../core/store/ConifgStore';
+import { usePortfolioStore } from '../store/portfolioStore';
 
 interface DynamicPortfolioFormProps {
   data: any;
@@ -24,6 +37,10 @@ interface DynamicPortfolioFormProps {
 
 const DynamicPortfolioForm: React.FC<DynamicPortfolioFormProps> = ({ data, onChange }) => {
   const { setShowNavBar } = useConfigStore();
+  const { uploadedImages } = usePortfolioStore();
+
+  const [isAssetDialogOpen, setIsAssetDialogOpen] = useState(false);
+  const [activeFieldPath, setActiveFieldPath] = useState<string[] | null>(null);
 
   useEffect(() => {
     setShowNavBar(false);
@@ -134,25 +151,41 @@ const DynamicPortfolioForm: React.FC<DynamicPortfolioFormProps> = ({ data, onCha
       );
     } else {
       return (
-        <TextField
-          key={path.join('.')}
-          label={key}
-          value={value || ''}
-          onChange={(e) => handleFieldChange(path, e.target.value)}
-          fullWidth
-          margin="normal"
-          variant="outlined"
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              color: '#fff',
-              '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
-              '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.4)' },
-              '&.Mui-focused fieldset': { borderColor: '#C084FC' },
-            },
-            '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
-            '& .MuiInputLabel-root.Mui-focused': { color: '#C084FC' },
-          }}
-        />
+        <Box key={path.join('.')} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <TextField
+            label={key}
+            value={value || ''}
+            onChange={(e) => handleFieldChange(path, e.target.value)}
+            fullWidth
+            margin="normal"
+            variant="outlined"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                color: '#fff',
+                '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.4)' },
+                '&.Mui-focused fieldset': { borderColor: '#C084FC' },
+              },
+              '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
+              '& .MuiInputLabel-root.Mui-focused': { color: '#C084FC' },
+            }}
+          />
+          <IconButton
+            onClick={() => {
+              setActiveFieldPath(path);
+              setIsAssetDialogOpen(true);
+            }}
+            sx={{
+              color: '#C084FC',
+              bgcolor: 'rgba(192, 132, 252, 0.1)',
+              mt: 1,
+              '&:hover': { bgcolor: 'rgba(192, 132, 252, 0.2)' }
+            }}
+            title="Choose Asset"
+          >
+            <ImageIcon />
+          </IconButton>
+        </Box>
       );
     }
   };
@@ -180,6 +213,58 @@ const DynamicPortfolioForm: React.FC<DynamicPortfolioFormProps> = ({ data, onCha
           {renderField(key, value, [key])}
         </Box>
       ))}
+
+      <Dialog 
+        open={isAssetDialogOpen} 
+        onClose={() => setIsAssetDialogOpen(false)} 
+        maxWidth="sm" 
+        fullWidth 
+        PaperProps={{ sx: { bgcolor: '#0f172a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } }}
+      >
+        <DialogTitle sx={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Select an Asset</DialogTitle>
+        <DialogContent sx={{ p: 0 }}>
+          {uploadedImages.length === 0 ? (
+              <Box sx={{ p: 4, textAlign: 'center' }}>
+                  <Typography sx={{ color: '#94A3B8' }}>No assets uploaded yet.</Typography>
+              </Box>
+          ) : (
+              <List sx={{ p: 0 }}>
+                {uploadedImages.map((img) => (
+                  <ListItem key={img.id} disablePadding sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    <ListItemButton onClick={() => {
+                      if (activeFieldPath) {
+                        const finalUrl = img.fileKey 
+                          ? `${import.meta.env.VITE_R2_BASEURL}/${img.fileKey}` 
+                          : img.url;
+                        handleFieldChange(activeFieldPath, finalUrl);
+                      }
+                      setIsAssetDialogOpen(false);
+                    }}>
+                      <ListItemAvatar>
+                          <Avatar sx={{ bgcolor: 'transparent', borderRadius: 1 }}>
+                              {img.file?.type.startsWith('image/') || img.url.endsWith('.webp') || img.url.match(/\.(jpeg|jpg|gif|png)$/) ? (
+                                  <img src={img.url} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              ) : (
+                                  <FileIcon sx={{ color: '#94A3B8' }} />
+                              )}
+                          </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText 
+                          primary={img.file?.name || img.fileKey || 'Asset'} 
+                          secondary={`${img.file && img.file.size > 0 ? (img.file.size / 1024).toFixed(2) + ' KB' : ''}`}
+                          primaryTypographyProps={{ color: '#fff', noWrap: true }}
+                          secondaryTypographyProps={{ color: '#94A3B8' }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ borderTop: '1px solid rgba(255,255,255,0.1)', p: 2 }}>
+          <Button onClick={() => setIsAssetDialogOpen(false)} sx={{ color: '#94A3B8' }}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -47,7 +47,7 @@ const ManageStudioPortfolioView: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     // Global Store State
-    const { htmlContent, setHtmlContent, portfolioData, setPortfolioData, uploadedImages, addUploadedImages, removeUploadedImage } = usePortfolioStore();
+    const { htmlContent, setHtmlContent, portfolioData, setPortfolioData, uploadedImages, setUploadedImages, addUploadedImages, removeUploadedImage } = usePortfolioStore();
     const { currentUser } = useAuthStore();
 
     const [blobUrl, setBlobUrl] = useState<string | null>(null);
@@ -112,13 +112,15 @@ const ManageStudioPortfolioView: React.FC = () => {
                 }
                 
                 if (assetsToLoad && assetsToLoad.length > 0) {
-                    addUploadedImages(assetsToLoad.map((asset: any) => ({
+                    setUploadedImages(assetsToLoad.map((asset: any) => ({
                         id: asset.id,
                         url: `${r2BaseUrl}/${asset.fileKey}`,
                         compressed: asset.compressed,
                         fileKey: asset.fileKey,
                         file: new File([], asset.fileName || "asset", { type: asset.contentType || "image/webp" })
                     })));
+                } else {
+                    setUploadedImages([]);
                 }
                 
                 setStep(2);
@@ -280,6 +282,25 @@ const ManageStudioPortfolioView: React.FC = () => {
             setUploadProgress(100);
             
             addUploadedImages(processedImages as any);
+
+            if (currentUser) {
+                const updatedImages = [...uploadedImages, ...processedImages];
+                const assetsMetadata = updatedImages.map(img => ({
+                    id: img.id,
+                    fileKey: (img as any).fileKey || img.fileKey,
+                    compressed: img.compressed,
+                    fileName: img.file?.name || 'asset',
+                    contentType: img.file?.type || 'image/webp'
+                }));
+                
+                const docRef = doc(db, 'portfolios', currentUser.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    await updateDoc(docRef, { assets: assetsMetadata });
+                } else {
+                    await setDoc(docRef, { assets: assetsMetadata });
+                }
+            }
         } catch (err) {
             console.error("Error compressing/uploading files:", err);
             alert("Failed to process or upload some files.");
@@ -287,6 +308,33 @@ const ManageStudioPortfolioView: React.FC = () => {
             setIsProcessingFiles(false);
             setIsUploading(false);
             setTimeout(() => setUploadProgress(0), 1000);
+        }
+    };
+
+    const handleRemoveAsset = async (id: string) => {
+        removeUploadedImage(id);
+        
+        if (currentUser) {
+            const updatedImages = uploadedImages.filter(img => img.id !== id);
+            const assetsMetadata = updatedImages.map(img => ({
+                id: img.id,
+                fileKey: img.fileKey,
+                compressed: img.compressed,
+                fileName: img.file?.name || 'asset',
+                contentType: img.file?.type || 'image/webp'
+            }));
+            
+            try {
+                const docRef = doc(db, 'portfolios', currentUser.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    await updateDoc(docRef, { assets: assetsMetadata });
+                } else {
+                    await setDoc(docRef, { assets: assetsMetadata });
+                }
+            } catch (err) {
+                console.error("Error updating firebase on remove:", err);
+            }
         }
     };
 
@@ -576,7 +624,7 @@ const ManageStudioPortfolioView: React.FC = () => {
                                                 secondaryTypographyProps={{ color: '#94A3B8' }}
                                             />
                                             <ListItemSecondaryAction>
-                                                <IconButton edge="end" onClick={() => removeUploadedImage(img.id)} sx={{ color: '#ef4444' }}>
+                                                <IconButton edge="end" onClick={() => handleRemoveAsset(img.id)} sx={{ color: '#ef4444' }}>
                                                     <DeleteIcon />
                                                 </IconButton>
                                             </ListItemSecondaryAction>
