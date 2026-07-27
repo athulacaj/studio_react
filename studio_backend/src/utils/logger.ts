@@ -1,15 +1,15 @@
 import pino from 'pino';
-import { config } from '../config/env';
+import { env } from '../config/env';
 
 export const logger = pino({
-  level: config.NODE_ENV === 'development' ? 'debug' : 'info',
+  level: env.NODE_ENV === 'development' ? 'debug' : 'info',
   transport:
-    config.NODE_ENV === 'development'
+    env.NODE_ENV === 'development'
       ? {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-          },
-        }
+        target: 'pino-pretty',
+        options: {
+          colorize: true,
+        },
+      }
       : undefined,
 });

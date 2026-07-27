@@ -8,14 +8,17 @@ import {
     PhotoLibrary as GalleryIcon,
     FolderSpecial as FolderIcon,
     AutoAwesome as SparkleIcon,
+    Settings as SettingsIcon,
 } from '@mui/icons-material';
 import CreateProjectModal from '../components/CreateProjectModal';
+import DomainSettingsModal from '../components/DomainSettingsModal';
 import ProjectList from '../components/ProjectList';
 import { useUserStore } from '../../auth';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 
 const StudioDashboard: React.FC = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
     const navigate = useNavigate();
     const { userProfile } = useUserStore();
     const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
@@ -190,6 +193,30 @@ const StudioDashboard: React.FC = () => {
                                     Manage Portfolio
                                 </Button>
                                 <Button
+                                    variant="outlined"
+                                    startIcon={<SettingsIcon />}
+                                    onClick={() => setIsSettingsModalOpen(true)}
+                                    sx={{
+                                        flex: { xs: 1, sm: 'initial' },
+                                        borderRadius: '16px',
+                                        borderColor: 'rgba(245, 158, 11, 0.3)',
+                                        color: '#F59E0B',
+                                        fontWeight: 600,
+                                        background: 'rgba(245, 158, 11, 0.06)',
+                                        backdropFilter: 'blur(8px)',
+                                        px: 3,
+                                        '&:hover': {
+                                            borderColor: '#F59E0B',
+                                            background: 'rgba(245, 158, 11, 0.12)',
+                                            boxShadow: '0 0 24px rgba(245, 158, 11, 0.2)',
+                                            transform: 'translateY(-2px)',
+                                        },
+                                        transition: 'all 0.25s ease',
+                                    }}
+                                >
+                                    Domain Settings
+                                </Button>
+                                <Button
                                     variant="contained"
                                     startIcon={<AddIcon />}
                                     onClick={() => setIsCreateModalOpen(true)}
@@ -341,6 +368,12 @@ const StudioDashboard: React.FC = () => {
                     <CreateProjectModal
                         open={isCreateModalOpen}
                         onClose={() => setIsCreateModalOpen(false)}
+                    />
+                )}
+                {!isAdminViewing && (
+                    <DomainSettingsModal
+                        open={isSettingsModalOpen}
+                        onClose={() => setIsSettingsModalOpen(false)}
                     />
                 )}
             </Container>

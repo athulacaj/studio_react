@@ -47,6 +47,7 @@ export const useUserStore = create<UserState>((set, get) => ({
                         name: data.name || '',
                         photoURL: data.photoURL || currentUser.photoURL || '',
                         isAdmin: data.isAdmin === true,
+                        tenantId: data.tenantId,
                         createdAt: data.createdAt?.toDate?.() || undefined,
                         updatedAt: data.updatedAt?.toDate?.() || undefined,
                     },

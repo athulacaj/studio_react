@@ -1,5 +1,5 @@
 import app from './app';
-import { config } from './config/env';
+import { env } from './config/env';
 import { logger } from './utils/logger';
 import { prisma } from './prisma/client';
 
@@ -8,9 +8,9 @@ const startServer = async () => {
     await prisma.$connect();
     logger.info('Connected to database');
 
-    const server = app.listen(config.PORT, () => {
-      logger.info(`Docs available at: http://localhost:${config.PORT}/docs`);
-      logger.info(`Server is running on port ${config.PORT} in ${config.NODE_ENV} mode`);
+    const server = app.listen(env.PORT, () => {
+      logger.info(`Docs available at: http://localhost:${env.PORT}/docs`);
+      logger.info(`Server is running on port ${env.PORT} in ${env.NODE_ENV} mode`);
     });
 
     process.on('SIGTERM', async () => {

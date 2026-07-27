@@ -6,7 +6,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import { logger } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import routes from './routes';
-import { config } from './config/env';
+import { env } from './config/env';
 
 const app = express();
 
@@ -25,11 +25,11 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: `http://localhost:${config.PORT}`,
+        url: env.API_URL,
       },
     ],
   },
-  apis: ['./src/routes/*.ts', './src/app.ts'], 
+  apis: ['./src/routes/*.ts', './src/app.ts'],
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
