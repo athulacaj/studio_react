@@ -1,46 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import {
     Container,
     Paper,
     Typography,
-    TextField,
     Button,
     Box,
-    Alert,
-    Link as MuiLink,
-    InputAdornment,
-    IconButton
+    Link as MuiLink
 } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+import GoogleIcon from '@mui/icons-material/Google';
+import { Link } from 'react-router-dom';
 
 export default function LoginPage() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const login = useAuthStore((state) => state.login);
-    const navigate = useNavigate();
-    const location = useLocation();
-
-    async function handleSubmit(e) {
-        e.preventDefault();
-
-        try {
-            setError('');
-            setLoading(true);
-            await login(email, password);
-            const from = location.state?.from?.pathname || "/";
-            navigate(from, { replace: true });
-        } catch (err) {
-            console.error(err);
-            setError('Failed to log in: ' + err.message);
-        }
-
-        setLoading(false);
-    }
+    useEffect(() => {
+        console.log("login page")
+    }, [])
+    const handleGoogleLogin = () => {
+        window.location.href = import.meta.env.VITE_GOOGLE_LOGIN_URL || '';
+    };
 
     return (
         <Container component="main" maxWidth="xs">
@@ -67,67 +43,24 @@ export default function LoginPage() {
                         Sign In
                     </Typography>
 
-                    {error && <Alert severity="error" sx={{ width: '100%', mb: 2 }}>{error}</Alert>}
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        startIcon={<GoogleIcon />}
+                        onClick={handleGoogleLogin}
+                        sx={{ mt: 1, mb: 2, py: 1.5 }}
+                    >
+                        Sign In with Google
+                    </Button>
 
-                    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            id="email"
-                            label="Email Address"
-                            name="email"
-                            autoComplete="email"
-                            autoFocus
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Password"
-                            type={showPassword ? 'text' : 'password'}
-                            id="password"
-                            autoComplete="current-password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            slotProps={{
-                                input: {
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                aria-label="toggle password visibility"
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                onMouseDown={(e) => e.preventDefault()}
-                                                edge="end"
-                                            >
-                                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    ),
-                                },
-                            }}
-                        />
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2, py: 1.5 }}
-                            disabled={loading}
-                        >
-                            Sign In
-                        </Button>
-                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                            <Typography variant="body2">
-                                Don't have an account?{' '}
-                                <MuiLink component={Link} to="/signup" variant="body2">
-                                    Sign Up
-                                </MuiLink>
-                            </Typography>
-                        </Box>
-                    </Box>
+                    {/* <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Typography variant="body2">
+                            Don't have an account?{' '}
+                            <MuiLink component={Link} to="/signup" variant="body2">
+                                Sign Up
+                            </MuiLink>
+                        </Typography>
+                    </Box> */}
                 </Paper>
             </Box>
         </Container>

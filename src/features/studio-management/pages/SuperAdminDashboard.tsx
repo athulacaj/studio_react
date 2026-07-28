@@ -31,7 +31,7 @@ import {
 } from '@mui/icons-material';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '../../../config/firebase';
-import { useUserStore } from '../../auth';
+import { useAuthStore } from '../../auth';
 
 interface UserListItem {
     uid: string;
@@ -273,18 +273,20 @@ const UserCardSkeleton: React.FC = () => (
 
 const SuperAdminDashboard: React.FC = () => {
     const navigate = useNavigate();
-    const { userProfile } = useUserStore();
+    const currentUser = useAuthStore((state) => state.currentUser);
     const [users, setUsers] = useState<UserListItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const isAdmin = currentUser?.role === "admin";
+
 
     // Gate: redirect non-admins away
     useEffect(() => {
-        if (userProfile && !userProfile.isAdmin) {
+        if (!isAdmin) {
             navigate('/private/studio', { replace: true });
         }
-    }, [userProfile, navigate]);
+    }, [currentUser, navigate]);
 
     // Fetch all users from Firestore
     useEffect(() => {
@@ -307,10 +309,10 @@ const SuperAdminDashboard: React.FC = () => {
             }
         };
 
-        if (userProfile?.isAdmin) {
+        if (isAdmin) {
             fetchUsers();
         }
-    }, [userProfile]);
+    }, []);
 
     // Filter users based on search
     const filteredUsers = users.filter((user) => {
@@ -327,7 +329,7 @@ const SuperAdminDashboard: React.FC = () => {
     };
 
     // Guard while profile loads
-    if (!userProfile?.isAdmin) {
+    if (!isAdmin) {
         return null;
     }
 

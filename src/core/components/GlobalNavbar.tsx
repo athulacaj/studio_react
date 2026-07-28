@@ -14,17 +14,15 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../features/auth/store/authStore';
-import { useUserStore } from '../../features/auth/store/userStore';
 
 const GlobalNavbar = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { logout } = useAuthStore();
-  const { userProfile } = useUserStore();
+  const { currentUser, logout } = useAuthStore();
+  console.log(" currentUser", currentUser)
 
-  const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+  const [_, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -34,9 +32,6 @@ const GlobalNavbar = () => {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
@@ -52,10 +47,6 @@ const GlobalNavbar = () => {
     }
   };
 
-  const pages = [
-    { name: 'Studio Dashboard', path: '/private/studio' },
-    { name: 'Portfolio Builder', path: '/private/portfolio-builder' },
-  ];
 
   return (
     <AppBar position="sticky" sx={{
@@ -230,7 +221,7 @@ const GlobalNavbar = () => {
                 boxShadow: '0 0 16px rgba(157, 78, 221, 0.25)',
               }}
             >
-              {userProfile?.name?.charAt(0)?.toUpperCase() || <AccountCircleIcon />}
+              {currentUser?.name?.charAt(0)?.toUpperCase() || <AccountCircleIcon />}
             </Avatar>
           </IconButton>
           <Menu
@@ -261,8 +252,8 @@ const GlobalNavbar = () => {
             onClose={handleCloseUserMenu}
           >
             <Box sx={{ px: 2.5, py: 2 }}>
-              <Typography variant="body1" sx={{ fontWeight: 700, color: '#F8FAFC', fontSize: '0.95rem' }}>{userProfile?.name || 'User'}</Typography>
-              <Typography variant="body2" sx={{ color: '#64748B', fontSize: '0.8rem' }}>{userProfile?.email}</Typography>
+              <Typography variant="body1" sx={{ fontWeight: 700, color: '#F8FAFC', fontSize: '0.95rem' }}>{currentUser?.name || 'User'}</Typography>
+              <Typography variant="body2" sx={{ color: '#64748B', fontSize: '0.8rem' }}>{currentUser?.email}</Typography>
             </Box>
             <Divider sx={{ borderColor: 'rgba(255,255,255,0.06)', mx: 1.5 }} />
             <MenuItem

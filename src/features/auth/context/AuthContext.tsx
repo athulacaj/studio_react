@@ -28,5 +28,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     // Still gate children on loading to preserve the original behavior
     // where the app waited for Firebase auth to initialize
-    return <>{!loading && children}</>;
+    return <>{!loading ? children
+        : <>loading...</>
+    }</>;
 }

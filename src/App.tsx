@@ -1,10 +1,11 @@
 import { createTheme, ThemeProvider, CssBaseline, Backdrop, CircularProgress } from '@mui/material';
 import AppRouter from './router';
-import { AuthProvider } from './features/auth';
+import { AuthProvider, useAuthStore } from './features/auth';
 import './features/studio-management/store/studioManagementStore';
-import './features/auth/store/userStore';
 import { useGlobalLoader } from './core/context/globalLoader';
 import GlobalToast from './shared/components/GlobalToast';
+import { useEffect } from 'react';
+import { getMe } from './features/auth/services/userService';
 
 
 const mizhivTheme = createTheme({
@@ -118,6 +119,20 @@ const mizhivTheme = createTheme({
 
 function App() {
   const { isLoading } = useGlobalLoader();
+  const { setLoading, setUser } = useAuthStore();
+
+  useEffect(() => {
+    getMe().then(res => {
+      if (res) {
+        setUser(res)
+      }
+    }).catch((err) => {
+      console.log(err)
+    }).finally(() => {
+      console.log("finished")
+      setLoading(false)
+    })
+  }, [])
   return (
     <ThemeProvider theme={mizhivTheme}>
       <CssBaseline />

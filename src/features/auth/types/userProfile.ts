@@ -8,3 +8,11 @@ export interface UserProfile {
     createdAt?: Date;
     updatedAt?: Date;
 }
+
+export interface User {
+    name: string;
+    email: string;
+    photoUrl: string;
+    userId: string;
+    role: string;
+}

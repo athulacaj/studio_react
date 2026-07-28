@@ -1,17 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { useUserStore } from '../store/userStore';
 import { Box, CircularProgress } from '@mui/material';
-import UserDetailsModal from './UserDetailsModal';
 import GlobalNavbar from '../../../core/components/GlobalNavbar';
 import { useConfigStore } from '../../../core/store/ConifgStore';
+import { getMe } from '../services/userService';
 
 const ProtectedRoute = () => {
-    const { currentUser, loading: authLoading } = useAuthStore();
+    const { currentUser, loading: authLoading, setUser } = useAuthStore();
     const { showNavBar } = useConfigStore();
-    const { loading: profileLoading, initialized } = useUserStore();
     const location = useLocation();
+
+
 
     // Wait for auth to resolve
     if (authLoading) {
@@ -28,7 +28,7 @@ const ProtectedRoute = () => {
     }
 
     // Wait for user profile to be fetched at least once
-    if (!initialized || profileLoading) {
+    if (authLoading) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                 <CircularProgress />
@@ -43,7 +43,6 @@ const ProtectedRoute = () => {
                 <GlobalNavbar />
             }
             {/* Force user to fill name if missing */}
-            <UserDetailsModal forcedMode />
             <Box component="main" sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                 <Outlet />
             </Box>

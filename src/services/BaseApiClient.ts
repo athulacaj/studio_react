@@ -15,6 +15,7 @@ export class BaseApiClient {
   constructor(baseURL: string, config?: AxiosRequestConfig) {
     this.axiosInstance = axios.create({
       baseURL,
+      withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
       },

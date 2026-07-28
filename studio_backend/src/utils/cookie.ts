@@ -11,15 +11,18 @@ export interface SessionInfo {
  * from different URLs (like a hosted IP or localhost:3000).
  */
 export const setAuthCookie = (res: Response, session: SessionInfo) => {
-    res.cookie('sessionId', session.sessionId, {
+    const isProduction = process.env.NODE_ENV === "production";
+    const domain = process.env.DOMAIN_NAME;
+
+    res.cookie("sessionId", session.sessionId, {
         httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        path: '/',
-        domain: '.neuratrialdev.online', // key fix
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
+        path: "/",
+        domain: isProduction ? "." + domain : undefined,
         expires: new Date(session.expiresAt),
-    })
-}
+    });
+};
 
 /**
  * Common function to clear the authentication cookie during logout.

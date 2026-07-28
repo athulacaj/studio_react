@@ -32,7 +32,6 @@ import {
 } from '@mui/icons-material';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import { useAuthStore } from '../../auth';
-import { useUserStore } from '../../auth';
 import CreateProjectModal from '../components/CreateProjectModal';
 import ManageShareLinksModal from '../components/ManageShareLinksModal';
 import { useToastStore } from '../../../shared/hooks/useToastStore';
@@ -45,11 +44,10 @@ const ProjectDetailView: React.FC = () => {
     const projects = useStudioManagementStore((state) => state.projects);
     const loading = useStudioManagementStore((state) => state.loading);
     const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
-    const { userProfile } = useUserStore();
 
     // When admin is viewing another user, use that user's ID for links
-    const effectiveUserId = viewAsUserId || currentUser?.uid;
-    const isAdminViewing = !!viewAsUserId && userProfile?.isAdmin;
+    const effectiveUserId = viewAsUserId || currentUser?.id;
+    const isAdminViewing = !!viewAsUserId && currentUser?.role === "admin";
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -517,13 +515,13 @@ const ProjectDetailView: React.FC = () => {
                         </Button>
                     </Box>
                 </Paper>
-                
+
                 {/* Drive Integration (for Google Photos source) */}
                 {project.source === 'google_photos' && (
                     <Box sx={{ mt: 2 }}>
-                        <DriveFileBrowser 
-                            studioUserId={effectiveUserId!} 
-                            projectId={project.id} 
+                        <DriveFileBrowser
+                            studioUserId={effectiveUserId!}
+                            projectId={project.id}
                         />
                     </Box>
                 )}

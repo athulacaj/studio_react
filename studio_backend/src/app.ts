@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import pinoHttp from 'pino-http';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
@@ -10,7 +11,11 @@ import { env } from './config/env';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: env.WEB_URL,
+  credentials: true,
+}));
+app.use(cookieParser());
 app.use(express.json({ limit: '50mb' }));
 app.use(pinoHttp({ logger }));
 

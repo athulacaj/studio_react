@@ -21,9 +21,9 @@ import {
 } from '@mui/icons-material';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../config/firebase';
-import { useUserStore } from '../../auth';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import StudioDashboard from './StudioDashboard';
+import { useAuthStore } from '../../auth';
 
 interface ViewedUser {
     uid: string;
@@ -37,24 +37,28 @@ interface ViewedUser {
 const AdminUserView: React.FC = () => {
     const { userId } = useParams<{ userId: string }>();
     const navigate = useNavigate();
-    const { userProfile } = useUserStore();
+    const currentUser = useAuthStore((state) => state.currentUser);
+
     const setViewAsUserId = useStudioManagementStore((state) => state.setViewAsUserId);
     const clearViewAsUserId = useStudioManagementStore((state) => state.clearViewAsUserId);
     const fetchProjects = useStudioManagementStore((state) => state.fetchProjects);
 
     const [viewedUser, setViewedUser] = useState<ViewedUser | null>(null);
     const [loadingUser, setLoadingUser] = useState(true);
+    const isAdmin = currentUser?.role === "admin";
+
+
 
     // Gate: redirect non-admins
     useEffect(() => {
-        if (userProfile && !userProfile.isAdmin) {
+        if (currentUser && !isAdmin) {
             navigate('/private/studio', { replace: true });
         }
-    }, [userProfile, navigate]);
+    }, [currentUser, navigate]);
 
     // Set viewAsUserId on mount, clear on unmount
     useEffect(() => {
-        if (!userId || !userProfile?.isAdmin) return;
+        if (!userId || !isAdmin) return;
 
         setViewAsUserId(userId);
         // Fetch projects for the viewed user
@@ -71,11 +75,11 @@ const AdminUserView: React.FC = () => {
                 useStudioManagementStore.getState().fetchProjects();
             }, 0);
         };
-    }, [userId, userProfile]);
+    }, [userId, currentUser]);
 
     // Fetch viewed user's profile
     useEffect(() => {
-        if (!userId || !userProfile?.isAdmin) return;
+        if (!userId || !isAdmin) return;
 
         const fetchUser = async () => {
             setLoadingUser(true);
@@ -93,9 +97,9 @@ const AdminUserView: React.FC = () => {
         };
 
         fetchUser();
-    }, [userId, userProfile]);
+    }, [userId]);
 
-    if (!userProfile?.isAdmin) return null;
+    if (!isAdmin) return null;
 
     const userInitials = viewedUser?.name
         ? viewedUser.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)

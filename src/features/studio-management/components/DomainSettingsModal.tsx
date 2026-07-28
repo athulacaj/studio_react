@@ -11,8 +11,8 @@ import {
     CircularProgress,
     Alert
 } from '@mui/material';
-import { useUserStore } from '../../auth';
 import { createTenant, updateTenant, getTenant } from '../api/tenantService';
+import { useAuthStore } from '../../auth';
 
 interface DomainSettingsModalProps {
     open: boolean;
@@ -20,20 +20,20 @@ interface DomainSettingsModalProps {
 }
 
 const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose }) => {
-    const { userProfile, saveUserProfile } = useUserStore();
-    
+    const { currentUser } = useAuthStore();
+
     const [name, setName] = useState('');
     const [slug, setSlug] = useState('');
     const [customDomain, setCustomDomain] = useState('');
-    
+
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
 
     useEffect(() => {
-        if (open && userProfile?.tenantId) {
-            fetchTenant(userProfile.tenantId);
+        if (open && currentUser?.userId) {
+            fetchTenant(currentUser.userId);
         } else if (open) {
             // Reset fields for new creation
             setName('');
@@ -42,9 +42,9 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
             setError(null);
             setSuccess(null);
         }
-    }, [open, userProfile?.tenantId]);
+    }, [open, currentUser?.id]);
 
-    const fetchTenant = async (id: number) => {
+    const fetchTenant = async (id: string) => {
         setFetching(true);
         setError(null);
         try {
@@ -61,8 +61,8 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
     };
 
     const handleSave = async () => {
-        if (!userProfile) return;
-        
+        if (!currentUser?.id) return;
+
         if (!name || !slug) {
             setError('Name and Slug are required.');
             return;
@@ -73,9 +73,9 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
         setSuccess(null);
 
         try {
-            if (userProfile.tenantId) {
+            if (currentUser.userId) {
                 // Update existing
-                await updateTenant(userProfile.tenantId, {
+                await updateTenant(currentUser.userId, {
                     name,
                     slug,
                     customDomain: customDomain || undefined
@@ -83,18 +83,17 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
                 setSuccess('Tenant updated successfully.');
             } else {
                 // Create new
-                const data = await createTenant({
-                    ownerUserId: userProfile.uid,
+                await createTenant({
+                    ownerUserId: currentUser.userId,
                     name,
                     slug,
                     customDomain: customDomain || undefined,
                     isActive: true
                 });
-                
-                await saveUserProfile({ tenantId: data.id });
+
                 setSuccess('Tenant created successfully.');
             }
-            
+
             setTimeout(() => {
                 onClose();
             }, 1500);
@@ -107,8 +106,8 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
     };
 
     return (
-        <Dialog 
-            open={open} 
+        <Dialog
+            open={open}
             onClose={loading ? undefined : onClose}
             maxWidth="sm"
             fullWidth
@@ -127,7 +126,7 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
                     Domain Settings
                 </Typography>
             </DialogTitle>
-            
+
             <DialogContent sx={{ px: 4, py: 2 }}>
                 {fetching ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
@@ -157,7 +156,7 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
                                 sx: { color: 'rgba(255,255,255,0.7)' }
                             }}
                         />
-                        
+
                         <TextField
                             label="Slug"
                             value={slug}
@@ -194,10 +193,10 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
                     </Box>
                 )}
             </DialogContent>
-            
+
             <DialogActions sx={{ px: 4, pb: 4, pt: 1 }}>
-                <Button 
-                    onClick={onClose} 
+                <Button
+                    onClick={onClose}
                     disabled={loading || fetching}
                     sx={{ color: '#94A3B8' }}
                 >

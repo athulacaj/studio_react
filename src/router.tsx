@@ -16,6 +16,8 @@ const AppRouter = () => {
   const location = useLocation();
   // const isPublicRoute = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/about' || location.pathname.includes('/portfolio') || location.pathname.includes('/p/');
 
+
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Box component="main" sx={{ flexGrow: 1 }}>

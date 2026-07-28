@@ -23,10 +23,10 @@ export const createTenant = async (data: TenantPayload): Promise<TenantResponse>
     return await StudioApiClient.post<TenantResponse>('/tenant', data);
 };
 
-export const updateTenant = async (id: number, data: Partial<TenantPayload>): Promise<TenantResponse> => {
+export const updateTenant = async (id: string, data: Partial<TenantPayload>): Promise<TenantResponse> => {
     return await StudioApiClient.put<TenantResponse>(`/tenant/${id}`, data);
 };
 
-export const getTenant = async (id: number): Promise<TenantResponse> => {
+export const getTenant = async (id: string): Promise<TenantResponse> => {
     return await StudioApiClient.get<TenantResponse>(`/tenant/${id}`);
 };

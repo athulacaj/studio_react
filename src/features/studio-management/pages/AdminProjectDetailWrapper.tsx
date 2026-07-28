@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useUserStore } from '../../auth';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import ProjectDetailView from './ProjectDetailView';
+import { useAuthStore } from '../../auth';
 
 /**
  * Wrapper for admin viewing a user's project detail.
@@ -12,22 +12,23 @@ import ProjectDetailView from './ProjectDetailView';
 const AdminProjectDetailWrapper: React.FC = () => {
     const { userId } = useParams<{ userId: string }>();
     const navigate = useNavigate();
-    const { userProfile } = useUserStore();
+    const currentUser = useAuthStore((state) => state.currentUser);
+
     const setViewAsUserId = useStudioManagementStore((state) => state.setViewAsUserId);
     const clearViewAsUserId = useStudioManagementStore((state) => state.clearViewAsUserId);
     const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
-    const fetchProjects = useStudioManagementStore((state) => state.fetchProjects);
+    const isAdmin = currentUser?.role === "admin";
 
     // Gate: redirect non-admins
     useEffect(() => {
-        if (userProfile && !userProfile.isAdmin) {
+        if (currentUser && !isAdmin) {
             navigate('/private/studio', { replace: true });
         }
-    }, [userProfile, navigate]);
+    }, [currentUser, navigate]);
 
     // Set viewAsUserId on mount if not already set (e.g., direct URL navigation)
     useEffect(() => {
-        if (!userId || !userProfile?.isAdmin) return;
+        if (!userId || !isAdmin) return;
 
         // Only set if not already viewing this user
         if (viewAsUserId !== userId) {
@@ -43,9 +44,9 @@ const AdminProjectDetailWrapper: React.FC = () => {
                 useStudioManagementStore.getState().fetchProjects();
             }, 0);
         };
-    }, [userId, userProfile]);
+    }, [userId, currentUser]);
 
-    if (!userProfile?.isAdmin) return null;
+    if (!isAdmin) return null;
 
     return <ProjectDetailView />;
 };

@@ -13,21 +13,21 @@ import {
 import CreateProjectModal from '../components/CreateProjectModal';
 import DomainSettingsModal from '../components/DomainSettingsModal';
 import ProjectList from '../components/ProjectList';
-import { useUserStore } from '../../auth';
 import { useStudioManagementStore } from '../store/studioManagementStore';
+import { useAuthStore } from '../../auth';
 
 const StudioDashboard: React.FC = () => {
+    const { currentUser } = useAuthStore();
+
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
     const navigate = useNavigate();
-    const { userProfile } = useUserStore();
     const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
     const projects = useStudioManagementStore((state) => state.projects);
 
     // When admin is viewing another user's dashboard, hide management actions
-    const isAdminViewing = !!viewAsUserId && userProfile?.isAdmin;
+    const isAdminViewing = !!viewAsUserId && currentUser?.role === "admin";
 
-    const totalFolders = projects.reduce((acc, p) => acc + (p.selectedFolders?.length || 0), 0);
     const activeProjects = projects.filter(p => p.status === 'active').length;
 
 
@@ -120,7 +120,7 @@ const StudioDashboard: React.FC = () => {
                                     mb: 1,
                                 }}
                             >
-                                {isAdminViewing ? 'User Dashboard' : `Welcome back${userProfile?.name ? `, ${userProfile.name}` : ''}`}
+                                {isAdminViewing ? 'User Dashboard' : `Welcome back${currentUser?.name ? `, ${currentUser.name}` : ''}`}
                             </Typography>
                             <Typography
                                 variant="body1"
@@ -144,7 +144,7 @@ const StudioDashboard: React.FC = () => {
                                     flexWrap: 'wrap',
                                 }}
                             >
-                                {userProfile?.isAdmin && (
+                                {currentUser?.role == "admin" && (
                                     <Button
                                         variant="outlined"
                                         startIcon={<AdminIcon />}
