@@ -15,6 +15,7 @@ export const projects = pgTable("projects", {
 
     createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
+    driveUrl: text("drive_url"),
 }, (table) => [
     foreignKey({
         columns: [table.userId],

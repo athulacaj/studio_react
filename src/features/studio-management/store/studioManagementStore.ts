@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, updateDoc, deleteDoc, limit, startAfter, QueryDocumentSnapshot, DocumentData, getDoc } from 'firebase/firestore';
 import { useAuthStore } from '../../auth';
 import { db } from '../../../config/firebase';
-import { Project, SharedLink } from '../types';
+import { Project, ProjectAssets, ProjectStatus, SharedLink, Source } from '../types';
+import { createProject, getProject } from '../api/projectService';
 
 const PAGE_LIMIT = 3;
 
@@ -36,7 +37,6 @@ interface StudioManagementState {
     updateProjectLocalState: (projectId: string) => Promise<void>;
 }
 
-const getCurrentUser = () => useAuthStore.getState().currentUser;
 
 /**
  * Returns the effective user ID for Firestore queries.
@@ -44,11 +44,10 @@ const getCurrentUser = () => useAuthStore.getState().currentUser;
  * Otherwise returns the current authenticated user's uid.
  */
 const getEffectiveUserId = (): string | null => {
-    const viewAsUserId = useStudioManagementStore.getState().viewAsUserId;
+    const viewAsUserId = useAuthStore.getState().currentUser?.userId;
     if (viewAsUserId) return viewAsUserId;
-    const currentUser = getCurrentUser();
-    return currentUser?.uid || null;
-};
+    return null
+}
 
 export const useStudioManagementStore = create<StudioManagementState>((set, get) => ({
     projects: [],
@@ -103,14 +102,10 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
             const querySnapshot = await getDocs(q);
             const docs = querySnapshot.docs;
             const hasNext = docs.length > PAGE_LIMIT;
-            const visibleDocs = hasNext ? docs.slice(0, PAGE_LIMIT) : docs;
+            const visibleDocs = await getProject(effectiveUid)
 
-            const projectsData = visibleDocs.map(d => ({
-                id: d.id,
-                ...d.data()
-            })) as Project[];
+            const projectsData = [] as Project[];
 
-            const lastVisible = visibleDocs.length > 0 ? visibleDocs[visibleDocs.length - 1] : null;
 
             set({
                 projects: projectsData,
@@ -240,15 +235,41 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
         if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
         try {
-            const docRef = await addDoc(collection(db, 'projects', effectiveUid, 'projects'), {
-                ...projectData,
+            // const docRef = await addDoc(collection(db, 'projects', effectiveUid, 'projects'), {
+            //     ...projectData,
+            //     userId: effectiveUid,
+            //     createdAt: serverTimestamp(),
+            //     status: 'active'
+            // });
+
+
+            //     name: string;
+            //     userId: string;
+            //     description?: string;
+            //     source: Source;
+            //     status: ProjectStatus;
+            //     projectAssets: ProjectAssets;
+            //     createdAt?: string;
+            //     updatedAt?: string;
+            //     driveUrl?: string;
+            // }
+            await createProject({
+                name: projectData.name ?? '',
                 userId: effectiveUid,
-                createdAt: serverTimestamp(),
-                status: 'active'
-            });
+                description: projectData.description,
+                source: projectData.source ?? Source.GOOGLE_PHOTOS,
+                status: projectData.status ?? ProjectStatus.READY_FOR_SYNC,
+                projectAssets: projectData.projectAssets ?? ProjectAssets.GDRIVE,
+                driveUrl: projectData.driveUrl
+            }, {
+                driveData: projectData.driveData ?? {},
+                selectedFolders: projectData.selectedFolders,
+            })
+
+
             // After adding, re-fetch from page 1 to get consistent state
             await get().fetchProjects();
-            return docRef.id;
+            return '';
         } catch (err: any) {
             console.error("Error adding project:", err);
             set({ error: err.message });

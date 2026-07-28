@@ -5,7 +5,13 @@ export const validate =
   (schema: ZodSchema, source: 'body' | 'query' | 'params' = 'body') =>
     (req: Request, res: Response, next: NextFunction): void => {
       try {
-        req[source] = schema.parse(req[source])
+        const parsed = schema.parse(req[source])
+        Object.defineProperty(req, source, {
+          value: parsed,
+          configurable: true,
+          writable: true,
+          enumerable: true
+        })
         next()
       } catch (error) {
         if (error instanceof ZodError) {

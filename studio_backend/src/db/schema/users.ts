@@ -40,3 +40,6 @@ export const sessions = pgTable("sessions", {
         name: "sessions_user_id_users_user_id_fk"
     }),
 ]);
+
+export type User = typeof users.$inferSelect;
+export type Session = typeof sessions.$inferSelect;

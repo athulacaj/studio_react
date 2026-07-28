@@ -5,11 +5,6 @@ import { AuthService } from '../services/AuthService'
 const authService = new AuthService()
 
 export const requireAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const notExcludedPaths = ['/me', '/study-list']
-    if (!notExcludedPaths.includes(req.path)) {
-        next()
-        return
-    }
     try {
         const sessionId = req.cookies.sessionId
 

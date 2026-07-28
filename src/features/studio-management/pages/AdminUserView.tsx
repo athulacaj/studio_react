@@ -63,17 +63,17 @@ const AdminUserView: React.FC = () => {
         setViewAsUserId(userId);
         // Fetch projects for the viewed user
         // Small delay to ensure viewAsUserId is set in store
-        const timer = setTimeout(() => {
-            fetchProjects();
-        }, 0);
+        // const timer = setTimeout(() => {
+        //     fetchProjects();
+        // }, 0);
 
         return () => {
             clearTimeout(timer);
             clearViewAsUserId();
             // Re-fetch own projects after leaving admin view
-            setTimeout(() => {
-                useStudioManagementStore.getState().fetchProjects();
-            }, 0);
+            // setTimeout(() => {
+            //     useStudioManagementStore.getState().fetchProjects();
+            // }, 0);
         };
     }, [userId, currentUser]);
 

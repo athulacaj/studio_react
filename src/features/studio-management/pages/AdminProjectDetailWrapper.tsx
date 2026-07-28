@@ -33,16 +33,16 @@ const AdminProjectDetailWrapper: React.FC = () => {
         // Only set if not already viewing this user
         if (viewAsUserId !== userId) {
             setViewAsUserId(userId);
-            setTimeout(() => {
-                useStudioManagementStore.getState().fetchProjects();
-            }, 0);
+            // setTimeout(() => {
+            //     useStudioManagementStore.getState().fetchProjects();
+            // }, 0);
         }
 
         return () => {
             clearViewAsUserId();
-            setTimeout(() => {
-                useStudioManagementStore.getState().fetchProjects();
-            }, 0);
+            // setTimeout(() => {
+            //     useStudioManagementStore.getState().fetchProjects();
+            // }, 0);
         };
     }, [userId, currentUser]);
 

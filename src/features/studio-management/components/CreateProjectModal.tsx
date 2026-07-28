@@ -129,7 +129,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
             const result = await getFolderStructure({ url: driveUrl });
             const newFolderStructure = result.data as DriveNode;
             setFolderStructure(newFolderStructure);
-            
+
             if (isEditMode && project) {
                 await updateProject(project.id, {
                     driveData: newFolderStructure
@@ -167,7 +167,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                 if (folderStructure) {
                     newProjectData.driveData = folderStructure;
                 }
-                
+
                 const projectId = await addProject(newProjectData);
 
                 if (projectId && source === 'google_drive' && foldersToSave.length > 0) {

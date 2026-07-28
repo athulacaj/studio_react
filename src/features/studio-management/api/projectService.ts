@@ -1,8 +1,9 @@
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { db } from '../../../config/firebase';
-import { Project, SharedLink, DriveNode } from '../types';
+import { Project, SharedLink, DriveNode, DriveData } from '../types';
 import { StudioApiClient } from '../../../services/ApiInitalizer';
+import ApiEndPoints from '../../../config/apiEndpoints';
 
 /**
  * Fetches project details from Firestore.
@@ -10,20 +11,15 @@ import { StudioApiClient } from '../../../services/ApiInitalizer';
  * @param {string} projectId 
  * @returns {Promise<Project>} Project data
  */
-export const getProject = async (userId: string, projectId: string): Promise<Project> => {
-    try {
-        const projectRef = doc(db, 'projects', userId, 'projects', projectId);
-        const projectSnap = await getDoc(projectRef);
+export const getProject = async (userId?: string, projectId?: string): Promise<Project> => {
+    return await StudioApiClient.get<Project>(ApiEndPoints.projects.get.projects({
+        userId: userId,
+        projectId: projectId
+    }));
+};
 
-        if (!projectSnap.exists()) {
-            throw new Error('Project not found');
-        }
-
-        return projectSnap.data() as Project;
-    } catch (error) {
-        console.error("Error fetching project:", error);
-        throw error;
-    }
+export const createProject = async (project: Partial<Project>, driveData?: Partial<DriveData>): Promise<string> => {
+    return await StudioApiClient.post<string>(ApiEndPoints.projects.post.projects(), { project, driveData });
 };
 
 /**
@@ -89,3 +85,5 @@ export const getProjectTreeData = async (filePath: string): Promise<DriveNode> =
         throw error;
     }
 };
+
+
