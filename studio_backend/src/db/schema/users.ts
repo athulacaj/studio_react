@@ -6,7 +6,7 @@ export const users = pgTable("users", {
     email: text().notNull(),
     name: text(),
     role: userRole(),
-    createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
 }, (table) => [
     unique("users_email_unique").on(table.email),
 ]);
@@ -17,7 +17,7 @@ export const authAccounts = pgTable("auth_accounts", {
     provider: text().notNull(),
     providerAccountId: text("provider_account_id"),
     passwordHash: text("password_hash"),
-    createdAt: timestamp("created_at", { mode: 'string' }).defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
 }, (table) => [
     foreignKey({
         columns: [table.userId],
@@ -30,8 +30,8 @@ export const authAccounts = pgTable("auth_accounts", {
 export const sessions = pgTable("sessions", {
     sessionId: uuid("session_id").defaultRandom().primaryKey().notNull(),
     userId: uuid("user_id").notNull(),
-    issuedAt: timestamp("issued_at", { mode: 'string' }).defaultNow().notNull(),
-    expiresAt: timestamp("expires_at", { mode: 'string' }).notNull(),
+    issuedAt: timestamp("issued_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true, mode: "string" }).notNull(),
     ipAddress: text("ip_address"),
 }, (table) => [
     foreignKey({

@@ -7,15 +7,15 @@ const projectService = new ProjectService();
 export class ProjectController {
     async create(req: Request, res: Response) {
         try {
-            const data = req.body;
+            const { project, driveData } = req.body;
             // Overwrite userId with current user's ID
             const userId = req.user?.userId;
             if (!userId) {
                 return res.status(401).json({ success: false, error: "User not authenticated" });
             }
-            data.userId = userId;
+            project.userId = userId;
 
-            const newProject = await projectService.createProject(data);
+            const newProject = await projectService.createProject(project, driveData);
             res.status(201).json({ success: true, data: newProject });
         } catch (error: any) {
             console.error("Error creating project:", error);

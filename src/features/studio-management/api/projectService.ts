@@ -1,7 +1,7 @@
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { db } from '../../../config/firebase';
-import { Project, SharedLink, DriveNode, DriveData } from '../types';
+import { Project, SharedLink, DriveNode, DriveData, ProjectJoinDriveData } from '../types';
 import { StudioApiClient } from '../../../services/ApiInitalizer';
 import ApiEndPoints from '../../../config/apiEndpoints';
 
@@ -11,8 +11,8 @@ import ApiEndPoints from '../../../config/apiEndpoints';
  * @param {string} projectId 
  * @returns {Promise<Project>} Project data
  */
-export const getProject = async (userId?: string, projectId?: string): Promise<Project> => {
-    return await StudioApiClient.get<Project>(ApiEndPoints.projects.get.projects({
+export const getProject = async (userId?: string, projectId?: string): Promise<{ data: ProjectJoinDriveData[] }> => {
+    return await StudioApiClient.get<{ data: ProjectJoinDriveData[] }>(ApiEndPoints.projects.get.projects({
         userId: userId,
         projectId: projectId
     }));

@@ -23,7 +23,7 @@ import {
     NavigateNext as NavigateNextIcon,
     CameraAlt as CameraAltIcon,
 } from '@mui/icons-material';
-import { Project } from '../types';
+import { Project, ProjectStatus } from '../types';
 
 interface ProjectCardProps {
     project: Project;
@@ -170,15 +170,15 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                                 borderRadius: '999px',
                                 fontSize: '0.7rem',
                                 height: 26,
-                                backgroundColor: project.status === 'active'
+                                backgroundColor: project.status === ProjectStatus.ACTIVE
                                     ? 'rgba(34, 197, 94, 0.12)'
                                     : 'rgba(148, 163, 184, 0.12)',
-                                color: project.status === 'active'
+                                color: project.status === ProjectStatus.ACTIVE
                                     ? '#22C55E'
                                     : '#94A3B8',
                                 fontWeight: 600,
                                 border: '1px solid',
-                                borderColor: project.status === 'active'
+                                borderColor: project.status === ProjectStatus.ACTIVE
                                     ? 'rgba(34, 197, 94, 0.2)'
                                     : 'rgba(148, 163, 184, 0.15)',
                             }}
@@ -264,7 +264,7 @@ const ProjectCardSkeleton: React.FC = () => (
 );
 
 const ProjectList: React.FC = () => {
-    const projects = useStudioManagementStore((state) => state.projects);
+    const projectJoinDriveData = useStudioManagementStore((state) => state.projects);
     const loading = useStudioManagementStore((state) => state.loading);
     const currentPage = useStudioManagementStore((state) => state.currentPage);
     const hasNextPage = useStudioManagementStore((state) => state.hasNextPage);
@@ -272,7 +272,7 @@ const ProjectList: React.FC = () => {
     const fetchNextPage = useStudioManagementStore((state) => state.fetchNextPage);
     const fetchPreviousPage = useStudioManagementStore((state) => state.fetchPreviousPage);
 
-    if (loading && projects.length === 0) {
+    if (loading && projectJoinDriveData.length === 0) {
         return (
             <Grid container spacing={3}>
                 {[...Array(4)].map((_, i) => (
@@ -284,7 +284,7 @@ const ProjectList: React.FC = () => {
         );
     }
 
-    if (!projects || projects.length === 0) {
+    if (!projectJoinDriveData || projectJoinDriveData.length === 0) {
         return (
             <Box
                 sx={{
@@ -343,9 +343,9 @@ const ProjectList: React.FC = () => {
                     </Box>
                 )}
                 <Grid container spacing={3}>
-                    {projects.map((project) => (
-                        <Grid item xs={12} sm={6} md={4} key={project.id}>
-                            <ProjectCard project={project} />
+                    {projectJoinDriveData.map((project) => (
+                        <Grid item xs={12} sm={6} md={4} key={project.project.id}>
+                            <ProjectCard project={project.project} />
                         </Grid>
                     ))}
                 </Grid>

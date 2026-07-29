@@ -12,7 +12,8 @@ export const selectedAlbums = pgTable("selected_albums", {
     url: text("url"),
     selections: jsonb("selections"),
     folderPathList: jsonb("folder_path_list").$type<string[]>(),
-    updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
 }, (table) => [
     foreignKey({
         columns: [table.sharedLinkId],

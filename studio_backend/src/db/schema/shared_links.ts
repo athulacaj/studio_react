@@ -9,8 +9,8 @@ export const sharedLinks = pgTable("shared_links", {
     categories: jsonb("categories").$type<{ id: string; isHidden: boolean; label: string }[]>(),
     includedFolders: jsonb("included_folders").$type<string[]>(),
     createdBy: uuid("created_by").notNull(),
-    createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
 }, (table) => [
     foreignKey({
         columns: [table.sourceProjectId],

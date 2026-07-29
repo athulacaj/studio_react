@@ -13,8 +13,8 @@ export const projects = pgTable("projects", {
     status: projectStatus("project_status"),
     projectAssets: projectAssets("project_assets"),
 
-    createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
     driveUrl: text("drive_url"),
 }, (table) => [
     foreignKey({

@@ -15,6 +15,7 @@ import DomainSettingsModal from '../components/DomainSettingsModal';
 import ProjectList from '../components/ProjectList';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import { useAuthStore } from '../../auth';
+import { ProjectStatus } from '../types';
 
 const StudioDashboard: React.FC = () => {
     const { currentUser } = useAuthStore();
@@ -23,12 +24,12 @@ const StudioDashboard: React.FC = () => {
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
     const navigate = useNavigate();
     const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
-    const projects = useStudioManagementStore((state) => state.projects);
+    const projectJoinDriveData = useStudioManagementStore((state) => state.projects);
 
     // When admin is viewing another user's dashboard, hide management actions
     const isAdminViewing = !!viewAsUserId && currentUser?.role === "admin";
 
-    const activeProjects = projects.filter(p => p.status === 'active').length;
+    const activeProjects = projectJoinDriveData.map(p => p.project).filter(p => p.status === ProjectStatus.ACTIVE).length;
 
 
     return (
@@ -254,7 +255,7 @@ const StudioDashboard: React.FC = () => {
                             {
                                 icon: <CameraIcon sx={{ fontSize: 28, color: '#9D4EDD' }} />,
                                 label: 'Total Projects',
-                                value: projects.length,
+                                value: projectJoinDriveData.length,
                                 glowColor: 'rgba(157, 78, 221, 0.15)',
                             },
                             {

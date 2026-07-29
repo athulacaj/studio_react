@@ -28,12 +28,10 @@ export interface LinkCategory {
     isHidden?: boolean;
 }
 
-
 export enum ProjectStatus {
-    READY_FOR_SYNC = 'ready_for_sync',
-    SYNCED = 'synced',
-    FAILED = 'failed',
-    INITIALIZING = 'initializing',
+    ACTIVE = 'ACTIVE',
+    INACTIVE = 'INACTIVE',
+    ARCHIVED = 'ARCHIVED',
 }
 
 export enum Source {
@@ -76,14 +74,7 @@ export interface Project {
     selectedFolders?: any;
     syncedFolders?: any;
 }
-// id: uuid("id").defaultRandom().primaryKey().notNull(),
-// projectId: uuid("project_id").notNull(),
 
-// selectedFolders: jsonb("selected_folders"),
-// driveData: jsonb("drive_data"),
-// syncedFolders: jsonb("synced_folders"),
-// createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
-// updatedAt
 
 export interface DriveData {
     id: string;
@@ -93,6 +84,11 @@ export interface DriveData {
     syncedFolders: SyncedFolder[];
     createdAt: string;
     updatedAt: string;
+}
+
+export interface ProjectJoinDriveData {
+    project: Project;
+    driveData: DriveData | null;
 }
 
 export interface SharedLink {

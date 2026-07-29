@@ -9,8 +9,8 @@ export const studios = pgTable(
         slug: varchar("slug", { length: 100 }).notNull(),
         customDomain: varchar("custom_domain", { length: 255 }),
         isActive: boolean("is_active").default(true).notNull(),
-        createdAt: timestamp("created_at").defaultNow().notNull(),
-        updatedAt: timestamp("updated_at").defaultNow().notNull(),
+        createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
+        updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
     },
     (table) => [
         uniqueIndex("studios_slug_idx").on(table.slug),

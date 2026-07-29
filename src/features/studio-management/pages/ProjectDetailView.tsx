@@ -36,17 +36,18 @@ import CreateProjectModal from '../components/CreateProjectModal';
 import ManageShareLinksModal from '../components/ManageShareLinksModal';
 import { useToastStore } from '../../../shared/hooks/useToastStore';
 import { DriveFileBrowser, useDriveIntegrationStore } from '../../drive-integration';
+import { ProjectStatus } from '../types';
 
 const ProjectDetailView: React.FC = () => {
     const { projectId } = useParams<{ projectId: string }>();
     const navigate = useNavigate();
     const currentUser = useAuthStore((state) => state.currentUser);
-    const projects = useStudioManagementStore((state) => state.projects);
+    const projectJoinDriveData = useStudioManagementStore((state) => state.projects);
     const loading = useStudioManagementStore((state) => state.loading);
     const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
 
     // When admin is viewing another user, use that user's ID for links
-    const effectiveUserId = viewAsUserId || currentUser?.id;
+    const effectiveUserId = viewAsUserId || currentUser?.userId;
     const isAdminViewing = !!viewAsUserId && currentUser?.role === "admin";
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -59,10 +60,11 @@ const ProjectDetailView: React.FC = () => {
     const driveLoading = useDriveIntegrationStore((state) => state.loading);
     const fetchConnection = useDriveIntegrationStore((state) => state.fetchConnection);
 
-    const project = useMemo(
-        () => projects.find((p) => p.id === projectId) || null,
-        [projects, projectId]
+    const projectData = useMemo(
+        () => projectJoinDriveData.find((p) => p.project.id === projectId) || null,
+        [projectJoinDriveData, projectId]
     );
+    const project = projectData?.project;
 
     // Fetch Drive connection for google_photos projects
     useEffect(() => {
@@ -120,16 +122,18 @@ const ProjectDetailView: React.FC = () => {
         );
     }
 
-    const formattedDate = project.createdAt?.toDate
-        ? project.createdAt.toDate().toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
+    const formattedDate = project.createdAt
+        ? new Date(project.createdAt).toLocaleString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            // hour: "numeric",
+            // minute: "2-digit",
         })
-        : 'Just now';
+        : "Just now";
 
-    const formattedUpdatedDate = project.updatedAt?.toDate
-        ? project.updatedAt.toDate().toLocaleDateString('en-US', {
+    const formattedUpdatedDate = project.updatedAt
+        ? new Date(project.updatedAt).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -202,7 +206,7 @@ const ProjectDetailView: React.FC = () => {
                             <Chip
                                 label={project.status}
                                 size="small"
-                                color={project.status === 'active' ? 'success' : 'default'}
+                                color={project.status === ProjectStatus.ACTIVE ? 'success' : 'default'}
                                 sx={{ borderRadius: 2, fontSize: '0.75rem' }}
                             />
                         </Box>
