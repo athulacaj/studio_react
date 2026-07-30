@@ -4,6 +4,7 @@ import studioRoutes from './studio';
 import { baseRoutes, tenantRoutes } from './tenantRoutes';
 import { authRouter } from './authRoutes';
 import { projectRoutes } from './projectRoutes';
+import { googleRoutes } from './googleRoutes';
 
 const router = Router();
 
@@ -13,6 +14,7 @@ router.use('/studio', studioRoutes);
 router.use('/', baseRoutes);
 router.use('/tenant', tenantRoutes);
 router.use('/auth', authRouter);
+router.use('/google', googleRoutes);
 
 
 export default router;

@@ -57,6 +57,13 @@
       "when": 1785345896636,
       "tag": "0007_sour_rumiko_fujikawa",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1785350439961,
+      "tag": "0008_fancy_expediter",
+      "breakpoints": true
     }
   ]
 }

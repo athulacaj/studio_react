@@ -14,8 +14,7 @@ import {
     Alert,
     SelectChangeEvent,
     CircularProgress,
-    Fade,
-    Typography
+    Fade
 } from '@mui/material';
 import {
     CreateNewFolderOutlined as CreateIcon,
@@ -23,19 +22,18 @@ import {
 } from '@mui/icons-material';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import { useAuthStore } from '../../auth';
-import { httpsCallable } from 'firebase/functions';
-import { functions } from '../../../config/firebase';
 import FolderSelectionDialog from './FolderSelectionDialog';
-import { Project, DriveNode } from '../types';
+import { DriveNode, ProjectJoinDriveData } from '../types';
 import { useGlobalLoader } from '../../../core/context/globalLoader';
+import { getFolderStructure, uploadDriveData } from '../api/GoogleService';
 
 interface CreateProjectModalProps {
     open: boolean;
     onClose: () => void;
-    project?: Project | null;
+    projectData?: ProjectJoinDriveData | null;
 }
 
-const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, project = null }) => {
+const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, projectData = null }) => {
     const addProject = useStudioManagementStore((state) => state.addProject);
     const updateProject = useStudioManagementStore((state) => state.updateProject);
     const currentUser = useAuthStore((state) => state.currentUser);
@@ -51,6 +49,9 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
     const [folderStructure, setFolderStructure] = useState<DriveNode | null>(null);
     const [selectedFolders, setSelectedFolders] = useState<string[]>([]);
 
+    const project = projectData?.project;
+    const driveData = projectData?.driveData;
+
     const isEditMode = !!project;
 
     useEffect(() => {
@@ -59,8 +60,8 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                 setProjectName(project.name);
                 setSource(project.source);
                 setDriveUrl(project.driveUrl || '');
-                setFolderStructure(project.driveData || null);
-                setSelectedFolders(project.selectedFolders || []);
+                setFolderStructure(driveData?.driveData || null);
+                setSelectedFolders(driveData?.selectedFolders || []);
             } else {
                 // Reset for create mode
                 setProjectName('');
@@ -98,15 +99,14 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
         setLoading(true);
         try {
             if (source === 'google_drive') {
-                if (isEditMode && project && project.driveData) {
+                if (isEditMode && project && driveData?.driveData) {
                     // Use existing structure for edit
-                    setFolderStructure(project.driveData);
+                    setFolderStructure(driveData?.driveData);
                     setFolderSelectionOpen(true);
                     setLoading(false);
                 } else {
                     // Fetch folder structure first
-                    const getFolderStructure = httpsCallable(functions, 'getFolderStructure');
-                    const result = await getFolderStructure({ url: driveUrl });
+                    const result = await getFolderStructure(driveUrl);
                     setFolderStructure(result.data as DriveNode);
                     setFolderSelectionOpen(true); // Open selection dialog
                     setLoading(false); // Stop loading for this modal
@@ -125,9 +125,8 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
     const handleReload = async () => {
         if (!driveUrl) return;
         try {
-            const getFolderStructure = httpsCallable(functions, 'getFolderStructure');
-            const result = await getFolderStructure({ url: driveUrl });
-            const newFolderStructure = result.data as DriveNode;
+            const result = await getFolderStructure(driveUrl);
+            const newFolderStructure = result as DriveNode;
             setFolderStructure(newFolderStructure);
 
             if (isEditMode && project) {
@@ -186,13 +185,11 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
 
     const handleDriveUpload = async (projectId: string, folders: string[]) => {
         const viewAsUserId = useStudioManagementStore.getState().viewAsUserId;
-        const effectiveUid = viewAsUserId || currentUser?.uid;
+        const effectiveUid = viewAsUserId || currentUser?.userId;
         if (!effectiveUid) return;
-        const uploadDriveData = httpsCallable(functions, 'uploadDriveData');
         const uploadPromises = folders.map(folderId => {
             return uploadDriveData({
                 folderId: folderId,
-                userId: effectiveUid,
                 projectId: projectId,
                 recursive: false
             }).catch(err => {
@@ -311,7 +308,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                 folderStructure={folderStructure}
                 onConfirm={handleSubmit}
                 initialSelection={selectedFolders}
-                syncedFolders={project?.syncedFolders}
+                syncedFolders={driveData?.syncedFolders}
                 projectId={project?.id}
                 onReload={source === 'google_drive' ? handleReload : undefined}
             />

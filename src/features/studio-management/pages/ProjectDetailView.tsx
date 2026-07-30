@@ -535,13 +535,13 @@ const ProjectDetailView: React.FC = () => {
             <CreateProjectModal
                 open={isEditModalOpen}
                 onClose={handleCloseEditModal}
-                project={project}
+                projectData={projectData}
             />
 
             <ManageShareLinksModal
                 open={isShareModalOpen}
                 onClose={() => setIsShareModalOpen(false)}
-                project={project}
+                projectData={projectData}
             />
         </Container>
     );

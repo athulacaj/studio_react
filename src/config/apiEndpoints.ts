@@ -31,6 +31,12 @@ const ApiEndPoints = {
             selectedAlbums: () => `/projects/selected-albums`,
             sharedLinks: () => `/projects/shared-links`,
         }
+    },
+    google: {
+        post: {
+            folderStructure: () => `/google/folder-structure`,
+            uploadDriveData: () => `/google/upload-drive-data`,
+        }
     }
 
 }

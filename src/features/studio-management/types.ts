@@ -70,9 +70,6 @@ export interface Project {
     createdAt?: string;
     updatedAt?: string;
     driveUrl?: string;
-    driveData?: any;
-    selectedFolders?: any;
-    syncedFolders?: any;
 }
 
 
@@ -81,7 +78,7 @@ export interface DriveData {
     projectId: string;
     selectedFolders: string[];
     driveData: DriveNode;
-    syncedFolders: SyncedFolder[];
+    syncedFolders: Record<string, SyncedFolder>;
     createdAt: string;
     updatedAt: string;
 }

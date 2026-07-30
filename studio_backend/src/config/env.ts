@@ -11,7 +11,12 @@ const envSchema = z.object({
   PORT: z.string(),
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
-  WEB_URL: z.string()
+  WEB_URL: z.string(),
+  GOOGLE_DRIVE_API_KEY: z.string(),
+  GOOGLE_DRIVE_CLIENT_ID: z.string(),
+  GOOGLE_DRIVE_CLIENT_SECRET: z.string(),
+  TOKEN_ENCRYPTION_KEY: z.string()
+
 });
 
 const envVars = envSchema.safeParse(process.env);
@@ -30,4 +35,8 @@ export const env = {
   GOOGLE_CLIENT_ID: envVars.data.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: envVars.data.GOOGLE_CLIENT_SECRET,
   WEB_URL: envVars.data.WEB_URL,
+  GOOGLE_DRIVE_API_KEY: envVars.data.GOOGLE_DRIVE_API_KEY,
+  GOOGLE_DRIVE_CLIENT_ID: envVars.data.GOOGLE_DRIVE_CLIENT_ID,
+  GOOGLE_DRIVE_CLIENT_SECRET: envVars.data.GOOGLE_DRIVE_CLIENT_SECRET,
+  TOKEN_ENCRYPTION_KEY: envVars.data.TOKEN_ENCRYPTION_KEY,
 };

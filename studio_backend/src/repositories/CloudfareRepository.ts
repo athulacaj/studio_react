@@ -10,13 +10,16 @@ export default class CloudflareRepository {
     async uploadData(
         key: string,
         body: Buffer | Uint8Array | Blob | string,
-        contentType?: string
+        contentType?: string,
+        contentEncoding?: string
+
     ): Promise<void> {
         const command = new PutObjectCommand({
             Bucket: this.bucketName,
             Key: key,
             Body: body,
             ContentType: contentType,
+            ContentEncoding: contentEncoding,
         });
 
         await this.s3.send(command);

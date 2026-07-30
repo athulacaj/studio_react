@@ -37,20 +37,20 @@ import {
 } from '@mui/icons-material';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import FolderTree from './FolderTree';
-import { Project, SharedLink, LinkCategory } from '../types';
+import { Project, SharedLink, LinkCategory, ProjectJoinDriveData, DriveData } from '../types';
 import { useToastStore } from '../../../shared/hooks/useToastStore';
 
 interface ManageShareLinksModalProps {
     open: boolean;
     onClose: () => void;
-    project: Project | null;
+    projectData: ProjectJoinDriveData;
 }
 
 const SUGGESTED_CATEGORIES = ['Favourites', 'Album', 'Selected'];
 
 type ViewMode = 'list' | 'create' | 'edit';
 
-const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onClose, project }) => {
+const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onClose, projectData }) => {
     const fetchShareLinks = useStudioManagementStore((state) => state.fetchShareLinks);
     const createShareLink = useStudioManagementStore((state) => state.createShareLink);
     const updateShareLink = useStudioManagementStore((state) => state.updateShareLink);
@@ -59,6 +59,8 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
     const [links, setLinks] = useState<SharedLink[]>([]);
     const [loading, setLoading] = useState(false);
     const [view, setView] = useState<ViewMode>('list');
+    const project = projectData.project;
+    const driveData: DriveData | null = projectData.driveData;
 
     const [currentLink, setCurrentLink] = useState<SharedLink | null>(null);
     const [error, setError] = useState('');
@@ -189,7 +191,7 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
         }
     };
 
-    const allowedFolderIds = project?.selectedFolders ? new Set(project.selectedFolders) : new Set<string>();
+    const allowedFolderIds = driveData?.selectedFolders ? new Set(driveData.selectedFolders) : new Set<string>();
 
     const renderList = () => (
         <Fade in timeout={400}>
@@ -464,7 +466,7 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                     <Typography variant="subtitle1" sx={{ mb: 1.5, fontWeight: 500 }}>
                         Select Folders to Include
                     </Typography>
-                    {Object.keys(project?.syncedFolders || {}).length > 0 ? (
+                    {Object.keys(driveData?.syncedFolders || {}).length > 0 ? (
                         <Paper
                             variant="outlined"
                             sx={{
@@ -476,12 +478,12 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                         >
                             <Box sx={{ maxHeight: 350, overflow: 'auto', p: 1 }}>
                                 <FolderTree
-                                    folderStructure={project?.driveData}
+                                    folderStructure={driveData?.driveData}
                                     selectedFolders={selectedFolders}
                                     onToggleSelect={handleToggleSelect}
                                     onSelectAllChange={setSelectedFolders}
                                     selectableIds={allowedFolderIds}
-                                    syncedFolders={project?.syncedFolders}
+                                    syncedFolders={driveData?.syncedFolders}
                                 />
                             </Box>
                         </Paper>

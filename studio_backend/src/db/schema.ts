@@ -5,3 +5,4 @@ export * from "./schema/projects";
 export * from "./schema/driveData";
 export * from "./schema/shared_links";
 export * from "./schema/selected_albums";
+export * from "./schema/driveConnections";

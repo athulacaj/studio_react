@@ -38,7 +38,7 @@ class TenantRepository {
     async update(id: number, data: Partial<NewStudio>): Promise<Studio | undefined> {
         const result = await db
             .update(studios)
-            .set({ ...data, updatedAt: new Date() })
+            .set({ ...data, updatedAt: new Date().toISOString() })
             .where(eq(studios.id, id))
             .returning();
         return result[0];

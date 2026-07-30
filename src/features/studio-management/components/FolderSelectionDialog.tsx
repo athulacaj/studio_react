@@ -35,7 +35,7 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
     folderStructure,
     onConfirm,
     initialSelection = [],
-    syncedFolders = {},
+    syncedFolders,
     projectId,
     onReload
 }) => {
@@ -169,7 +169,7 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
                     <Button onClick={() => setConfirmReloadOpen(false)} sx={{ color: 'text.secondary' }}>
                         Cancel
                     </Button>
-                    <Button 
+                    <Button
                         onClick={async () => {
                             setConfirmReloadOpen(false);
                             setIsReloading(true);
@@ -178,8 +178,8 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
                             } finally {
                                 setIsReloading(false);
                             }
-                        }} 
-                        variant="contained" 
+                        }}
+                        variant="contained"
                         color="primary"
                         sx={{ borderRadius: '8px' }}
                     >
