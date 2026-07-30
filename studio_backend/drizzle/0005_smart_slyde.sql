@@ -1,1 +1,0 @@
-ALTER TABLE "projects" ADD COLUMN "drive_url" text;
