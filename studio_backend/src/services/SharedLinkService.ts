@@ -10,8 +10,12 @@ export class SharedLinkService {
         return newSharedLink;
     }
 
-    async getSharedLinks(sourceProjectId?: string, createdBy?: string, updatedAfter?: string) {
+    async getSharedLinks(id?: string, sourceProjectId?: string, createdBy?: string, updatedAfter?: string) {
         const conditions = [];
+
+        if (id) {
+            conditions.push(eq(sharedLinks.id, id));
+        }
 
         if (sourceProjectId) {
             conditions.push(eq(sharedLinks.sourceProjectId, sourceProjectId));
@@ -32,5 +36,17 @@ export class SharedLinkService {
         }
 
         return await query;
+    }
+
+    async updateSharedLink(id: string, data: Partial<NewSharedLink>) {
+        const [updatedLink] = await db.update(sharedLinks)
+            .set({ ...data, updatedAt: new Date().toISOString() })
+            .where(eq(sharedLinks.id, id))
+            .returning();
+        
+        if (!updatedLink) {
+            throw new Error(`Shared link with id ${id} not found`);
+        }
+        return updatedLink;
     }
 }

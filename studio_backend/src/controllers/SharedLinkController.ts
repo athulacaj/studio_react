@@ -25,16 +25,33 @@ export class SharedLinkController {
 
     async get(req: Request, res: Response) {
         try {
+            const id = req.query.id as string | undefined;
             const sourceProjectId = req.query.sourceProjectId as string | undefined;
             const requestedCreatedBy = req.query.createdBy as string | undefined;
             const updatedAfter = req.query.updatedAfter as string | undefined;
 
             const createdBy = getEffectiveUserId(req, requestedCreatedBy);
 
-            const sharedLinks = await sharedLinkService.getSharedLinks(sourceProjectId, createdBy, updatedAfter);
+            const sharedLinks = await sharedLinkService.getSharedLinks(id, sourceProjectId, createdBy, updatedAfter);
             res.status(200).json({ success: true, data: sharedLinks });
         } catch (error: any) {
             console.error("Error fetching shared links:", error);
+            res.status(500).json({ success: false, error: error.message });
+        }
+    }
+
+    async update(req: Request, res: Response) {
+        try {
+            const id = req.params.id as string;
+            const data = req.body;
+
+            const updatedSharedLink = await sharedLinkService.updateSharedLink(id, data);
+            res.status(200).json({ success: true, data: updatedSharedLink });
+        } catch (error: any) {
+            console.error("Error updating shared link:", error);
+            if (error.message.includes("not found")) {
+                return res.status(404).json({ success: false, error: error.message });
+            }
             res.status(500).json({ success: false, error: error.message });
         }
     }

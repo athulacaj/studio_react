@@ -12,7 +12,9 @@ export const createSharedLinkSchema = z.object({
 });
 
 export const getSharedLinksSchema = z.object({
+  id: z.string().uuid('Invalid shared link ID').optional(),
   sourceProjectId: z.string().uuid('Invalid project ID').optional(),
   createdBy: z.string().uuid('Invalid user ID').optional(),
   updatedAfter: z.string().datetime().optional(),
 });
+export const updateSharedLinkSchema = createSharedLinkSchema.partial();

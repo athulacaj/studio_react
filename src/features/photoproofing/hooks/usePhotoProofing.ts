@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePhotoProofingStore } from '../store/usePhotoProofingStore';
 import { getProject, getSharedLink, getProjectTreeData } from '../../studio-management/api/projectService';
-import { Project, SharedLink, DriveNode } from '../../studio-management/types';
+import { Project, SharedLink, DriveNode, ProjectJoinDriveData, DriveData } from '../../studio-management/types';
 import { albumSyncService } from '../services/AlbumSyncService';
 import { useSearchParams } from 'react-router-dom';
 import { AlbumCategory } from '../types';
@@ -73,7 +73,9 @@ export default function usePhotoProofing(userId: string, projectId: string, link
         setIds(userId, projectId, linkId || null);
     }, [userId, projectId, linkId, setIds]);
     const [error, setError] = useState<string | null>(null);
-    const [project, setProject] = useState<Project | null>(null);
+    const [projectData, setProjectData] = useState<ProjectJoinDriveData | null>(null);
+    const project: Project | undefined = projectData?.project;
+    const driveData: DriveData | null | undefined = projectData?.driveData;
 
     // Cache for fetched trees: { [rootFolderId]: treeData }
     const [cachedTrees, setCachedTrees] = useState<{ [key: string]: DriveNode }>({});
@@ -92,13 +94,13 @@ export default function usePhotoProofing(userId: string, projectId: string, link
             setShareLinkData(linkData);
             // albums example
             // "favourites": { name: "Favourites", images: [] }
-            let categoriesObj: Record<string, AlbumCategory> = {}
+            const categoriesObj: Record<string, AlbumCategory> = {}
             linkData?.categories?.forEach(e => { categoriesObj[e.id] = { name: e.label, images: [], id: e.id } });
             setCategories(categoriesObj);
 
             // Find the "roots" of the shared selection from the project's driveData
-            if (projectData.driveData) {
-                const sharedRoots = findSharedRoots(projectData.driveData);
+            if (driveData?.driveData) {
+                const sharedRoots = findSharedRoots(driveData.driveData);
                 initialFolders = sharedRoots;
             }
 
@@ -117,9 +119,12 @@ export default function usePhotoProofing(userId: string, projectId: string, link
     const loadProjectAndLink = useCallback(async () => {
         try {
             // 1. Fetch Project Details
-            const projectData = await getProject(userId, projectId);
-            setProject(projectData);
-            handleLinkShared(projectData);
+            const res = await getProject(userId, projectId);
+            if (res.data && res.data.length > 0) {
+                const project = res.data[0];
+                setProjectData(project);
+                handleLinkShared(project.project);
+            }
 
 
         } catch (err: unknown) {
@@ -147,9 +152,9 @@ export default function usePhotoProofing(userId: string, projectId: string, link
 
         // Handle explicit SHARED_ROOT navigation
         if (currentFolderId === 'SHARED_ROOT') {
-            if (linkId && shareLinkData && project.driveData) {
+            if (linkId && shareLinkData && driveData?.driveData) {
                 const includedIds = new Set<string>(shareLinkData.includedFolders || []);
-                const sharedRoots = findSharedRoots(project.driveData, includedIds);
+                const sharedRoots = findSharedRoots(driveData.driveData, includedIds);
                 setFolders(sharedRoots);
                 setImages([]);
                 return;
@@ -164,7 +169,7 @@ export default function usePhotoProofing(userId: string, projectId: string, link
             let rootId = folderRootMap[currentFolderId];
 
             // If not in map, check if it's a direct key in projectData (meaning it's a root itself)
-            if (!rootId && project[currentFolderId]) {
+            if (!rootId && project && project?.currentFolderId) {
                 rootId = currentFolderId;
                 setFolderRootMap(prev => ({ ...prev, [currentFolderId]: currentFolderId }));
             }

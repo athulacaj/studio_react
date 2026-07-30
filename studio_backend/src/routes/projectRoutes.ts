@@ -6,7 +6,9 @@ import { createProjectSchema, getProjectsSchema } from '../validators/project-va
 import { selectedAlbumController } from '../controllers/SelectedAlbumController';
 import { createSelectedAlbumSchema, getSelectedAlbumsSchema } from '../validators/selected-album-validator';
 import { sharedLinkController } from '../controllers/SharedLinkController';
-import { createSharedLinkSchema, getSharedLinksSchema } from '../validators/shared-link-validator';
+import { createSharedLinkSchema, getSharedLinksSchema, updateSharedLinkSchema } from '../validators/shared-link-validator';
+import { albumController } from '../controllers/AlbumController';
+import { createAlbumsSchema, getAlbumsSchema } from '../validators/album-validator';
 
 const router = Router();
 
@@ -170,13 +172,15 @@ router.get('/selected-albums', requireAuth, validate(getSelectedAlbumsSchema, 'q
 
 
 
+
+
 /**
  * @swagger
- * /projects/shared-links:
+ * /projects/sharedLinks:
  *   post:
  *     tags:
  *       - Projects
- *     summary: Create a new shared link
+ *     summary: Create a new shared link (Alias)
  *     description: Creates a new shared link for the authenticated user
  *     security:
  *       - cookieAuth: []
@@ -202,6 +206,8 @@ router.get('/selected-albums', requireAuth, validate(getSelectedAlbumsSchema, 'q
  *                   properties:
  *                     id:
  *                       type: string
+ *                     name:
+ *                       type: string
  *                     isHidden:
  *                       type: boolean
  *                     label:
@@ -218,19 +224,25 @@ router.get('/selected-albums', requireAuth, validate(getSelectedAlbumsSchema, 'q
  *       422:
  *         description: Validation error
  */
-router.post('/shared-links', requireAuth, validate(createSharedLinkSchema), sharedLinkController.create);
+router.post('/sharedLinks', requireAuth, validate(createSharedLinkSchema), sharedLinkController.create);
 
 /**
  * @swagger
- * /projects/shared-links:
+ * /projects/sharedLinks:
  *   get:
  *     tags:
  *       - Projects
- *     summary: Get shared links
- *     description: Retrieves shared links, optionally filtered by sourceProjectId, createdBy, or updatedAfter.
+ *     summary: Get shared links (Alias)
+ *     description: Retrieves shared links, optionally filtered by id, sourceProjectId, createdBy, or updatedAfter.
  *     security:
  *       - cookieAuth: []
  *     parameters:
+ *       - in: query
+ *         name: id
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Optional Shared Link ID
  *       - in: query
  *         name: sourceProjectId
  *         schema:
@@ -255,7 +267,138 @@ router.post('/shared-links', requireAuth, validate(createSharedLinkSchema), shar
  *       401:
  *         description: Unauthorized
  */
-router.get('/shared-links', requireAuth, validate(getSharedLinksSchema, 'query'), sharedLinkController.get);
+router.get('/sharedLinks', requireAuth, validate(getSharedLinksSchema, 'query'), sharedLinkController.get);
+
+
+/**
+ * @swagger
+ * /projects/sharedLinks/{id}:
+ *   put:
+ *     tags:
+ *       - Projects
+ *     summary: Update a shared link
+ *     description: Updates an existing shared link for the authenticated user
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: The shared link ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               categories:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                     isHidden:
+ *                       type: boolean
+ *                     label:
+ *                       type: string
+ *               includedFolders:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Shared link updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Shared link not found
+ *       422:
+ *         description: Validation error
+ */
+
+router.put('/sharedLinks/:id', requireAuth, validate(updateSharedLinkSchema), sharedLinkController.update);
+
+/**
+ * @swagger
+ * /projects/albums:
+ *   post:
+ *     tags:
+ *       - Projects
+ *     summary: Create albums in bulk
+ *     description: Creates or updates multiple albums for a shared link
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: array
+ *             items:
+ *               type: object
+ *               required:
+ *                 - imageId
+ *                 - linkId
+ *                 - projectId
+ *               properties:
+ *                 imageId:
+ *                   type: string
+ *                 linkId:
+ *                   type: string
+ *                   format: uuid
+ *                 projectId:
+ *                   type: string
+ *                   format: uuid
+ *                 image:
+ *                   type: object
+ *                 selections:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *     responses:
+ *       201:
+ *         description: Albums created successfully
+ *       401:
+ *         description: Unauthorized
+ *       422:
+ *         description: Validation error
+ */
+router.post('/albums', requireAuth, validate(createAlbumsSchema), albumController.create);
+
+/**
+ * @swagger
+ * /projects/albums:
+ *   get:
+ *     tags:
+ *       - Projects
+ *     summary: Get albums
+ *     description: Retrieves albums, optionally filtered by link_id.
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: link_id
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Optional Shared Link ID
+ *     responses:
+ *       200:
+ *         description: List of albums
+ *       401:
+ *         description: Unauthorized
+ */
+router.get('/albums', requireAuth, validate(getAlbumsSchema, 'query'), albumController.get);
 
 
 export { router as projectRoutes };
+

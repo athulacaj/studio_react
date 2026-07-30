@@ -3,7 +3,9 @@ import { collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, upda
 import { useAuthStore } from '../../auth';
 import { db } from '../../../config/firebase';
 import { Project, ProjectAssets, ProjectJoinDriveData, ProjectStatus, SharedLink, Source } from '../types';
-import { createProject, getProject } from '../api/projectService';
+import { createProject, getProject, getSharedLink, postShareLink } from '../api/projectService';
+import ApiEndPoints from '../../../config/apiEndpoints';
+import { StudioApiClient } from '../../../services/ApiInitalizer';
 
 const PAGE_LIMIT = 3;
 
@@ -192,11 +194,14 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
         if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
         try {
-            const shareLinkRef = await addDoc(collection(db, 'projects', effectiveUid, 'projects', projectId, 'shared_links'), {
-                ...linkData,
-                createdAt: serverTimestamp(),
-                createdBy: effectiveUid
-            });
+            const shareLinkRef = await postShareLink({
+                name: linkData.name,
+                sourceProjectId: linkData.sourceProjectId,
+                categories: linkData.categories,
+                includedFolders: linkData.includedFolders
+            })
+
+
             return shareLinkRef.id;
         } catch (err: any) {
             console.error("Error creating share link:", err);
@@ -212,15 +217,13 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
         if (!effectiveUid) return [];
         set({ loading: true });
         try {
-            const q = query(
-                collection(db, 'projects', effectiveUid, 'projects', projectId, 'shared_links'),
-                orderBy('createdAt', 'desc')
-            );
-            const querySnapshot = await getDocs(q);
-            return querySnapshot.docs.map(d => ({
-                id: d.id,
-                ...d.data()
-            })) as SharedLink[];
+            const linkRef = await getSharedLink(
+                {
+                    createdBy: effectiveUid,
+                    sourceProjectId: projectId,
+                }
+            )
+            return linkRef;
         } catch (err: any) {
             console.error("Error fetching share links:", err);
             set({ error: err.message });
@@ -240,6 +243,12 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
                 ...updates,
                 updatedAt: serverTimestamp()
             });
+            const shareLinkRef = await postShareLink({
+                name: updates.name,
+                sourceProjectId: linkData.sourceProjectId,
+                categories: linkData.categories,
+                includedFolders: linkData.includedFolders
+            })
         } catch (err: any) {
             console.error("Error updating share link:", err);
             set({ error: err.message });
@@ -275,3 +284,4 @@ useAuthStore.subscribe((state, prevState) => {
         useStudioManagementStore.setState({ projects: [], error: null, viewAsUserId: null, currentPage: 1, hasNextPage: false, hasPreviousPage: false, lastVisibleDoc: null, pageStartCursors: [null] });
     }
 });
+

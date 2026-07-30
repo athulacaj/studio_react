@@ -1,9 +1,10 @@
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { db } from '../../../config/firebase';
-import { Project, SharedLink, DriveNode, DriveData, ProjectJoinDriveData } from '../types';
+import { Project, SharedLink, DriveNode, DriveData, ProjectJoinDriveData, LinkCategory } from '../types';
 import { StudioApiClient } from '../../../services/ApiInitalizer';
 import ApiEndPoints from '../../../config/apiEndpoints';
+import { SharedLinksParams } from '../../../types/apiEndPointTypes';
 
 /**
  * Fetches project details from Firestore.
@@ -39,6 +40,7 @@ export const updateProjectSyncFolder = async (
     }
 };
 
+
 /**
  * Fetches shared link details from Firestore.
  * @param {string} userId 
@@ -46,21 +48,82 @@ export const updateProjectSyncFolder = async (
  * @param {string} linkId 
  * @returns {Promise<SharedLink>} Shared link data
  */
-export const getSharedLink = async (userId: string, projectId: string, linkId: string): Promise<SharedLink> => {
+export const getSharedLink = async (params: SharedLinksParams): Promise<SharedLink[]> => {
     try {
-        const linkRef = doc(db, 'projects', userId, 'projects', projectId, 'shared_links', linkId);
-        const linkSnap = await getDoc(linkRef);
-
-        if (!linkSnap.exists()) {
-            throw new Error('Share link not found');
+        const payload: any = {
+            createdBy: params.createdBy,
+            sourceProjectId: params.sourceProjectId,
+        };
+        if (params.id) {
+            payload.id = params.id;
         }
-
-        return linkSnap.data() as SharedLink;
+        const linkRef = await StudioApiClient.get<{ data: SharedLink[] }>(ApiEndPoints.projects.get.sharedLinks(payload))
+        return linkRef.data;
     } catch (error) {
         console.error("Error fetching shared link:", error);
         throw error;
     }
 };
+// {
+//   "name": "string",
+//   "sourceProjectId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+//   "categories": [
+//     {
+//       "id": "string",
+//       "name": "string",
+//       "isHidden": true,
+//       "label": "string"
+//     }
+//   ],
+//   "includedFolders": [
+//     "string"
+//   ]
+// }
+
+type PostShareLinkData = {
+    name?: string;
+    sourceProjectId: string;
+    categories: LinkCategory[];
+    includedFolders: string[];
+}
+
+
+
+export const postShareLink = async (data: PostShareLinkData): Promise<any> => {
+    try {
+        const linkRef = await StudioApiClient.post<PostShareLinkData>(ApiEndPoints.projects.post.sharedLinks(), {
+            name: data.name,
+            sourceProjectId: data.sourceProjectId,
+            categories: data.categories,
+            includedFolders: data.includedFolders
+        })
+        return linkRef;
+    } catch (error) {
+        console.error("Error creating shared link:", error);
+        throw error;
+    }
+};
+
+type PutShareLinkData = {
+    name?: string;
+    categories?: LinkCategory[];
+    includedFolders?: string[];
+}
+
+export const putShareLink = async (id: string, data: PutShareLinkData): Promise<any> => {
+    try {
+        const linkRef = await StudioApiClient.put<PutShareLinkData>(ApiEndPoints.projects.put.sharedLinks(id), {
+            name: data.name,
+            categories: data.categories,
+            includedFolders: data.includedFolders
+        });
+        return linkRef;
+    } catch (error) {
+        console.error("Error updating shared link:", error);
+        throw error;
+    }
+};
+
 
 /**
  * Fetches the project tree structure (JSON) from Firebase Storage.
