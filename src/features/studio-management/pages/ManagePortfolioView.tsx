@@ -36,10 +36,12 @@ import DynamicPortfolioForm from '../components/DynamicPortfolioForm';
 import UploadDialogComponent from '../../../shared/components/UploadDialogComponent';
 import { usePortfolioStore } from '../store/portfolioStore';
 import imageCompression from 'browser-image-compression';
-import { getUploadUrls, uploadFileToR2 } from '../api/StudioportfolioService';
+import { createWebsite, createWebsitePath, getUploadUrls, getWebsitePaths, getWebsites, updateWebsite, uploadFileToR2, WebsitePath } from '../api/WebsiteService';
 import { doc, setDoc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../../../config/firebase';
 import { useAuthStore } from '../../auth/store/authStore';
+import { getBusinessByUserId } from '../api/businessService';
+import { version } from 'node:os';
 
 const ManageStudioPortfolioView: React.FC = () => {
     const navigate = useNavigate();
@@ -47,7 +49,9 @@ const ManageStudioPortfolioView: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     // Global Store State
-    const { htmlContent, setHtmlContent, portfolioData, setPortfolioData, uploadedImages, setUploadedImages, addUploadedImages, removeUploadedImage } = usePortfolioStore();
+    const { htmlContent, setHtmlContent, portfolioData, setPortfolioData, uploadedImages,
+        setUploadedImages, addUploadedImages, removeUploadedImage, businessData,
+        setBusinessData, webSiteData, setWebsiteData, pathData, setPathData } = usePortfolioStore();
     const { currentUser } = useAuthStore();
 
     const [blobUrl, setBlobUrl] = useState<string | null>(null);
@@ -56,7 +60,7 @@ const ManageStudioPortfolioView: React.FC = () => {
     const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [isPublishing, setIsPublishing] = useState(false);
 
-    const [versions, setVersions] = useState<{path: string, publishedAt: string}[]>([]);
+    const [versions, setVersions] = useState<{ path: string, publishedAt: string }[]>([]);
     const [selectedVersionPath, setSelectedVersionPath] = useState<string>('');
 
     // State for tabs
@@ -72,6 +76,29 @@ const ManageStudioPortfolioView: React.FC = () => {
     const [isProcessingFiles, setIsProcessingFiles] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
+
+    async function handlePath(businessId: number) {
+        const pathDataList: WebsitePath[] = await getWebsitePaths(businessId);
+        if (pathDataList.length > 0) {
+            const pathData = pathDataList.filter(path => path.path === "/")[0];
+            setPathData(pathData)
+        } else {
+            const data = await createWebsitePath({
+                businessId: businessId,
+                path: "/"
+            })
+            setPathData(data);
+        }
+
+    }
+
+    useEffect(() => {
+        getBusinessByUserId(currentUser?.userId ?? '').then((res) => {
+            const data = res.data.filter(e => e.typeId = 1)[0];
+            setBusinessData(data)
+            handlePath(data.id)
+        })
+    }, [])
 
     useEffect(() => {
         if (!isDragging) return;
@@ -99,18 +126,18 @@ const ManageStudioPortfolioView: React.FC = () => {
             setIsInitialLoading(true);
             const r2BaseUrl = import.meta.env.VITE_R2_BASEURL;
             const response = await fetch(`${r2BaseUrl}/${path}`);
-            
+
             if (response.ok) {
                 const htmlText = await response.text();
                 setHtmlContent(htmlText);
-                
+
                 const match = htmlText.match(/let\s+portfolioData\s*=\s*(\{[\s\S]*?\});/);
                 if (match && match[1]) {
                     // eslint-disable-next-line no-new-func
                     const parsedData = new Function('return ' + match[1])();
                     setPortfolioData(parsedData);
                 }
-                
+
                 if (assetsToLoad && assetsToLoad.length > 0) {
                     setUploadedImages(assetsToLoad.map((asset: any) => ({
                         id: asset.id,
@@ -122,7 +149,7 @@ const ManageStudioPortfolioView: React.FC = () => {
                 } else {
                     setUploadedImages([]);
                 }
-                
+
                 setStep(2);
             }
         } catch (error) {
@@ -133,39 +160,38 @@ const ManageStudioPortfolioView: React.FC = () => {
     };
 
     useEffect(() => {
-        const fetchPortfolio = async () => {
-            if (!currentUser) {
-                setIsInitialLoading(false);
-                return;
-            }
-
-            try {
-                const docRef = doc(db, 'portfolios', currentUser.uid);
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (data.versions) {
-                        setVersions(data.versions);
-                    }
-                    if (data.currentPath) {
-                        setSelectedVersionPath(data.currentPath);
-                        await loadPortfolioFromPath(data.currentPath, data.assets);
-                    } else {
-                        setIsInitialLoading(false);
-                    }
-                } else {
-                    setIsInitialLoading(false);
+        const fetchPortfolio = async (businessId: number) => {
+            const websiteData = await getWebsites({
+                businessId: businessId
+            });
+            const data = websiteData.data[0];
+            if (data) {
+                setWebsiteData(data)
+                if (data.currentPath) {
+                    setSelectedVersionPath(data.currentPath);
+                    await loadPortfolioFromPath(data.currentPath, data.assets);
                 }
-            } catch (error) {
-                console.error("Error fetching portfolio:", error);
-                setIsInitialLoading(false);
+                setVersions(data.versions);
             }
+            setIsInitialLoading(false);
         };
+        if (businessData?.id) {
+            fetchPortfolio(businessData.id);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [businessData]);
 
-        fetchPortfolio();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentUser]);
+    async function createWebsiteHandler(urlInfo: any, versions: any = []) {
+        const updatedWebsiteData = await createWebsite({
+            businessId: businessData!.id,
+            projectId: null,
+            pathId: pathData!.id,
+            assets: [],
+            currentPath: urlInfo?.key,
+            versions: []
+        })
+        setWebsiteData(updatedWebsiteData.data);
+    }
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         setError(null);
@@ -184,11 +210,14 @@ const ManageStudioPortfolioView: React.FC = () => {
                 try {
                     const match = content.match(/let\s+portfolioData\s*=\s*(\{[\s\S]*?\});/);
                     if (match && match[1]) {
-                        // eslint-disable-next-line no-new-func
+
                         const parsedData = new Function('return ' + match[1])();
                         setPortfolioData(parsedData);
                         setHtmlContent(content);
                         setStep(2);
+                        if (!webSiteData) {
+                            createWebsiteHandler({})
+                        }
                     } else {
                         setError('Could not find portfolioData in the uploaded template. Make sure the file contains "let portfolioData = {...};".');
                     }
@@ -247,7 +276,7 @@ const ManageStudioPortfolioView: React.FC = () => {
                     compressed
                 });
             }
-            
+
             setIsProcessingFiles(false);
             setIsUploading(true);
 
@@ -259,7 +288,7 @@ const ManageStudioPortfolioView: React.FC = () => {
             }));
 
             const urlsResponse = await getUploadUrls({ folder, files: fileUploadDetails });
-            
+
             const totalFiles = processedImages.length;
             let currentFileIndex = 0;
 
@@ -278,9 +307,9 @@ const ManageStudioPortfolioView: React.FC = () => {
                 }
                 currentFileIndex++;
             }
-            
+
             setUploadProgress(100);
-            
+
             addUploadedImages(processedImages as any);
 
             if (currentUser) {
@@ -292,14 +321,10 @@ const ManageStudioPortfolioView: React.FC = () => {
                     fileName: img.file?.name || 'asset',
                     contentType: img.file?.type || 'image/webp'
                 }));
-                
-                const docRef = doc(db, 'portfolios', currentUser.uid);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    await updateDoc(docRef, { assets: assetsMetadata });
-                } else {
-                    await setDoc(docRef, { assets: assetsMetadata });
-                }
+                const updatedWebsiteData = await updateWebsite(webSiteData!.id, {
+                    assets: assetsMetadata
+                })
+                setWebsiteData(updatedWebsiteData.data)
             }
         } catch (err) {
             console.error("Error compressing/uploading files:", err);
@@ -313,7 +338,7 @@ const ManageStudioPortfolioView: React.FC = () => {
 
     const handleRemoveAsset = async (id: string) => {
         removeUploadedImage(id);
-        
+
         if (currentUser) {
             const updatedImages = uploadedImages.filter(img => img.id !== id);
             const assetsMetadata = updatedImages.map(img => ({
@@ -323,44 +348,38 @@ const ManageStudioPortfolioView: React.FC = () => {
                 fileName: img.file?.name || 'asset',
                 contentType: img.file?.type || 'image/webp'
             }));
-            
-            try {
-                const docRef = doc(db, 'portfolios', currentUser.uid);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    await updateDoc(docRef, { assets: assetsMetadata });
-                } else {
-                    await setDoc(docRef, { assets: assetsMetadata });
-                }
-            } catch (err) {
-                console.error("Error updating firebase on remove:", err);
-            }
+
+            const updatedWebsiteData = await updateWebsite(webSiteData!.id, {
+                assets: assetsMetadata
+            })
+            setWebsiteData(updatedWebsiteData.data)
         }
     };
 
-    const handlePublish = async () => {
-        if (!currentUser) return;
+    const handlePublish = async (businessId: number | undefined) => {
+        if (!currentUser || !businessId || !pathData) {
+            console.error("User or businessId or pathData is not defined");
+            return;
+        };
         setIsPublishing(true);
         try {
             const updatedHtml = htmlContent.replace(
                 /let\s+portfolioData\s*=\s*\{[\s\S]*?\};/,
                 `let portfolioData = ${JSON.stringify(portfolioData, null, 2)};`
             );
-            
+
             const file = new File([updatedHtml], "index.html", { type: "text/html" });
-            
-            const urlsResponse = await getUploadUrls({ 
-                folder: 'portfolios', 
-                files: [{ fileName: 'index.html', contentType: 'text/html' }] 
+
+            const urlsResponse = await getUploadUrls({
+                folder: 'portfolios',
+                files: [{ fileName: 'index.html', contentType: 'text/html' }]
             });
-            
+
             const urlInfo = urlsResponse[0];
             if (urlInfo) {
                 await uploadFileToR2({ key: urlInfo.key, uploadUrl: urlInfo.uploadUrl }, file);
-                
-                const docRef = doc(db, 'portfolios', currentUser.uid);
-                const docSnap = await getDoc(docRef);
-                
+
+
                 const assetsMetadata = uploadedImages.map(img => ({
                     id: img.id,
                     fileKey: img.fileKey,
@@ -368,28 +387,39 @@ const ManageStudioPortfolioView: React.FC = () => {
                     fileName: img.file?.name || 'asset',
                     contentType: img.file?.type || 'image/webp'
                 }));
-                
+
                 const versionData = {
                     path: urlInfo.key,
                     publishedAt: new Date().toISOString()
                 };
-                
-                if (docSnap.exists()) {
-                    await updateDoc(docRef, {
+
+                const pathId = pathData.id;
+
+                let updatedWebsiteData;
+                if (webSiteData) {
+                    updatedWebsiteData = await updateWebsite(webSiteData.id, {
+                        businessId: businessId,
+                        pathId: pathId!,
                         currentPath: urlInfo.key,
-                        assets: assetsMetadata,
-                        versions: arrayUnion(versionData)
-                    });
-                    setVersions(prev => [...prev, versionData]);
+                        versions: [...webSiteData.versions, versionData]
+                    })
+                    setWebsiteData(updatedWebsiteData.data);
+
                 } else {
-                    await setDoc(docRef, {
+                    updatedWebsiteData = await createWebsite({
+                        businessId: businessId,
+                        projectId: null,
+                        pathId: pathId!,
+                        assets: assetsMetadata,
                         currentPath: urlInfo.key,
                         r2BaseUrl: import.meta.env.VITE_R2_BASEURL,
-                        assets: assetsMetadata,
                         versions: [versionData]
-                    });
-                    setVersions([versionData]);
+                    })
+
                 }
+                setVersions(prev => [...prev, versionData]);
+                setWebsiteData(updatedWebsiteData.data);
+
                 setSelectedVersionPath(urlInfo.key);
                 alert('Portfolio published successfully!');
             }
@@ -491,7 +521,13 @@ const ManageStudioPortfolioView: React.FC = () => {
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Button
                             startIcon={<ArrowBackIcon />}
-                            onClick={() => setStep(1)}
+                            onClick={() => {
+                                if (businessData == null) {
+                                    setStep(1)
+                                } else {
+                                    navigate('/private/studio', { replace: true })
+                                }
+                            }}
                             sx={{ color: '#94A3B8', mr: 2 }}
                         >
                             Back
@@ -551,12 +587,12 @@ const ManageStudioPortfolioView: React.FC = () => {
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                                 <Typography variant="h6" sx={{ color: '#fff' }}>Assets ({uploadedImages.length})</Typography>
-                                <Button 
-                                    variant="outlined" 
+                                <Button
+                                    variant="outlined"
                                     startIcon={<UploadIcon />}
                                     onClick={() => setIsUploadDialogOpen(true)}
-                                    sx={{ 
-                                        color: '#C084FC', 
+                                    sx={{
+                                        color: '#C084FC',
                                         borderColor: '#C084FC',
                                         '&:hover': { borderColor: '#A855F7', bgcolor: 'rgba(192, 132, 252, 0.1)' }
                                     }}
@@ -578,15 +614,15 @@ const ManageStudioPortfolioView: React.FC = () => {
                                         <Typography variant="body2" sx={{ color: '#94A3B8' }}>Uploading to cloud...</Typography>
                                         <Typography variant="body2" sx={{ color: '#C084FC', fontWeight: 'bold' }}>{uploadProgress}%</Typography>
                                     </Box>
-                                    <LinearProgress 
-                                        variant="determinate" 
-                                        value={uploadProgress} 
-                                        sx={{ 
-                                            height: 8, 
-                                            borderRadius: 4, 
+                                    <LinearProgress
+                                        variant="determinate"
+                                        value={uploadProgress}
+                                        sx={{
+                                            height: 8,
+                                            borderRadius: 4,
                                             bgcolor: 'rgba(255,255,255,0.1)',
                                             '& .MuiLinearProgress-bar': { bgcolor: '#C084FC' }
-                                        }} 
+                                        }}
                                     />
                                 </Box>
                             )}
@@ -599,11 +635,11 @@ const ManageStudioPortfolioView: React.FC = () => {
                             ) : (
                                 <List sx={{ width: '100%', p: 0 }}>
                                     {uploadedImages.map((img) => (
-                                        <ListItem 
-                                            key={img.id} 
-                                            sx={{ 
-                                                bgcolor: 'rgba(255,255,255,0.03)', 
-                                                borderRadius: 2, 
+                                        <ListItem
+                                            key={img.id}
+                                            sx={{
+                                                bgcolor: 'rgba(255,255,255,0.03)',
+                                                borderRadius: 2,
                                                 mb: 1.5,
                                                 border: '1px solid rgba(255,255,255,0.05)'
                                             }}
@@ -633,7 +669,7 @@ const ManageStudioPortfolioView: React.FC = () => {
                                 </List>
                             )}
 
-                            <UploadDialogComponent 
+                            <UploadDialogComponent
                                 open={isUploadDialogOpen}
                                 onClose={() => setIsUploadDialogOpen(false)}
                                 onUpload={processFiles}
@@ -645,10 +681,10 @@ const ManageStudioPortfolioView: React.FC = () => {
                     {activeTab === 2 && (
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                             {/* Publish Card */}
-                            <Paper sx={{ 
-                                p: 4, 
-                                borderRadius: 4, 
-                                bgcolor: 'rgba(124, 58, 237, 0.05)', 
+                            <Paper sx={{
+                                p: 4,
+                                borderRadius: 4,
+                                bgcolor: 'rgba(124, 58, 237, 0.05)',
                                 border: '1px solid rgba(124, 58, 237, 0.2)',
                                 display: 'flex',
                                 flexDirection: 'column',
@@ -656,32 +692,32 @@ const ManageStudioPortfolioView: React.FC = () => {
                                 position: 'relative',
                                 overflow: 'hidden'
                             }}>
-                                <Box sx={{ 
-                                    position: 'absolute', 
-                                    top: -50, 
-                                    right: -50, 
-                                    width: 150, 
-                                    height: 150, 
-                                    bgcolor: 'rgba(124, 58, 237, 0.1)', 
+                                <Box sx={{
+                                    position: 'absolute',
+                                    top: -50,
+                                    right: -50,
+                                    width: 150,
+                                    height: 150,
+                                    bgcolor: 'rgba(124, 58, 237, 0.1)',
                                     borderRadius: '50%',
                                     filter: 'blur(40px)',
                                     pointerEvents: 'none'
                                 }} />
-                                
+
                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                                     <Avatar sx={{ bgcolor: 'rgba(124, 58, 237, 0.2)', color: '#C084FC', mr: 2 }}>
                                         <UploadIcon />
                                     </Avatar>
                                     <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600 }}>Publish Portfolio</Typography>
                                 </Box>
-                                
+
                                 <Typography variant="body2" sx={{ color: '#94A3B8', mb: 4, lineHeight: 1.6, maxWidth: '90%' }}>
                                     Make your portfolio live and accessible to the world. Publishing will securely save your current configuration, images, and layout, generating a new snapshot in your version history.
                                 </Typography>
-                                
+
                                 <Button
                                     variant="contained"
-                                    onClick={handlePublish}
+                                    onClick={() => handlePublish(businessData?.id)}
                                     disabled={isPublishing}
                                     startIcon={isPublishing ? <CircularProgress size={20} color="inherit" /> : <UploadIcon />}
                                     sx={{
@@ -709,10 +745,10 @@ const ManageStudioPortfolioView: React.FC = () => {
 
                             {/* Version History Card */}
                             {versions.length > 0 && (
-                                <Paper sx={{ 
-                                    p: 4, 
-                                    borderRadius: 4, 
-                                    bgcolor: 'rgba(15, 26, 46, 0.6)', 
+                                <Paper sx={{
+                                    p: 4,
+                                    borderRadius: 4,
+                                    bgcolor: 'rgba(15, 26, 46, 0.6)',
                                     backdropFilter: 'blur(12px)',
                                     border: '1px solid rgba(255,255,255,0.05)'
                                 }}>
@@ -722,11 +758,11 @@ const ManageStudioPortfolioView: React.FC = () => {
                                         </Avatar>
                                         <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600 }}>Version History</Typography>
                                     </Box>
-                                    
+
                                     <Typography variant="body2" sx={{ color: '#94A3B8', mb: 4, lineHeight: 1.6 }}>
                                         Easily roll back to previous versions of your portfolio. Selecting a past version will instantly load its layout and configuration into the editor.
                                     </Typography>
-                                    
+
                                     <FormControl fullWidth variant="outlined" sx={{
                                         '& .MuiOutlinedInput-root': {
                                             color: '#fff',
@@ -767,7 +803,7 @@ const ManageStudioPortfolioView: React.FC = () => {
                                                 const day = String(d.getDate()).padStart(2, '0');
                                                 const month = String(d.getMonth() + 1).padStart(2, '0');
                                                 const year = String(d.getFullYear()).slice(-2);
-                                                
+
                                                 return (
                                                     <MenuItem key={v.path} value={v.path} sx={{ py: 1.5 }}>
                                                         {`${index + 1} - ${day}/${month}/${year}`}

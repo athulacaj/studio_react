@@ -11,7 +11,7 @@ import {
     CircularProgress,
     Alert
 } from '@mui/material';
-import { createTenant, updateTenant, getTenant } from '../api/tenantService';
+import { createBusiness, getBusiness, getBusinessByUserId } from '../api/businessService';
 import { useAuthStore } from '../../auth';
 
 interface DomainSettingsModalProps {
@@ -33,7 +33,7 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
 
     useEffect(() => {
         if (open && currentUser?.userId) {
-            fetchTenant(currentUser.userId);
+            fetchBusiness(currentUser.userId);
         } else if (open) {
             // Reset fields for new creation
             setName('');
@@ -42,13 +42,14 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
             setError(null);
             setSuccess(null);
         }
-    }, [open, currentUser?.id]);
+    }, [open, currentUser?.userId]);
 
-    const fetchTenant = async (id: string) => {
+    const fetchBusiness = async (id: string) => {
         setFetching(true);
         setError(null);
         try {
-            const data = await getTenant(id);
+            const res = await getBusinessByUserId(id);
+            const data = res.data.filter(e => e.typeId = 1)[0];
             setName(data.name || '');
             setSlug(data.slug || '');
             setCustomDomain(data.customDomain || '');
@@ -61,7 +62,7 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
     };
 
     const handleSave = async () => {
-        if (!currentUser?.id) return;
+        if (!currentUser?.userId) return;
 
         if (!name || !slug) {
             setError('Name and Slug are required.');
@@ -73,26 +74,18 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
         setSuccess(null);
 
         try {
-            if (currentUser.userId) {
-                // Update existing
-                await updateTenant(currentUser.userId, {
-                    name,
-                    slug,
-                    customDomain: customDomain || undefined
-                });
-                setSuccess('Tenant updated successfully.');
-            } else {
-                // Create new
-                await createTenant({
-                    ownerUserId: currentUser.userId,
-                    name,
-                    slug,
-                    customDomain: customDomain || undefined,
-                    isActive: true
-                });
 
-                setSuccess('Tenant created successfully.');
-            }
+            // Create new
+            await createBusiness({
+                ownerUserId: currentUser.userId,
+                name,
+                slug,
+                customDomain: customDomain || undefined,
+                isActive: true
+            });
+
+            setSuccess('Tenant created successfully.');
+
 
             setTimeout(() => {
                 onClose();

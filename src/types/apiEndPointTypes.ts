@@ -16,4 +16,9 @@ interface SharedLinksParams {
     updatedAfter?: string;
 }
 
-export type { GetProjectsParams, SelectedAlbumsParams, SharedLinksParams };
+interface GetWebsitesParams {
+    projectId?: string;
+    businessId?: number;
+}
+
+export type { GetProjectsParams, SelectedAlbumsParams, SharedLinksParams, GetWebsitesParams };

@@ -1,4 +1,4 @@
-import { GetProjectsParams, SelectedAlbumsParams, SharedLinksParams } from "../types/apiEndPointTypes"
+import { GetProjectsParams, SelectedAlbumsParams, SharedLinksParams, GetWebsitesParams } from "../types/apiEndPointTypes"
 
 
 
@@ -27,6 +27,33 @@ const ApiEndPoints = {
         post: {
             folderStructure: () => `/google/folder-structure`,
             uploadDriveData: () => `/google/upload-drive-data`,
+        }
+    },
+    business: {
+        get: {
+            byUserId: (userId: string) => `/business?userId=${userId}`,
+            business: (id?: string) => `/business/${id ?? ''}`
+        },
+        post: {
+            business: () => `/business`
+        },
+        put: {
+            business: (id: string) => `/business/${id}`
+        }
+    },
+    website: {
+        get: {
+            website: (params: GetWebsitesParams) => `/website?` + makeQueryUrl(params),
+            path: (businessId: number) => `/website/path?businessId=${businessId}`
+        },
+        post: {
+            "web": () => "/website",
+            "website": () => "/website",
+            "upload-urls": () => "/website/upload-urls",
+            path: () => "/website/path"
+        },
+        put: {
+            website: (id: number) => `/website/${id}`
         }
     }
 
