@@ -6,6 +6,7 @@ import { ImageObj } from '../../types';
 import { usePhotoProofingStore } from '../../store/usePhotoProofingStore';
 import { CachedImage } from '../../../../shared/utils/MakeGlobalImageCache';
 import { useToastStore } from '../../../../shared/hooks/useToastStore';
+import { useSearchParams } from 'react-router-dom';
 
 interface PhotoCardProps {
     imageObj: ImageObj;
@@ -15,8 +16,16 @@ interface PhotoCardProps {
 
 const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScreen }) => {
 
-    const { albums, selectedAlbum, handleAddToAlbum, handleRemoveFromAlbum, categories } = usePhotoProofingStore();
-    const { toAddWhichAlbum, syncAndLoadAlbumns } = usePhotoProofingStore();
+    const { albums, handleAddToAlbum, handleRemoveFromAlbum, categories, toAddWhichAlbum, syncAndLoadAlbumns } = usePhotoProofingStore();
+
+    const [searchParams] = useSearchParams();
+    const selectedAlbum = searchParams.get('selectedAlbum') || 'all';
+    
+    let breadcrumbs: any[] = [];
+    const breadcrumbsStr = searchParams.get('breadcrumbs');
+    if (breadcrumbsStr) {
+        try { breadcrumbs = JSON.parse(atob(breadcrumbsStr)); } catch (e) {}
+    }
 
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
     const [isAdded, setIsAdded] = React.useState(false);
@@ -55,7 +64,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
 
     const handleAlbumSelect = (event: React.MouseEvent<HTMLElement>, albumName: string) => {
         event.stopPropagation();
-        handleAddToAlbum(albumName, imageObj);
+        handleAddToAlbum(albumName, imageObj, breadcrumbs);
         handleMenuClose();
     };
 
@@ -70,7 +79,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
             if (isInAlbum) {
                 handleRemoveFromAlbum(toAddWhichAlbum, imageObj);
             } else {
-                handleAddToAlbum(toAddWhichAlbum, imageObj);
+                handleAddToAlbum(toAddWhichAlbum, imageObj, breadcrumbs);
                 flashAdded();
             }
         }
@@ -87,7 +96,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
         if (isSameTapAsHover()) return;
         if (toAddWhichAlbum) {
 
-            const isSuccess = await handleAddToAlbum(toAddWhichAlbum, imageObj);
+            const isSuccess = await handleAddToAlbum(toAddWhichAlbum, imageObj, breadcrumbs);
             if (!isSuccess) {
                 showToast(
                     `Failed to add to category '${categories[toAddWhichAlbum].name}'`,

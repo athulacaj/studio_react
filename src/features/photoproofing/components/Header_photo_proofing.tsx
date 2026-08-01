@@ -33,12 +33,12 @@ interface HeaderPhotoProofingProps {
   allDisplayedImages: ImageObj[],
 }
 
-const HeaderPhotoProofing = ({ allDisplayedImages }: HeaderPhotoProofingProps) => {
+const HeaderPhotoProofing = ({ allDisplayedImages, selectedAlbum }: HeaderPhotoProofingProps) => {
   // const theme = useTheme();
   // We use CSS breakpoints for layout hiding, but keep isMobile logic if needed for JS control
   // currently primarily handled via Sx props, but keeping the hook call is standard for future proofing or explicit logic
   // const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const { albums, selectedAlbum, images, currentImageIndex, categories } = usePhotoProofingStore();
+  const { albums, images, currentImageIndex, categories } = usePhotoProofingStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [localDownloadModalOpen, setLocalDownloadModalOpen] = useState(false);

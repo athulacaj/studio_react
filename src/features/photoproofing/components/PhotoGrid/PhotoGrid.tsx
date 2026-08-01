@@ -10,13 +10,43 @@ import { ImageObj } from '../../types';
 import { globalImageCache } from '../../../../shared/utils/MakeGlobalImageCache';
 
 const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) => {
-    const { albums, selectedAlbum, images, itemsPerPage,
-        folders, navigateToFolder, breadcrumbs, currentFolderId, setBreadcrumbs, setSelectedAlbum,
-        imagesCache } = usePhotoProofingStore();
+    const { albums, images, itemsPerPage,
+        folders, imagesCache } = usePhotoProofingStore();
     const [fullScreenOpen, setFullScreenOpen] = useState(false);
     const [currentImage, setCurrentImage] = useState<ImageObj | null>(null);
 
     const [searchParams, setSearchParams] = useSearchParams();
+
+    const selectedAlbum = searchParams.get('selectedAlbum') || 'all';
+
+    const breadcrumbsStr = searchParams.get('breadcrumbs');
+    let breadcrumbs: any[] = [];
+    if (breadcrumbsStr) {
+        try { breadcrumbs = JSON.parse(atob(breadcrumbsStr)); } catch (e) {}
+    }
+
+    const navigateToFolder = (folderId: string | null, folderName: string) => {
+        setSearchParams(prev => {
+            const newParams = new URLSearchParams(prev);
+            if (folderId) {
+                newParams.set('folderId', folderId);
+                const currentBreadcrumbsStr = prev.get('breadcrumbs');
+                let prevBreadcrumbs = [];
+                if (currentBreadcrumbsStr) {
+                    try { prevBreadcrumbs = JSON.parse(atob(currentBreadcrumbsStr)); } catch (e) {}
+                }
+                const index = prevBreadcrumbs.findIndex((b: any) => b.id === folderId);
+                const newBreadcrumbs = index !== -1
+                    ? prevBreadcrumbs.slice(0, index + 1)
+                    : [...prevBreadcrumbs, { id: folderId, name: folderName }];
+                newParams.set('breadcrumbs', btoa(JSON.stringify(newBreadcrumbs)));
+            } else {
+                newParams.delete('folderId');
+                newParams.delete('breadcrumbs');
+            }
+            return newParams;
+        });
+    };
 
     const page = parseInt(searchParams.get(selectedAlbum + '__page') || '1', 10);
     const [jumpPage, setJumpPage] = useState(page.toString());
@@ -27,39 +57,6 @@ const PhotoGrid = ({ allDisplayedImages }: { allDisplayedImages: ImageObj[] }) =
     useEffect(() => {
         setJumpPage(page.toString());
     }, [page]);
-
-    // Reset page to 1 when album or folder changes
-    const prevAlbumRef = useRef(selectedAlbum);
-    const prevFolderRef = useRef(currentFolderId);
-
-    useEffect(() => {
-        if (prevAlbumRef.current !== selectedAlbum || prevFolderRef.current !== currentFolderId) {
-            setSearchParams(prev => {
-                const newParams = new URLSearchParams(prev);
-                // newParams.set('page', '1');
-                if (currentFolderId) {
-                    newParams.set('folderId', currentFolderId);
-                }
-                newParams.set("selectedAlbum", selectedAlbum);
-                const encodedBreadcrumbs = btoa(JSON.stringify(breadcrumbs));
-                newParams.set('breadcrumbs', encodedBreadcrumbs);
-                return newParams;
-            });
-            prevAlbumRef.current = selectedAlbum;
-            prevFolderRef.current = currentFolderId;
-        } else {
-            if (searchParams.get('folderId')) {
-                navigateToFolder(searchParams.get('folderId')!, "")
-            }
-            if (searchParams.get('breadcrumbs')) {
-                const decodedBreadcrumbs = atob(searchParams.get('breadcrumbs')!);
-                setBreadcrumbs(JSON.parse(decodedBreadcrumbs));
-            }
-            if (searchParams.get("selectedAlbum")) {
-                setSelectedAlbum(searchParams.get("selectedAlbum")!);
-            }
-        }
-    }, [selectedAlbum, currentFolderId, setSearchParams]);
 
     const handleOpenFullScreen = (imageObj: ImageObj) => {
         setCurrentImage(imageObj);

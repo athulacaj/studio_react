@@ -19,6 +19,7 @@ import FullScreenLoader from './FullScreenLoader';
 import { usePhotoProofingStore } from '../../store/usePhotoProofingStore';
 import { indexedDBService } from '../../services/IndexedDBService';
 import { CachedImage } from '../../../../shared/utils/MakeGlobalImageCache';
+import { useSearchParams } from 'react-router-dom';
 
 interface FullScreenViewProps {
     images: ImageObj[];
@@ -35,6 +36,13 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
 }) => {
     const { albums, toAddWhichAlbum, handleAddToAlbum, addToAlbumLoader, handleRemoveFromAlbum, projectId, currentImageIndex, setCurrentImageIndex } = usePhotoProofingStore();
     const [isImageInAlbum, setIsImageInAlbum] = useState(false);
+
+    const [searchParams] = useSearchParams();
+    let breadcrumbs: any[] = [];
+    const breadcrumbsStr = searchParams.get('breadcrumbs');
+    if (breadcrumbsStr) {
+        try { breadcrumbs = JSON.parse(atob(breadcrumbsStr)); } catch (e) {}
+    }
 
     const [showLikeAnimation, setShowLikeAnimation] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
@@ -114,7 +122,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
         if (isImageInAlbum) {
             handleRemoveFromAlbum(toAddWhichAlbum, images[currentImageIndex]);
         } else {
-            handleAddToAlbum(toAddWhichAlbum, images[currentImageIndex]);
+            handleAddToAlbum(toAddWhichAlbum, images[currentImageIndex], breadcrumbs);
             setShowLikeAnimation(true);
             setTimeout(() => setShowLikeAnimation(false), 2000);
         }
@@ -124,7 +132,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
         setControlsVisible((prev) => !prev);
     };
 
-    const handleImageClick = useDoubleClick(handleAddToAlbum, handleSingleClick);
+    const handleImageClick = useDoubleClick(onhandleAddToAlbum, handleSingleClick);
 
     const handleMouseEnter = () => !isMobile && setIsHovering(true);
     const handleMouseLeave = () => !isMobile && setIsHovering(false);

@@ -14,22 +14,16 @@ interface PhotoProofingState {
     loading: boolean;
     images: ImageObj[];
     folders: Folder[];
-    breadcrumbs: { id: string; name: string }[];
     currentImageIndex: number;
     itemsPerPage: number;
 
     // Albums
     albums: Record<string, ImageObj[]>; // this is the saved categories to the album
     categories: Record<string, AlbumCategory>; // this the categories from the db
-
-    selectedAlbum: string;
     toAddWhichAlbum: string | null;
 
     addToAlbumLoader: boolean;
 
-
-    // Folder Navigation (synced with URL via useUrlSync hook)
-    currentFolderId: string | null;
 
     // File System Access API handles
     sourceDirectoryHandle: FileSystemDirectoryHandle | null;
@@ -52,21 +46,14 @@ interface PhotoProofingActions {
     setLoading: (loading: boolean) => void;
     setImages: (images: ImageObj[] | ((prev: ImageObj[]) => ImageObj[])) => void;
     setFolders: (folders: Folder[] | ((prev: Folder[]) => Folder[])) => void;
-    setBreadcrumbs: (breadcrumbs: { id: string; name: string }[] | ((prev: { id: string; name: string }[]) => { id: string; name: string }[])) => void;
     setCurrentImageIndex: (index: number | ((prev: number) => number)) => void;
 
     // Album actions
     syncAndLoadAlbumns: () => Promise<void>;
     setToAddWhichAlbum: (album: string | null | ((prev: string | null) => string | null)) => void;
     setCategories: (categories: Record<string, AlbumCategory> | ((prev: Record<string, AlbumCategory>) => Record<string, AlbumCategory>)) => void;
-    setSelectedAlbum: (album: string | ((prev: string) => string)) => void;
-    handleAlbumChange: (album: AlbumCategory) => void;
-    handleAddToAlbum: (albumName: string, image: ImageObj) => Promise<boolean>;
+    handleAddToAlbum: (albumName: string, image: ImageObj, breadcrumbs: { id: string, name: string }[]) => Promise<boolean>;
     handleRemoveFromAlbum: (albumName: string, image: ImageObj) => Promise<boolean>;
-
-    // Folder navigation
-    setCurrentFolderId: (folderId: string | null | ((prev: string | null) => string | null)) => void;
-    navigateToFolder: (folderId: string | null, folderName: string) => void;
 
     // File handles
     setSourceDirectoryHandle: (handle: FileSystemDirectoryHandle | null) => void;
@@ -92,15 +79,12 @@ const initialState: PhotoProofingState = {
     loading: true,
     images: [],
     folders: [],
-    breadcrumbs: [],
     currentImageIndex: -1,
     itemsPerPage: 8,
     albums: {},
-    selectedAlbum: 'all',
     toAddWhichAlbum: '',
     categories: {},
     addToAlbumLoader: false,
-    currentFolderId: null,
     sourceDirectoryHandle: null,
     destinationDirectoryHandle: null,
     imagesCache: [],
@@ -168,27 +152,13 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
         folders: resolve(folders, state.folders),
     })),
 
-    setBreadcrumbs: (breadcrumbs) => set((state) => ({
-        breadcrumbs: resolve(breadcrumbs, state.breadcrumbs),
+    setCategories: (categories) => set((state) => ({
+        categories: resolve(categories, state.categories),
     })),
 
     setCurrentImageIndex: (index) => set((state) => ({
         currentImageIndex: resolve(index, state.currentImageIndex),
     })),
-
-
-
-    setSelectedAlbum: (album) => set((state) => ({
-        selectedAlbum: resolve(album, state.selectedAlbum),
-    })),
-    setCategories: (categories) => set((state) => ({
-        categories: resolve(categories, state.categories),
-    })),
-
-
-    handleAlbumChange: (category: AlbumCategory) => {
-        set({ selectedAlbum: category.id });
-    },
     setToAddWhichAlbum: (album: string | null | ((prev: string | null) => string | null)) => set((state) => {
         localStorage.setItem('toAddWhichAlbum', album as string ?? '');
         return {
@@ -213,8 +183,8 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
         }
     },
 
-    handleAddToAlbum: async (albumName, image) => {
-        const { userId, projectId, linkId, breadcrumbs } = get();
+    handleAddToAlbum: async (albumName, image, breadcrumbs = []) => {
+        const { userId, projectId, linkId } = get();
         image.folderPathList = breadcrumbs.map((b) => b.name).slice(1);
         if (!image || !image.id) return false;
 
@@ -290,25 +260,6 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
             }
         }
         return false;
-    },
-
-    // --- Folder navigation ---
-    setCurrentFolderId: (folderId) => set((state) => ({
-        currentFolderId: resolve(folderId, state.currentFolderId),
-    })),
-
-    navigateToFolder: (folderId, folderName) => {
-        set((state) => {
-            if (folderId) {
-                const index = state.breadcrumbs.findIndex(b => b.id === folderId);
-                const newBreadcrumbs = index !== -1
-                    ? state.breadcrumbs.slice(0, index + 1)
-                    : [...state.breadcrumbs, { id: folderId, name: folderName }];
-                return { currentFolderId: folderId, breadcrumbs: newBreadcrumbs };
-            } else {
-                return { currentFolderId: null, breadcrumbs: [] };
-            }
-        });
     },
 
     // --- File handles ---

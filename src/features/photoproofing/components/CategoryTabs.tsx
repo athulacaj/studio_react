@@ -4,13 +4,12 @@ import { usePhotoProofingStore } from '../store/usePhotoProofingStore';
 import { AlbumCategory } from '../types';
 import { useSearchParams } from 'react-router-dom';
 
-interface CategoryTabsProps {
-    handleAlbumChange?: (category: AlbumCategory) => void;
-}
+interface CategoryTabsProps {}
 
-const CategoryTabs = ({ handleAlbumChange }: CategoryTabsProps) => {
-    const { categories: categories1, selectedAlbum } = usePhotoProofingStore();
-    const [searchParams] = useSearchParams();
+const CategoryTabs = (props: CategoryTabsProps) => {
+    const { categories: categories1 } = usePhotoProofingStore();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const selectedAlbum = searchParams.get('selectedAlbum') || 'all';
 
     const categories: Record<string, AlbumCategory> = {
         "all": { name: "All Photos", images: [], id: "all" },
@@ -21,28 +20,17 @@ const CategoryTabs = ({ handleAlbumChange }: CategoryTabsProps) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const [activeTab, setActiveTab] = useState<string>(categoryKeys[0] ?? '');
-    const onlyCalledOnceRef = useRef(false);
-
-    useEffect(() => {
-        if (!onlyCalledOnceRef.current) {
-            const selectedAlbumFromUrl = searchParams.get('selectedAlbum');
-            if (selectedAlbumFromUrl) {
-                setActiveTab(selectedAlbumFromUrl);
-            }
-            onlyCalledOnceRef.current = true;
-        }
-    }, [selectedAlbum])
-
-
-
     const handleChange = (_event: React.SyntheticEvent, newValue: string) => {
-        setActiveTab(newValue);
-        console.log(selectedAlbum)
-        handleAlbumChange?.(categories[newValue]);
+        setSearchParams(prev => {
+            const newParams = new URLSearchParams(prev);
+            if (newValue === 'all') {
+                newParams.delete('selectedAlbum');
+            } else {
+                newParams.set('selectedAlbum', newValue);
+            }
+            return newParams;
+        });
     };
-
-    useEffect(() => { })
 
     if (categoryKeys.length === 0) return null;
 
@@ -58,7 +46,7 @@ const CategoryTabs = ({ handleAlbumChange }: CategoryTabsProps) => {
             }}
         >
             <Tabs
-                value={activeTab}
+                value={selectedAlbum}
                 onChange={handleChange}
                 variant={isMobile ? 'scrollable' : 'scrollable'}
                 scrollButtons={isMobile ? 'auto' : false}

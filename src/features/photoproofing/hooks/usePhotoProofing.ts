@@ -54,16 +54,52 @@ const findPathToNode = (node: DriveNode, targetId: string, path: { id: string, n
 export default function usePhotoProofing(userId: string, linkId: string) {
     const {
         loading, setLoading, setImages, setFolders,
-        currentFolderId, setCurrentFolderId, breadcrumbs, setBreadcrumbs,
         setIds, setAlbums, currentImageIndex, itemsPerPage,
-        setShareLinkData, shareLinkData, categories, setCategories, selectedAlbum,
+        setShareLinkData, shareLinkData, categories, setCategories,
         projectId, setProjectId, setSyncedFolders, syncedFolders, syncAndLoadAlbumns
     } = usePhotoProofingStore();
 
-    const breadcrumbsRef = useRef(breadcrumbs);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const selectedAlbum = searchParams.get('selectedAlbum') || 'all';
+
+    const getBreadcrumbs = useCallback(() => {
+        const breadcrumbsStr = searchParams.get('breadcrumbs');
+        if (breadcrumbsStr) {
+            try { return JSON.parse(atob(breadcrumbsStr)); } catch (e) { return []; }
+        }
+        return [];
+    }, [searchParams]);
+
+    const setBreadcrumbs = useCallback((newBreadcrumbs: {id: string, name: string}[]) => {
+        setSearchParams(prev => {
+            const newParams = new URLSearchParams(prev);
+            if (newBreadcrumbs.length > 0) {
+                newParams.set('breadcrumbs', btoa(JSON.stringify(newBreadcrumbs)));
+            } else {
+                newParams.delete('breadcrumbs');
+            }
+            return newParams;
+        }, { replace: true });
+    }, [setSearchParams]);
+
+    const breadcrumbsRef = useRef(getBreadcrumbs());
     useEffect(() => {
-        breadcrumbsRef.current = breadcrumbs;
-    }, [breadcrumbs]);
+        breadcrumbsRef.current = getBreadcrumbs();
+    }, [getBreadcrumbs]);
+
+    const currentFolderId = searchParams.get('folderId');
+
+    const setCurrentFolderId = useCallback((newFolderId: string | null) => {
+        setSearchParams(prev => {
+            const newParams = new URLSearchParams(prev);
+            if (newFolderId) {
+                newParams.set('folderId', newFolderId);
+            } else {
+                newParams.delete('folderId');
+            }
+            return newParams;
+        }, { replace: true });
+    }, [setSearchParams]);
 
     const currentFolderIdRef = useRef(currentFolderId);
     useEffect(() => {
@@ -179,7 +215,7 @@ export default function usePhotoProofing(userId: string, linkId: string) {
             let rootId = folderRootMap[currentFolderId];
 
             // If not in map, check if it's a direct key in projectData (meaning it's a root itself)
-            if (!rootId && project && project?.currentFolderId) {
+            if (!rootId && project && (project as any)[currentFolderId]) {
                 rootId = currentFolderId;
                 setFolderRootMap(prev => ({ ...prev, [currentFolderId]: currentFolderId }));
             }
@@ -294,7 +330,7 @@ export default function usePhotoProofing(userId: string, linkId: string) {
     useEffect(() => {
         if (!currentFolderId && !projectData) return;
         fetchContent(projectData?.project, projectData?.driveData);
-    }, [currentFolderId]);
+    }, [currentFolderId, projectData]);
 
     // Effect to sync albums on page load
     useEffect(() => {
@@ -305,7 +341,6 @@ export default function usePhotoProofing(userId: string, linkId: string) {
 
 
     // cahnge page number if the user changes to the next or previous page through fullscreen autoplay or next button
-    const [, setSearchParams] = useSearchParams();
 
     useEffect(() => {
         if (currentImageIndex > -1) {

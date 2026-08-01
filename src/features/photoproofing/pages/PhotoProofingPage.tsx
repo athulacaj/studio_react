@@ -6,9 +6,12 @@ import HeaderPhotoProofing from '../components/Header_photo_proofing';
 import { ImageObj } from '../types';
 import { CachedImage } from '../../../shared/utils/MakeGlobalImageCache';
 import CategoryTabs from '../components/CategoryTabs';
+import { useSearchParams } from 'react-router-dom';
 
 const PhotoProofingPage = () => {
-    const { albums, selectedAlbum, handleAlbumChange, images, categories } = usePhotoProofingStore();
+    const { albums, images, categories } = usePhotoProofingStore();
+    const [searchParams] = useSearchParams();
+    const selectedAlbum = searchParams.get('selectedAlbum') || 'all';
     const allDisplayedImages: ImageObj[] = selectedAlbum === 'all'
         ? images
         : (albums[selectedAlbum] as ImageObj[] || []);
@@ -49,7 +52,7 @@ const PhotoProofingPage = () => {
                 backdropFilter: 'blur(12px)',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
             }}>
-                <CategoryTabs handleAlbumChange={handleAlbumChange} />
+                <CategoryTabs />
             </Box>
 
             {!reload && <PhotoGrid allDisplayedImages={allDisplayedImages} />}
