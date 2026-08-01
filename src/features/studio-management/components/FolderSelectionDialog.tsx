@@ -17,6 +17,7 @@ import { FolderCopyOutlined as FolderIcon, Sync as SyncIcon } from '@mui/icons-m
 import FolderTree from './FolderTree';
 import { DriveNode, SyncedFolder } from '../types';
 import { useStudioManagementStore } from '../store/studioManagementStore';
+import { getSyncedFolders } from '../api/projectService';
 
 interface FolderSelectionDialogProps {
     open: boolean;
@@ -35,7 +36,6 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
     folderStructure,
     onConfirm,
     initialSelection = [],
-    syncedFolders,
     projectId,
     onReload
 }) => {
@@ -43,13 +43,21 @@ const FolderSelectionDialog: React.FC<FolderSelectionDialogProps> = ({
     const [confirmReloadOpen, setConfirmReloadOpen] = useState(false);
     const [isReloading, setIsReloading] = useState(false);
     const updateProjectLocalState = useStudioManagementStore((state) => state.updateProjectLocalState);
-
+    const [syncedFolders, setSyncedFolders] = useState<Record<string, SyncedFolder>>({});
     // Reset selection when dialog opens or initialSelection changes
     useEffect(() => {
         if (open) {
             setSelectedFolders(new Set(initialSelection));
         }
     }, [open, initialSelection]);
+
+    useEffect(() => {
+        if (projectId && open) {
+            getSyncedFolders(projectId).then((res) => {
+                setSyncedFolders(res as Record<string, SyncedFolder>);
+            })
+        }
+    }, [projectId, open])
 
     useEffect(() => {
         if (open && projectId) {

@@ -11,6 +11,7 @@ const ApiEndPoints = {
             projects: (params: GetProjectsParams) => `/projects/projects?` + makeQueryUrl(params),
             selectedAlbums: (params: SelectedAlbumsParams) => `/projects/selected-albums?` + makeQueryUrl(params),
             sharedLinks: (params: SharedLinksParams) => `/projects/sharedLinks?` + makeQueryUrl(params),
+            syncedFolders: (projectId: string) => `/projects/${projectId}/synced-folders`,
         },
         post: {
             projects: () => `/projects/projects`,
@@ -19,6 +20,7 @@ const ApiEndPoints = {
         },
         put: {
             sharedLinks: (id: string) => `/projects/sharedLinks/${id}`,
+            selectedAlbums: () => `/projects/selected-albums`,
         }
     },
     google: {

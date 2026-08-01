@@ -36,13 +36,14 @@ import CreateProjectModal from '../components/CreateProjectModal';
 import ManageShareLinksModal from '../components/ManageShareLinksModal';
 import { useToastStore } from '../../../shared/hooks/useToastStore';
 import { DriveFileBrowser, useDriveIntegrationStore } from '../../drive-integration';
-import { ProjectStatus } from '../types';
+import { ProjectJoinDriveData, ProjectStatus } from '../types';
 
 const ProjectDetailView: React.FC = () => {
     const { projectId } = useParams<{ projectId: string }>();
     const navigate = useNavigate();
     const currentUser = useAuthStore((state) => state.currentUser);
-    const projectJoinDriveData = useStudioManagementStore((state) => state.projects);
+    const currentProject: ProjectJoinDriveData | null = useStudioManagementStore((state) => state.currentProject);
+    const fetchCurrentProject: (projectId: string) => void = useStudioManagementStore((state) => state.fetchCurrentProject);
     const loading = useStudioManagementStore((state) => state.loading);
     const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
 
@@ -60,11 +61,14 @@ const ProjectDetailView: React.FC = () => {
     const driveLoading = useDriveIntegrationStore((state) => state.loading);
     const fetchConnection = useDriveIntegrationStore((state) => state.fetchConnection);
 
-    const projectData = useMemo(
-        () => projectJoinDriveData.find((p) => p.project.id === projectId) || null,
-        [projectJoinDriveData, projectId]
-    );
+    const projectData = currentProject;
     const project = projectData?.project;
+
+    useEffect(() => {
+        if (projectId) {
+            fetchCurrentProject(projectId)
+        }
+    }, [])
 
     // Fetch Drive connection for google_photos projects
     useEffect(() => {

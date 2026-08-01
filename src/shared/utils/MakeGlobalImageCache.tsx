@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 const InOnePage = 8;
-const LIMIT = 8 + 3; // 3 preload when viewing full screent
+const LIMIT = 16 + 3; // 3 preload when viewing full screent
 // ImageCache.js
 class RAMImageCache {
     limit: number;

@@ -35,6 +35,7 @@ const FolderItem: React.FC<FolderItemProps> = ({
     syncedFolders = {},
     type
 }) => {
+    syncedFolders = syncedFolders ?? {}
     const [open, setOpen] = useState(false);
 
     // If selectableIds is provided, check if this folder is allowed to be selected
@@ -158,7 +159,7 @@ interface FolderTreeProps {
     readOnly?: boolean;
     selectableIds?: Set<string> | null;
     syncedFolders?: Record<string, SyncedFolder>;
-    type: "edit_project_modal" | "share_link_modal";
+    type?: "edit_project_modal" | "share_link_modal";
 }
 
 const FolderTree: React.FC<FolderTreeProps> = ({

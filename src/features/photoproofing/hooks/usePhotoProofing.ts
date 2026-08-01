@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePhotoProofingStore } from '../store/usePhotoProofingStore';
-import { getProject, getSharedLink, getProjectTreeData } from '../../studio-management/api/projectService';
+import { getProject, getSharedLink, getProjectTreeData, getSyncedFolders } from '../../studio-management/api/projectService';
 import { Project, SharedLink, DriveNode, ProjectJoinDriveData, DriveData } from '../../studio-management/types';
 import { albumSyncService } from '../services/AlbumSyncService';
 import { useSearchParams } from 'react-router-dom';
@@ -51,12 +51,13 @@ const findPathToNode = (node: DriveNode, targetId: string, path: { id: string, n
     return null;
 };
 
-export default function usePhotoProofing(userId: string, projectId: string, linkId?: string) {
+export default function usePhotoProofing(userId: string, linkId: string) {
     const {
         loading, setLoading, setImages, setFolders,
         currentFolderId, setCurrentFolderId, breadcrumbs, setBreadcrumbs,
         setIds, setAlbums, currentImageIndex, itemsPerPage,
-        setShareLinkData, shareLinkData, categories, setCategories, selectedAlbum
+        setShareLinkData, shareLinkData, categories, setCategories, selectedAlbum,
+        projectId, setProjectId, setSyncedFolders, syncedFolders, syncAndLoadAlbumns
     } = usePhotoProofingStore();
 
     const breadcrumbsRef = useRef(breadcrumbs);
@@ -70,19 +71,19 @@ export default function usePhotoProofing(userId: string, projectId: string, link
     }, [currentFolderId]);
 
     useEffect(() => {
-        setIds(userId, projectId, linkId || null);
-    }, [userId, projectId, linkId, setIds]);
+        setIds(userId, linkId);
+    }, [userId, linkId, setIds]);
     const [error, setError] = useState<string | null>(null);
     const [projectData, setProjectData] = useState<ProjectJoinDriveData | null>(null);
-    const project: Project | undefined = projectData?.project;
-    const driveData: DriveData | null | undefined = projectData?.driveData;
+    // const project: Project | undefined = projectData?.project;
+    // const driveData: DriveData | null | undefined = projectData?.driveData;
 
     // Cache for fetched trees: { [rootFolderId]: treeData }
     const [cachedTrees, setCachedTrees] = useState<{ [key: string]: DriveNode }>({});
     // Map to track which root a folder belongs to: { [folderId]: rootFolderId }
     const [folderRootMap, setFolderRootMap] = useState<{ [key: string]: string }>({});
 
-    const handleLinkShared = useCallback(async (projectData: Project) => {
+    const handleLinkShared = useCallback(async () => {
         let initialFolders: DriveNode[] = [];
 
         let initialBreadcrumbs: { id: string; name: string }[] = [];
@@ -90,8 +91,13 @@ export default function usePhotoProofing(userId: string, projectId: string, link
         // 2. Handle Share Link if present
         if (linkId) {
             setLoading(true);
-            const linkData = await getSharedLink(userId, projectId, linkId);
+            const linkData = (await getSharedLink({
+                id: linkId
+            }))[0];
             setShareLinkData(linkData);
+            setProjectId(linkData.sourceProjectId)
+            const projectData = await loadProjectAndLink(linkData.sourceProjectId);
+
             // albums example
             // "favourites": { name: "Favourites", images: [] }
             const categoriesObj: Record<string, AlbumCategory> = {}
@@ -99,8 +105,8 @@ export default function usePhotoProofing(userId: string, projectId: string, link
             setCategories(categoriesObj);
 
             // Find the "roots" of the shared selection from the project's driveData
-            if (driveData?.driveData) {
-                const sharedRoots = findSharedRoots(driveData.driveData);
+            if (projectData && projectData!.driveData?.driveData) {
+                const sharedRoots = findSharedRoots(projectData.driveData.driveData);
                 initialFolders = sharedRoots;
             }
 
@@ -114,16 +120,23 @@ export default function usePhotoProofing(userId: string, projectId: string, link
             }
             setLoading(false);
         }
-    }, [linkId, userId, projectId]);
+    }, [linkId, userId]);
+    useEffect(() => {
+        if (linkId) {
+            handleLinkShared();
+        }
+    }, [linkId])
 
-    const loadProjectAndLink = useCallback(async () => {
+    const loadProjectAndLink = useCallback(async (projectId: string) => {
         try {
             // 1. Fetch Project Details
             const res = await getProject(userId, projectId);
             if (res.data && res.data.length > 0) {
-                const project = res.data[0];
-                setProjectData(project);
-                handleLinkShared(project.project);
+                const projectData = res.data[0];
+                setProjectData(projectData);
+                const temp = await getSyncedFolders(projectData.project.id)
+                setSyncedFolders(temp)
+                return projectData;
             }
 
 
@@ -139,12 +152,9 @@ export default function usePhotoProofing(userId: string, projectId: string, link
         }
     }, [linkId, userId, projectId]);
 
-    useEffect(() => {
-        loadProjectAndLink();
-    }, [userId, projectId, linkId]);
 
 
-    const fetchContent = async () => {
+    const fetchContent = async (project: Project | undefined, driveData: DriveData | null | undefined) => {
         if (!project) return;
 
         // If linkId is present and currentFolderId is null, we are at the "Shared Root"
@@ -178,16 +188,16 @@ export default function usePhotoProofing(userId: string, projectId: string, link
             let tree: DriveNode | undefined = cachedTrees[rootId];
 
             // Fallback: If no tree in cache, try to use project.driveData as the tree
-            if (!tree && project.driveData) {
+            if (!tree && driveData?.driveData) {
                 // Check if the current folder is within driveData
-                const foundInDriveData = findNodeById(project.driveData, currentFolderId);
+                const foundInDriveData = findNodeById(driveData.driveData, currentFolderId);
                 if (foundInDriveData) {
-                    tree = project.driveData;
+                    tree = driveData.driveData;
                 }
             }
 
             // If we don't have the tree, we need to fetch it.
-            if (!tree && rootId && project[rootId]) {
+            if (!tree && rootId && project && project[rootId]) {
                 const { filePath } = project[rootId];
 
                 // Fetch from Storage
@@ -225,7 +235,6 @@ export default function usePhotoProofing(userId: string, projectId: string, link
 
             if (currentNode) {
                 // Extract files
-                const syncedFolders = project.syncedFolders ?? {}
                 const fileCount = syncedFolders[currentFolderId]?.filesCount ?? 0;
                 const isFolderSelected = true;
                 // shareLinkData?.includedFolders?.includes(currentFolderId);
@@ -279,31 +288,18 @@ export default function usePhotoProofing(userId: string, projectId: string, link
         }
     };
 
+
+
     // Effect to fetch content when currentFolderId changes or project/shareLinkData loads
     useEffect(() => {
-        if (!currentFolderId) return;
-        fetchContent();
-    }, [currentFolderId, project, shareLinkData]);
+        if (!currentFolderId && !projectData) return;
+        fetchContent(projectData?.project, projectData?.driveData);
+    }, [currentFolderId]);
 
     // Effect to sync albums on page load
     useEffect(() => {
         if (userId && projectId && linkId && Object.keys(categories).length > 0) {
-            const syncAndLoad = async () => {
-                try {
-                    await albumSyncService.syncAlbums(userId, projectId, linkId);
-
-                    // After sync, load everything from local cache to state
-                    const localAlbums = await albumSyncService.getAggregatedAlbums(userId, projectId, linkId, categories);
-                    console.log('localAlbums', localAlbums);
-                    setAlbums(prev => ({
-                        ...prev,
-                        ...localAlbums
-                    }));
-                } catch (error) {
-                    console.error("Failed to sync albums:", error);
-                }
-            };
-            syncAndLoad();
+            syncAndLoadAlbumns();
         }
     }, [userId, projectId, linkId, categories]);
 
@@ -326,7 +322,8 @@ export default function usePhotoProofing(userId: string, projectId: string, link
     return {
         loading,
         error,
-        project,
-        shareLinkData
+        shareLinkData,
+        projectData,
+        syncAndLoadAlbumns
     };
 };

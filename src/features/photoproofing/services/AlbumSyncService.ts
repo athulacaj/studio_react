@@ -1,8 +1,7 @@
 
-import { db } from '../../../config/firebase';
-import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import { indexedDBService } from './IndexedDBService';
-import { AlbumCategory } from '../types';
+import { AlbumCategory, ImageObj } from '../types';
+import { getSelectedAlbums } from '../../studio-management/api/projectService';
 
 export class AlbumSyncService {
     /**
@@ -17,30 +16,27 @@ export class AlbumSyncService {
         const syncId = `${userId}:${projectId}:${linkId}`;
         const lastSyncTime = await indexedDBService.getLastSyncTime(projectId, syncId);
 
-        const lastSyncTimestamp = Timestamp.fromMillis(lastSyncTime);
 
         try {
-            const albumsRef = collection(db, 'projects', userId, 'projects', projectId, 'shared_links', linkId, 'albums');
+            const albums = await getSelectedAlbums({
+                sharedLinkId: linkId!,
+                updatedAfter: new Date(lastSyncTime).toISOString()
+            })
 
-            const q = query(
-                albumsRef,
-                where('updatedAt', '>', lastSyncTimestamp)
-            );
-
-            const querySnapshot = await getDocs(q);
-
-            if (querySnapshot.empty) {
-                console.log('No new album updates to sync');
-                return;
-            }
-
-            console.log(`Syncing ${querySnapshot.size} album updates...`);
-
-            const syncPromises = querySnapshot.docs.map(async (doc) => {
-                const data = doc.data();
+            const syncPromises = albums.map(async (album) => {
+                // const image = {
+                //     imageId: album.imageId,
+                //     sharedLinkId: album.sharedLinkId,
+                //     name: album.name,
+                //     mimeType: album.mimeType,
+                //     url: album.url,
+                //     src: album.src,
+                //     folderPathList: album.folderPathList,
+                //     image: JSON.stringify(album),
+                // }
                 const imageRecord = {
-                    ...data,
-                    id: doc.id,
+                    id: album.imageId,
+                    ...album,
                     syncId: syncId
                 };
                 await indexedDBService.insertOrUpdateImage(projectId, imageRecord);
@@ -76,9 +72,9 @@ export class AlbumSyncService {
     /**
      * Gets all synced data and aggregates it into the format expected by the UI
      */
-    async getAggregatedAlbums(userId: string, projectId: string, linkId: string, categories: Record<string, AlbumCategory>): Promise<Record<string, string[]>> {
+    async getAggregatedAlbums(userId: string, projectId: string, linkId: string): Promise<Record<string, ImageObj[]>> {
         const images = await this.getLocalImages(userId, projectId, linkId);
-        const result: Record<string, string[]> = {};
+        const result: Record<string, ImageObj[]> = {};
 
         images.forEach((img: any) => {
             if (img.selections && Array.isArray(img.selections)) {
@@ -86,10 +82,7 @@ export class AlbumSyncService {
                     if (!result[albumKey]) {
                         result[albumKey] = [];
                     }
-                    // img.image is JSON.stringify(imageObj) saved by handleAddToAlbum — store it directly.
-                    if (img.image) {
-                        result[albumKey].push(img.image);
-                    }
+                    result[albumKey].push(img);
                 });
             }
         });

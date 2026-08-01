@@ -16,12 +16,13 @@ interface PhotoCardProps {
 const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScreen }) => {
 
     const { albums, selectedAlbum, handleAddToAlbum, handleRemoveFromAlbum, categories } = usePhotoProofingStore();
-    const { toAddWhichAlbum } = usePhotoProofingStore();
+    const { toAddWhichAlbum, syncAndLoadAlbumns } = usePhotoProofingStore();
+
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
     const [isAdded, setIsAdded] = React.useState(false);
     const [imageLoaded, setImageLoaded] = React.useState(false);
     const open = Boolean(anchorEl);
-    const image = imageObj.src || imageObj.thumbnailLink;
+    const image = imageObj.src || imageObj.url;
     const showToast = useToastStore((state) => state.showToast);
 
     // Guard: record when the card first enters hover so we can ignore
@@ -31,9 +32,10 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
 
     // Is this image already in the selected target album?
     // Album entries are always JSON.stringify(imageObj), so we parse to compare by id.
-    const isInAlbum = !!(toAddWhichAlbum && albums[toAddWhichAlbum]?.some((entry: string) => {
-        try { return JSON.parse(entry).id === imageObj.id; } catch { return entry === imageObj.id; }
-    }));
+    let isInAlbum = false;
+    if (albums && toAddWhichAlbum && albums[toAddWhichAlbum]) {
+        isInAlbum = albums[toAddWhichAlbum].filter(e => e.id === imageObj.id).length > 0
+    }
 
 
     const flashAdded = () => {
@@ -80,28 +82,45 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ imageObj, isLiked, onOpenFullScre
         onOpenFullScreen(imageObj);
     };
 
-    const handleAddToAlbumClick = (event: React.MouseEvent<HTMLElement>) => {
+    const handleAddToAlbumClick = async (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
         if (isSameTapAsHover()) return;
         if (toAddWhichAlbum) {
-            handleAddToAlbum(toAddWhichAlbum, imageObj);
-            showToast(
-                `Added to category '${categories[toAddWhichAlbum].name}'`,
-                'success'
-            );
+
+            const isSuccess = await handleAddToAlbum(toAddWhichAlbum, imageObj);
+            if (!isSuccess) {
+                showToast(
+                    `Failed to add to category '${categories[toAddWhichAlbum].name}'`,
+                    'error'
+                );
+            } else {
+                showToast(
+                    `Added to category '${categories[toAddWhichAlbum].name}'`,
+                    'success'
+                );
+            }
+            // syncAndLoadAlbumns();
             flashAdded();
         }
     };
 
-    const handleRemoveFromTargetAlbumClick = (event: React.MouseEvent<HTMLElement>) => {
+    const handleRemoveFromTargetAlbumClick = async (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
         if (isSameTapAsHover()) return;
         if (toAddWhichAlbum) {
-            showToast(
-                `Removed from category '${categories[toAddWhichAlbum].name}'`,
-                'success'
-            );
-            handleRemoveFromAlbum(toAddWhichAlbum, imageObj);
+
+            const isSucess = await handleRemoveFromAlbum(toAddWhichAlbum, imageObj);
+            if (isSucess) {
+                showToast(
+                    `Removed from category '${categories[toAddWhichAlbum].name}'`,
+                    'success'
+                );
+            } else {
+                showToast(
+                    `Failed to remove from category '${categories[toAddWhichAlbum].name}'`,
+                    'error'
+                );
+            }
         }
     };
     return (

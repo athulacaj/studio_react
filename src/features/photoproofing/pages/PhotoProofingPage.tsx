@@ -8,14 +8,15 @@ import { CachedImage } from '../../../shared/utils/MakeGlobalImageCache';
 import CategoryTabs from '../components/CategoryTabs';
 
 const PhotoProofingPage = () => {
-    const { albums, selectedAlbum, handleAlbumChange, images, currentImageIndex, categories } = usePhotoProofingStore();
+    const { albums, selectedAlbum, handleAlbumChange, images, categories } = usePhotoProofingStore();
     const allDisplayedImages: ImageObj[] = selectedAlbum === 'all'
         ? images
-        : (albums[selectedAlbum] || [])
-            .map((entry: string) => {
-                try { return JSON.parse(entry) as ImageObj; } catch { return null; }
-            })
-            .filter((img): img is ImageObj => img !== null);
+        : (albums[selectedAlbum] as ImageObj[] || []);
+
+    // .map((entry: any) => {
+    //     try { return JSON.parse(entry.image) as ImageObj; } catch { return null; }
+    // })
+    // .filter((img): img is ImageObj => img !== null);
 
 
     const [reload, setReload] = useState(true);
@@ -33,7 +34,7 @@ const PhotoProofingPage = () => {
             <HeaderPhotoProofing
                 albums={albums}
                 selectedAlbum={selectedAlbum}
-                onAlbumChange={handleAlbumChange}
+                // onAlbumChange={handleAlbumChange}
                 allDisplayedImages={allDisplayedImages}
                 categories={categories}
             />

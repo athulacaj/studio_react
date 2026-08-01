@@ -3,6 +3,7 @@ export interface ImageObj {
     folderPathList?: string[];
     thumbnailLink?: string;
     [key: string]: any;
+    id: string
 }
 export interface SelectedImageObj {
     src?: string;

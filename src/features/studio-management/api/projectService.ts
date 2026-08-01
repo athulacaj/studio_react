@@ -1,10 +1,9 @@
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { db } from '../../../config/firebase';
-import { Project, SharedLink, DriveNode, DriveData, ProjectJoinDriveData, LinkCategory } from '../types';
-import { StudioApiClient } from '../../../services/ApiInitalizer';
+import { Project, SharedLink, DriveNode, DriveData, ProjectJoinDriveData, LinkCategory, SyncedFolder, SelectedAlbum } from '../types';
+import { AssetsApiClient, StudioApiClient } from '../../../services/ApiInitalizer';
 import ApiEndPoints from '../../../config/apiEndpoints';
-import { SharedLinksParams } from '../../../types/apiEndPointTypes';
+import { SharedLinksParams, SelectedAlbumsParams } from '../../../types/apiEndPointTypes';
 
 /**
  * Fetches project details from Firestore.
@@ -50,14 +49,7 @@ export const updateProjectSyncFolder = async (
  */
 export const getSharedLink = async (params: SharedLinksParams): Promise<SharedLink[]> => {
     try {
-        const payload: any = {
-            createdBy: params.createdBy,
-            sourceProjectId: params.sourceProjectId,
-        };
-        if (params.id) {
-            payload.id = params.id;
-        }
-        const linkRef = await StudioApiClient.get<{ data: SharedLink[] }>(ApiEndPoints.projects.get.sharedLinks(payload))
+        const linkRef = await StudioApiClient.get<{ data: SharedLink[] }>(ApiEndPoints.projects.get.sharedLinks(params))
         return linkRef.data;
     } catch (error) {
         console.error("Error fetching shared link:", error);
@@ -132,16 +124,17 @@ export const putShareLink = async (id: string, data: PutShareLinkData): Promise<
  */
 export const getProjectTreeData = async (filePath: string): Promise<DriveNode> => {
     try {
-        const storage = getStorage();
-        const fileRef = ref(storage, filePath);
-        const url = await getDownloadURL(fileRef);
+        //     const storage = getStorage();
+        //     const fileRef = ref(storage, filePath);
+        //     const url = await getDownloadURL(fileRef);
 
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch tree data: ${response.statusText}`);
-        }
+        //     const response = await fetch(url);
+        //     if (!response.ok) {
+        //         throw new Error(`Failed to fetch tree data: ${response.statusText}`);
+        //     }
 
-        const data = await response.json();
+        //     const data = await response.json();
+        const data = await AssetsApiClient.get<DriveNode>(filePath);
         return data;
     } catch (error) {
         console.error("Error fetching project tree data:", error);
@@ -149,4 +142,69 @@ export const getProjectTreeData = async (filePath: string): Promise<DriveNode> =
     }
 };
 
+/**
+ * Fetches the synced folders for a project.
+ * @param {string} projectId 
+ * @returns {Promise<SyncedFolder[]>} Array of synced folders
+ */
+export const getSyncedFolders = async (projectId: string): Promise<Record<string, SyncedFolder>> => {
+    try {
+        const response = await StudioApiClient.get<{ data: Record<string, SyncedFolder>, success: boolean, message: string }>(ApiEndPoints.projects.get.syncedFolders(projectId));
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching synced folders:", error);
+        throw error;
+    }
+};
 
+/**
+ * Creates a new selected album.
+ * @param {SelectedAlbum} data Selected album data
+ * @returns {Promise<any>} The response containing created selected album
+ */
+export const postSelectedAlbum = async (data: SelectedAlbum): Promise<any> => {
+    try {
+        const response = await StudioApiClient.post<SelectedAlbum>(ApiEndPoints.projects.post.selectedAlbums(), data);
+        return response;
+    } catch (error) {
+        console.error("Error creating selected album:", error);
+        throw error;
+    }
+};
+
+/**
+ * Fetches selected albums.
+ * @param {SelectedAlbumsParams} params Query parameters
+ * @returns {Promise<SelectedAlbum[]>} Array of selected albums
+ */
+export const getSelectedAlbums = async (params: SelectedAlbumsParams): Promise<SelectedAlbum[]> => {
+    try {
+        const response = await StudioApiClient.get<{ data: SelectedAlbum[] }>(ApiEndPoints.projects.get.selectedAlbums(params));
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching selected albums:", error);
+        throw error;
+    }
+};
+
+export type PutSelectedAlbumData = {
+    action: 'add' | 'remove';
+    value: string;
+    imageId: string;
+    sharedLinkId: string;
+};
+
+/**
+ * Updates selection of an album.
+ * @param {PutSelectedAlbumData} data Action and value
+ * @returns {Promise<any>} Response
+ */
+export const putSelectedAlbum = async (data: PutSelectedAlbumData): Promise<any> => {
+    try {
+        const response = await StudioApiClient.put<PutSelectedAlbumData>(ApiEndPoints.projects.put.selectedAlbums(), data);
+        return response;
+    } catch (error) {
+        console.error("Error updating selected album:", error);
+        throw error;
+    }
+};

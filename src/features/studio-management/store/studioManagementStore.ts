@@ -13,6 +13,7 @@ interface StudioManagementState {
     projects: ProjectJoinDriveData[];
     loading: boolean;
     error: string | null;
+    currentProject: ProjectJoinDriveData | null;
 
     // Admin view-as-user support
     /** When set, the store operates on this user's data instead of the logged-in user */
@@ -37,6 +38,7 @@ interface StudioManagementState {
     updateShareLink: (projectId: string, linkId: string, updates: Partial<SharedLink>) => Promise<void>;
     deleteShareLink: (projectId: string, linkId: string) => Promise<void>;
     updateProjectLocalState: (projectId: string) => Promise<void>;
+    fetchCurrentProject: (projectId: string) => Promise<void>;
 }
 
 
@@ -55,6 +57,7 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     projects: [],
     loading: false,
     error: null,
+    currentProject: null,
 
     // Admin view-as-user
     viewAsUserId: null,
@@ -96,9 +99,6 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
         set({ loading: true });
         try {
             const projectsData = await getProject(effectiveUid)
-
-
-
             set({
                 projects: projectsData.data,
                 error: null,
@@ -113,6 +113,17 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
             set({ loading: false });
         }
     },
+    fetchCurrentProject: async (projectId: string) => {
+        set({ loading: true });
+        const projectData = await getProject(projectId);
+        set({ loading: false });
+        if (projectData.data[0]) {
+            set({
+                currentProject: projectData.data[0]
+            })
+        }
+    },
+
 
     fetchNextPage: async () => {
         return;
@@ -127,24 +138,6 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
         if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
         try {
-            // const docRef = await addDoc(collection(db, 'projects', effectiveUid, 'projects'), {
-            //     ...projectData,
-            //     userId: effectiveUid,
-            //     createdAt: serverTimestamp(),
-            //     status: 'active'
-            // });
-
-
-            //     name: string;
-            //     userId: string;
-            //     description?: string;
-            //     source: Source;
-            //     status: ProjectStatus;
-            //     projectAssets: ProjectAssets;
-            //     createdAt?: string;
-            //     updatedAt?: string;
-            //     driveUrl?: string;
-            // }
             await createProject({
                 name: projectData.name ?? '',
                 userId: effectiveUid,
@@ -157,10 +150,6 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
                 driveData: projectData.driveData ?? {},
                 selectedFolders: projectData.selectedFolders,
             })
-
-
-            // After adding, re-fetch from page 1 to get consistent state
-            await get().fetchProjects();
             return '';
         } catch (err: any) {
             console.error("Error adding project:", err);
@@ -275,13 +264,5 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     },
 }));
 
-// Subscribe to auth changes: auto-fetch projects when user logs in, clear on logout
-useAuthStore.subscribe((state, prevState) => {
-    if (state.currentUser && state.currentUser !== prevState.currentUser) {
-        useStudioManagementStore.getState().fetchProjects();
-    }
-    if (!state.currentUser && prevState.currentUser) {
-        useStudioManagementStore.setState({ projects: [], error: null, viewAsUserId: null, currentPage: 1, hasNextPage: false, hasPreviousPage: false, lastVisibleDoc: null, pageStartCursors: [null] });
-    }
-});
+
 

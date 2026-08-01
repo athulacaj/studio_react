@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Typography, Box, Button, Chip } from '@mui/material';
 import {
@@ -25,12 +25,18 @@ const StudioDashboard: React.FC = () => {
     const navigate = useNavigate();
     const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
     const projectJoinDriveData = useStudioManagementStore((state) => state.projects);
+    const fetchProjects = useStudioManagementStore((state) => state.fetchProjects);
+
 
     // When admin is viewing another user's dashboard, hide management actions
     const isAdminViewing = !!viewAsUserId && currentUser?.role === "admin";
 
     const activeProjects = projectJoinDriveData.map(p => p.project).filter(p => p.status === ProjectStatus.ACTIVE).length;
 
+
+    useEffect(() => {
+        fetchProjects();
+    }, [])
 
     return (
         <Box

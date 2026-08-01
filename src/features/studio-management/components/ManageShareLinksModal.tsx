@@ -37,8 +37,9 @@ import {
 } from '@mui/icons-material';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import FolderTree from './FolderTree';
-import { Project, SharedLink, LinkCategory, ProjectJoinDriveData, DriveData } from '../types';
+import { Project, SharedLink, LinkCategory, ProjectJoinDriveData, DriveData, SyncedFolder } from '../types';
 import { useToastStore } from '../../../shared/hooks/useToastStore';
+import { getSyncedFolders } from '../api/projectService';
 
 interface ManageShareLinksModalProps {
     open: boolean;
@@ -61,6 +62,8 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
     const [view, setView] = useState<ViewMode>('list');
     const project = projectData.project;
     const driveData: DriveData | null = projectData.driveData;
+    const [syncedFolders, setSyncedFolders] = useState<Record<string, SyncedFolder>>({});
+    const [isSyncLoading, setIsSyncLoading] = useState(false);
 
     const [currentLink, setCurrentLink] = useState<SharedLink | null>(null);
     const [error, setError] = useState('');
@@ -77,6 +80,17 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
             updateProjectLocalState(project?.id);
         }
     }, [open]);
+
+
+    useEffect(() => {
+        if (project?.id && open) {
+            setIsSyncLoading(true);
+            getSyncedFolders(project?.id).then((res) => {
+                setSyncedFolders(res as Record<string, SyncedFolder>);
+            })
+            setIsSyncLoading(false);
+        }
+    }, [project?.id, open])
 
 
     useEffect(() => {
@@ -136,7 +150,7 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
     const handleCopyLink = (linkId: string) => {
         if (!project) return;
         const userId = project.userId;
-        const url = `${window.location.origin}/share/${userId}/${project.id}/${linkId}`;
+        const url = `${window.location.origin}/share/${userId}/${linkId}`;
         navigator.clipboard.writeText(url);
         showToast('Project link copied to clipboard!', 'success');
 
@@ -153,6 +167,7 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
     };
 
     const handleSave = async () => {
+        setError('')
         if (!project || !linkName.trim()) {
             setError('Link name is required');
             return;
@@ -466,7 +481,7 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                     <Typography variant="subtitle1" sx={{ mb: 1.5, fontWeight: 500 }}>
                         Select Folders to Include
                     </Typography>
-                    {Object.keys(driveData?.syncedFolders || {}).length > 0 ? (
+                    {Object.keys(syncedFolders).length > 0 ? (
                         <Paper
                             variant="outlined"
                             sx={{
@@ -483,7 +498,7 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                                     onToggleSelect={handleToggleSelect}
                                     onSelectAllChange={setSelectedFolders}
                                     selectableIds={allowedFolderIds}
-                                    syncedFolders={driveData?.syncedFolders}
+                                    syncedFolders={syncedFolders}
                                 />
                             </Box>
                         </Paper>
@@ -492,9 +507,13 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
                             variant="outlined"
                             sx={{ p: 3, textAlign: 'center', borderRadius: 3, bgcolor: 'background.default', borderColor: 'divider' }}
                         >
-                            <Typography color="text.secondary">
-                                No synced folders available. Sync folders from the project details page first.
-                            </Typography>
+                            {isSyncLoading ? (
+                                <CircularProgress />
+                            ) : (
+                                <Typography color="text.secondary">
+                                    No synced folders available. Sync folders from the project details page first.
+                                </Typography>
+                            )}
                         </Paper>
                     )}
                 </Box>

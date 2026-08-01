@@ -343,17 +343,20 @@ const PremiumInvalidUrlState = () => (
 );
 
 // ─── Wrapper component to use the context and hook ──────────────────────────────
-const ProjectViewer = ({ userId, projectId, linkId }: { userId: string, projectId: string, linkId?: string }) => {
+const ProjectViewer = ({ userId, linkId }: { userId: string, linkId: string }) => {
     // The hook handles data fetching and updates the store
-    const { loading, error, project } = usePhotoProofing(userId, projectId, linkId);
+    const { loading, error, projectData } = usePhotoProofing(userId, linkId);
 
-    if (loading && !project) { // Only full screen loading for initial project load
+    if (loading || !projectData) { // Only full screen loading for initial project load
         return <PremiumLoadingScreen />;
     }
 
     if (error) {
         return <PremiumErrorState message={error} />;
     }
+
+    const project = projectData?.project;
+    const driveData = projectData?.driveData;
 
     return (
         <Box
@@ -363,15 +366,9 @@ const ProjectViewer = ({ userId, projectId, linkId }: { userId: string, projectI
                 position: 'relative',
             }}
         >
-            {project.source === 'google_photos' && !project.driveConnectionId ? (
-                <DriveConnectPrompt 
-                    userId={userId} 
-                    projectId={projectId} 
-                    projectName={project.name || 'this project'} 
-                />
-            ) : (
-                <PhotoProofingPage />
-            )}
+
+            <PhotoProofingPage />
+
             <Backdrop
                 sx={{
                     color: '#C084FC',
@@ -404,14 +401,14 @@ const ProjectViewer = ({ userId, projectId, linkId }: { userId: string, projectI
 };
 
 const PublicProjectView = () => {
-    const { userId, projectId, linkId } = useParams<{ userId: string; projectId: string; linkId?: string }>();
+    const { userId, linkId } = useParams<{ userId: string; linkId: string }>();
 
-    if (!userId || !projectId) {
+    if (!userId || !linkId) {
         return <PremiumInvalidUrlState />;
     }
 
     return (
-        <ProjectViewer userId={userId} projectId={projectId} linkId={linkId} />
+        <ProjectViewer userId={userId} linkId={linkId} />
     );
 };
 

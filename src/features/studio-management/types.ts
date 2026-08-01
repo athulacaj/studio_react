@@ -104,3 +104,17 @@ export interface SyncedFolder {
     syncTime: Timestamp;
     filesCount: number;
 }
+
+export interface SelectedAlbum {
+    imageId: string;
+    sharedLinkId: string;
+    name: string;
+    mimeType?: string;
+    source?: Source | string;
+    src?: string;
+    url?: string;
+    selections: string[];
+    folderPathList?: string[];
+    createdAt?: any;
+    updatedAt?: any;
+}

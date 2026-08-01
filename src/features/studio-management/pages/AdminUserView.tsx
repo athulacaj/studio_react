@@ -41,7 +41,6 @@ const AdminUserView: React.FC = () => {
 
     const setViewAsUserId = useStudioManagementStore((state) => state.setViewAsUserId);
     const clearViewAsUserId = useStudioManagementStore((state) => state.clearViewAsUserId);
-    const fetchProjects = useStudioManagementStore((state) => state.fetchProjects);
 
     const [viewedUser, setViewedUser] = useState<ViewedUser | null>(null);
     const [loadingUser, setLoadingUser] = useState(true);
@@ -55,6 +54,7 @@ const AdminUserView: React.FC = () => {
             navigate('/private/studio', { replace: true });
         }
     }, [currentUser, navigate]);
+
 
     // Set viewAsUserId on mount, clear on unmount
     useEffect(() => {
