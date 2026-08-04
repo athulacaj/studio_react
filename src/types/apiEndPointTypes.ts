@@ -1,7 +1,7 @@
 interface GetProjectsParams {
-    userId?: string;
+    userId: string | null;
     updatedAfter?: string;
-    projectId?: string;
+    projectId: string | null;
 }
 
 interface SelectedAlbumsParams {

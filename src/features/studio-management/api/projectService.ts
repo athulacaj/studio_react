@@ -12,10 +12,13 @@ import { SharedLinksParams, SelectedAlbumsParams } from '../../../types/apiEndPo
  * @returns {Promise<Project>} Project data
  */
 export const getProject = async (userId?: string, projectId?: string): Promise<{ data: ProjectJoinDriveData[] }> => {
-    return await StudioApiClient.get<{ data: ProjectJoinDriveData[] }>(ApiEndPoints.projects.get.projects({
-        userId: userId,
-        projectId: projectId
-    }));
+    const q: any = {
+    }
+    if (userId) q.userId = userId
+    if (projectId) q.projectId = projectId
+    // userId: userId ?? null,
+    //     projectId: projectId ?? null
+    return await StudioApiClient.get<{ data: ProjectJoinDriveData[] }>(ApiEndPoints.projects.get.projects(q));
 };
 
 export const createProject = async (project: Partial<Project>, driveData?: Partial<DriveData>): Promise<string> => {

@@ -51,7 +51,7 @@ const findPathToNode = (node: DriveNode, targetId: string, path: { id: string, n
     return null;
 };
 
-export default function usePhotoProofing(userId: string, linkId: string) {
+export default function usePhotoProofing(linkId: string) {
     const {
         loading, setLoading, setImages, setFolders,
         setIds, setAlbums, currentImageIndex, itemsPerPage,
@@ -70,7 +70,7 @@ export default function usePhotoProofing(userId: string, linkId: string) {
         return [];
     }, [searchParams]);
 
-    const setBreadcrumbs = useCallback((newBreadcrumbs: {id: string, name: string}[]) => {
+    const setBreadcrumbs = useCallback((newBreadcrumbs: { id: string, name: string }[]) => {
         setSearchParams(prev => {
             const newParams = new URLSearchParams(prev);
             if (newBreadcrumbs.length > 0) {
@@ -107,8 +107,8 @@ export default function usePhotoProofing(userId: string, linkId: string) {
     }, [currentFolderId]);
 
     useEffect(() => {
-        setIds(userId, linkId);
-    }, [userId, linkId, setIds]);
+        setIds(linkId);
+    }, [linkId, setIds]);
     const [error, setError] = useState<string | null>(null);
     const [projectData, setProjectData] = useState<ProjectJoinDriveData | null>(null);
     // const project: Project | undefined = projectData?.project;
@@ -156,7 +156,7 @@ export default function usePhotoProofing(userId: string, linkId: string) {
             }
             setLoading(false);
         }
-    }, [linkId, userId]);
+    }, [linkId]);
     useEffect(() => {
         if (linkId) {
             handleLinkShared();
@@ -166,7 +166,7 @@ export default function usePhotoProofing(userId: string, linkId: string) {
     const loadProjectAndLink = useCallback(async (projectId: string) => {
         try {
             // 1. Fetch Project Details
-            const res = await getProject(userId, projectId);
+            const res = await getProject(undefined, projectId);
             if (res.data && res.data.length > 0) {
                 const projectData = res.data[0];
                 setProjectData(projectData);
@@ -186,7 +186,7 @@ export default function usePhotoProofing(userId: string, linkId: string) {
         } finally {
             setLoading(false);
         }
-    }, [linkId, userId, projectId]);
+    }, [linkId, projectId]);
 
 
 
@@ -334,10 +334,10 @@ export default function usePhotoProofing(userId: string, linkId: string) {
 
     // Effect to sync albums on page load
     useEffect(() => {
-        if (userId && projectId && linkId && Object.keys(categories).length > 0) {
+        if (projectId && linkId && Object.keys(categories).length > 0) {
             syncAndLoadAlbumns();
         }
-    }, [userId, projectId, linkId, categories]);
+    }, [projectId, linkId, categories]);
 
 
     // cahnge page number if the user changes to the next or previous page through fullscreen autoplay or next button

@@ -343,9 +343,9 @@ const PremiumInvalidUrlState = () => (
 );
 
 // ─── Wrapper component to use the context and hook ──────────────────────────────
-const ProjectViewer = ({ userId, linkId }: { userId: string, linkId: string }) => {
+const ProjectViewer = ({ linkId }: { linkId: string }) => {
     // The hook handles data fetching and updates the store
-    const { loading, error, projectData } = usePhotoProofing(userId, linkId);
+    const { loading, error, projectData } = usePhotoProofing(linkId);
 
     if (loading || !projectData) { // Only full screen loading for initial project load
         return <PremiumLoadingScreen />;
@@ -355,8 +355,6 @@ const ProjectViewer = ({ userId, linkId }: { userId: string, linkId: string }) =
         return <PremiumErrorState message={error} />;
     }
 
-    const project = projectData?.project;
-    const driveData = projectData?.driveData;
 
     return (
         <Box
@@ -401,14 +399,14 @@ const ProjectViewer = ({ userId, linkId }: { userId: string, linkId: string }) =
 };
 
 const PublicProjectView = () => {
-    const { userId, linkId } = useParams<{ userId: string; linkId: string }>();
+    const { linkId } = useParams<{ userId: string; linkId: string }>();
 
-    if (!userId || !linkId) {
+    if (!linkId) {
         return <PremiumInvalidUrlState />;
     }
 
     return (
-        <ProjectViewer userId={userId} linkId={linkId} />
+        <ProjectViewer linkId={linkId} />
     );
 };
 

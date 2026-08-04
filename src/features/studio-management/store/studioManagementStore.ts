@@ -6,6 +6,7 @@ import { Project, ProjectAssets, ProjectJoinDriveData, ProjectStatus, SharedLink
 import { createProject, getProject, getSharedLink, postShareLink } from '../api/projectService';
 import ApiEndPoints from '../../../config/apiEndpoints';
 import { StudioApiClient } from '../../../services/ApiInitalizer';
+import { Business } from '../api/businessService';
 
 const PAGE_LIMIT = 3;
 
@@ -27,6 +28,8 @@ interface StudioManagementState {
     hasPreviousPage: boolean;
     lastVisibleDoc: QueryDocumentSnapshot<DocumentData> | null;
     pageStartCursors: (QueryDocumentSnapshot<DocumentData> | null)[];
+    businessData: Business | null;
+
 
     fetchProjects: () => Promise<void>;
     fetchNextPage: () => Promise<void>;
@@ -39,6 +42,8 @@ interface StudioManagementState {
     deleteShareLink: (projectId: string, linkId: string) => Promise<void>;
     updateProjectLocalState: (projectId: string) => Promise<void>;
     fetchCurrentProject: (projectId: string) => Promise<void>;
+    setBusinessData: (data: Business) => void;
+
 }
 
 
@@ -58,6 +63,7 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     loading: false,
     error: null,
     currentProject: null,
+    businessData: null,
 
     // Admin view-as-user
     viewAsUserId: null,
@@ -262,6 +268,12 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
             set({ loading: false });
         }
     },
+
+    setBusinessData: (data: Business) => {
+        set({
+            businessData: data,
+        })
+    }
 }));
 
 

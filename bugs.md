@@ -1,0 +1,1 @@
+when a new project is added need to refresh the page to see it

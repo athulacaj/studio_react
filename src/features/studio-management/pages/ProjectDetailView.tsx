@@ -46,6 +46,7 @@ const ProjectDetailView: React.FC = () => {
     const fetchCurrentProject: (projectId: string) => void = useStudioManagementStore((state) => state.fetchCurrentProject);
     const loading = useStudioManagementStore((state) => state.loading);
     const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
+    const businessData = useStudioManagementStore((state) => state.businessData);
 
     // When admin is viewing another user, use that user's ID for links
     const effectiveUserId = viewAsUserId || currentUser?.userId;
@@ -64,6 +65,7 @@ const ProjectDetailView: React.FC = () => {
     const projectData = currentProject;
     const project = projectData?.project;
 
+
     useEffect(() => {
         if (projectId) {
             fetchCurrentProject(projectId)
@@ -79,7 +81,13 @@ const ProjectDetailView: React.FC = () => {
 
     const handleCopyLink = () => {
         if (!effectiveUserId || !project) return;
-        const link = `${window.location.origin}/view/${effectiveUserId}/${project.id}`;
+        let link = '';
+        if (businessData?.slug) {
+            link = `${businessData.slug}/view/${project.id}`;
+        }
+        else {
+            link = `${window.location.origin}/view/${effectiveUserId}/${project.id}`;
+        }
         navigator.clipboard.writeText(link);
         showToast('Project link copied to clipboard!', 'success');
     };

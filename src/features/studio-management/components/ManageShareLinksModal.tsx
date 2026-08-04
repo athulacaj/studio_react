@@ -57,6 +57,8 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
     const updateShareLink = useStudioManagementStore((state) => state.updateShareLink);
     const deleteShareLink = useStudioManagementStore((state) => state.deleteShareLink);
     const updateProjectLocalState = useStudioManagementStore((state) => state.updateProjectLocalState);
+    const businessData = useStudioManagementStore((state) => state.businessData);
+
     const [links, setLinks] = useState<SharedLink[]>([]);
     const [loading, setLoading] = useState(false);
     const [view, setView] = useState<ViewMode>('list');
@@ -150,7 +152,15 @@ const ManageShareLinksModal: React.FC<ManageShareLinksModalProps> = ({ open, onC
     const handleCopyLink = (linkId: string) => {
         if (!project) return;
         const userId = project.userId;
-        const url = `${window.location.origin}/share/${userId}/${linkId}`;
+        let url;
+        if (businessData?.slug) {
+            url = `${businessData.slug}.mizhiv.com/share/${linkId}`;
+        }
+        else {
+            url = `${window.location.origin}/share/${userId}/${linkId}`;
+        }
+
+
         navigator.clipboard.writeText(url);
         showToast('Project link copied to clipboard!', 'success');
 

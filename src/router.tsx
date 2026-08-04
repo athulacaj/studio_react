@@ -42,7 +42,7 @@ const AppRouter = () => {
           <Route path="/drive/success" element={<DriveSuccessPage />} />
           <Route path="/view/vivid/vivid" element={<VividView />} />
           <Route path="/view/:userId/:projectId" element={<PublicProjectView />} />
-          <Route path="/share/:userId/:linkId" element={<PublicProjectView />} />
+          <Route path="/share/:linkId" element={<PublicProjectView />} />
           <Route path="/about" element={<About />} />
           <Route path="/p/:userId/:eventpath" element={<EventPageViewer />} />
           <Route path="*" element={<NotFound />} />

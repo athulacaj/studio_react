@@ -16,6 +16,7 @@ import ProjectList from '../components/ProjectList';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import { useAuthStore } from '../../auth';
 import { ProjectStatus } from '../types';
+import { getBusinessByUserId } from '../api/businessService';
 
 const StudioDashboard: React.FC = () => {
     const { currentUser } = useAuthStore();
@@ -26,6 +27,7 @@ const StudioDashboard: React.FC = () => {
     const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
     const projectJoinDriveData = useStudioManagementStore((state) => state.projects);
     const fetchProjects = useStudioManagementStore((state) => state.fetchProjects);
+    const setBusinessData = useStudioManagementStore((state) => state.setBusinessData);
 
 
     // When admin is viewing another user's dashboard, hide management actions
@@ -36,6 +38,12 @@ const StudioDashboard: React.FC = () => {
 
     useEffect(() => {
         fetchProjects();
+
+        getBusinessByUserId(currentUser?.userId ?? '').then((res) => {
+            const data = res.data.filter(e => e.typeId = 1)[0];
+            setBusinessData(data)
+
+        })
     }, [])
 
     return (

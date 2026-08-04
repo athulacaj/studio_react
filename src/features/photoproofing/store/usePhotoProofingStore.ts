@@ -35,12 +35,14 @@ interface PhotoProofingState {
     //Share link data
     shareLinkData: Record<string, any>;
     syncedFolders: Record<string, any>;
+
+
 }
 
 interface PhotoProofingActions {
     // Core ID setters
     setProjectId: (projectId: string) => void;
-    setIds: (userId: string, linkId?: string | null) => void;
+    setIds: (linkId?: string | null) => void;
 
     // UI setters
     setLoading: (loading: boolean) => void;
