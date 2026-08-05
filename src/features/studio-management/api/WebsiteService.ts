@@ -59,7 +59,7 @@ export const uploadFileToR2 = async (info: UploadFileInfo, file: File, onProgres
 export interface CreateWebsiteRequest {
     businessId: number;
     projectId: string | null;
-    pathId: string;
+    path: string;
     assets?: any;
     currentPath?: string;
     r2BaseUrl?: string;
@@ -69,7 +69,7 @@ export interface CreateWebsiteRequest {
 export interface UpdateWebsiteRequest {
     businessId?: number;
     projectId?: string;
-    pathId?: string;
+    path: string;
     assets?: any;
     currentPath?: string;
     r2BaseUrl?: string;
@@ -118,14 +118,7 @@ export interface CreateWebsitePathRequest {
     path: string;
 }
 
-export const createWebsitePath = async (data: CreateWebsitePathRequest): Promise<WebsitePath> => {
-    try {
-        return (await StudioApiClient.post<{ data: WebsitePath }>(ApiEndPoints.website.post.path(), data)).data;
-    } catch (error) {
-        console.error("Error creating website path:", error);
-        throw error;
-    }
-};
+
 export interface WebsitePath {
     id: string;
     businessId: number;

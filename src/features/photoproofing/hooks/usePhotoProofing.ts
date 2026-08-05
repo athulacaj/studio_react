@@ -54,9 +54,9 @@ const findPathToNode = (node: DriveNode, targetId: string, path: { id: string, n
 export default function usePhotoProofing(linkId: string) {
     const {
         loading, setLoading, setImages, setFolders,
-        setIds, setAlbums, currentImageIndex, itemsPerPage,
+        setLinkId, setAlbums, currentImageIndex, itemsPerPage,
         setShareLinkData, shareLinkData, categories, setCategories,
-        projectId, setProjectId, setSyncedFolders, syncedFolders, syncAndLoadAlbumns
+        projectId, setProjectId, setSyncedFolders, syncedFolders, syncAndLoadAlbumns, setP
     } = usePhotoProofingStore();
 
     const [searchParams, setSearchParams] = useSearchParams();
@@ -107,8 +107,8 @@ export default function usePhotoProofing(linkId: string) {
     }, [currentFolderId]);
 
     useEffect(() => {
-        setIds(linkId);
-    }, [linkId, setIds]);
+        setLinkId(linkId)
+    }, [linkId]);
     const [error, setError] = useState<string | null>(null);
     const [projectData, setProjectData] = useState<ProjectJoinDriveData | null>(null);
     // const project: Project | undefined = projectData?.project;

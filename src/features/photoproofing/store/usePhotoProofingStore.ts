@@ -42,7 +42,8 @@ interface PhotoProofingState {
 interface PhotoProofingActions {
     // Core ID setters
     setProjectId: (projectId: string) => void;
-    setIds: (linkId?: string | null) => void;
+    setLinkId: (linkId: string) => void;
+    setuserId: (userId: string) => void;
 
     // UI setters
     setLoading: (loading: boolean) => void;
@@ -138,9 +139,12 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
     setProjectId: (projectId: string) => {
         set({ projectId });
     },
-    // --- Core ID setters ---
-    setIds: (userId, linkId = null) => {
-        set({ userId, linkId });
+
+    setuserId: (userId: string) => {
+        set({ userId });
+    },
+    setLinkId: (linkId: string) => {
+        set({ linkId });
     },
 
     // --- UI setters ---
@@ -168,16 +172,16 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
         }
     }),
     syncAndLoadAlbumns: async () => {
-        const { userId, projectId, linkId, categories } = get();
-        if (!userId || !projectId || !linkId) {
+        const { projectId, linkId, categories } = get();
+        if (!projectId || !linkId) {
             console.log("Failed to sync albums: Missing userId, projectId, or linkId");
             return;
         };
         try {
-            await albumSyncService.syncAlbums(userId, projectId, linkId);
+            await albumSyncService.syncAlbums(projectId, linkId);
 
             // After sync, load everything from local cache to state
-            const localAlbums: Record<string, ImageObj[]> = await albumSyncService.getAggregatedAlbums(userId, projectId, linkId, categories);
+            const localAlbums: Record<string, ImageObj[]> = await albumSyncService.getAggregatedAlbums(projectId, linkId, categories);
             console.log('localAlbums', localAlbums);
             set({ albums: localAlbums });
         } catch (error) {
@@ -186,7 +190,7 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
     },
 
     handleAddToAlbum: async (albumName, image, breadcrumbs = []) => {
-        const { userId, projectId, linkId } = get();
+        const { projectId, linkId } = get();
         image.folderPathList = breadcrumbs.map((b) => b.name).slice(1);
         if (!image || !image.id) return false;
 
@@ -194,7 +198,7 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
         set({ addToAlbumLoader: true });
 
 
-        if (userId && projectId && linkId) {
+        if (projectId && linkId) {
 
             try {
                 const payload = {
@@ -229,12 +233,12 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
     },
 
     handleRemoveFromAlbum: async (albumName, image) => {
-        const { userId, projectId, linkId } = get();
+        const { projectId, linkId } = get();
         if (!image || !image.id) return false;
 
         set({ addToAlbumLoader: true });
 
-        if (userId && projectId && linkId) {
+        if (projectId && linkId) {
             set((state) => {
                 return addOrRemoveFromSelection(state, albumName, image, false);
             });

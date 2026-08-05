@@ -7,13 +7,13 @@ export class AlbumSyncService {
     /**
      * Syncs album entries from Firestore to IndexedDB if they have been updated since last sync.
      */
-    async syncAlbums(userId: string, projectId: string, linkId: string): Promise<void> {
-        if (!userId || !projectId || !linkId) {
+    async syncAlbums(projectId: string, linkId: string): Promise<void> {
+        if (!projectId || !linkId) {
             console.warn('Missing parameters for album sync');
             return;
         }
 
-        const syncId = `${userId}:${projectId}:${linkId}`;
+        const syncId = `${projectId}:${linkId}`;
         const lastSyncTime = await indexedDBService.getLastSyncTime(projectId, syncId);
 
 
@@ -56,8 +56,8 @@ export class AlbumSyncService {
     /**
      * Gets all synced images for a specific link
      */
-    async getLocalImages(userId: string, projectId: string, linkId: string): Promise<any[]> {
-        const syncId = `${userId}:${projectId}:${linkId}`;
+    async getLocalImages(projectId: string, linkId: string): Promise<any[]> {
+        const syncId = `${projectId}:${linkId}`;
         const allImages = await indexedDBService.getAllImages(projectId);
         return allImages.filter(img => img.syncId === syncId);
     }
@@ -72,8 +72,8 @@ export class AlbumSyncService {
     /**
      * Gets all synced data and aggregates it into the format expected by the UI
      */
-    async getAggregatedAlbums(userId: string, projectId: string, linkId: string): Promise<Record<string, ImageObj[]>> {
-        const images = await this.getLocalImages(userId, projectId, linkId);
+    async getAggregatedAlbums(projectId: string, linkId: string): Promise<Record<string, ImageObj[]>> {
+        const images = await this.getLocalImages(projectId, linkId);
         const result: Record<string, ImageObj[]> = {};
 
         images.forEach((img: any) => {

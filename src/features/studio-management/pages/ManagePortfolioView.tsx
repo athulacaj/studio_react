@@ -36,7 +36,7 @@ import DynamicPortfolioForm from '../components/DynamicPortfolioForm';
 import UploadDialogComponent from '../../../shared/components/UploadDialogComponent';
 import { usePortfolioStore } from '../store/portfolioStore';
 import imageCompression from 'browser-image-compression';
-import { createWebsite, createWebsitePath, getUploadUrls, getWebsitePaths, getWebsites, updateWebsite, uploadFileToR2, WebsitePath } from '../api/WebsiteService';
+import { createWebsite, getUploadUrls, getWebsites, updateWebsite, uploadFileToR2, WebsitePath } from '../api/WebsiteService';
 import { doc, setDoc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../../../config/firebase';
 import { useAuthStore } from '../../auth/store/authStore';
@@ -51,7 +51,7 @@ const ManageStudioPortfolioView: React.FC = () => {
     // Global Store State
     const { htmlContent, setHtmlContent, portfolioData, setPortfolioData, uploadedImages,
         setUploadedImages, addUploadedImages, removeUploadedImage, businessData,
-        setBusinessData, webSiteData, setWebsiteData, pathData, setPathData } = usePortfolioStore();
+        setBusinessData, webSiteData, setWebsiteData } = usePortfolioStore();
     const { currentUser } = useAuthStore();
 
     const [blobUrl, setBlobUrl] = useState<string | null>(null);
@@ -77,26 +77,11 @@ const ManageStudioPortfolioView: React.FC = () => {
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
 
-    async function handlePath(businessId: number) {
-        const pathDataList: WebsitePath[] = await getWebsitePaths(businessId);
-        if (pathDataList.length > 0) {
-            const pathData = pathDataList.filter(path => path.path === "/")[0];
-            setPathData(pathData)
-        } else {
-            const data = await createWebsitePath({
-                businessId: businessId,
-                path: "/"
-            })
-            setPathData(data);
-        }
-
-    }
 
     useEffect(() => {
         getBusinessByUserId(currentUser?.userId ?? '').then((res) => {
             const data = res.data.filter(e => e.typeId = 1)[0];
             setBusinessData(data)
-            handlePath(data.id)
         })
     }, [])
 
@@ -185,7 +170,7 @@ const ManageStudioPortfolioView: React.FC = () => {
         const updatedWebsiteData = await createWebsite({
             businessId: businessData!.id,
             projectId: null,
-            pathId: pathData!.id,
+            pathId: "/",
             assets: [],
             currentPath: urlInfo?.key,
             versions: []
@@ -357,7 +342,7 @@ const ManageStudioPortfolioView: React.FC = () => {
     };
 
     const handlePublish = async (businessId: number | undefined) => {
-        if (!currentUser || !businessId || !pathData) {
+        if (!currentUser || !businessId) {
             console.error("User or businessId or pathData is not defined");
             return;
         };
@@ -393,13 +378,11 @@ const ManageStudioPortfolioView: React.FC = () => {
                     publishedAt: new Date().toISOString()
                 };
 
-                const pathId = pathData.id;
-
                 let updatedWebsiteData;
                 if (webSiteData) {
                     updatedWebsiteData = await updateWebsite(webSiteData.id, {
                         businessId: businessId,
-                        pathId: pathId!,
+                        path: "/",
                         currentPath: urlInfo.key,
                         versions: [...webSiteData.versions, versionData]
                     })
@@ -409,7 +392,7 @@ const ManageStudioPortfolioView: React.FC = () => {
                     updatedWebsiteData = await createWebsite({
                         businessId: businessId,
                         projectId: null,
-                        pathId: pathId!,
+                        path: "/",
                         assets: assetsMetadata,
                         currentPath: urlInfo.key,
                         r2BaseUrl: import.meta.env.VITE_R2_BASEURL,

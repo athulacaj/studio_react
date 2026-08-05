@@ -4,7 +4,7 @@ import { usePhotoProofingStore } from '../store/usePhotoProofingStore';
 import { AlbumCategory } from '../types';
 import { useSearchParams } from 'react-router-dom';
 
-interface CategoryTabsProps {}
+interface CategoryTabsProps { }
 
 const CategoryTabs = (props: CategoryTabsProps) => {
     const { categories: categories1 } = usePhotoProofingStore();
