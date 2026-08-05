@@ -232,31 +232,6 @@ export default function usePhotoProofing(linkId: string) {
                 }
             }
 
-            // If we don't have the tree, we need to fetch it.
-            if (!tree && rootId && project && project[rootId]) {
-                const { filePath } = project[rootId];
-
-                // Fetch from Storage
-                const data = await getProjectTreeData(filePath);
-                setImages(data.files || []);
-                tree = data;
-
-                // Update cache
-                if (tree) {
-                    setCachedTrees(prev => ({ ...prev, [rootId]: tree as DriveNode }));
-
-                    // Update folderRootMap for all children in this tree
-                    const updateMap = (node: DriveNode, rId: string) => {
-                        if (node.folders) {
-                            Object.values(node.folders).forEach(child => {
-                                setFolderRootMap(prev => ({ ...prev, [child.id]: rId }));
-                                updateMap(child, rId);
-                            });
-                        }
-                    };
-                    updateMap(tree, rootId);
-                }
-            }
 
             // Now we have the tree (hopefully), let's find the current folder node
             let currentNode: DriveNode | null = null;
