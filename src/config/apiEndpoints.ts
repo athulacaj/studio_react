@@ -12,6 +12,7 @@ const ApiEndPoints = {
             selectedAlbums: (params: SelectedAlbumsParams) => `/projects/selected-albums?` + makeQueryUrl(params),
             sharedLinks: (params: SharedLinksParams) => `/projects/sharedLinks?` + makeQueryUrl(params),
             syncedFolders: (projectId: string) => `/projects/${projectId}/synced-folders`,
+            public: (projectId: string) => `/projects/projects/public/${projectId}`,
         },
         post: {
             projects: () => `/projects/projects`,

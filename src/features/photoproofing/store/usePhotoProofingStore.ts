@@ -170,7 +170,7 @@ export const usePhotoProofingStore = create<PhotoProofingStore>((set, get) => ({
     syncAndLoadAlbumns: async () => {
         const { userId, projectId, linkId, categories } = get();
         if (!userId || !projectId || !linkId) {
-            console.error("Failed to sync albums: Missing userId, projectId, or linkId");
+            console.log("Failed to sync albums: Missing userId, projectId, or linkId");
             return;
         };
         try {

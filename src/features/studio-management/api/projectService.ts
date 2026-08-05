@@ -21,6 +21,11 @@ export const getProject = async (userId?: string, projectId?: string): Promise<{
     return await StudioApiClient.get<{ data: ProjectJoinDriveData[] }>(ApiEndPoints.projects.get.projects(q));
 };
 
+export const getPublicProject = async (projectId: string): Promise<{ data: ProjectJoinDriveData[] }> => {
+
+    return await StudioApiClient.get<{ data: ProjectJoinDriveData[] }>(ApiEndPoints.projects.get.public(projectId));
+};
+
 export const createProject = async (project: Partial<Project>, driveData?: Partial<DriveData>): Promise<string> => {
     return await StudioApiClient.post<string>(ApiEndPoints.projects.post.projects(), { project, driveData });
 };

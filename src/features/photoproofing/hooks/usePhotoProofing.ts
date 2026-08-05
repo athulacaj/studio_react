@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePhotoProofingStore } from '../store/usePhotoProofingStore';
-import { getProject, getSharedLink, getProjectTreeData, getSyncedFolders } from '../../studio-management/api/projectService';
+import { getProject, getSharedLink, getProjectTreeData, getSyncedFolders, getPublicProject } from '../../studio-management/api/projectService';
 import { Project, SharedLink, DriveNode, ProjectJoinDriveData, DriveData } from '../../studio-management/types';
 import { albumSyncService } from '../services/AlbumSyncService';
 import { useSearchParams } from 'react-router-dom';
@@ -166,7 +166,7 @@ export default function usePhotoProofing(linkId: string) {
     const loadProjectAndLink = useCallback(async (projectId: string) => {
         try {
             // 1. Fetch Project Details
-            const res = await getProject(undefined, projectId);
+            const res = await getPublicProject(projectId);
             if (res.data && res.data.length > 0) {
                 const projectData = res.data[0];
                 setProjectData(projectData);
@@ -328,9 +328,9 @@ export default function usePhotoProofing(linkId: string) {
 
     // Effect to fetch content when currentFolderId changes or project/shareLinkData loads
     useEffect(() => {
-        if (!currentFolderId && !projectData) return;
+        if (!currentFolderId && !projectData && !syncedFolders) return;
         fetchContent(projectData?.project, projectData?.driveData);
-    }, [currentFolderId, projectData]);
+    }, [currentFolderId, projectData, syncedFolders]);
 
     // Effect to sync albums on page load
     useEffect(() => {
@@ -362,3 +362,4 @@ export default function usePhotoProofing(linkId: string) {
         syncAndLoadAlbumns
     };
 };
+

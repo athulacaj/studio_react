@@ -4,7 +4,6 @@ import { useAuthStore } from '../store/authStore';
 import { Box, CircularProgress } from '@mui/material';
 import GlobalNavbar from '../../../core/components/GlobalNavbar';
 import { useConfigStore } from '../../../core/store/ConifgStore';
-import { getMe } from '../services/userService';
 
 const ProtectedRoute = () => {
     const { currentUser, loading: authLoading, setUser } = useAuthStore();
