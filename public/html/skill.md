@@ -883,3 +883,357 @@ The generated website must expose the following communication contract.
 ```
 
 Future communication between the generated website and external editors should continue using the same `window.postMessage` pattern.
+
+---
+
+---------------       -----------------------------------------------
+
+# Performance Optimization
+
+Generated websites must be optimized for low-end devices. Poor performance causes the page to hang, animate poorly, or fail to load entirely on budget phones and slow networks.
+
+Apply all of the following rules in every generated website.
+
+---
+
+## 1. Font Preconnect
+
+Always add `preconnect` hints **before** any Google Fonts or external font `<link>` tags.
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+```
+
+### ✅ Good
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+```
+
+### ❌ Bad
+
+```html
+<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+```
+
+Missing `preconnect` blocks rendering while the browser opens a DNS + TLS connection.
+
+---
+
+## 2. Hero Image Preload
+
+The hero image is the largest contentful paint element. Always preload it so the browser fetches it as early as possible.
+
+Add this inside `<head>`, before any scripts:
+
+```html
+<link rel="preload" as="image" href="{websiteData.hero.image}" />
+```
+
+If the image URL comes from data, inject this tag dynamically right before `renderHero()` runs:
+
+```javascript
+function preloadHeroImage() {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = websiteData.hero.image;
+    document.head.appendChild(link);
+}
+```
+
+Call `preloadHeroImage()` as the very first step in `renderDataAll()`.
+
+---
+
+## 3. `will-change` — Do Not Apply Globally
+
+`will-change` forces the GPU to allocate a compositing layer. Applying it to many elements at once exhausts GPU memory on low-end devices and causes the page to hang or crash.
+
+### ❌ Bad — Applied to all elements at page load
+
+```css
+.fade-in-section {
+    will-change: opacity, transform; /* Applied to ALL sections simultaneously */
+}
+
+.gallery-item img {
+    will-change: transform; /* Applied to all gallery images simultaneously */
+}
+```
+
+### ✅ Good — Apply only when needed, reset immediately after
+
+```css
+/* Remove will-change from the base rule */
+.fade-in-section {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 1s ease, transform 1s ease;
+}
+
+/* Apply temporarily during animation only */
+.fade-in-section.animating {
+    will-change: opacity, transform;
+}
+
+/* Reset after animation completes */
+.fade-in-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+    will-change: auto;
+}
+```
+
+Apply and remove `will-change` using the IntersectionObserver:
+
+```javascript
+function initScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animating');
+                requestAnimationFrame(() => {
+                    entry.target.classList.add('visible');
+                    entry.target.classList.remove('animating');
+                });
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.fade-in-section').forEach(el => observer.observe(el));
+}
+```
+
+---
+
+## 4. Scroll Handler — Always Use `requestAnimationFrame`
+
+Never run DOM reads or writes directly inside a scroll event handler. Scroll events fire hundreds of times per second. Without throttling, every pixel of scroll triggers layout recalculation and forced reflow, causing jank and freezes.
+
+### ❌ Bad — Runs on every scroll event
+
+```javascript
+window.onscroll = () => {
+    const scroll = window.scrollY;
+    navbar.classList.toggle('scrolled', scroll > 100);
+    heroImage.style.transform = `translateY(${scroll * 0.3}px)`;
+};
+```
+
+### ✅ Good — Throttled with `requestAnimationFrame`
+
+```javascript
+let ticking = false;
+
+window.addEventListener('scroll', () => {
+    if (!ticking) {
+        requestAnimationFrame(() => {
+            const scroll = window.scrollY;
+
+            navbar.classList.toggle('nav-scrolled', scroll > 100);
+
+            if (heroImage && scroll < window.innerHeight) {
+                heroImage.style.transform = `translateY(${scroll * 0.3}px) scale(1.1)`;
+            }
+
+            ticking = false;
+        });
+        ticking = true;
+    }
+}, { passive: true });
+```
+
+Always add `{ passive: true }` to scroll listeners. This tells the browser the handler will never call `preventDefault()`, allowing it to scroll on a separate thread without waiting for JavaScript.
+
+---
+
+## 5. Lazy Load iFrames with IntersectionObserver
+
+iFrames (e.g. Google Maps) are extremely heavy. Even with `loading="lazy"`, they are parsed and can block the main thread if injected into the DOM at page load.
+
+Always defer iframe `src` injection until the iframe is about to enter the viewport.
+
+### ❌ Bad — iFrame loads at page start
+
+```javascript
+function renderLocations() {
+    document.getElementById('location').innerHTML = events.map(event => `
+        <iframe src="${event.locationUrl}" loading="lazy"></iframe>
+    `).join('');
+}
+```
+
+### ✅ Good — Inject `src` only when visible
+
+```javascript
+function renderLocations() {
+    document.getElementById('location').innerHTML = events.map(event => `
+        <iframe data-src="${event.locationUrl}" loading="lazy"></iframe>
+    `).join('');
+}
+
+function initLazyIframes() {
+    const iframes = document.querySelectorAll('iframe[data-src]');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.src = entry.target.dataset.src;
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { rootMargin: '300px' });
+
+    iframes.forEach(iframe => observer.observe(iframe));
+}
+```
+
+Call `initLazyIframes()` inside `initializeComponents()`.
+
+---
+
+## 6. `backdrop-filter` — Use Only When Supported
+
+`backdrop-filter: blur()` is one of the most GPU-intensive CSS properties. On low-end devices it causes visible stuttering, especially when triggered by scroll events.
+
+### ❌ Bad — Always applied
+
+```css
+.nav-scrolled {
+    backdrop-filter: blur(12px);
+}
+```
+
+### ✅ Good — Apply only when the browser can handle it
+
+```css
+.nav-scrolled {
+    background-color: rgba(250, 249, 246, 0.95);
+}
+
+@supports (backdrop-filter: blur(12px)) {
+    .nav-scrolled {
+        background-color: rgba(250, 249, 246, 0.85);
+        backdrop-filter: blur(12px);
+    }
+}
+```
+
+Devices that do not support `backdrop-filter` fall back to a solid semi-transparent background color.
+
+---
+
+## 7. Tailwind CDN — Development Only
+
+Using the Tailwind CDN (`https://cdn.tailwindcss.com`) is acceptable for prototyping and development. It must **never** be used in production.
+
+The CDN downloads the full Tailwind framework (~350 KB uncompressed) and parses all CSS classes in the browser at runtime. This is extremely slow on low-end devices and significantly delays time-to-first-paint.
+
+### ❌ Bad — CDN in a deployed website
+
+```html
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+```
+
+### ✅ Good — Compiled CSS for production
+
+For production, build Tailwind through its CLI or PostCSS pipeline and ship only the CSS classes that are actually used. The output is typically 5–15 KB.
+
+If the generated website must remain a single self-contained HTML file, use a minimal inline `<style>` block with only the required utility classes instead of loading the full CDN.
+
+---
+
+## 8. Gallery Images — Always Use `loading="lazy"`
+
+Gallery images are below the fold. Always add `loading="lazy"` so the browser only fetches them when they are about to enter the viewport.
+
+### ✅ Required
+
+```html
+<img src="${img.src}" alt="Gallery photo" loading="lazy" />
+```
+
+Additionally, provide a `width` and `height` attribute or use `aspect-ratio` in CSS to prevent cumulative layout shift (CLS) as images load.
+
+```html
+<img src="${img.src}" alt="Gallery photo" loading="lazy" width="740" height="450" />
+```
+
+---
+
+## 9. Reduced Motion Accessibility
+
+Some users configure their OS to reduce animations. Always respect the `prefers-reduced-motion` media query. Ignoring it can cause motion sickness and also reduces load on low-end hardware.
+
+```css
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+```
+
+Add this at the end of every `<style>` block.
+
+---
+
+## 10. Loader Removal
+
+Always hide the preloader after all rendering and component initialization is complete, not before.
+
+### ✅ Good — Hide loader last
+
+```javascript
+function initializeComponents() {
+    initScrollAnimations();
+    initNavbarScroll();
+    initLazyIframes();
+    initRsvpForm();
+    hideLoader(); // Always call last
+}
+
+function hideLoader() {
+    const loader = document.getElementById('loader');
+    if (loader) {
+        setTimeout(() => loader.classList.add('hidden'), 300);
+    }
+}
+```
+
+### ❌ Bad — Hiding loader before rendering completes
+
+```javascript
+hideLoader();
+renderGallery(); // Gallery renders after loader is already gone
+```
+
+---
+
+## Performance Checklist
+
+Apply this checklist to every generated website before delivery.
+
+| Check | Required |
+|---|---|
+| `preconnect` before all Google Fonts `<link>` tags | ✅ |
+| Hero image preloaded dynamically | ✅ |
+| `will-change` not applied globally in CSS | ✅ |
+| `will-change` reset to `auto` after animation | ✅ |
+| Scroll handler wrapped in `requestAnimationFrame` | ✅ |
+| Scroll listener uses `{ passive: true }` | ✅ |
+| iFrames use `data-src` and lazy IntersectionObserver | ✅ |
+| `backdrop-filter` inside `@supports` block | ✅ |
+| Tailwind CDN not used in production | ✅ |
+| All gallery images use `loading="lazy"` | ✅ |
+| `prefers-reduced-motion` block included | ✅ |
+| Loader hidden only after all rendering completes | ✅ |

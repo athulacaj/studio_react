@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
     Box,
     Typography,
@@ -284,12 +284,18 @@ const ManageStudioPortfolioView: React.FC = () => {
         }
     }, [htmlContent]);
 
-    const handleDataChange = (newData: any) => {
+    // Debounce ref to avoid hammering the iframe with postMessages on rapid changes
+    const iframeDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const handleDataChange = useCallback((newData: any) => {
         setPortfolioData(newData);
-        if (iframeRef.current && iframeRef.current.contentWindow) {
-            iframeRef.current.contentWindow.postMessage({ type: 'UPDATE_DATA', data: newData }, '*');
-        }
-    };
+        if (iframeDebounceRef.current) clearTimeout(iframeDebounceRef.current);
+        iframeDebounceRef.current = setTimeout(() => {
+            if (iframeRef.current && iframeRef.current.contentWindow) {
+                iframeRef.current.contentWindow.postMessage({ type: 'UPDATE_DATA', data: newData }, '*');
+            }
+        }, 100);
+    }, []);
 
     const processFiles = async (files: File[]) => {
         setIsProcessingFiles(true);
