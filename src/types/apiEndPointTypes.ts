@@ -19,6 +19,7 @@ interface SharedLinksParams {
 interface GetWebsitesParams {
     projectId?: string;
     businessId?: number;
+    path?: string;
 }
 
 export type { GetProjectsParams, SelectedAlbumsParams, SharedLinksParams, GetWebsitesParams };

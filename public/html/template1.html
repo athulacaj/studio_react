@@ -4,92 +4,39 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title id="title">Wedding Celebration</title>
+    <title id="page-title">Wedding Celebration</title>
+
+    <!-- Dependencies -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap"
-        rel="stylesheet" />
+        rel="stylesheet" id="font-links" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
 
-    <!-- Tailwind Configuration -->
+    <!-- Dynamic Tailwind Configuration -->
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        "on-secondary-fixed-variant": "#4f4533",
-                        "secondary-container": "#eddec5",
-                        "on-background": "#1a1c1a",
-                        "on-surface": "#1a1c1a",
-                        "outline": "#747872",
-                        "inverse-primary": "#bccabb",
-                        "background": "#faf9f6",
-                        "on-secondary-fixed": "#221b0b",
-                        "secondary-fixed-dim": "#d3c5ad",
-                        "on-surface-variant": "#444843",
-                        "inverse-on-surface": "#f2f1ee",
-                        "on-primary-fixed": "#131e14",
-                        "surface": "#faf9f6",
-                        "on-secondary-container": "#6c614e",
-                        "inverse-surface": "#2f312f",
-                        "surface-bright": "#faf9f6",
-                        "tertiary-container": "#483200",
-                        "surface-container": "#efeeeb",
-                        "on-tertiary-container": "#be9953",
-                        "surface-container-lowest": "#ffffff",
-                        "on-tertiary": "#ffffff",
-                        "on-tertiary-fixed": "#261900",
-                        "error": "#ba1a1a",
-                        "surface-container-highest": "#e3e2e0",
-                        "surface-tint": "#556255",
-                        "tertiary": "#2d1e00",
-                        "primary-container": "#2d392e",
-                        "surface-container-low": "#f4f3f1",
-                        "on-error": "#ffffff",
-                        "error-container": "#ffdad6",
-                        "on-secondary": "#ffffff",
-                        "secondary-fixed": "#f0e0c8",
-                        "surface-variant": "#e3e2e0",
-                        "outline-variant": "#c4c8c1",
-                        "on-primary": "#ffffff",
-                        "primary": "#182319",
-                        "surface-dim": "#dbdad7",
-                        "on-error-container": "#93000a",
-                        "primary-fixed": "#d8e6d6",
-                        "secondary": "#685d4a",
-                        "on-primary-container": "#95a394",
-                        "on-tertiary-fixed-variant": "#5d4201",
-                        "surface-container-high": "#e9e8e5",
-                        "tertiary-fixed": "#ffdea5",
-                        "tertiary-fixed-dim": "#e9c176",
-                        "primary-fixed-dim": "#bccabb",
-                        "on-primary-fixed-variant": "#3e4a3e"
-                    },
-                    borderRadius: {
-                        DEFAULT: "0.125rem",
-                        lg: "0.25rem",
-                        xl: "0.5rem",
-                        full: "9999px"
+                        primary: "var(--theme-primary)",
+                        secondary: "var(--theme-secondary)",
+                        background: "var(--theme-background)",
+                        "surface-container-low": "var(--theme-surface-container-low)",
+                        "surface-container-lowest": "var(--theme-surface-container-lowest)",
+                        "surface-container-high": "var(--theme-surface-container-high)",
+                        "on-surface-variant": "var(--theme-on-surface-variant)",
+                        "secondary-container": "var(--theme-secondary-container)",
+                        "outline-variant": "var(--theme-outline-variant)",
                     },
                     spacing: {
-                        "stack-lg": "48px",
-                        "stack-sm": "8px",
-                        "section-padding-desktop": "120px",
-                        "section-padding-mobile": "64px",
-                        "container-max": "1120px",
-                        "stack-md": "24px",
                         "gutter": "24px"
                     },
                     fontFamily: {
-                        "headline-sm": ["Playfair Display", "serif"],
-                        "display-lg": ["Playfair Display", "serif"],
-                        "display-lg-mobile": ["Playfair Display", "serif"],
-                        "body-md": ["Plus Jakarta Sans", "sans-serif"],
-                        "label-caps": ["Plus Jakarta Sans", "sans-serif"],
-                        "headline-md": ["Playfair Display", "serif"],
-                        "body-lg": ["Plus Jakarta Sans", "sans-serif"]
+                        "headline": ["var(--theme-font-headline)"],
+                        "body": ["var(--theme-font-body)"]
                     }
                 }
             }
@@ -125,7 +72,7 @@
         #loader {
             position: fixed;
             inset: 0;
-            background-color: #faf9f6;
+            background-color: var(--theme-background, #faf9f6);
             z-index: 9999;
             display: flex;
             align-items: center;
@@ -178,7 +125,6 @@
             }
         }
 
-        /* Staggered Text Animations for Hero */
         .hero-text-anim {
             opacity: 0;
             animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -207,7 +153,6 @@
             opacity: 0;
         }
 
-        /* Scroll Reveal Sections */
         .fade-in-section {
             opacity: 0;
             transform: translateY(28px);
@@ -220,7 +165,6 @@
             transform: translateY(0);
         }
 
-        /* Gallery Image Hover Polish */
         .gallery-item {
             overflow: hidden;
         }
@@ -234,7 +178,6 @@
             transform: scale(1.03);
             filter: brightness(1.05);
         }
-
 
         @keyframes gentleFloat {
 
@@ -252,495 +195,454 @@
             animation: gentleFloat 3s ease-in-out infinite;
         }
 
-        /* Nav Transition */
         .nav-scrolled {
-            background-color: rgba(250, 249, 246, 0.95) !important;
+            background-color: color-mix(in srgb, var(--theme-background) 95%, transparent) !important;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
             backdrop-filter: blur(12px);
-            border-bottom-color: rgba(196, 200, 193, 0.5) !important;
+            border-bottom-color: color-mix(in srgb, var(--theme-outline-variant) 50%, transparent) !important;
         }
     </style>
 </head>
 
-<body class="bg-background text-on-background font-body-md selection:bg-secondary-container">
+<body class="bg-background text-on-background font-body selection:bg-secondary-container">
 
-    <!-- Elegant Loader -->
+    <!-- Preloader -->
     <div id="loader">
-        <div class="font-headline-md text-primary tracking-[0.3em] uppercase animate-pulse">
+        <div class="font-headline text-primary tracking-[0.3em] uppercase animate-pulse">
             Loading...
         </div>
     </div>
 
-    <!-- Top Navigation Bar -->
+    <!-- Render Targets -->
     <nav id="navbar"
         class="fixed top-0 w-full z-50 bg-transparent border-b border-transparent transition-[background-color,box-shadow,backdrop-filter] duration-[800ms] flex justify-between items-center px-gutter h-20 md:h-24">
-        <div class="flex items-center gap-4">
-            <button aria-label="Menu"
-                class="text-white nav-item hover:text-secondary-container transition-colors duration-300">
-                <span class="material-symbols-outlined text-2xl">menu</span>
-            </button>
-        </div>
-        <div class="font-headline-md text-2xl md:text-3xl text-white nav-item tracking-widest uppercase transition-colors duration-300"
-            id="nav_logo">
-        </div>
-        <div class="flex items-center gap-4">
-            <button aria-label="Favorite"
-                class="text-white nav-item hover:text-secondary-container transition-colors duration-300">
-                <span class="material-symbols-outlined text-2xl"
-                    style="font-variation-settings: 'FILL' 1;">favorite</span>
-            </button>
-        </div>
     </nav>
-
-    <!-- Hero Section with Parallax -->
-    <header class="relative h-screen w-full flex items-center justify-center overflow-hidden">
-        <div class="absolute inset-0 z-0 bg-primary">
-            <div id="mainImage" class="w-full h-full bg-cover bg-center animate-slow-zoom"
-                style="will-change: transform;">
-                <!-- Gradient Overlay for better text readability -->
-                <div
-                    class="absolute inset-0 bg-gradient-to-b from-primary/40 via-primary/20 to-primary/60 mix-blend-multiply">
-                </div>
-            </div>
-        </div>
-
-        <div class="relative z-10 text-center text-white px-gutter flex flex-col items-center">
-            <p
-                class="font-label-caps text-xs md:text-sm tracking-[0.4em] mb-6 text-surface-container-lowest hero-text-anim delay-1">
-                THE WEDDING OF
-            </p>
-            <h1 class="font-display-lg text-5xl md:text-7xl lg:text-8xl mb-2 font-light tracking-tight">
-                <span id="header_name1" class="inline-block hero-text-anim delay-2"></span>
-                <span class="inline-block mx-2 hero-text-anim delay-2 text-secondary-container">&</span>
-                <span id="header_name2" class="inline-block hero-text-anim delay-3"></span>
-            </h1>
-            <div class="w-16 h-[1px] bg-white/70 mx-auto mt-8 mb-8 delay-line"></div>
-            <p class="font-headline-sm text-xl md:text-2xl italic tracking-wide hero-text-anim delay-4 text-surface-container-low"
-                id="header_main_date">
-            </p>
-        </div>
-
-        <div class="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 hero-text-anim delay-4">
-            <span class="material-symbols-outlined text-white/70 text-3xl scroll-indicator">expand_more</span>
-        </div>
-    </header>
+    <header id="hero" class="relative h-screen w-full flex items-center justify-center overflow-hidden"></header>
 
     <main class="max-w-[1120px] mx-auto px-gutter py-24 md:py-32 space-y-32 md:space-y-48">
-
-        <!-- The Invitation -->
-        <section class="fade-in-section text-center max-w-3xl mx-auto" id="invitation">
-            <div class="flex flex-col items-center">
-                <div class="relative mb-12 group cursor-pointer">
-                    <div
-                        class="absolute inset-0 bg-secondary/20 rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-all duration-700 blur-xl">
-                    </div>
-                    <img alt="Wedding ring or elegant detail"
-                        class="relative w-36 h-36 md:w-52 md:h-52 object-cover rounded-full border border-outline-variant/30 p-2 grayscale hover:grayscale-0 transition-all duration-1000 z-10"
-                        src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" />
-                </div>
-                <p class="font-label-caps text-xs md:text-sm text-secondary tracking-[0.3em] mb-6">SAVE THE DATE</p>
-                <h2 class="font-headline-md text-3xl md:text-5xl text-primary mb-8 leading-tight italic"
-                    id="invitation_heading">
-                </h2>
-                <p class="font-body-md text-lg md:text-xl text-on-surface-variant max-w-2xl mx-auto leading-relaxed font-light"
-                    id="invitation_description">
-                </p>
-            </div>
+        <section id="invitation" class="fade-in-section text-center max-w-3xl mx-auto"></section>
+        <section id="details" class="fade-in-section"></section>
+        <section id="location" class="fade-in-section space-y-12"></section>
+        <section id="gallery" class="fade-in-section"></section>
+        <section id="rsvp"
+            class="fade-in-section max-w-2xl mx-auto text-center bg-surface-container-low p-12 md:p-16 rounded-2xl border border-outline-variant/20 relative overflow-hidden">
         </section>
-
-        <!-- When & Where Bento Grid -->
-        <section class="fade-in-section" id="details-section">
-            <div class="text-center mb-16">
-                <p class="font-label-caps text-xs text-secondary tracking-[0.3em] mb-4">THE CELEBRATION</p>
-                <h2 class="font-headline-md text-3xl md:text-4xl text-primary">When & Where</h2>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="details">
-                <!-- Dynamically populated -->
-            </div>
-        </section>
-
-        <!-- Location Cards -->
-        <section class="fade-in-section space-y-12" id="location">
-            <!-- Dynamically populated -->
-        </section>
-
-        <!-- Gallery -->
-        <section class="fade-in-section" id="gallery">
-            <div class="text-center mb-16">
-                <p class="font-label-caps text-xs text-secondary tracking-[0.3em] mb-4">GALLERY</p>
-                <h2 class="font-headline-md text-3xl md:text-4xl text-primary">Our Moments</h2>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="gallery_grid">
-                <!-- Dynamically populated -->
-            </div>
-        </section>
-
-        <!-- RSVP Section (Mockup) -->
-        <section
-            class="fade-in-section max-w-2xl mx-auto text-center bg-surface-container-low p-12 md:p-16 rounded-2xl border border-outline-variant/20 relative overflow-hidden"
-            id="rsvp">
-            <div
-                class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-50">
-            </div>
-            <p class="font-label-caps text-xs text-secondary tracking-[0.3em] mb-4">ATTENDANCE</p>
-            <h2 class="font-headline-md text-3xl md:text-4xl text-primary mb-8">Join the Celebration</h2>
-            <form class="flex flex-col gap-6 text-left">
-                <div>
-                    <label class="block font-body-md text-sm text-on-surface-variant mb-2">Full Name</label>
-                    <input type="text"
-                        class="w-full bg-surface border-outline-variant/30 border rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary transition-all"
-                        placeholder="Enter your name" required>
-                </div>
-                <div>
-                    <label class="block font-body-md text-sm text-on-surface-variant mb-2">Will you be
-                        attending?</label>
-                    <select
-                        class="w-full bg-surface border-outline-variant/30 border rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary transition-all"
-                        required>
-                        <option value="" disabled selected>Please select...</option>
-                        <option value="yes">Joyfully Accept</option>
-                        <option value="no">Regretfully Decline</option>
-                    </select>
-                </div>
-                <button type="submit"
-                    class="mt-4 bg-primary text-white font-label-caps tracking-[0.2em] py-4 rounded-lg hover:bg-secondary transition-colors duration-300 w-full flex justify-center items-center gap-2">
-                    <span>SEND RSVP</span>
-                </button>
-            </form>
-        </section>
-
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-surface-container-low py-20 px-gutter text-center border-t border-outline-variant/20">
-        <h2 class="font-headline-md text-3xl text-primary mb-6 tracking-widest uppercase" id="footer_logo"></h2>
-        <p class="font-body-md text-on-surface-variant mb-12 font-light">We can't wait to celebrate with you.</p>
-        <div class="flex justify-center gap-6 text-secondary/60">
-            <span class="material-symbols-outlined text-sm">favorite</span>
-        </div>
-        <p class="mt-12 font-label-caps text-[10px] text-outline tracking-widest uppercase" id="footer_copyright"></p>
+    <footer id="footer" class="bg-surface-container-low py-20 px-gutter text-center border-t border-outline-variant/20">
     </footer>
 
-    <!-- Bottom Navigation (Mobile Only) -->
-    <nav
-        class="md:hidden fixed bottom-0 left-0 w-full z-50 bg-surface/90 backdrop-blur-lg flex justify-around items-center px-4 py-4 pb-safe border-t border-outline-variant/20 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-        <a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-5 py-2 transition-transform active:scale-95"
-            href="#">
-            <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">home</span>
-            <span class="font-label-caps text-[9px] mt-1 tracking-wider">HOME</span>
-        </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant/70 hover:text-primary transition-all active:scale-95"
-            href="#details-section">
-            <span class="material-symbols-outlined text-xl">event_note</span>
-            <span class="font-label-caps text-[9px] mt-1 tracking-wider">DETAILS</span>
-        </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant/70 hover:text-primary transition-all active:scale-95"
-            href="#gallery">
-            <span class="material-symbols-outlined text-xl">photo_library</span>
-            <span class="font-label-caps text-[9px] mt-1 tracking-wider">GALLERY</span>
-        </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant/70 hover:text-primary transition-all active:scale-95"
-            href="#rsvp">
-            <span class="material-symbols-outlined text-xl">mail</span>
-            <span class="font-label-caps text-[9px] mt-1 tracking-wider">RSVP</span>
-        </a>
+    <nav id="mobile-nav"
+        class="md:hidden fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-lg flex justify-around items-center px-4 py-4 pb-safe border-t border-outline-variant/20 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
     </nav>
 
+    <!-- Core Javascript Data & Renderer -->
     <script>
-        // Page Load Animation
-        window.addEventListener('load', () => {
-            const loader = document.getElementById('loader');
-            setTimeout(() => {
-                loader.classList.add('hidden');
-            }, 300); // Slight delay for smoother transition
-        });
-
-        // Intersection Observer for scroll animations (Fade in Sections)
-        const observerOptions = {
-            threshold: 0.15,
-            rootMargin: "0px 0px -50px 0px"
+        // 1. SINGLE SOURCE OF TRUTH
+        let websiteData = {
+            brand: {
+                logo: "A & C",
+                names: {
+                    first: "Alan",
+                    second: "Celeste"
+                },
+                copyright: "© 2026 ALAN AND CELESTE",
+                theme: {
+                    primary: "#182319",
+                    secondary: "#685d4a",
+                    background: "#faf9f6",
+                    surfaceContainerLow: "#f4f3f1",
+                    surfaceContainerLowest: "#ffffff",
+                    surfaceContainerHigh: "#e9e8e5",
+                    onSurfaceVariant: "#444843",
+                    secondaryContainer: "#eddec5",
+                    outlineVariant: "#c4c8c1",
+                    fontHeadline: "'Playfair Display', serif",
+                    fontBody: "'Plus Jakarta Sans', sans-serif"
+                }
+            },
+            navigation: [
+                { title: "HOME", href: "#", icon: "home" },
+                { title: "DETAILS", href: "#details", icon: "event_note" },
+                { title: "GALLERY", href: "#gallery", icon: "photo_library" },
+                { title: "RSVP", href: "#rsvp", icon: "mail" }
+            ],
+            hero: {
+                image: "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
+                subtitle: "THE WEDDING OF",
+                date: "Saturday, June 21, 2026",
+                scrollIcon: "expand_more"
+            },
+            invitation: {
+                image: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                subtitle: "SAVE THE DATE",
+                title: "We invite you to celebrate our union",
+                description: "In the presence of family and friends, join us as we exchange vows and begin our new chapter together surrounded by the breathtaking rolling hills of the countryside."
+            },
+            detailsSection: {
+                subtitle: "THE CELEBRATION",
+                title: "When & Where",
+                events: [
+                    {
+                        type: "ceremony",
+                        time: "4:00 PM",
+                        locationName: "The Glass House Estate",
+                        locationAddress: "123 Orchard Lane, Valley",
+                        locationUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d100939.98555098464!2d-122.50764!3d37.757815!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80859a6d00690021%3A0x4a501367f076adff!2sSan%20Francisco%2C%20CA!5e0!3m2!1sen!2sus!4v1655000000000!5m2!1sen!2sus",
+                        locationDesc: "The ceremony will take place in the main garden overlooking the vineyards. Please arrive 30 minutes early to find your seats and enjoy a welcome refreshment."
+                    },
+                    {
+                        type: "reception",
+                        time: "6:30 PM",
+                        locationName: "The Grand Pavilion",
+                        locationAddress: "125 Orchard Lane, Valley",
+                        locationUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.835434509374!2d-122.4194155!3d37.7749295!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8085809c6c8f4459%3A0xb10ed6d9b5050f14!2sCivic%20Center%2C%20San%20Francisco%2C%20CA!5e0!3m2!1sen!2sus!4v1655000000001!5m2!1sen!2sus",
+                        locationDesc: "Following the ceremony, join us for cocktails, dinner, and dancing under the stars. Valet parking will be available at the main entrance."
+                    }
+                ]
+            },
+            gallerySection: {
+                subtitle: "GALLERY",
+                title: "Our Moments",
+                images: [
+                    { src: "https://images.unsplash.com/photo-1520854221256-17451cc331bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" },
+                    { src: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" },
+                    { src: "https://images.unsplash.com/photo-1606800052052-a08af7148866?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" },
+                    { src: "https://images.unsplash.com/photo-1583939000240-690d568c0725?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" },
+                    { src: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" },
+                    { src: "https://images.unsplash.com/photo-1607190072270-128b1ba74a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" }
+                ]
+            },
+            rsvpSection: {
+                subtitle: "ATTENDANCE",
+                title: "Join the Celebration",
+                buttonText: "SEND RSVP"
+            },
+            footer: {
+                message: "We can't wait to celebrate with you.",
+                icon: "favorite"
+            }
         };
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    // Unobserve after revealing to keep the state
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
+        // 2. RENDERING FUNCTIONS
+        function renderTheme() {
+            const root = document.documentElement;
+            const theme = websiteData.brand.theme;
 
-        // Navbar Scroll Effect & Parallax
-        const navbar = document.getElementById('navbar');
-        const navItems = document.querySelectorAll('.nav-item');
-        const heroImage = document.getElementById('mainImage');
+            root.style.setProperty("--theme-primary", theme.primary);
+            root.style.setProperty("--theme-secondary", theme.secondary);
+            root.style.setProperty("--theme-background", theme.background);
+            root.style.setProperty("--theme-surface-container-low", theme.surfaceContainerLow);
+            root.style.setProperty("--theme-surface-container-lowest", theme.surfaceContainerLowest);
+            root.style.setProperty("--theme-surface-container-high", theme.surfaceContainerHigh);
+            root.style.setProperty("--theme-on-surface-variant", theme.onSurfaceVariant);
+            root.style.setProperty("--theme-secondary-container", theme.secondaryContainer);
+            root.style.setProperty("--theme-outline-variant", theme.outlineVariant);
+            root.style.setProperty("--theme-font-headline", theme.fontHeadline);
+            root.style.setProperty("--theme-font-body", theme.fontBody);
 
-        window.addEventListener('scroll', () => {
-            const scroll = window.scrollY;
-
-            // Navbar appearance
-            if (scroll > 100) {
-                navbar.classList.add('nav-scrolled');
-                navItems.forEach(item => {
-                    item.classList.remove('text-white');
-                    item.classList.add('text-primary');
-                });
-            } else {
-                navbar.classList.remove('nav-scrolled');
-                navItems.forEach(item => {
-                    item.classList.add('text-white');
-                    item.classList.remove('text-primary');
-                });
-            }
-
-            // Subtle Parallax for hero image
-            if (heroImage && scroll < window.innerHeight) {
-                heroImage.style.transform = `translateY(${scroll * 0.3}px) scale(1.1)`;
-            }
-        });
-
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else {
-                    const element = document.querySelector(targetId);
-                    if (element) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                }
-            });
-        });
-
-        // RSVP Form interaction mockup
-        const form = document.querySelector('form');
-        if (form) {
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const btn = form.querySelector('button');
-                const btnText = btn.querySelector('span');
-                const originalText = btnText.innerText;
-
-                btnText.innerText = 'SENDING...';
-                btn.classList.add('opacity-80', 'cursor-not-allowed');
-                btn.disabled = true;
-
-                // Simulate API call
-                setTimeout(() => {
-                    btnText.innerText = 'RSVP RECEIVED!';
-                    btn.classList.replace('bg-primary', 'bg-secondary');
-                    form.reset();
-
-                    setTimeout(() => {
-                        btnText.innerText = originalText;
-                        btn.classList.replace('bg-secondary', 'bg-primary');
-                        btn.classList.remove('opacity-80', 'cursor-not-allowed');
-                        btn.disabled = false;
-                    }, 4000);
-                }, 1500);
-            });
+            document.getElementById("page-title").innerText = `${websiteData.brand.names.first} & ${websiteData.brand.names.second}`;
         }
 
-        // Apply key-value CSS styles to a DOM element
-        function applyStylesToElement(element, styles) {
-            if (!element || !styles || typeof styles !== 'object') return;
-            Object.entries(styles).forEach(([prop, value]) => {
-                try {
-                    element.style.setProperty(prop, value);
-                } catch (e) {
-                    console.warn(`Invalid CSS property: ${prop}`, e);
-                }
-            });
+        function renderNavbar() {
+            document.getElementById("navbar").innerHTML = `
+                <div class="flex items-center gap-4">
+                    <button aria-label="Menu" class="text-white nav-item hover:text-secondary-container transition-colors duration-300">
+                        <span class="material-symbols-outlined text-2xl">menu</span>
+                    </button>
+                </div>
+                <div class="brand-logo font-headline text-2xl md:text-3xl text-white nav-item tracking-widest uppercase transition-colors duration-300" data-json-path="brand.logo">
+                    ${websiteData.brand.logo}
+                </div>
+                <div class="flex items-center gap-4">
+                    <button aria-label="Favorite" class="text-white nav-item hover:text-secondary-container transition-colors duration-300">
+                        <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                    </button>
+                </div>
+            `;
+
+            document.getElementById("mobile-nav").innerHTML = websiteData.navigation.map((item, index) => `
+                <a class="navigation-item navigation-item-${index} flex flex-col items-center justify-center text-on-surface-variant/70 hover:text-primary transition-all active:scale-95" data-json-path="navigation[${index}]" href="${item.href}">
+                    <span class="navigation-icon navigation-item-${index}-icon material-symbols-outlined text-xl" data-json-path="navigation[${index}].icon">${item.icon}</span>
+                    <span class="navigation-title navigation-item-${index}-title font-body text-[9px] mt-1 font-bold tracking-wider uppercase" data-json-path="navigation[${index}].title">${item.title}</span>
+                </a>
+            `).join('');
         }
 
-        // HTML Renderer Helper
-        function renderInnerHTml(id, data, options = {}) {
-            const element = document.getElementById(id);
-            if (!element) return;
+        function renderHero() {
+            const hero = websiteData.hero;
+            const names = websiteData.brand.names;
 
-            const { prefix = '', suffix = '' } = options;
-            const textValue = data.value || '';
-
-            // Only update if there's actual data
-            if (textValue) {
-                element.innerHTML = `${prefix}${textValue}${suffix}`;
-            }
-
-            // Apply custom styles if present
-            if (data.styles) {
-                applyStylesToElement(element, data.styles);
-            }
+            document.getElementById("hero").innerHTML = `
+                <div class="absolute inset-0 z-0 bg-primary">
+                    <div id="mainImage" class="hero-image w-full h-full bg-cover bg-center animate-slow-zoom" style="will-change: transform; background-image: url('${hero.image}');" data-json-path="hero.image">
+                        <div class="absolute inset-0 bg-gradient-to-b from-primary/40 via-primary/20 to-primary/60 mix-blend-multiply"></div>
+                    </div>
+                </div>
+                <div class="relative z-10 text-center text-white px-gutter flex flex-col items-center">
+                    <p class="hero-subtitle font-body font-bold text-xs md:text-sm tracking-[0.4em] mb-6 text-surface-container-lowest hero-text-anim delay-1" data-json-path="hero.subtitle">
+                        ${hero.subtitle}
+                    </p>
+                    <h1 class="font-headline text-5xl md:text-7xl lg:text-8xl mb-2 font-light tracking-tight">
+                        <span class="brand-names-first inline-block hero-text-anim delay-2" data-json-path="brand.names.first">${names.first}</span>
+                        <span class="inline-block mx-2 hero-text-anim delay-2 text-secondary-container">&</span>
+                        <span class="brand-names-second inline-block hero-text-anim delay-3" data-json-path="brand.names.second">${names.second}</span>
+                    </h1>
+                    <div class="w-16 h-[1px] bg-white/70 mx-auto mt-8 mb-8 delay-line"></div>
+                    <p class="hero-date font-headline text-xl md:text-2xl italic tracking-wide hero-text-anim delay-4 text-surface-container-low" data-json-path="hero.date">
+                        ${hero.date}
+                    </p>
+                </div>
+                <div class="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 hero-text-anim delay-4">
+                    <span class="hero-scrollIcon material-symbols-outlined text-white/70 text-3xl scroll-indicator" data-json-path="hero.scrollIcon">${hero.scrollIcon}</span>
+                </div>
+            `;
         }
 
-        // Main Page Renderer
-        function renderPage(data) {
-            if (!data) return;
+        function renderInvitation() {
+            const invite = websiteData.invitation;
+            document.getElementById("invitation").innerHTML = `
+                <div class="flex flex-col items-center">
+                    <div class="relative mb-12 group cursor-pointer">
+                        <div class="absolute inset-0 bg-secondary/20 rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-all duration-700 blur-xl"></div>
+                        <img alt="Invitation visual" class="invitation-image relative w-36 h-36 md:w-52 md:h-52 object-cover rounded-full border border-outline-variant/30 p-2 grayscale hover:grayscale-0 transition-all duration-1000 z-10" data-json-path="invitation.image" src="${invite.image}" />
+                    </div>
+                    <p class="invitation-subtitle font-body font-bold text-xs md:text-sm text-secondary tracking-[0.3em] mb-6 uppercase" data-json-path="invitation.subtitle">${invite.subtitle}</p>
+                    <h2 class="invitation-title font-headline text-3xl md:text-5xl text-primary mb-8 leading-tight italic" data-json-path="invitation.title">${invite.title}</h2>
+                    <p class="invitation-description font-body text-lg md:text-xl text-on-surface-variant max-w-2xl mx-auto leading-relaxed font-light" data-json-path="invitation.description">${invite.description}</p>
+                </div>
+            `;
+        }
 
-            // Set Document Title
-            const n1 = data.name1?.value || "A";
-            const n2 = data.name2?.value || "B";
-            document.title = `${n1} & ${n2} | Wedding`;
+        function renderDetails() {
+            const ds = websiteData.detailsSection;
+            document.getElementById("details").innerHTML = `
+                <div class="text-center mb-16">
+                    <p class="detailsSection-subtitle font-body font-bold text-xs text-secondary tracking-[0.3em] mb-4 uppercase" data-json-path="detailsSection.subtitle">${ds.subtitle}</p>
+                    <h2 class="detailsSection-title font-headline text-3xl md:text-4xl text-primary" data-json-path="detailsSection.title">${ds.title}</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    ${ds.events.map((event, index) => `
+                        <a href="#location_${index}" class="detailsSection-events detailsSection-events-${index} block group" data-json-path="detailsSection.events[${index}]">
+                            <div class="relative bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-10 flex flex-col items-center text-center group-hover:border-secondary/50 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] group-hover:-translate-y-0.5 transition-[background-color,box-shadow,backdrop-filter] duration-[800ms] cursor-pointer overflow-hidden h-full">
+                                <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-secondary/10 to-transparent rounded-bl-full -mr-10 -mt-10 transition-transform duration-500 group-hover:scale-150"></div>
+                                <span class="absolute top-6 right-6 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-4 transition-all duration-300 text-secondary text-xl material-symbols-outlined">arrow_forward</span>
+                                <p class="detailsSection-events-type detailsSection-events-${index}-type font-body font-bold text-xs text-secondary tracking-[0.2em] mb-3 uppercase" data-json-path="detailsSection.events[${index}].type">${event.type}</p>
+                                <h3 class="detailsSection-events-time detailsSection-events-${index}-time font-headline text-3xl text-primary mb-4" data-json-path="detailsSection.events[${index}].time">${event.time}</h3>
+                                <div class="w-8 h-[1px] bg-outline-variant/50 mb-4"></div>
+                                <p class="detailsSection-events-locationName detailsSection-events-${index}-locationName font-body text-on-surface-variant font-light px-4" data-json-path="detailsSection.events[${index}].locationName">${event.locationName}</p>
+                            </div>
+                        </a>
+                    `).join('')}
+                </div>
+            `;
+        }
 
-            // Hero Settings
-            if (data.heroImage && data.heroImage.url) {
-                const mainImg = document.getElementById("mainImage");
-                mainImg.style.backgroundImage = `url('${data.heroImage.url}')`;
-                // Apply custom styles (e.g., background-position)
-                const heroStyles = { 'background-position': '50% 50%', ...(data.heroImage.styles || {}) };
-                applyStylesToElement(mainImg, heroStyles);
-            }
-
-            // Top-Level Text Data
-            renderInnerHTml("nav_logo", data.nav_logo);
-            renderInnerHTml("footer_logo", data.nav_logo);
-
-            const footerCopy = document.getElementById("footer_copyright");
-            if (footerCopy) footerCopy.innerText = `© ${new Date().getFullYear()} ${n1} AND ${n2}`;
-
-            renderInnerHTml("header_name1", data.name1);
-            renderInnerHTml("header_name2", data.name2);
-            renderInnerHTml("header_main_date", data.mainDate);
-            renderInnerHTml("invitation_heading", data.invitationHeading);
-            renderInnerHTml("invitation_description", data.invitationDescription);
-
-            // Populate Event Details (Bento Grid)
-            const detailsContainer = document.getElementById("details");
-            if (detailsContainer && data.details) {
-                detailsContainer.innerHTML = '';
-                data.details.forEach((detail, index) => {
-                    const link = document.createElement("a");
-                    link.href = `#location_${index}`;
-                    link.className = "block group";
-                    link.innerHTML = `
-                    <div class="relative bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-10 flex flex-col items-center text-center group-hover:border-secondary/50 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] group-hover:-translate-y-0.5 transition-[background-color,box-shadow,backdrop-filter] duration-[800ms] cursor-pointer overflow-hidden h-full">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-secondary/10 to-transparent rounded-bl-full -mr-10 -mt-10 transition-transform duration-500 group-hover:scale-150"></div>
-                        <span class="absolute top-6 right-6 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-4 transition-all duration-300 text-secondary text-xl material-symbols-outlined">arrow_forward</span>
-                        
-                        <p class="font-label-caps text-xs text-secondary tracking-[0.2em] mb-3">${(detail.type || 'event').toUpperCase()}</p>
-                        <h3 class="font-headline-md text-3xl text-primary mb-4">${detail.time}</h3>
-                        <div class="w-8 h-[1px] bg-outline-variant/50 mb-4"></div>
-                        <p class="font-body-md text-on-surface-variant font-light px-4">${detail.location?.name || ''}</p>
-                    </div>`;
-                    detailsContainer.appendChild(link);
-                });
-            }
-
-            // Populate Location Cards (Map + Info)
-            const locationContainer = document.getElementById("location");
-            if (locationContainer && data.details) {
-                locationContainer.innerHTML = '';
-                data.details.forEach((detail, index) => {
-                    const node = document.createElement("div");
-                    node.id = `location_${index}`;
-                    node.className = "bg-surface-container-lowest border border-outline-variant/20 rounded-3xl overflow-hidden shadow-sm flex flex-col md:flex-row hover:shadow-md transition-shadow duration-500";
-                    node.innerHTML = `
+        function renderLocations() {
+            const events = websiteData.detailsSection.events;
+            document.getElementById("location").innerHTML = events.map((event, index) => `
+                <div id="location_${index}" class="detailsSection-events detailsSection-events-${index} bg-surface-container-lowest border border-outline-variant/20 rounded-3xl overflow-hidden shadow-sm flex flex-col md:flex-row hover:shadow-md transition-shadow duration-500" data-json-path="detailsSection.events[${index}]">
                     <div class="md:w-1/2 h-[350px] md:h-auto bg-surface-container-high relative overflow-hidden group">
-                        <iframe class="maps-iframe w-full h-full absolute inset-0" src="${detail.location?.url || ''}" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                        <iframe class="detailsSection-events-locationUrl detailsSection-events-${index}-locationUrl maps-iframe w-full h-full absolute inset-0" data-json-path="detailsSection.events[${index}].locationUrl" src="${event.locationUrl}" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                     </div>
                     <div class="md:w-1/2 p-10 md:p-16 flex flex-col justify-center relative">
                         <div class="absolute top-0 left-0 w-2 h-full bg-secondary/20"></div>
-                        <p class="font-label-caps text-xs text-secondary tracking-[0.2em] mb-4">${(detail.type || 'Event').toUpperCase()} LOCATION</p>
-                        <h2 class="font-headline-md text-3xl md:text-4xl text-primary mb-6">Getting There</h2>
-                        <p class="font-body-md text-on-surface-variant leading-relaxed font-light mb-8">${detail.location?.desc || ''}</p>
-                        <a href="${detail.location?.url || '#'}" target="_blank" class="inline-flex items-center gap-2 text-sm font-label-caps tracking-widest text-secondary hover:text-primary transition-colors w-fit group">
+                        <p class="detailsSection-events-type detailsSection-events-${index}-type font-body font-bold text-xs text-secondary tracking-[0.2em] mb-4 uppercase" data-json-path="detailsSection.events[${index}].type">${event.type} LOCATION</p>
+                        <h2 class="detailsSection-events-locationName detailsSection-events-${index}-locationName font-headline text-3xl md:text-4xl text-primary mb-6" data-json-path="detailsSection.events[${index}].locationName">${event.locationName.split('<br')[0]}</h2>
+                        <p class="detailsSection-events-locationAddress detailsSection-events-${index}-locationAddress font-body text-secondary text-sm mb-4" data-json-path="detailsSection.events[${index}].locationAddress">${event.locationAddress}</p>
+                        <p class="detailsSection-events-locationDesc detailsSection-events-${index}-locationDesc font-body text-on-surface-variant leading-relaxed font-light mb-8" data-json-path="detailsSection.events[${index}].locationDesc">${event.locationDesc}</p>
+                        <a href="${event.locationUrl}" target="_blank" class="detailsSection-events-locationUrl detailsSection-events-${index}-locationUrl inline-flex items-center gap-2 text-sm font-body font-bold tracking-widest text-secondary hover:text-primary transition-colors w-fit group" data-json-path="detailsSection.events[${index}].locationUrl">
                             OPEN IN MAPS 
                             <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
                         </a>
-                    </div>`;
-                    locationContainer.appendChild(node);
-                });
-            }
-
-            // Populate Photo Gallery
-            const galleryContainer = document.getElementById("gallery_grid");
-            if (galleryContainer && data.gallery) {
-                galleryContainer.innerHTML = '';
-                data.gallery.forEach((photo, index) => {
-                    // Stagger the fade in classes
-                    let delayClass = index % 3 === 0 ? '' : (index % 3 === 1 ? 'delay-[100ms]' : 'delay-[200ms]');
-
-                    const node = document.createElement("div");
-                    node.className = `gallery-item rounded-2xl shadow-sm ${delayClass}`;
-                    node.innerHTML = `
-                        <img alt="Wedding photo ${index + 1}" class="w-full h-[300px] md:h-[450px] object-cover" src="${photo.url}" loading="lazy" />
-                    `;
-                    // Apply custom styles to gallery image
-                    if (photo.styles) {
-                        const imgEl = node.querySelector('img');
-                        applyStylesToElement(imgEl, photo.styles);
-                    }
-                    galleryContainer.appendChild(node);
-                });
-            }
-
-            // Re-observe new elements for scroll fade-in
-            setTimeout(() => {
-                document.querySelectorAll('.fade-in-section, .gallery-item').forEach(section => {
-                    observer.observe(section);
-                });
-            }, 100);
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // Setup PostMessage Listener for dynamic injection
-        window.addEventListener('message', function (event) {
-            if (event.data && event.data.type === 'UPDATE_DATA') {
-                renderPage(event.data.data);
+        function renderGallery() {
+            const gs = websiteData.gallerySection;
+            document.getElementById("gallery").innerHTML = `
+                <div class="text-center mb-16">
+                    <p class="gallerySection-subtitle font-body font-bold text-xs text-secondary tracking-[0.3em] mb-4 uppercase" data-json-path="gallerySection.subtitle">${gs.subtitle}</p>
+                    <h2 class="gallerySection-title font-headline text-3xl md:text-4xl text-primary" data-json-path="gallerySection.title">${gs.title}</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${gs.images.map((img, index) => {
+                let delayClass = index % 3 === 0 ? '' : (index % 3 === 1 ? 'delay-[100ms]' : 'delay-[200ms]');
+                return `
+                        <div class="gallerySection-images gallerySection-images-${index} gallery-item rounded-2xl shadow-sm ${delayClass}" data-json-path="gallerySection.images[${index}]">
+                            <img alt="Gallery photo ${index + 1}" class="gallerySection-images-src gallerySection-images-${index}-src w-full h-[300px] md:h-[450px] object-cover" data-json-path="gallerySection.images[${index}].src" src="${img.src}" loading="lazy" />
+                        </div>
+                        `;
+            }).join('')}
+                </div>
+            `;
+        }
+
+        function renderRsvp() {
+            const rsvp = websiteData.rsvpSection;
+            document.getElementById("rsvp").innerHTML = `
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-50"></div>
+                <p class="rsvpSection-subtitle font-body font-bold text-xs text-secondary tracking-[0.3em] mb-4 uppercase" data-json-path="rsvpSection.subtitle">${rsvp.subtitle}</p>
+                <h2 class="rsvpSection-title font-headline text-3xl md:text-4xl text-primary mb-8" data-json-path="rsvpSection.title">${rsvp.title}</h2>
+                <form id="rsvpForm" class="flex flex-col gap-6 text-left">
+                    <div>
+                        <label class="block font-body text-sm text-on-surface-variant mb-2">Full Name</label>
+                        <input type="text" class="w-full bg-background border-outline-variant/30 border rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary transition-all" placeholder="Enter your name" required>
+                    </div>
+                    <div>
+                        <label class="block font-body text-sm text-on-surface-variant mb-2">Will you be attending?</label>
+                        <select class="w-full bg-background border-outline-variant/30 border rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary transition-all" required>
+                            <option value="" disabled selected>Please select...</option>
+                            <option value="yes">Joyfully Accept</option>
+                            <option value="no">Regretfully Decline</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="rsvpSection-buttonText mt-4 bg-primary text-white font-body font-bold tracking-[0.2em] py-4 rounded-lg hover:bg-secondary transition-colors duration-300 w-full flex justify-center items-center gap-2 uppercase" data-json-path="rsvpSection.buttonText">
+                        <span>${rsvp.buttonText}</span>
+                    </button>
+                </form>
+            `;
+        }
+
+        function renderFooter() {
+            const footer = websiteData.footer;
+            const brand = websiteData.brand;
+            document.getElementById("footer").innerHTML = `
+                <h2 class="brand-logo font-headline text-3xl text-primary mb-6 tracking-widest uppercase" data-json-path="brand.logo">${brand.logo}</h2>
+                <p class="footer-message font-body text-on-surface-variant mb-12 font-light" data-json-path="footer.message">${footer.message}</p>
+                <div class="flex justify-center gap-6 text-secondary/60">
+                    <span class="footer-icon material-symbols-outlined text-sm" data-json-path="footer.icon">${footer.icon}</span>
+                </div>
+                <p class="brand-copyright mt-12 font-body font-bold text-[10px] text-outline-variant tracking-widest uppercase" data-json-path="brand.copyright">${brand.copyright}</p>
+            `;
+        }
+
+        // 3. MASTER RENDERER
+        function renderDataAll(data) {
+            if (data) {
+                websiteData = data;
+            }
+
+            renderTheme();
+            renderNavbar();
+            renderHero();
+            renderInvitation();
+            renderDetails();
+            renderLocations();
+            renderGallery();
+            renderRsvp();
+            renderFooter();
+
+            initializeComponents();
+        }
+
+        // 4. BEHAVIOR & INTERACTIVITY
+        function initializeComponents() {
+            initScrollAnimations();
+            initNavbarScroll();
+            initRsvpForm();
+            hideLoader();
+        }
+
+        function hideLoader() {
+            const loader = document.getElementById('loader');
+            if (loader) {
+                setTimeout(() => loader.classList.add('hidden'), 300);
+            }
+        }
+
+        function initScrollAnimations() {
+            const observerOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in-section').forEach(section => observer.observe(section));
+        }
+
+        function initNavbarScroll() {
+            const navbar = document.getElementById('navbar');
+            const navItems = navbar.querySelectorAll('.nav-item');
+            const heroImage = document.getElementById('mainImage');
+
+            // Clean up old listener if re-rendering
+            window.onscroll = () => {
+                const scroll = window.scrollY;
+                if (scroll > 100) {
+                    navbar.classList.add('nav-scrolled');
+                    navItems.forEach(item => { item.classList.remove('text-white'); item.classList.add('text-primary'); });
+                } else {
+                    navbar.classList.remove('nav-scrolled');
+                    navItems.forEach(item => { item.classList.add('text-white'); item.classList.remove('text-primary'); });
+                }
+
+                if (heroImage && scroll < window.innerHeight) {
+                    heroImage.style.transform = `translateY(${scroll * 0.3}px) scale(1.1)`;
+                }
+            };
+        }
+
+        function initRsvpForm() {
+            const form = document.getElementById('rsvpForm');
+            if (form) {
+                form.onsubmit = (e) => {
+                    e.preventDefault();
+                    const btn = form.querySelector('button');
+                    const btnText = btn.querySelector('span');
+                    const originalText = btnText.innerText;
+
+                    btnText.innerText = 'SENDING...';
+                    btn.classList.add('opacity-80', 'cursor-not-allowed');
+                    btn.disabled = true;
+
+                    setTimeout(() => {
+                        btnText.innerText = 'RSVP RECEIVED!';
+                        btn.classList.replace('bg-primary', 'bg-secondary');
+                        form.reset();
+
+                        setTimeout(() => {
+                            btnText.innerText = originalText;
+                            btn.classList.replace('bg-secondary', 'bg-primary');
+                            btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                            btn.disabled = false;
+                        }, 4000);
+                    }, 1500);
+                };
+            }
+        }
+
+        // 5. EVENT LISTENERS
+        document.addEventListener("DOMContentLoaded", function () {
+            renderDataAll();
+        });
+        let parentOrigin = null;
+
+
+        window.addEventListener("message", function (event) {
+            parentOrigin = event.origin;
+            console.log("parentOrigin ", parentOrigin)
+            if (event.data && event.data.type === "UPDATE_DATA") {
+                renderDataAll(event.data.data);
             }
         });
+        document.addEventListener("click", function (event) {
+            console.log("clicked")
+            console.log(event.target)
+            if (!parentOrigin) return;
 
-        // Premium Dummy Data for Standalone Viewing
-        const premiumDummyData = {
-            nav_logo: { value: "A & C" },
-            name1: { value: "Alan" },
-            name2: { value: "Celeste" },
-            heroImage: {
-                url: "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
-                styles: { "background-position": "50% 50%" }
-            },
-            mainDate: { value: "Saturday, June 21, 2025" },
-            invitationHeading: { value: "We invite you to celebrate our union" },
-            invitationDescription: { value: "In the presence of family and friends, join us as we exchange vows and begin our new chapter together surrounded by the breathtaking rolling hills of the countryside." },
-            details: [
-                {
-                    type: "ceremony",
-                    time: "4:00 PM",
-                    location: {
-                        name: "The Glass House Estate<br />123 Orchard Lane, Valley",
-                        url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d100939.98555098464!2d-122.50764!3d37.757815!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80859a6d00690021%3A0x4a501367f076adff!2sSan%20Francisco%2C%20CA!5e0!3m2!1sen!2sus!4v1655000000000!5m2!1sen!2sus",
-                        desc: "The ceremony will take place in the main garden overlooking the vineyards. Please arrive 30 minutes early to find your seats and enjoy a welcome refreshment."
-                    }
-                },
-                {
-                    type: "reception",
-                    time: "6:30 PM",
-                    location: {
-                        name: "The Grand Pavilion<br />125 Orchard Lane, Valley",
-                        url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.835434509374!2d-122.4194155!3d37.7749295!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8085809c6c8f4459%3A0xb10ed6d9b5050f14!2sCivic%20Center%2C%20San%20Francisco%2C%20CA!5e0!3m2!1sen!2sus!4v1655000000001!5m2!1sen!2sus",
-                        desc: "Following the ceremony, join us for cocktails, dinner, and dancing under the stars. Valet parking will be available at the main entrance."
-                    }
-                }
-            ],
-            gallery: [
-                { url: "https://images.unsplash.com/photo-1520854221256-17451cc331bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" },
-                { url: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" },
-                { url: "https://images.unsplash.com/photo-1606800052052-a08af7148866?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" },
-                { url: "https://images.unsplash.com/photo-1583939000240-690d568c0725?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" },
-                { url: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" },
-                { url: "https://images.unsplash.com/photo-1607190072270-128b1ba74a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" }
-            ]
-        };
+            window.parent.postMessage({
+                type: "ELEMENT_CLICKED",
+                jsonPath: event.target.dataset.jsonPath
+            }, parentOrigin);
+        });
 
-        // Render dummy data on initial load
-        renderPage(premiumDummyData);
-
-        // Notify parent that template is ready if in iframe
-        if (window.parent !== window) {
-            window.parent.postMessage({ type: 'TEMPLATE_READY' }, '*');
-        }
     </script>
 </body>
 

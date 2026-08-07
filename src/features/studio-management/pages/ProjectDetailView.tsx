@@ -514,7 +514,8 @@ const ProjectDetailView: React.FC = () => {
                         <Button
                             variant="outlined"
                             startIcon={<ArticleIcon />}
-                            onClick={() => navigate(`/private/portfolio/builder/${projectId}`)}
+                            // onClick={() => navigate(`/private/portfolio/builder/${projectId}`)}
+                            onClick={() => navigate(`/private/studio/portfolio/manage?path=${encodeURIComponent(projectData.project.id)}`)}
                             sx={{
                                 flex: { xs: 1, sm: 'initial' },
                                 borderRadius: 2,
@@ -527,7 +528,7 @@ const ProjectDetailView: React.FC = () => {
                                 },
                             }}
                         >
-                            Manage Portfolio
+                            Manage Invitation
                         </Button>
                     </Box>
                 </Paper>

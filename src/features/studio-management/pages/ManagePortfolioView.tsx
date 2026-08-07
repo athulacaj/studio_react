@@ -37,16 +37,19 @@ import UploadDialogComponent from '../../../shared/components/UploadDialogCompon
 import { usePortfolioStore } from '../store/portfolioStore';
 import imageCompression from 'browser-image-compression';
 import { createWebsite, getUploadUrls, getWebsites, updateWebsite, uploadFileToR2, WebsitePath } from '../api/WebsiteService';
-import { doc, setDoc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { setDoc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../../../config/firebase';
 import { useAuthStore } from '../../auth/store/authStore';
 import { getBusinessByUserId } from '../api/businessService';
-import { version } from 'node:os';
+import { useSearchParams } from "react-router-dom";
 
 const ManageStudioPortfolioView: React.FC = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState<1 | 2>(1);
     const [error, setError] = useState<string | null>(null);
+    const [searchParams] = useSearchParams();
+
+    const path = searchParams.get("path");
 
     // Global Store State
     const { htmlContent, setHtmlContent, portfolioData, setPortfolioData, uploadedImages,
@@ -66,6 +69,23 @@ const ManageStudioPortfolioView: React.FC = () => {
     // State for tabs
     const [activeTab, setActiveTab] = useState(0);
     const iframeRef = useRef<HTMLIFrameElement>(null);
+
+    function scrollToTheId(id: string) {
+
+    }
+
+    useEffect(() => {
+        const handleMessage = (event: MessageEvent) => {
+            if (event.data.type === "ELEMENT_CLICKED") {
+                console.log("Element clicked:", event.data);
+            }
+        };
+
+        window.addEventListener("message", handleMessage);
+        return () => {
+            window.removeEventListener("message", handleMessage);
+        };
+    }, []);
 
     // State for resizer
     const [sidebarWidth, setSidebarWidth] = useState(500);
@@ -116,7 +136,7 @@ const ManageStudioPortfolioView: React.FC = () => {
                 const htmlText = await response.text();
                 setHtmlContent(htmlText);
 
-                const match = htmlText.match(/let\s+portfolioData\s*=\s*(\{[\s\S]*?\});/);
+                const match = htmlText.match(/let\s+websiteData\s*=\s*(\{[\s\S]*?\});/);
                 if (match && match[1]) {
                     // eslint-disable-next-line no-new-func
                     const parsedData = new Function('return ' + match[1])();
@@ -147,9 +167,10 @@ const ManageStudioPortfolioView: React.FC = () => {
     useEffect(() => {
         const fetchPortfolio = async (businessId: number) => {
             const websiteData = await getWebsites({
-                businessId: businessId
+                businessId: businessId,
+                path: path!
             });
-            const data = websiteData.data[0];
+            const data = websiteData.data.filter((e: any) => e.path === path)[0];
             if (data) {
                 setWebsiteData(data)
                 if (data.currentPath) {
@@ -170,7 +191,7 @@ const ManageStudioPortfolioView: React.FC = () => {
         const updatedWebsiteData = await createWebsite({
             businessId: businessData!.id,
             projectId: null,
-            pathId: "/",
+            path: path!,
             assets: [],
             currentPath: urlInfo?.key,
             versions: []
@@ -193,7 +214,7 @@ const ManageStudioPortfolioView: React.FC = () => {
             const content = e.target?.result as string;
             if (content) {
                 try {
-                    const match = content.match(/let\s+portfolioData\s*=\s*(\{[\s\S]*?\});/);
+                    const match = content.match(/let\s+websiteData\s*=\s*(\{[\s\S]*?\});/);
                     if (match && match[1]) {
 
                         const parsedData = new Function('return ' + match[1])();
@@ -204,11 +225,11 @@ const ManageStudioPortfolioView: React.FC = () => {
                             createWebsiteHandler({})
                         }
                     } else {
-                        setError('Could not find portfolioData in the uploaded template. Make sure the file contains "let portfolioData = {...};".');
+                        setError('Could not find websiteData in the uploaded template. Make sure the file contains "let websiteData = {...};".');
                     }
                 } catch (err) {
-                    console.error('Error parsing portfolioData:', err);
-                    setError('Failed to parse portfolioData. It might contain syntax errors.');
+                    console.error('Error parsing websiteData:', err);
+                    setError('Failed to parse websiteData. It might contain syntax errors.');
                 }
             }
         };
@@ -349,8 +370,8 @@ const ManageStudioPortfolioView: React.FC = () => {
         setIsPublishing(true);
         try {
             const updatedHtml = htmlContent.replace(
-                /let\s+portfolioData\s*=\s*\{[\s\S]*?\};/,
-                `let portfolioData = ${JSON.stringify(portfolioData, null, 2)};`
+                /let\s+websiteData\s*=\s*\{[\s\S]*?\};/,
+                `let websiteData = ${JSON.stringify(portfolioData, null, 2)};`
             );
 
             const file = new File([updatedHtml], "index.html", { type: "text/html" });
@@ -382,7 +403,7 @@ const ManageStudioPortfolioView: React.FC = () => {
                 if (webSiteData) {
                     updatedWebsiteData = await updateWebsite(webSiteData.id, {
                         businessId: businessId,
-                        path: "/",
+                        path: path!,
                         currentPath: urlInfo.key,
                         versions: [...webSiteData.versions, versionData]
                     })
@@ -392,7 +413,7 @@ const ManageStudioPortfolioView: React.FC = () => {
                     updatedWebsiteData = await createWebsite({
                         businessId: businessId,
                         projectId: null,
-                        path: "/",
+                        path: path!,
                         assets: assetsMetadata,
                         currentPath: urlInfo.key,
                         r2BaseUrl: import.meta.env.VITE_R2_BASEURL,
@@ -419,6 +440,14 @@ const ManageStudioPortfolioView: React.FC = () => {
         setSelectedVersionPath(path);
         await loadPortfolioFromPath(path);
     };
+
+    if (!path) {
+        return (
+            <Box>
+                Error no path is provided
+            </Box>
+        );
+    }
 
     if (isInitialLoading) {
         return (
@@ -516,7 +545,7 @@ const ManageStudioPortfolioView: React.FC = () => {
                             Back
                         </Button>
                         <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600 }}>
-                            Manage Portfolio
+                            Manage Portfolio 1
                         </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1 }}>

@@ -69,7 +69,7 @@ export interface CreateWebsiteRequest {
 export interface UpdateWebsiteRequest {
     businessId?: number;
     projectId?: string;
-    path: string;
+    path?: string;
     assets?: any;
     currentPath?: string;
     r2BaseUrl?: string;

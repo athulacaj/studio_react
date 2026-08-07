@@ -186,7 +186,7 @@ const StudioDashboard: React.FC = () => {
                                 )}
                                 <Button
                                     variant="outlined"
-                                    onClick={() => navigate('/private/studio/portfolio/manage')}
+                                    onClick={() => navigate(`/private/studio/portfolio/manage?path=${encodeURIComponent("/")}`)}
                                     sx={{
                                         flex: { xs: 1, sm: 'initial' },
                                         borderRadius: '16px',
