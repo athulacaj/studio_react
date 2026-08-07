@@ -736,3 +736,150 @@ window.addEventListener("message", function (event) {
 - Be modular and easy to extend.
 - Support replacing the complete website by supplying a new `websiteData` object.
 - Produce a single `index.html` unless the user explicitly requests a multi-file project.
+
+
+
+---------------       -----------------------------------------------
+
+
+
+
+## Parent Communication
+
+The generated website must communicate with its parent window using `window.postMessage`.
+
+For maximum compatibility, all outgoing messages should use `"*"` as the `targetOrigin`.
+
+```javascript
+window.parent.postMessage(message, "*");
+```
+
+This allows the generated website to work whether it is embedded on the same origin or a different origin without requiring additional configuration.
+
+---
+
+## Element Click Events
+
+The generated website **must** register a global click listener.
+
+```javascript
+document.addEventListener("click", function (event) {
+
+    console.log("clicked");
+
+    const jsonPath = event.target.dataset.jsonPath;
+
+    if (!jsonPath) return;
+
+    window.parent.postMessage({
+        type: "ELEMENT_CLICKED",
+        jsonPath
+    }, "*");
+
+});
+```
+
+---
+
+## Requirements
+
+This event listener must:
+
+* Be included in every generated website.
+* Be initialized automatically.
+* Remain active after every call to `renderDataAll()`.
+* Work for dynamically rendered elements.
+* Send the selected element's `data-json-path` to the parent window.
+* Use `"*"` as the `targetOrigin`.
+* Be usable by external applications without modification.
+
+---
+
+## Message Format
+
+Whenever a rendered element is clicked, the website should send:
+
+```javascript
+window.parent.postMessage({
+    type: "ELEMENT_CLICKED",
+    jsonPath: event.target.dataset.jsonPath
+}, "*");
+```
+
+Example messages
+
+```javascript
+{
+    type: "ELEMENT_CLICKED",
+    jsonPath: "hero.title"
+}
+```
+
+```javascript
+{
+    type: "ELEMENT_CLICKED",
+    jsonPath: "services[0]"
+}
+```
+
+```javascript
+{
+    type: "ELEMENT_CLICKED",
+    jsonPath: "gallery[4].image"
+}
+```
+
+---
+
+## JSON Path Requirement
+
+Since editor communication depends on `data-json-path`, **every HTML element created by the renderer must include a valid `data-json-path` attribute**.
+
+This includes:
+
+* Root section containers
+* Parent wrapper elements
+* Child wrapper elements
+* Cards
+* Grid items
+* Navigation items
+* Buttons
+* Links
+* Images
+* Icons
+* SVG elements
+* Forms
+* Inputs
+* Labels
+* Headings
+* Paragraphs
+* List items
+* Every dynamically rendered HTML element
+
+There are **no exceptions**.
+
+---
+
+## Public Communication Contract
+
+The generated website must expose the following communication contract.
+
+### Parent → Website
+
+```javascript
+{
+    type: "UPDATE_DATA",
+    data: websiteData
+}
+```
+
+### Website → Parent
+
+```javascript
+{
+    type: "ELEMENT_CLICKED",
+    jsonPath: "hero.title"
+}
+```
+
+Future communication between the generated website and external editors should continue using the same `window.postMessage` pattern.

@@ -85,9 +85,10 @@ const DynamicPortfolioForm: React.FC<DynamicPortfolioFormProps> = ({ data, onCha
   };
 
   const renderField = (key: string, value: any, path: string[]) => {
+    const fieldId = path.join('.');
     if (Array.isArray(value)) {
       return (
-        <Box key={path.join('.')} sx={{ mb: 3 }}>
+        <Box key={path.join('.')} id={fieldId} sx={{ mb: 3 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
             <Typography variant="h6" sx={{ color: '#F8FAFC', textTransform: 'capitalize' }}>
               {key}
@@ -138,7 +139,7 @@ const DynamicPortfolioForm: React.FC<DynamicPortfolioFormProps> = ({ data, onCha
       );
     } else if (typeof value === 'object' && value !== null) {
       return (
-        <Box key={path.join('.')} sx={{ mb: 3 }}>
+        <Box key={path.join('.')} id={fieldId} sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2, color: '#F8FAFC', textTransform: 'capitalize' }}>
             {key}
           </Typography>
@@ -151,7 +152,7 @@ const DynamicPortfolioForm: React.FC<DynamicPortfolioFormProps> = ({ data, onCha
       );
     } else {
       return (
-        <Box key={path.join('.')} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box key={path.join('.')} id={fieldId} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <TextField
             label={key}
             value={value || ''}

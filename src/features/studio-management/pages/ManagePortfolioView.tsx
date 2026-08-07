@@ -71,13 +71,51 @@ const ManageStudioPortfolioView: React.FC = () => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
     function scrollToTheId(id: string) {
+        // Normalize array notation (e.g. events[0]) to dot notation (events.0)
+        const normalizedId = id.replace(/\[(\d+)\]/g, '.$1');
+        const element = document.getElementById(normalizedId) || document.getElementById(id);
+        
+        if (element) {
+            // Open any parent accordions that are closed
+            let current = element.parentElement;
+            let didOpenAccordion = false;
+            
+            while (current) {
+                if (current.classList.contains('MuiAccordion-root') && !current.classList.contains('Mui-expanded')) {
+                    const summary = current.querySelector('.MuiAccordionSummary-root') as HTMLElement;
+                    if (summary) {
+                        summary.click();
+                        didOpenAccordion = true;
+                    }
+                }
+                current = current.parentElement;
+            }
 
+            // Scroll to the element, adding a slight delay if we had to open an accordion
+            // so the DOM has time to expand and layout correctly before calculating scroll position
+            setTimeout(() => {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Optional: highlight the element briefly
+                const originalBg = element.style.backgroundColor;
+                element.style.transition = 'background-color 0.5s ease';
+                element.style.backgroundColor = 'rgba(192, 132, 252, 0.3)';
+                setTimeout(() => {
+                    element.style.backgroundColor = originalBg;
+                }, 1500);
+            }, didOpenAccordion ? 300 : 0);
+
+        } else {
+            console.warn(`Element with id "${id}" (normalized to "${normalizedId}") not found for scrolling.`);
+        }
     }
 
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
             if (event.data.type === "ELEMENT_CLICKED") {
                 console.log("Element clicked:", event.data);
+                if (event.data.jsonPath) {
+                    scrollToTheId(event.data.jsonPath);
+                }
             }
         };
 
