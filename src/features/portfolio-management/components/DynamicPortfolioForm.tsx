@@ -30,6 +30,7 @@ import {
 import { useConfigStore } from '../../../core/store/ConifgStore';
 import { usePortfolioStore } from '../store/portfolioStore';
 import { usePortfolioContext } from '../context/portfolioGlobalContext';
+import { scrollToJsonPath } from '../functions/scrollToJsonPath';
 
 
 // ---------------------------------------------------------------------------
@@ -45,6 +46,7 @@ interface LeafFieldProps {
   path: string[];
   onCommit: (path: string[], value: string) => void;
   onAssetPick: (path: string[]) => void;
+  detailedPath: string;
 }
 
 const LeafField = React.memo(({
@@ -54,7 +56,11 @@ const LeafField = React.memo(({
   path,
   onCommit,
   onAssetPick,
+  detailedPath
 }: LeafFieldProps) => {
+  const { managePortfolioController } = usePortfolioContext();
+  const { iframeRef } = managePortfolioController;
+
   const [localValue, setLocalValue] = useState<string>(initialValue ?? '');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Keep path in a ref so the debounce closure always has the latest path
@@ -90,6 +96,9 @@ const LeafField = React.memo(({
         label={fieldKey}
         value={localValue}
         onChange={handleChange}
+        onFocus={() => {
+          scrollToJsonPath(iframeRef, detailedPath)
+        }}
         fullWidth
         margin="normal"
         variant="outlined"
@@ -172,7 +181,9 @@ const DynamicPortfolioForm: React.FC = () => {
   // Text-field commits update this WITHOUT triggering a form re-render.
   const dataRef = useRef<any>(portfolioData);
 
-  // Detect genuine external data replacements (version load, etc.)
+  // Tracks the last value we ourselves committed upward via handleLeafCommit.
+  // When portfolioData changes because of our own commit, it will match this ref
+  // and we'll skip the formKey bump (which would unmount & collapse accordions).
   const lastExternalRef = useRef<any>(portfolioData);
 
   const [prevData, setPrevData] = useState(portfolioData);
@@ -180,7 +191,14 @@ const DynamicPortfolioForm: React.FC = () => {
 
   if (portfolioData !== prevData) {
     setPrevData(portfolioData);
-    setFormKey(k => k + 1);
+    // Only remount the form tree for genuinely external changes
+    // (e.g. version load, initial load). Our own leaf commits set
+    // lastExternalRef right before calling handleDataChange, so those
+    // will match and be skipped here.
+    if (portfolioData !== lastExternalRef.current) {
+      lastExternalRef.current = portfolioData;
+      setFormKey(k => k + 1);
+    }
   }
 
   useEffect(() => {
@@ -223,7 +241,7 @@ const DynamicPortfolioForm: React.FC = () => {
     setFormKey(k => k + 1);
   }, [handleDataChange]);
 
-  const renderField = (key: string, value: any, path: string[]) => {
+  const renderField = (key: string, value: any, path: string[], detailedPath: string = '') => {
     const fieldId = path.join('.');
 
     if (Array.isArray(value)) {
@@ -252,6 +270,7 @@ const DynamicPortfolioForm: React.FC = () => {
             const itemPath = [...path, index.toString()];
             const itemId = itemPath.join('.');
             const isPrimitive = item === null || typeof item !== 'object';
+            const detailedPathNew = `${detailedPath}[${index}]`;
 
             return (
               <Accordion key={index} sx={{ background: 'rgba(255,255,255,0.05)', mb: 1, color: '#fff' }}>
@@ -280,10 +299,11 @@ const DynamicPortfolioForm: React.FC = () => {
                           path={itemPath}
                           onCommit={handleLeafCommit}
                           onAssetPick={handleAssetPick}
+                          detailedPath={detailedPathNew}
                         />
                       ) : (
                         Object.entries(item).map(([subKey, subValue]) =>
-                          renderField(subKey, subValue, [...itemPath, subKey])
+                          renderField(subKey, subValue, [...itemPath, subKey], detailedPathNew + '.' + subKey)
                         )
                       )}
                     </Box>
@@ -304,7 +324,7 @@ const DynamicPortfolioForm: React.FC = () => {
           </Typography>
           <Box sx={{ pl: 2, borderLeft: '2px solid rgba(192, 132, 252, 0.3)' }}>
             {Object.entries(value).map(([subKey, subValue]) =>
-              renderField(subKey, subValue, [...path, subKey])
+              renderField(subKey, subValue, [...path, subKey], detailedPath + '.' + subKey)
             )}
           </Box>
         </Box>
@@ -321,6 +341,7 @@ const DynamicPortfolioForm: React.FC = () => {
         path={path}
         onCommit={handleLeafCommit}
         onAssetPick={handleAssetPick}
+        detailedPath={detailedPath}
       />
     );
   };
@@ -331,7 +352,7 @@ const DynamicPortfolioForm: React.FC = () => {
     <Box key={formKey}>
       {Object.entries(portfolioData).map(([key, value]) => (
         <Box key={key} sx={{ mb: 4, background: 'rgba(15, 26, 46, 0.4)', p: 3, borderRadius: 2 }}>
-          {renderField(key, value, [key])}
+          {renderField(key, value, [key], key)}
         </Box>
       ))}
 

@@ -1,6 +1,9 @@
 import React from 'react';
 import { Box, Container, Paper, Typography, Button, Alert } from '@mui/material';
 import { ArrowBack as ArrowBackIcon, CloudUpload as UploadIcon } from '@mui/icons-material';
+import { usePortfolioContext } from '../context/portfolioGlobalContext';
+import { WebsiteTemplate } from '../api/WebsiteService';
+import { usePortfolioStore } from '../store/portfolioStore';
 
 interface UploadTemplateStepProps {
     error: string | null;
@@ -13,6 +16,9 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
     onNavigateBack,
     onFileUpload,
 }) => {
+    const { templatesDataList }: {
+        templatesDataList: WebsiteTemplate[]
+    } = usePortfolioStore();
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: '#030912', pt: 8, pb: 4 }}>
             <Container maxWidth="sm">

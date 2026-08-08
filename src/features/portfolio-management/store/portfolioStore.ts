@@ -44,7 +44,7 @@ export interface PortfolioState {
     isProcessingFiles: boolean;
     isUploading: boolean;
     uploadProgress: number;
-    templatesData: WebsiteTemplate[];
+    templatesDataList: WebsiteTemplate[];
 }
 
 // Actions Interface
@@ -111,7 +111,7 @@ export const initialState: PortfolioState = {
     isProcessingFiles: false,
     isUploading: false,
     uploadProgress: 0,
-    templatesData: [],
+    templatesDataList: [],
 };
 
 export const usePortfolioStore = create<PortfolioStore>((set) => ({
@@ -150,7 +150,7 @@ export const usePortfolioStore = create<PortfolioStore>((set) => ({
     setIsProcessingFiles: (isProcessingFiles) => set({ isProcessingFiles }),
     setIsUploading: (isUploading) => set({ isUploading }),
     setUploadProgress: (uploadProgress) => set({ uploadProgress }),
-    setTemplatesData: (data) => set({ templatesData: data }),
+    setTemplatesData: (data) => set({ templatesDataList: data }),
 
     // Reset Action
     resetStep: () => set({ step: 1 }),

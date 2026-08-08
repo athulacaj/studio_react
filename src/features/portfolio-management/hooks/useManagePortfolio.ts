@@ -39,7 +39,7 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
         isProcessingFiles, setIsProcessingFiles,
         isUploading, setIsUploading,
         uploadProgress, setUploadProgress,
-        templatesData, setTemplatesData, resetStep,
+        templatesDataList, setTemplatesData, resetStep,
     } = usePortfolioStore();
 
     const { currentUser } = useAuthStore();
