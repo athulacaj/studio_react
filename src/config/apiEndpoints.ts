@@ -45,7 +45,8 @@ const ApiEndPoints = {
     website: {
         get: {
             website: (params: GetWebsitesParams) => `/website?` + makeQueryUrl(params),
-            path: (businessId: number) => `/website/path?businessId=${businessId}`
+            path: (businessId: number) => `/website/path?businessId=${businessId}`,
+            templates: (type: string) => `/website/templates?type=${encodeURIComponent(type)}`
         },
         post: {
             "web": () => "/website",

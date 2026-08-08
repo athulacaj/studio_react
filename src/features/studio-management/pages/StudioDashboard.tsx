@@ -17,6 +17,7 @@ import { useStudioManagementStore } from '../store/studioManagementStore';
 import { useAuthStore } from '../../auth';
 import { ProjectStatus } from '../types';
 import { getBusinessByUserId } from '../api/businessService';
+import { WebsiteTemplateType } from '../api/WebsiteService';
 
 const StudioDashboard: React.FC = () => {
     const { currentUser } = useAuthStore();

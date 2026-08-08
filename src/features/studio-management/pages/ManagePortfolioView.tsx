@@ -50,6 +50,7 @@ const ManageStudioPortfolioView: React.FC = () => {
     const [searchParams] = useSearchParams();
 
     const path = searchParams.get("path");
+    const type = searchParams.get("type");
 
     // Global Store State
     const { htmlContent, setHtmlContent, portfolioData, setPortfolioData, uploadedImages,
@@ -74,12 +75,12 @@ const ManageStudioPortfolioView: React.FC = () => {
         // Normalize array notation (e.g. events[0]) to dot notation (events.0)
         const normalizedId = id.replace(/\[(\d+)\]/g, '.$1');
         const element = document.getElementById(normalizedId) || document.getElementById(id);
-        
+
         if (element) {
             // Open any parent accordions that are closed
             let current = element.parentElement;
             let didOpenAccordion = false;
-            
+
             while (current) {
                 if (current.classList.contains('MuiAccordion-root') && !current.classList.contains('Mui-expanded')) {
                     const summary = current.querySelector('.MuiAccordionSummary-root') as HTMLElement;
@@ -176,7 +177,7 @@ const ManageStudioPortfolioView: React.FC = () => {
 
                 const match = htmlText.match(/let\s+websiteData\s*=\s*(\{[\s\S]*?\});/);
                 if (match && match[1]) {
-                    // eslint-disable-next-line no-new-func
+
                     const parsedData = new Function('return ' + match[1])();
                     setPortfolioData(parsedData);
                 }

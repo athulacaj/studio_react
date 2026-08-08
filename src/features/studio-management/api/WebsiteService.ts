@@ -134,3 +134,32 @@ export const getWebsitePaths = async (businessId: number): Promise<WebsitePath[]
         throw error;
     }
 };
+
+export interface WebsiteTemplate {
+    id: number;
+    type: string;
+    url: string;
+    mobileScreenshotUrl: string | null;
+    desktopScreenshotUrl: string | null;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export enum WebsiteTemplateType {
+    weddingInvitation = "wedding__invitation",
+}
+/**
+ * Fetches website templates by template type.
+ */
+export const getWebsiteTemplatesByType = async (type: WebsiteTemplateType): Promise<WebsiteTemplate[]> => {
+    try {
+        const response = await StudioApiClient.get<{ success: boolean; data: WebsiteTemplate[] }>(
+            ApiEndPoints.website.get.templates(type)
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching website templates by type:", error);
+        throw error;
+    }
+};
+

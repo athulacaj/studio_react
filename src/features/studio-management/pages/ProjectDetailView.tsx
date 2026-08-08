@@ -37,6 +37,7 @@ import ManageShareLinksModal from '../components/ManageShareLinksModal';
 import { useToastStore } from '../../../shared/hooks/useToastStore';
 import { DriveFileBrowser, useDriveIntegrationStore } from '../../drive-integration';
 import { ProjectJoinDriveData, ProjectStatus } from '../types';
+import { WebsiteTemplateType } from '../api/WebsiteService';
 
 const ProjectDetailView: React.FC = () => {
     const { projectId } = useParams<{ projectId: string }>();
@@ -515,7 +516,7 @@ const ProjectDetailView: React.FC = () => {
                             variant="outlined"
                             startIcon={<ArticleIcon />}
                             // onClick={() => navigate(`/private/portfolio/builder/${projectId}`)}
-                            onClick={() => navigate(`/private/studio/portfolio/manage?path=${encodeURIComponent(projectData.project.id)}`)}
+                            onClick={() => navigate(`/private/studio/portfolio/manage?path=${encodeURIComponent(projectData.project.id)}&type=${WebsiteTemplateType.weddingInvitation}`)}
                             sx={{
                                 flex: { xs: 1, sm: 'initial' },
                                 borderRadius: 2,
