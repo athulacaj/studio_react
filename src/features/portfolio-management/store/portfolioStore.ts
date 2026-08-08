@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Business } from '../api/businessService';
+import { Business } from '../../studio-management/api/businessService';
 import { Website, WebsitePath } from '../api/WebsiteService';
 
 interface PortfolioState {

@@ -37,7 +37,7 @@ import ManageShareLinksModal from '../components/ManageShareLinksModal';
 import { useToastStore } from '../../../shared/hooks/useToastStore';
 import { DriveFileBrowser, useDriveIntegrationStore } from '../../drive-integration';
 import { ProjectJoinDriveData, ProjectStatus } from '../types';
-import { WebsiteTemplateType } from '../api/WebsiteService';
+import { WebsiteTemplateType } from '../../portfolio-management';
 
 const ProjectDetailView: React.FC = () => {
     const { projectId } = useParams<{ projectId: string }>();

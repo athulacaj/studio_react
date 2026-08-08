@@ -75,11 +75,19 @@ This document outlines the development plan for a modern, responsive photo proof
     *   Tokens are securely encrypted in Firestore using `AES-256-CBC` within Firebase Cloud Functions.
     *   Added Cloud Functions to handle all Drive API requests (folder creation, file listing, Base64 multipart file uploads, token revocation).
 
-#### Iteration 6: Axios API Client Handler
 
-1.  **Axios Client Wrapper:**
-    *   Created `src/services/apiClient.ts` using `axios`.
-    *   Configured base URL directly from `import.meta.env.VITE_API_URL`.
-    *   Exposed intuitive utility methods (`get`, `post`, `put`, `delete`).
-    *   Supports passing generic response types, custom headers, query params, request bodies, and full Axios configuration.
+#### Iteration 7: Manage Portfolio View Refactoring
+
+1. **Extract Custom Hooks:**
+   - `useSidebarResizer`: Extract sidebar dragging & resizer width calculations.
+   - `usePortfolioIframe`: Extract iframe message postMessage synchronization and element scroll handling.
+2. **Decompose Page Components:**
+   - `UploadTemplateStep`: Modularize HTML template upload initial step UI.
+   - `ManagePortfolioHeader`: Modularize header with Back button, Title & Desktop/Mobile toggles.
+   - `AssetsTabContent`: Modularize asset list, compression, upload progress bar & dialog.
+   - `SettingsTabContent`: Modularize Publish card & Version History selection menu.
+   - `PortfolioPreview`: Modularize iframe preview container with desktop/mobile device framing.
+3. **Refactor ManagePortfolioView:**
+   - Simplify main container component from 924 lines to concise, readable orchestration of hooks and components.
+
 

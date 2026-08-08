@@ -2,6 +2,7 @@ import ApiEndPoints from "../../../config/apiEndpoints";
 import { StudioApiClient } from "../../../services/ApiInitalizer";
 import axios from "axios";
 import { GetWebsitesParams } from "../../../types/apiEndPointTypes";
+
 export interface FileUploadDetail {
     fileName: string;
     contentType: string;
@@ -162,4 +163,3 @@ export const getWebsiteTemplatesByType = async (type: WebsiteTemplateType): Prom
         throw error;
     }
 };
-
