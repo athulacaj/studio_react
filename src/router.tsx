@@ -8,8 +8,6 @@ import { LoginPage, SignupPage, ProtectedRoute } from './features/auth';
 import { StudioDashboard, ProjectDetailView, PublicProjectView, SuperAdminDashboard, AdminUserView, AdminProjectDetailWrapper, ManageStudioPortfolioView } from './features/studio-management';
 import Footer from './core/components/Footer';
 import GlobalNavbar from './core/components/GlobalNavbar';
-import EventPageViewer from './features/events-portfoliobuilder/pages/EventPageViewer';
-import EventPortfolioBuilder from './features/events-portfoliobuilder/pages/EventPortfolioBuilder';
 import { DriveConnectPage, DriveSuccessPage } from './features/drive-integration';
 
 const AppRouter = () => {
@@ -33,7 +31,6 @@ const AppRouter = () => {
             <Route path="admin" element={<SuperAdminDashboard />} />
             <Route path="admin/user/:userId" element={<AdminUserView />} />
             <Route path="admin/user/:userId/studio/:projectId" element={<AdminProjectDetailWrapper />} />
-            <Route path="portfolio/builder/:projectId" element={<EventPortfolioBuilder />} />
             <Route path="studio/portfolio/manage" element={<ManageStudioPortfolioView />} />
           </Route>
 
@@ -44,7 +41,6 @@ const AppRouter = () => {
           <Route path="/view/:userId/:projectId" element={<PublicProjectView />} />
           <Route path="/share/:linkId" element={<PublicProjectView />} />
           <Route path="/about" element={<About />} />
-          <Route path="/p/:userId/:eventpath" element={<EventPageViewer />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Box>
