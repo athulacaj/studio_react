@@ -20,12 +20,13 @@ import {
     Delete as DeleteIcon,
 } from '@mui/icons-material';
 import UploadDialogComponent from '../../../shared/components/UploadDialogComponent';
-import { useManagePortfolio } from '../hooks/useManagePortfolio';
+import { usePortfolioContext } from '../context/portfolioGlobalContext';
 
 
 
 
 export const AssetsTabContent: React.FC = () => {
+    const { managePortfolioController } = usePortfolioContext();
 
     const {
         isUploadDialogOpen,
@@ -35,7 +36,7 @@ export const AssetsTabContent: React.FC = () => {
         uploadProgress,
         uploadedImages,
         processFiles,
-        handleRemoveAsset } = useManagePortfolio();
+        handleRemoveAsset } = managePortfolioController;
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>

@@ -1,15 +1,17 @@
 import React, { RefObject } from 'react';
 import { Box } from '@mui/material';
-import { useManagePortfolio } from '../hooks/useManagePortfolio';
+import { usePortfolioContext } from '../context/portfolioGlobalContext';
 
 
 
 export const PortfolioPreview: React.FC = () => {
+    const { managePortfolioController } = usePortfolioContext();
+
     const {
         previewMode,
         isDragging,
         blobUrl,
-        iframeRef } = useManagePortfolio();
+        iframeRef } = managePortfolioController;
 
     return (
         <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', bgcolor: '#0f172a' }}>
@@ -57,3 +59,4 @@ export const PortfolioPreview: React.FC = () => {
 };
 
 export default PortfolioPreview;
+

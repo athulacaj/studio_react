@@ -38,10 +38,9 @@ function scrollToTheId(id: string) {
 }
 
 export const usePortfolioIframe = (
-    htmlContent: string,
+    htmlContent: string, iframeRef: React.RefObject<HTMLIFrameElement | null>,
     setPortfolioData: (data: any) => void
 ) => {
-    const { iframeRef }: { iframeRef: React.RefObject<HTMLIFrameElement | null> } = usePortfolioContext()
     const iframeDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Create and cleanup object URL for HTML content preview

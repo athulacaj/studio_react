@@ -1,10 +1,11 @@
 // contexts/AuthContext.tsx
 
 import { createContext, useContext } from "react";
+import { useManagePortfolio } from "../hooks/useManagePortfolio";
 
 
 export interface PortfolioContextValue {
-    iframeRef: React.RefObject<HTMLIFrameElement | null>;
+    managePortfolioController: ReturnType<typeof useManagePortfolio>;
 }
 
 export const PortfolioContext = createContext<PortfolioContextValue | null>(null);

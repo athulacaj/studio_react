@@ -17,18 +17,20 @@ import {
     InsertDriveFile as FileIcon,
 } from '@mui/icons-material';
 import { useManagePortfolio } from '../hooks/useManagePortfolio';
+import { usePortfolioContext } from '../context/portfolioGlobalContext';
 
 
 
 
 export const SettingsTabContent: React.FC = () => {
+    const { managePortfolioController } = usePortfolioContext();
 
     const {
         isPublishing,
         versions,
         selectedVersionPath,
         handlePublish,
-        handleVersionChange } = useManagePortfolio();
+        handleVersionChange } = managePortfolioController;
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {/* Publish Card */}

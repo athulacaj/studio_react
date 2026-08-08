@@ -29,7 +29,7 @@ import {
 } from '@mui/icons-material';
 import { useConfigStore } from '../../../core/store/ConifgStore';
 import { usePortfolioStore } from '../store/portfolioStore';
-import { useManagePortfolio } from '../hooks/useManagePortfolio';
+import { usePortfolioContext } from '../context/portfolioGlobalContext';
 
 
 // ---------------------------------------------------------------------------
@@ -155,9 +155,11 @@ function getByPath(obj: any, path: string[]): any {
 // ---------------------------------------------------------------------------
 
 const DynamicPortfolioForm: React.FC = () => {
+  const { managePortfolioController } = usePortfolioContext();
+
   const {
     portfolioData,
-    handleDataChange } = useManagePortfolio();
+    handleDataChange } = managePortfolioController;
 
 
   const { setShowNavBar } = useConfigStore();

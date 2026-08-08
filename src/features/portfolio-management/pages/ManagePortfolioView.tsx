@@ -9,9 +9,10 @@ import SettingsTabContent from '../components/SettingsTabContent';
 import PortfolioPreview from '../components/PortfolioPreview';
 
 import { useManagePortfolio } from '../hooks/useManagePortfolio';
-import { PortfolioContext } from '../context/portfolioGlobalContext';
+import { PortfolioContext, usePortfolioContext } from '../context/portfolioGlobalContext';
 
 const ManageStudioPortfolioView: React.FC = () => {
+    const { managePortfolioController } = usePortfolioContext();
 
     const {
         path,
@@ -24,8 +25,7 @@ const ManageStudioPortfolioView: React.FC = () => {
         isDragging,
         handleMouseDown,
         handleFileUpload,
-        navigate
-    } = useManagePortfolio();
+        navigate } = managePortfolioController;
 
     if (!path) {
         return <Box sx={{ p: 4, color: '#fff' }}>Error: No path is provided.</Box>;
@@ -117,7 +117,8 @@ const ManageStudioPortfolioView: React.FC = () => {
 
 function ManageStudioPortfolioViewProvider() {
     const iframeRef = useRef<HTMLIFrameElement>(null);
-    return <PortfolioContext.Provider value={{ iframeRef }}>
+    const managePortfolioController = useManagePortfolio(iframeRef);
+    return <PortfolioContext.Provider value={{ managePortfolioController }}>
         <ManageStudioPortfolioView />
     </PortfolioContext.Provider>
 

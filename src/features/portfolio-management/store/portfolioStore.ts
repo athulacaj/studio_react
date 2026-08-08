@@ -1,15 +1,29 @@
 import { create } from 'zustand';
 import { Business } from '../../studio-management/api/businessService';
-import { Website, WebsitePath } from '../api/WebsiteService';
+import { Website, WebsitePath, WebsiteTemplate } from '../api/WebsiteService';
 
-interface PortfolioState {
+export interface UploadedImage {
+    id: string;
+    file?: File;
+    url: string;
+    compressed: boolean;
+    fileKey?: string;
+}
+
+export interface PortfolioVersion {
+    path: string;
+    publishedAt: string;
+}
+
+// State Interface
+export interface PortfolioState {
     // Content & Data
     htmlContent: string;
     portfolioData: any;
     businessData: Business | null;
     webSiteData: Website | null;
     pathData: WebsitePath | null;
-    uploadedImages: { id: string; file?: File; url: string; compressed: boolean; fileKey?: string }[];
+    uploadedImages: UploadedImage[];
 
     // Steps & UI States
     step: 1 | 2;
@@ -22,7 +36,7 @@ interface PortfolioState {
     isPublishing: boolean;
 
     // Versioning States
-    versions: { path: string; publishedAt: string }[];
+    versions: PortfolioVersion[];
     selectedVersionPath: string;
 
     // Asset Processing & Uploading States
@@ -30,12 +44,16 @@ interface PortfolioState {
     isProcessingFiles: boolean;
     isUploading: boolean;
     uploadProgress: number;
+    templatesData: WebsiteTemplate[];
+}
 
+// Actions Interface
+export interface PortfolioActions {
     // Content & Data Setters
     setHtmlContent: (html: string) => void;
     setPortfolioData: (data: any) => void;
-    setUploadedImages: (images: { id: string; file?: File; url: string; compressed: boolean; fileKey?: string }[]) => void;
-    addUploadedImages: (images: { id: string; file?: File; url: string; compressed: boolean; fileKey?: string }[]) => void;
+    setUploadedImages: (images: UploadedImage[]) => void;
+    addUploadedImages: (images: UploadedImage[]) => void;
     removeUploadedImage: (id: string) => void;
     setBusinessData: (data: Business) => void;
     setWebsiteData: (data: Website) => void;
@@ -52,7 +70,7 @@ interface PortfolioState {
     setIsPublishing: (isPublishing: boolean) => void;
 
     // Versioning Setters
-    setVersions: (versions: { path: string; publishedAt: string }[] | ((prev: { path: string; publishedAt: string }[]) => { path: string; publishedAt: string }[])) => void;
+    setVersions: (versions: PortfolioVersion[] | ((prev: PortfolioVersion[]) => PortfolioVersion[])) => void;
     setSelectedVersionPath: (path: string) => void;
 
     // Asset Processing & Uploading Setters
@@ -60,16 +78,23 @@ interface PortfolioState {
     setIsProcessingFiles: (isProcessing: boolean) => void;
     setIsUploading: (isUploading: boolean) => void;
     setUploadProgress: (progress: number) => void;
+    setTemplatesData: (data: WebsiteTemplate[]) => void;
+
+    // Reset Action
+    resetStep: () => void;
+    resetState: () => void;
 }
 
-export const usePortfolioStore = create<PortfolioState>((set) => ({
+export type PortfolioStore = PortfolioState & PortfolioActions;
+
+export const initialState: PortfolioState = {
     // Initial Values
     htmlContent: '',
     portfolioData: null,
-    uploadedImages: [],
     businessData: null,
     webSiteData: null,
     pathData: null,
+    uploadedImages: [],
 
     step: 1,
     error: null,
@@ -86,6 +111,11 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
     isProcessingFiles: false,
     isUploading: false,
     uploadProgress: 0,
+    templatesData: [],
+};
+
+export const usePortfolioStore = create<PortfolioStore>((set) => ({
+    ...initialState,
 
     // Content & Data Actions
     setHtmlContent: (htmlContent) => set({ htmlContent }),
@@ -120,5 +150,10 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
     setIsProcessingFiles: (isProcessingFiles) => set({ isProcessingFiles }),
     setIsUploading: (isUploading) => set({ isUploading }),
     setUploadProgress: (uploadProgress) => set({ uploadProgress }),
+    setTemplatesData: (data) => set({ templatesData: data }),
+
+    // Reset Action
+    resetStep: () => set({ step: 1 }),
+    resetState: () => set(initialState),
 }));
 

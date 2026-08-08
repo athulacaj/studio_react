@@ -7,14 +7,18 @@ import { useSidebarResizer } from './useSidebarResizer';
 import { usePortfolioIframe } from './usePortfolioIframe';
 import { usePortfolioStore } from '../store/portfolioStore';
 import { useAuthStore } from '../../auth/store/authStore';
-import { createWebsite, getUploadUrls, getWebsites, updateWebsite, uploadFileToR2 } from '../api/WebsiteService';
+import { createWebsite, getUploadUrls, getWebsites, getWebsiteTemplatesByType, updateWebsite, uploadFileToR2 } from '../api/WebsiteService';
 import { getBusinessByUserId } from '../../studio-management/api/businessService';
-import { usePortfolioContext } from '../context/portfolioGlobalContext';
 
-export const useManagePortfolio = () => {
+
+
+
+export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement | null>) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const path = searchParams.get('path');
+    const type = searchParams.get('type')
+    const title = searchParams.get("title") ?? ''
 
     // Global Store State & Setters
     const {
@@ -34,15 +38,22 @@ export const useManagePortfolio = () => {
         isUploadDialogOpen, setIsUploadDialogOpen,
         isProcessingFiles, setIsProcessingFiles,
         isUploading, setIsUploading,
-        uploadProgress, setUploadProgress
+        uploadProgress, setUploadProgress,
+        templatesData, setTemplatesData, resetStep,
     } = usePortfolioStore();
 
     const { currentUser } = useAuthStore();
-    const { iframeRef } = usePortfolioContext()
 
     // Custom Hooks
     const { sidebarWidth, isDragging, handleMouseDown } = useSidebarResizer(500, 300);
-    const { blobUrl, handleDataChange } = usePortfolioIframe(htmlContent, setPortfolioData);
+    const { blobUrl, handleDataChange } = usePortfolioIframe(htmlContent, iframeRef, setPortfolioData);
+
+
+    useEffect(() => {
+        return () => {
+            resetStep();
+        }
+    }, [])
 
     // Fetch initial business details
     useEffect(() => {
@@ -347,12 +358,26 @@ export const useManagePortfolio = () => {
     };
 
     const handleBack = () => {
-        if (businessData == null) {
-            setStep(1);
-        } else {
-            navigate('/private/studio', { replace: true });
-        }
+        // if (businessData == null) {
+        //     setStep(1);
+        // } else {
+        //     navigate(-1);
+        // }
+        navigate(-1);
+
     };
+
+    const getTemplates = async () => {
+        if (type) {
+            const response = await getWebsiteTemplatesByType(type);
+            setTemplatesData(response);
+        } else {
+            setTemplatesData([])
+        }
+    }
+    useEffect(() => {
+        getTemplates();
+    }, [])
 
     return {
         path,
@@ -385,6 +410,7 @@ export const useManagePortfolio = () => {
         handlePublish,
         handleVersionChange,
         handleBack,
-        navigate
+        navigate,
+        title,
     };
 };

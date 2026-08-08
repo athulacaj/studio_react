@@ -1,20 +1,21 @@
 import React from 'react';
 import { Box, Typography, Button, IconButton } from '@mui/material';
 import { ArrowBack as ArrowBackIcon, DesktopMac as DesktopIcon, Smartphone as MobileIcon } from '@mui/icons-material';
-import { useManagePortfolio } from '../hooks/useManagePortfolio';
+import { usePortfolioContext } from '../context/portfolioGlobalContext';
 
 interface ManagePortfolioHeaderProps {
     title?: string;
 
 }
 
-export const ManagePortfolioHeader: React.FC<ManagePortfolioHeaderProps> = ({
-    title = 'Manage Portfolio 1'
-}) => {
+export const ManagePortfolioHeader: React.FC<ManagePortfolioHeaderProps> = () => {
+    const { managePortfolioController } = usePortfolioContext();
+
     const {
         previewMode,
         setPreviewMode,
-        handleBack } = useManagePortfolio();
+        title,
+        handleBack } = managePortfolioController;
     return (
         <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
