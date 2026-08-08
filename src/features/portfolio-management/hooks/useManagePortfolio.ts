@@ -7,7 +7,7 @@ import { useSidebarResizer } from './useSidebarResizer';
 import { usePortfolioIframe } from './usePortfolioIframe';
 import { usePortfolioStore } from '../store/portfolioStore';
 import { useAuthStore } from '../../auth/store/authStore';
-import { createWebsite, getUploadUrls, getWebsites, getWebsiteTemplatesByType, updateWebsite, uploadFileToR2 } from '../api/WebsiteService';
+import { createWebsite, getUploadUrls, getWebsites, getWebsiteTemplatesByType, updateWebsite, uploadFileToR2, WebsiteTemplate } from '../api/WebsiteService';
 import { getBusinessByUserId } from '../../studio-management/api/businessService';
 
 
@@ -174,6 +174,42 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
             }
         };
         reader.readAsText(file);
+    };
+
+    const handleSelectTemplate = async (template: WebsiteTemplate) => {
+        setError(null);
+        setIsInitialLoading(true);
+        try {
+            const rawUrl = template.url;
+            const templateFileUrl = rawUrl.startsWith('http://') || rawUrl.startsWith('https://')
+                ? rawUrl
+                : `${import.meta.env.VITE_R2_BASEURL}/${rawUrl}`;
+
+            const response = await fetch(templateFileUrl);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch template content (HTTP ${response.status})`);
+            }
+            const content = await response.text();
+            if (content) {
+                const match = content.match(/let\s+websiteData\s*=\s*(\{[\s\S]*?\});/);
+                if (match && match[1]) {
+                    const parsedData = new Function('return ' + match[1])();
+                    setPortfolioData(parsedData);
+                    setHtmlContent(content);
+                    setStep(2);
+                    if (!webSiteData) {
+                        await createWebsiteHandler({});
+                    }
+                } else {
+                    setError('Could not find websiteData in the selected template. Make sure it contains "let websiteData = {...};".');
+                }
+            }
+        } catch (err: any) {
+            console.error('Error loading template:', err);
+            setError(err.message || 'Failed to load selected template.');
+        } finally {
+            setIsInitialLoading(false);
+        }
     };
 
     const processFiles = async (files: File[]) => {
@@ -405,6 +441,8 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
         iframeRef,
         handleDataChange,
         handleFileUpload,
+        handleSelectTemplate,
+        templatesDataList,
         processFiles,
         handleRemoveAsset,
         handlePublish,

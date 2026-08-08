@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Apple Style Scroll Gallery</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            overflow-x: hidden;
+            background: #fafafa;
+            color: #111;
+        }
+
+        section {
+            width: 100%;
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5vw;
+            font-weight: bold;
+        }
+
+        .scroll-gallery {
+            position: relative;
+            height: 400vh;
+        }
+
+        .pin {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: hidden;
+            background: white;
+        }
+
+        .gallery {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .image {
+            position: absolute;
+            overflow: hidden;
+            border-radius: 28px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, .18);
+        }
+
+        .image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* ---------------- HERO ---------------- */
+
+        .img1 {
+            width: 100vw;
+            height: 100vh;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        /* Final size */
+
+        .img2,
+        .img3,
+        .img4,
+        .img5 {
+            width: 22vw;
+            height: 28vh;
+        }
+
+        /* Initial Offscreen */
+
+        .img2 {
+            left: -40vw;
+            top: 18%;
+        }
+
+        .img3 {
+            right: -40vw;
+            top: 18%;
+        }
+
+        .img4 {
+            left: 8%;
+            bottom: -45vh;
+        }
+
+        .img5 {
+            right: 8%;
+            top: -45vh;
+        }
+
+        .content {
+            padding: 120px 12vw;
+        }
+
+        .content h2 {
+            font-size: 64px;
+            margin-bottom: 30px;
+        }
+
+        .content p {
+            max-width: 800px;
+            line-height: 1.8;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* ---------------- MOBILE ---------------- */
+
+        @media(max-width:768px) {
+
+            .scroll-gallery {
+                height: auto;
+            }
+
+            .pin {
+                position: relative;
+                height: auto;
+                overflow: visible;
+                padding-bottom: 80px;
+            }
+
+            .gallery {
+                display: flex;
+                flex-direction: column;
+                gap: 24px;
+                align-items: center;
+                padding: 40px 20px;
+            }
+
+            .image {
+                position: relative !important;
+                left: auto !important;
+                right: auto !important;
+                top: auto !important;
+                bottom: auto !important;
+                transform: none !important;
+                width: 100% !important;
+                max-width: 420px;
+                height: 260px;
+            }
+
+            .img1 {
+                height: 70vh !important;
+            }
+
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <section class="hero">
+        Scroll Down
+    </section>
+
+    <section class="scroll-gallery">
+
+        <div class="pin">
+
+            <div class="gallery">
+
+                <div class="image img1">
+                    <img
+                        src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=80">
+                </div>
+
+                <div class="image img2">
+                    <img
+                        src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=80">
+                </div>
+
+                <div class="image img3">
+                    <img
+                        src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1200&q=80">
+                </div>
+
+                <div class="image img4">
+                    <img
+                        src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80">
+                </div>
+
+                <div class="image img5">
+                    <img
+                        src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80">
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <section class="content">
+
+        <h2>Beautiful Scroll Experience</h2>
+
+        <p>
+            This section exists to demonstrate the release of the pinned gallery.
+            Once the five-image composition is complete, the ScrollTrigger finishes
+            and normal scrolling resumes exactly like Apple's product pages.
+        </p>
+
+        <p>
+            The animation is fully scrubbed, reversible, and tied directly to the
+            scroll position.
+        </p>
+
+        <p>
+            Scroll back upward and every movement reverses smoothly.
+        </p>
+
+    </section>
+
+    <script>
+
+        gsap.registerPlugin(ScrollTrigger);
+
+        if (window.innerWidth > 768) {
+
+            const tl = gsap.timeline({
+
+                scrollTrigger: {
+                    trigger: ".scroll-gallery",
+                    start: "top top",
+                    end: "+=3000",
+                    scrub: 1,
+                    pin: ".pin",
+                    anticipatePin: 1
+                }
+
+            });
+
+            /* -----------------------------
+            PHASE 1
+            Shrink Hero
+            ------------------------------*/
+
+            tl.to(".img1", {
+
+                width: "30vw",
+                height: "42vh",
+                duration: 2,
+                ease: "none"
+
+            });
+
+            /* -----------------------------
+            PHASE 2
+            Left + Right
+            ------------------------------*/
+
+            tl.to(".img2", {
+
+                left: "8%",
+                duration: 1.6,
+                ease: "none"
+
+            }, "<0.3");
+
+            tl.to(".img3", {
+
+                right: "8%",
+                duration: 1.6,
+                ease: "none"
+
+            }, "<");
+
+            /* -----------------------------
+            PHASE 3
+            Top / Bottom
+            ------------------------------*/
+
+            tl.to(".img4", {
+
+                bottom: "12%",
+                duration: 1.4,
+                ease: "none"
+
+            }, "+=0.2");
+
+            tl.to(".img5", {
+
+                top: "12%",
+                duration: 1.4,
+                ease: "none"
+
+            }, "<");
+
+            /* -----------------------------
+            Small polish
+            ------------------------------*/
+
+            tl.to(".image", {
+
+                borderRadius: 36,
+                duration: 0.8
+
+            });
+
+        } else {
+
+            gsap.to(".img1", {
+
+                scale: .88,
+
+                scrollTrigger: {
+                    trigger: ".img1",
+                    start: "top top",
+                    end: "bottom top",
+                    scrub: true
+                }
+
+            });
+
+        }
+
+    </script>
+
+</body>
+
+</html>

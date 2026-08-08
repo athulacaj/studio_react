@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useMemo } from 'react';
-import { usePortfolioContext } from '../context/portfolioGlobalContext';
 
 function scrollToTheId(id: string) {
     // Normalize array notation (e.g. events[0]) to dot notation (events.0)

@@ -90,4 +90,33 @@ This document outlines the development plan for a modern, responsive photo proof
 3. **Refactor ManagePortfolioView:**
    - Simplify main container component from 924 lines to concise, readable orchestration of hooks and components.
 
+#### Iteration 8: Template Library Selection Dialog & Step 1 Redesign
+
+1. **Template Selection Dialog (`TemplateSelectionDialog.tsx`):**
+   - Modal interface allowing users to browse and search website templates from `templatesDataList`.
+   - Real-time search filter across template ID, type, and URLs.
+   - Glassmorphism dark aesthetic styling with desktop/mobile screenshot previews and fallback cards.
+   - Smooth selection feedback and loading indicators.
+2. **Step 1 UI Redesign (`UploadTemplateStep.tsx`):**
+   - Dual-card selection layout: Browse Template Library vs. Upload Custom HTML.
+   - Embedded dialog state management and selection callbacks.
+3. **Template Loader Handler (`useManagePortfolio.ts`):**
+   - `handleSelectTemplate`: Asynchronously fetches template HTML from R2/URL, parses embedded `websiteData`, initializes portfolio state, and transitions directly to Step 2.
+
+
+#### Iteration 9: Horizontal Step 1 Page UI & Browser Mockup Upgrade
+
+1. **Wide Horizontal Layout (`UploadTemplateStep.tsx`):**
+   - Expand page container to `maxWidth="xl"` with full horizontal side-by-side layout on large screens (`lg={6}`).
+   - Enhance grid card dimensions, balance, spacing, and glassmorphism depth.
+2. **Interactive Browser Preview Card (Browse Templates):**
+   - Embedded macOS-style browser top bar with search pill and live template thumbnails preview.
+   - Dynamic template counter chip, badge highlights, and vibrant gradient CTA.
+3. **Dropzone File Visual Card (Upload HTML):**
+   - Sleek interactive file upload dropzone UI with drag-and-drop feedback, file spec tags, and gradient outlined button.
+4. **Atmospheric Styling & Polish:**
+   - Hero header with step indicator badge, ambient background lighting, and glassmorphic navigation button.
+
+
+
 

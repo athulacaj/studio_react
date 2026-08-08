@@ -25,6 +25,7 @@ const ManageStudioPortfolioView: React.FC = () => {
         isDragging,
         handleMouseDown,
         handleFileUpload,
+        handleSelectTemplate,
         navigate } = managePortfolioController;
 
     if (!path) {
@@ -45,6 +46,7 @@ const ManageStudioPortfolioView: React.FC = () => {
                 error={error}
                 onNavigateBack={() => navigate(-1)}
                 onFileUpload={handleFileUpload}
+                onSelectTemplate={handleSelectTemplate}
             />
         );
     }
