@@ -1,19 +1,16 @@
 import React, { RefObject } from 'react';
 import { Box } from '@mui/material';
+import { useManagePortfolio } from '../hooks/useManagePortfolio';
 
-interface PortfolioPreviewProps {
-    blobUrl: string | null;
-    iframeRef: RefObject<HTMLIFrameElement | null>;
-    previewMode: 'desktop' | 'mobile';
-    isDragging: boolean;
-}
 
-export const PortfolioPreview: React.FC<PortfolioPreviewProps> = ({
-    blobUrl,
-    iframeRef,
-    previewMode,
-    isDragging,
-}) => {
+
+export const PortfolioPreview: React.FC = () => {
+    const {
+        previewMode,
+        isDragging,
+        blobUrl,
+        iframeRef } = useManagePortfolio();
+
     return (
         <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', bgcolor: '#0f172a' }}>
             <Box
@@ -43,6 +40,7 @@ export const PortfolioPreview: React.FC<PortfolioPreviewProps> = ({
                             borderRadius: previewMode === 'mobile' ? '24px' : '0',
                             overflow: 'hidden',
                             border: previewMode === 'mobile' ? '8px solid #1e293b' : 'none',
+                            margin: 'auto'
                         }}
                     >
                         <iframe

@@ -43,6 +43,8 @@ interface StudioManagementState {
     updateProjectLocalState: (projectId: string) => Promise<void>;
     fetchCurrentProject: (projectId: string) => Promise<void>;
     setBusinessData: (data: Business) => void;
+    setCurrentProject: (project: ProjectJoinDriveData | null) => void;
+    setLoading: (loading: boolean) => void;
 
 }
 
@@ -121,7 +123,7 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     },
     fetchCurrentProject: async (projectId: string) => {
         set({ loading: true });
-        const projectData = await getProject(projectId);
+        const projectData = await getProject(undefined, projectId);
         set({ loading: false });
         if (projectData.data[0]) {
             set({
@@ -272,6 +274,18 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     setBusinessData: (data: Business) => {
         set({
             businessData: data,
+        })
+    },
+
+    setCurrentProject: (project: ProjectJoinDriveData | null) => {
+        set({
+            currentProject: project,
+        })
+    },
+
+    setLoading: (loading: boolean) => {
+        set({
+            loading,
         })
     }
 }));

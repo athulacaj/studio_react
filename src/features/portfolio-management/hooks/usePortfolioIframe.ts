@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
+import { usePortfolioContext } from '../context/portfolioGlobalContext';
 
 function scrollToTheId(id: string) {
     // Normalize array notation (e.g. events[0]) to dot notation (events.0)
@@ -40,20 +41,21 @@ export const usePortfolioIframe = (
     htmlContent: string,
     setPortfolioData: (data: any) => void
 ) => {
-    const [blobUrl, setBlobUrl] = useState<string | null>(null);
-    const iframeRef = useRef<HTMLIFrameElement>(null);
+    const { iframeRef }: { iframeRef: React.RefObject<HTMLIFrameElement | null> } = usePortfolioContext()
     const iframeDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Create and cleanup object URL for HTML content preview
-    useEffect(() => {
-        if (htmlContent) {
-            const blob = new Blob([htmlContent], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            setBlobUrl(url);
-
-            return () => URL.revokeObjectURL(url);
-        }
+    const blobUrl = useMemo(() => {
+        if (!htmlContent) return null;
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        return URL.createObjectURL(blob);
     }, [htmlContent]);
+
+    useEffect(() => {
+        return () => {
+            if (blobUrl) URL.revokeObjectURL(blobUrl);
+        };
+    }, [blobUrl]);
 
     // Handle postMessage communication from iframe
     useEffect(() => {
@@ -73,7 +75,7 @@ export const usePortfolioIframe = (
     }, []);
 
     // Debounced data update to iframe
-    const handleDataChange = useCallback((newData: any) => {
+    const handleDataChange = (newData: any) => {
         setPortfolioData(newData);
         if (iframeDebounceRef.current) clearTimeout(iframeDebounceRef.current);
         iframeDebounceRef.current = setTimeout(() => {
@@ -81,11 +83,10 @@ export const usePortfolioIframe = (
                 iframeRef.current.contentWindow.postMessage({ type: 'UPDATE_DATA', data: newData }, '*');
             }
         }, 100);
-    }, [setPortfolioData]);
+    }
 
     return {
         blobUrl,
-        iframeRef,
         handleDataChange,
     };
 };

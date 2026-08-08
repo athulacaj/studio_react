@@ -6,7 +6,7 @@ import NotFound from './pages/NotFound';
 import VividView from './pages/VividView';
 import { LoginPage, SignupPage, ProtectedRoute } from './features/auth';
 import { StudioDashboard, ProjectDetailView, PublicProjectView, SuperAdminDashboard, AdminUserView, AdminProjectDetailWrapper } from './features/studio-management';
-import { ManageStudioPortfolioView } from './features/portfolio-management';
+import { ManageStudioPortfolioViewProvider } from './features/portfolio-management';
 import Footer from './core/components/Footer';
 import GlobalNavbar from './core/components/GlobalNavbar';
 import { DriveConnectPage, DriveSuccessPage } from './features/drive-integration';
@@ -32,7 +32,7 @@ const AppRouter = () => {
             <Route path="admin" element={<SuperAdminDashboard />} />
             <Route path="admin/user/:userId" element={<AdminUserView />} />
             <Route path="admin/user/:userId/studio/:projectId" element={<AdminProjectDetailWrapper />} />
-            <Route path="studio/portfolio/manage" element={<ManageStudioPortfolioView />} />
+            <Route path="studio/portfolio/manage" element={<ManageStudioPortfolioViewProvider />} />
           </Route>
 
 

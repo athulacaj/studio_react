@@ -29,11 +29,8 @@ import {
 } from '@mui/icons-material';
 import { useConfigStore } from '../../../core/store/ConifgStore';
 import { usePortfolioStore } from '../store/portfolioStore';
+import { useManagePortfolio } from '../hooks/useManagePortfolio';
 
-interface DynamicPortfolioFormProps {
-  data: any;
-  onChange: (newData: any) => void;
-}
 
 // ---------------------------------------------------------------------------
 // LeafField — isolated, memoized text field.
@@ -157,7 +154,12 @@ function getByPath(obj: any, path: string[]): any {
 // Main Form
 // ---------------------------------------------------------------------------
 
-const DynamicPortfolioForm: React.FC<DynamicPortfolioFormProps> = ({ data, onChange }) => {
+const DynamicPortfolioForm: React.FC = () => {
+  const {
+    portfolioData,
+    handleDataChange } = useManagePortfolio();
+
+
   const { setShowNavBar } = useConfigStore();
   const { uploadedImages } = usePortfolioStore();
 
@@ -166,26 +168,23 @@ const DynamicPortfolioForm: React.FC<DynamicPortfolioFormProps> = ({ data, onCha
 
   // Mutable ref holding the latest full data object.
   // Text-field commits update this WITHOUT triggering a form re-render.
-  const dataRef = useRef<any>(data);
+  const dataRef = useRef<any>(portfolioData);
 
   // Detect genuine external data replacements (version load, etc.)
-  const lastExternalRef = useRef<any>(data);
+  const lastExternalRef = useRef<any>(portfolioData);
 
-  // Bumping this key remounts LeafFields with fresh initialValues
+  const [prevData, setPrevData] = useState(portfolioData);
   const [formKey, setFormKey] = useState(0);
 
-  useEffect(() => {
-    if (data !== lastExternalRef.current) {
-      lastExternalRef.current = data;
-      dataRef.current = data;
-      setFormKey(k => k + 1);
-    }
-  }, [data]);
+  if (portfolioData !== prevData) {
+    setPrevData(portfolioData);
+    setFormKey(k => k + 1);
+  }
 
   useEffect(() => {
     setShowNavBar(false);
     return () => { setShowNavBar(true); };
-  }, []);
+  }, [setShowNavBar]);
 
   // Called by LeafField after its 300ms debounce.
   // Uses setByPath — cheap structural clone, NOT JSON.parse/stringify.
@@ -193,8 +192,8 @@ const DynamicPortfolioForm: React.FC<DynamicPortfolioFormProps> = ({ data, onCha
     const newData = setByPath(dataRef.current, path, value);
     dataRef.current = newData;
     lastExternalRef.current = newData;
-    onChange(newData);
-  }, [onChange]);
+    handleDataChange(newData);
+  }, [handleDataChange]);
 
   const handleAssetPick = useCallback((path: string[]) => {
     setActiveFieldPath(path);
@@ -207,9 +206,9 @@ const DynamicPortfolioForm: React.FC<DynamicPortfolioFormProps> = ({ data, onCha
     const newData = setByPath(dataRef.current, path, [...current, defaultItem]);
     dataRef.current = newData;
     lastExternalRef.current = newData;
-    onChange(newData);
+    handleDataChange(newData);
     setFormKey(k => k + 1);
-  }, [onChange]);
+  }, [handleDataChange]);
 
   const handleArrayRemove = useCallback((path: string[], index: number) => {
     const current = getByPath(dataRef.current, path);
@@ -218,9 +217,9 @@ const DynamicPortfolioForm: React.FC<DynamicPortfolioFormProps> = ({ data, onCha
     const newData = setByPath(dataRef.current, path, newArr);
     dataRef.current = newData;
     lastExternalRef.current = newData;
-    onChange(newData);
+    handleDataChange(newData);
     setFormKey(k => k + 1);
-  }, [onChange]);
+  }, [handleDataChange]);
 
   const renderField = (key: string, value: any, path: string[]) => {
     const fieldId = path.join('.');
@@ -324,11 +323,11 @@ const DynamicPortfolioForm: React.FC<DynamicPortfolioFormProps> = ({ data, onCha
     );
   };
 
-  if (!data) return null;
+  if (!portfolioData) return null;
 
   return (
     <Box key={formKey}>
-      {Object.entries(data).map(([key, value]) => (
+      {Object.entries(portfolioData).map(([key, value]) => (
         <Box key={key} sx={{ mb: 4, background: 'rgba(15, 26, 46, 0.4)', p: 3, borderRadius: 2 }}>
           {renderField(key, value, [key])}
         </Box>

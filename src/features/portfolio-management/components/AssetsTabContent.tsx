@@ -20,36 +20,22 @@ import {
     Delete as DeleteIcon,
 } from '@mui/icons-material';
 import UploadDialogComponent from '../../../shared/components/UploadDialogComponent';
+import { useManagePortfolio } from '../hooks/useManagePortfolio';
 
-interface AssetItem {
-    id: string;
-    url: string;
-    compressed?: boolean;
-    fileKey?: string;
-    file?: File;
-}
 
-interface AssetsTabContentProps {
-    uploadedImages: AssetItem[];
-    isUploadDialogOpen: boolean;
-    setIsUploadDialogOpen: (open: boolean) => void;
-    isProcessingFiles: boolean;
-    isUploading: boolean;
-    uploadProgress: number;
-    onUploadFiles: (files: File[]) => Promise<void>;
-    onRemoveAsset: (id: string) => Promise<void>;
-}
 
-export const AssetsTabContent: React.FC<AssetsTabContentProps> = ({
-    uploadedImages,
-    isUploadDialogOpen,
-    setIsUploadDialogOpen,
-    isProcessingFiles,
-    isUploading,
-    uploadProgress,
-    onUploadFiles,
-    onRemoveAsset,
-}) => {
+
+export const AssetsTabContent: React.FC = () => {
+
+    const {
+        isUploadDialogOpen,
+        setIsUploadDialogOpen,
+        isProcessingFiles,
+        isUploading,
+        uploadProgress,
+        uploadedImages,
+        processFiles,
+        handleRemoveAsset } = useManagePortfolio();
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -127,7 +113,7 @@ export const AssetsTabContent: React.FC<AssetsTabContentProps> = ({
                                 secondaryTypographyProps={{ color: '#94A3B8' }}
                             />
                             <ListItemSecondaryAction>
-                                <IconButton edge="end" onClick={() => onRemoveAsset(img.id)} sx={{ color: '#ef4444' }}>
+                                <IconButton edge="end" onClick={() => handleRemoveAsset(img.id)} sx={{ color: '#ef4444' }}>
                                     <DeleteIcon />
                                 </IconButton>
                             </ListItemSecondaryAction>
@@ -139,7 +125,7 @@ export const AssetsTabContent: React.FC<AssetsTabContentProps> = ({
             <UploadDialogComponent
                 open={isUploadDialogOpen}
                 onClose={() => setIsUploadDialogOpen(false)}
-                onUpload={onUploadFiles}
+                onUpload={processFiles}
                 multiple={true}
                 accept="image/*"
             />

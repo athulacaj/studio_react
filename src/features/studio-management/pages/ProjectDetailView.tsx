@@ -44,10 +44,12 @@ const ProjectDetailView: React.FC = () => {
     const navigate = useNavigate();
     const currentUser = useAuthStore((state) => state.currentUser);
     const currentProject: ProjectJoinDriveData | null = useStudioManagementStore((state) => state.currentProject);
+    const setCurrentProject: (project: ProjectJoinDriveData | null) => void = useStudioManagementStore((state) => state.setCurrentProject);
     const fetchCurrentProject: (projectId: string) => void = useStudioManagementStore((state) => state.fetchCurrentProject);
     const loading = useStudioManagementStore((state) => state.loading);
     const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
     const businessData = useStudioManagementStore((state) => state.businessData);
+    const setLoading = useStudioManagementStore((state) => state.setLoading);
 
     // When admin is viewing another user, use that user's ID for links
     const effectiveUserId = viewAsUserId || currentUser?.userId;
@@ -69,9 +71,11 @@ const ProjectDetailView: React.FC = () => {
 
     useEffect(() => {
         if (projectId) {
+            setLoading(true)
+            setCurrentProject(null)
             fetchCurrentProject(projectId)
         }
-    }, [])
+    }, [projectId])
 
     // Fetch Drive connection for google_photos projects
     useEffect(() => {

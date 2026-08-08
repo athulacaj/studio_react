@@ -16,27 +16,19 @@ import {
     CloudUpload as UploadIcon,
     InsertDriveFile as FileIcon,
 } from '@mui/icons-material';
+import { useManagePortfolio } from '../hooks/useManagePortfolio';
 
-interface PortfolioVersion {
-    path: string;
-    publishedAt: string;
-}
 
-interface SettingsTabContentProps {
-    isPublishing: boolean;
-    onPublish: () => void;
-    versions: PortfolioVersion[];
-    selectedVersionPath: string;
-    onVersionChange: (event: SelectChangeEvent<string>) => void;
-}
 
-export const SettingsTabContent: React.FC<SettingsTabContentProps> = ({
-    isPublishing,
-    onPublish,
-    versions,
-    selectedVersionPath,
-    onVersionChange,
-}) => {
+
+export const SettingsTabContent: React.FC = () => {
+
+    const {
+        isPublishing,
+        versions,
+        selectedVersionPath,
+        handlePublish,
+        handleVersionChange } = useManagePortfolio();
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {/* Publish Card */}
@@ -76,7 +68,7 @@ export const SettingsTabContent: React.FC<SettingsTabContentProps> = ({
 
                 <Button
                     variant="contained"
-                    onClick={onPublish}
+                    onClick={handlePublish}
                     disabled={isPublishing}
                     startIcon={isPublishing ? <CircularProgress size={20} color="inherit" /> : <UploadIcon />}
                     sx={{
@@ -140,7 +132,7 @@ export const SettingsTabContent: React.FC<SettingsTabContentProps> = ({
                         <Select
                             labelId="version-select-label"
                             value={selectedVersionPath}
-                            onChange={onVersionChange}
+                            onChange={handleVersionChange}
                             label="Load Version"
                             MenuProps={{
                                 PaperProps: {

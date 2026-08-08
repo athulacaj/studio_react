@@ -1,26 +1,26 @@
 import React from 'react';
 import { Box, Typography, Button, IconButton } from '@mui/material';
 import { ArrowBack as ArrowBackIcon, DesktopMac as DesktopIcon, Smartphone as MobileIcon } from '@mui/icons-material';
+import { useManagePortfolio } from '../hooks/useManagePortfolio';
 
 interface ManagePortfolioHeaderProps {
     title?: string;
-    onBack: () => void;
-    previewMode: 'desktop' | 'mobile';
-    onTogglePreviewMode: (mode: 'desktop' | 'mobile') => void;
+
 }
 
 export const ManagePortfolioHeader: React.FC<ManagePortfolioHeaderProps> = ({
-    title = 'Manage Portfolio 1',
-    onBack,
-    previewMode,
-    onTogglePreviewMode,
+    title = 'Manage Portfolio 1'
 }) => {
+    const {
+        previewMode,
+        setPreviewMode,
+        handleBack } = useManagePortfolio();
     return (
         <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Button
                     startIcon={<ArrowBackIcon />}
-                    onClick={onBack}
+                    onClick={handleBack}
                     sx={{ color: '#94A3B8', mr: 2 }}
                 >
                     Back
@@ -31,7 +31,7 @@ export const ManagePortfolioHeader: React.FC<ManagePortfolioHeaderProps> = ({
             </Box>
             <Box sx={{ display: 'flex', gap: 1 }}>
                 <IconButton
-                    onClick={() => onTogglePreviewMode('desktop')}
+                    onClick={() => setPreviewMode('desktop')}
                     sx={{
                         color: previewMode === 'desktop' ? '#C084FC' : '#64748B',
                         bgcolor: previewMode === 'desktop' ? 'rgba(192, 132, 252, 0.1)' : 'transparent',
@@ -41,7 +41,7 @@ export const ManagePortfolioHeader: React.FC<ManagePortfolioHeaderProps> = ({
                     <DesktopIcon />
                 </IconButton>
                 <IconButton
-                    onClick={() => onTogglePreviewMode('mobile')}
+                    onClick={() => setPreviewMode('mobile')}
                     sx={{
                         color: previewMode === 'mobile' ? '#C084FC' : '#64748B',
                         bgcolor: previewMode === 'mobile' ? 'rgba(192, 132, 252, 0.1)' : 'transparent',
