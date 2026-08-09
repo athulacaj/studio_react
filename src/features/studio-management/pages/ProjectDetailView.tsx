@@ -14,6 +14,8 @@ import {
     Divider,
     Skeleton,
     alpha,
+    Menu,
+    MenuItem,
 } from '@mui/material';
 import {
     ArrowBack as ArrowBackIcon,
@@ -60,6 +62,18 @@ const ProjectDetailView: React.FC = () => {
     const [driveConnectLinkCopied, setDriveConnectLinkCopied] = useState(false);
     const showToast = useToastStore((state) => state.showToast);
 
+    // Manage Invitation Menu state
+    const [manageInvitationAnchorEl, setManageInvitationAnchorEl] = useState<null | HTMLElement>(null);
+    const openManageInvitationMenu = Boolean(manageInvitationAnchorEl);
+    const handleManageInvitationClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setManageInvitationAnchorEl(event.currentTarget);
+    };
+    const handleManageInvitationClose = () => {
+        setManageInvitationAnchorEl(null);
+    };
+
+
+
     // Drive connection state
     const activeConnection = useDriveIntegrationStore((state) => state.activeConnection);
     const driveLoading = useDriveIntegrationStore((state) => state.loading);
@@ -91,7 +105,8 @@ const ProjectDetailView: React.FC = () => {
             link = `${businessData.slug}/view/${project.id}`;
         }
         else {
-            link = `${window.location.origin}/view/${effectiveUserId}/${project.id}`;
+            showToast('No business domain found for this account', 'error');
+            return;
         }
         navigator.clipboard.writeText(link);
         showToast('Project link copied to clipboard!', 'success');
@@ -519,8 +534,7 @@ const ProjectDetailView: React.FC = () => {
                         <Button
                             variant="outlined"
                             startIcon={<ArticleIcon />}
-                            // onClick={() => navigate(`/private/portfolio/builder/${projectId}`)}
-                            onClick={() => navigate(`/private/studio/portfolio/manage?path=${encodeURIComponent(projectData.project.name)}&type=${WebsiteTemplateType.weddingInvitation}&name=${project.name}&projectId=${encodeURIComponent(projectData.project.id)}`)}
+                            onClick={handleManageInvitationClick}
                             sx={{
                                 flex: { xs: 1, sm: 'initial' },
                                 borderRadius: 2,
@@ -535,6 +549,42 @@ const ProjectDetailView: React.FC = () => {
                         >
                             Manage Invitation
                         </Button>
+                        <Menu
+                            anchorEl={manageInvitationAnchorEl}
+                            open={openManageInvitationMenu}
+                            onClose={handleManageInvitationClose}
+                            MenuListProps={{
+                                'aria-labelledby': 'manage-invitation-button',
+                            }}
+                            sx={{
+                                '& .MuiPaper-root': {
+                                    borderRadius: 2,
+                                    mt: 1,
+                                    minWidth: 180,
+                                    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+                                }
+                            }}
+                        >
+                            <MenuItem onClick={() => {
+                                handleManageInvitationClose();
+                                if (projectData && project) {
+                                    navigate(`/private/studio/portfolio/manage?path=${encodeURIComponent(projectData.project.name)}&type=${WebsiteTemplateType.weddingInvitation}&name=${project.name}&projectId=${encodeURIComponent(projectData.project.id)}`);
+                                }
+                            }}>
+                                <EditIcon fontSize="small" sx={{ mr: 1.5, color: 'text.secondary' }} />
+                                Edit Page
+                            </MenuItem>
+                            <MenuItem onClick={() => {
+                                handleManageInvitationClose();
+                                if (project) {
+                                    navigator.clipboard.writeText(`https://test.mizhiv.com/view/${project.name}`);
+                                    showToast('Invitation link copied to clipboard!', 'success');
+                                }
+                            }}>
+                                <LinkIcon fontSize="small" sx={{ mr: 1.5, color: 'text.secondary' }} />
+                                Copy Link
+                            </MenuItem>
+                        </Menu>
                     </Box>
                 </Paper>
 
