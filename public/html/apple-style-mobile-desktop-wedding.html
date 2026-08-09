@@ -1,71 +1,885 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Responsive Apple Style Wedding Invite</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Inter,sans-serif;background:#faf7f3;overflow-x:hidden}
-.hero{height:100vh;display:grid;place-items:center;background:linear-gradient(135deg,#f8ece2,#fff)}
-.hero h1{font:700 clamp(2.8rem,8vw,5rem) "Cormorant Garamond",serif;text-align:center}
-.wrap{height:400vh;position:relative}
-.pin{position:sticky;top:0;height:100vh;background:#fff;overflow:hidden}
-.stage{position:relative;width:100%;height:100%}
-.card{position:absolute;border-radius:24px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.18)}
-.card img{width:100%;height:100%;object-fit:cover}
-.c1{left:50%;top:50%;transform:translate(-50%,-50%);width:100vw;height:100vh;z-index:5}
-.c2,.c3,.c4,.c5{width:22vw;height:28vh}
-.c2{left:-35vw;top:10%}
-.c3{right:-35vw;top:10%}
-.c4{left:8%;bottom:-40vh}
-.c5{right:8%;bottom:-40vh}
-@media(max-width:768px){
-.wrap{height:420vh}
-.c2,.c3,.c4,.c5{width:28vw;height:32vh}
-.c2{left:-40vw;top:4%}
-.c3{right:-40vw;top:20%}
-.c4{left:-40vw;bottom:20%}
-.c5{right:-40vw;bottom:4%}
-}
-.content{padding:100px 10vw;line-height:1.8}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Responsive Apple Style Wedding Invite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: Inter, sans-serif;
+            background: #faf7f3;
+            overflow-x: hidden
+        }
+
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #faf7f3;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-top-color: #333;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hero-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+            transform: translateY(-100%);
+            opacity: 0;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .hero-section.header-visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .hero-section>div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero-section h1 {
+            font: 700 clamp(1.5rem, 4vw, 2rem) "Cormorant Garamond", serif;
+            color: #333;
+            margin: 0;
+        }
+
+        .hero-section p {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #555;
+            margin: 0;
+        }
+
+        @media(max-width:768px) {
+            .hero-section {
+                padding: 15px 20px;
+            }
+
+            .hero-section h1 {
+                font-size: 1.3rem;
+            }
+
+            .hero-section p {
+                font-size: 0.85rem;
+            }
+        }
+
+        .wrap {
+            height: 400vh;
+            position: relative
+        }
+
+        .pin {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            background: #fff;
+            overflow: hidden
+        }
+
+        .stage {
+            position: relative;
+            width: 100%;
+            height: 100%
+        }
+
+        .card {
+            position: absolute;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .18)
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .c1 {
+            left: 50%;
+            top: 56%;
+            transform: translate(-50%, -56%);
+            width: 100vw;
+            height: 100vh;
+            z-index: 5
+        }
+
+        .c2,
+        .c3,
+        .c4,
+        .c5 {
+            width: 22vw;
+            height: 28vh
+        }
+
+        .c2 {
+            left: -35vw;
+            top: 20%
+        }
+
+        .c3 {
+            right: -35vw;
+            top: 18%
+        }
+
+        .c4 {
+            left: 8%;
+            bottom: -40vh
+        }
+
+        .c5 {
+            right: 8%;
+            bottom: -40vh
+        }
+
+        @media(max-width:768px) {
+            .wrap {
+                height: 420vh
+            }
+
+            .c2,
+            .c3,
+            .c4,
+            .c5 {
+                width: 28vw;
+                height: 32vh
+            }
+
+            .c2 {
+                left: -40vw;
+                top: 10%
+            }
+
+            .c3 {
+                right: -40vw;
+                top: 18%
+            }
+
+            .c4 {
+                left: -40vw;
+                bottom: 24%
+            }
+
+            .c5 {
+                right: -40vw;
+                bottom: 16%
+            }
+        }
+
+        .content-section {
+            padding: 100px 10vw;
+            line-height: 1.8
+        }
+
+        .events-section {
+            padding: 80px 10vw;
+            background: #fff;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .events-section h2 {
+            font: 700 3rem "Cormorant Garamond", serif;
+            margin-bottom: 40px;
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .event-card {
+            background: #faf7f3;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .event-card h3 {
+            font: 600 1.8rem "Cormorant Garamond", serif;
+            margin-bottom: 10px;
+        }
+
+        .event-time,
+        .event-date {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .countdown-section {
+            padding: 100px 10vw;
+            background: linear-gradient(135deg, #f8ece2, #fff);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .countdown-section h2 {
+            font: 700 3rem "Cormorant Garamond", serif;
+            margin-bottom: 40px;
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .countdown-item {
+            background: #fff;
+            padding: 20px;
+            border-radius: 16px;
+            min-width: 100px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .countdown-value {
+            font: 700 2.5rem "Cormorant Garamond", serif;
+            color: #333;
+        }
+
+        .countdown-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .location-section {
+            padding: 100px 10vw;
+            background: #faf7f3;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .location-section h2 {
+            font: 700 3rem "Cormorant Garamond", serif;
+            margin-bottom: 20px;
+        }
+
+        .location-section p {
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 1.1rem;
+        }
+
+        .maps-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 40px;
+            background: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .maps-button:hover {
+            background: #000;
+        }
+
+        @media (max-width: 768px) {
+            .countdown-timer {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .countdown-item {
+                min-width: 80px;
+                padding: 15px;
+            }
+
+            .countdown-value {
+                font-size: 2rem;
+            }
+        }
+
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .music-control:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .music-control svg {
+            width: 20px;
+            height: 20px;
+            fill: #333;
+        }
+
+        .music-control.playing .play-icon { display: none; }
+        .music-control.playing .pause-icon { display: block; }
+        .music-control:not(.playing) .play-icon { display: block; }
+        .music-control:not(.playing) .pause-icon { display: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
 </head>
+
 <body>
-<section class="hero"><div><h1>Arjun ♥ Meera</h1><p style="text-align:center">12 December 2027</p></div></section>
-<section class="wrap"><div class="pin"><div class="stage">
-<div class="card c1"><img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1800&q=80"></div>
-<div class="card c2"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80"></div>
-<div class="card c3"><img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=80"></div>
-<div class="card c4"><img src="https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1200&q=80"></div>
-<div class="card c5"><img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=80"></div>
-</div></div></section>
-<div class="content"><h2>You're Invited</h2><p>The mobile version uses the same animation timeline as desktop with responsive image sizing and positioning rather than a different stacked layout.</p></div>
-<script>
-gsap.registerPlugin(ScrollTrigger);
-const mobile=matchMedia("(max-width:768px)").matches;
-const tl=gsap.timeline({
-scrollTrigger:{trigger:".wrap",start:"top top",end:"+=3000",scrub:1,pin:".pin"}
-});
-if(mobile){
-tl.to(".c1",{width:"36vw",height:"72vh",duration:2,ease:"none"})
-.to(".c2",{left:"2%",duration:1.3,ease:"none"},"<0.3")
-.to(".c3",{right:"2%",duration:1.3,ease:"none"},"<")
-.to(".c4",{left:"2%",duration:1.3,ease:"none"},"+=0.2")
-.to(".c5",{right:"2%",duration:1.3,ease:"none"},"<");
-}else{
-tl.to(".c1",{width:"30vw",height:"42vh",duration:2,ease:"none"})
-.to(".c2",{left:"8%",duration:1.3,ease:"none"},"<0.3")
-.to(".c3",{right:"8%",duration:1.3,ease:"none"},"<")
-.to(".c4",{bottom:"12%",duration:1.3,ease:"none"},"+=0.2")
-.to(".c5",{bottom:"12%",duration:1.3,ease:"none"},"<");
-}
-</script>
+
+    <!-- Loader -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Hero Section -->
+
+    <!-- Gallery / Apple-Style Scroll Animation -->
+    <section class="wrap">
+        <div class="pin">
+            <div class="stage" id="gallery" data-json-path="gallery"></div>
+        </div>
+    </section>
+    <section id="hero" class="hero-section" data-json-path="hero"></section>
+
+    <!-- Events Section -->
+    <section id="events" class="events-section" data-json-path="events"></section>
+
+    <!-- Countdown Section -->
+    <section id="countdown" class="countdown-section" data-json-path="countdown"></section>
+
+    <!-- Location Section -->
+    <section id="location" class="location-section" data-json-path="location"></section>
+
+    <!-- Background Music -->
+    <audio id="bg-music" loop></audio>
+    <div id="music-btn" class="music-control">
+        <svg class="play-icon" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+        </svg>
+        <svg class="pause-icon" viewBox="0 0 24 24">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </svg>
+    </div>
+
+    <script>
+        /* ───────────────────────────────────────────────
+           1. SINGLE SOURCE OF TRUTH
+           ─────────────────────────────────────────────── */
+        let websiteData = {
+
+            music: {
+                url: "https://cdn.mizhiv.com/assets/audio/Ordinary.mp3"
+            },
+
+            brand: {
+                name: "Arjun & Meera Wedding",
+                theme: {
+                    primary: "#f8ece2",
+                    secondary: "#fff",
+                    background: "#faf7f3",
+                    font: "Cormorant Garamond",
+                    bodyFont: "Inter"
+                }
+            },
+
+            hero: {
+                title: "Arjun ♥ Meera",
+                date: "12 December 2027"
+            },
+
+            gallery: [
+                {
+                    image: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1800&q=80",
+                    alt: "Wedding ceremony hero shot",
+                    cardClass: "c1"
+                },
+                {
+                    image: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80",
+                    alt: "Wedding bouquet",
+                    cardClass: "c2"
+                },
+                {
+                    image: "https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=80",
+                    alt: "Couple holding hands",
+                    cardClass: "c3"
+                },
+                {
+                    image: "https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1200&q=80",
+                    alt: "Floral arrangement",
+                    cardClass: "c4"
+                },
+                {
+                    image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=80",
+                    alt: "Wedding table setting",
+                    cardClass: "c5"
+                }
+            ],
+
+            content: {
+                title: "You're Invited",
+                description: "The mobile version uses the same animation timeline as desktop with responsive image sizing and positioning rather than a different stacked layout."
+            },
+
+            events: {
+                title: "Wedding Events",
+                list: [
+                    {
+                        title: "Haldi Ceremony",
+                        date: "11 December 2027",
+                        time: "10:00 AM",
+                        description: "Join us for a vibrant morning filled with colors and joy."
+                    },
+                    {
+                        title: "Wedding Ceremony",
+                        date: "12 December 2027",
+                        time: "09:00 AM",
+                        description: "The auspicious muhurtham where we tie the knot."
+                    },
+                    {
+                        title: "Grand Reception",
+                        date: "12 December 2027",
+                        time: "07:00 PM",
+                        description: "An evening of celebration, dinner, and dancing."
+                    }
+                ]
+            },
+
+            countdown: {
+                title: "The Countdown Begins",
+                targetDate: "2027-12-12T09:00:00",
+                labels: { days: "Days", hours: "Hours", minutes: "Mins", seconds: "Secs" }
+            },
+
+            location: {
+                title: "Venue & Location",
+                venueName: "The Grand Palace Resort",
+                address: "123 Royal Avenue, Udaipur, Rajasthan",
+                googleMapsLink: "https://maps.google.com/?q=Udaipur,Rajasthan",
+                googleMapsText: "Open in Google Maps"
+            }
+
+        };
+
+
+        /* ───────────────────────────────────────────────
+           2. PERFORMANCE — Hero Image Preload
+           ─────────────────────────────────────────────── */
+        function preloadHeroImage() {
+            if (!websiteData.gallery || !websiteData.gallery[0]) return;
+            const existing = document.querySelector('link[rel="preload"][as="image"]');
+            if (existing) existing.remove();
+            const link = document.createElement("link");
+            link.rel = "preload";
+            link.as = "image";
+            link.href = websiteData.gallery[0].image;
+            document.head.appendChild(link);
+        }
+
+
+        /* ───────────────────────────────────────────────
+           3. RENDER FUNCTIONS
+           ─────────────────────────────────────────────── */
+
+        function renderHero() {
+            const hero = websiteData.hero;
+            document.getElementById("hero").innerHTML = `
+        <div>
+            <h1 class="hero-title"
+                data-json-path="hero.title">${hero.title}</h1>
+            <p  class="hero-date"
+                data-json-path="hero.date">${hero.date}</p>
+        </div>
+    `;
+        }
+
+
+        function renderGallery() {
+            const gallery = websiteData.gallery;
+            document.getElementById("gallery").innerHTML = gallery.map((item, i) => `
+        <div class="card ${item.cardClass} gallery-item gallery-item-${i}"
+             data-json-path="gallery[${i}]">
+            <img class="gallery-image gallery-item-${i}-image"
+                 data-json-path="gallery[${i}].image"
+                 src="${item.image}"
+                 alt="${item.alt || ''}"
+                 ${i > 0 ? 'loading="lazy"' : ''} />
+        </div>
+    `).join("");
+        }
+
+
+
+        function renderEvents() {
+            const events = websiteData.events;
+            document.getElementById("events").innerHTML = `
+                <h2 class="events-title" data-json-path="events.title">${events.title}</h2>
+                <div class="events-grid">
+                    ${events.list.map((event, i) => `
+                        <div class="event-card events-list events-list-${i}" data-json-path="events.list[${i}]">
+                            <h3 class="events-list-${i}-title" data-json-path="events.list[${i}].title">${event.title}</h3>
+                            <p class="event-date events-list-${i}-date" data-json-path="events.list[${i}].date">${event.date}</p>
+                            <p class="event-time events-list-${i}-time" data-json-path="events.list[${i}].time">${event.time}</p>
+                            <p class="event-description events-list-${i}-description" data-json-path="events.list[${i}].description">${event.description}</p>
+                        </div>
+                    `).join("")}
+                </div>
+            `;
+        }
+
+        function renderCountdown() {
+            const countdown = websiteData.countdown;
+            document.getElementById("countdown").innerHTML = `
+                <h2 class="countdown-title" data-json-path="countdown.title">${countdown.title}</h2>
+                <div class="countdown-timer">
+                    <div class="countdown-item">
+                        <div class="countdown-value" id="cd-days">00</div>
+                        <div class="countdown-label countdown-labels-days" data-json-path="countdown.labels.days">${countdown.labels.days}</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-value" id="cd-hours">00</div>
+                        <div class="countdown-label countdown-labels-hours" data-json-path="countdown.labels.hours">${countdown.labels.hours}</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-value" id="cd-minutes">00</div>
+                        <div class="countdown-label countdown-labels-minutes" data-json-path="countdown.labels.minutes">${countdown.labels.minutes}</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-value" id="cd-seconds">00</div>
+                        <div class="countdown-label countdown-labels-seconds" data-json-path="countdown.labels.seconds">${countdown.labels.seconds}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderLocation() {
+            const location = websiteData.location;
+            document.getElementById("location").innerHTML = `
+                <h2 class="location-title" data-json-path="location.title">${location.title}</h2>
+                <p class="location-venueName" data-json-path="location.venueName"><strong>${location.venueName}</strong></p>
+                <p class="location-address" data-json-path="location.address">${location.address}</p>
+                <a href="${location.googleMapsLink}" target="_blank" class="maps-button location-googleMapsText" data-json-path="location.googleMapsText">${location.googleMapsText}</a>
+            `;
+        }
+
+        /* ───────────────────────────────────────────────
+           4. COMPONENT INITIALIZATION (GSAP & Countdown)
+           ─────────────────────────────────────────────── */
+
+        let countdownInterval;
+
+        function initCounters() {
+            if (countdownInterval) clearInterval(countdownInterval);
+            const targetDate = new Date(websiteData.countdown.targetDate).getTime();
+
+            function updateCounter() {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+
+                if (distance < 0) {
+                    clearInterval(countdownInterval);
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                const elDays = document.getElementById("cd-days");
+                const elHours = document.getElementById("cd-hours");
+                const elMinutes = document.getElementById("cd-minutes");
+                const elSeconds = document.getElementById("cd-seconds");
+
+                if (elDays) elDays.innerText = String(days).padStart(2, '0');
+                if (elHours) elHours.innerText = String(hours).padStart(2, '0');
+                if (elMinutes) elMinutes.innerText = String(minutes).padStart(2, '0');
+                if (elSeconds) elSeconds.innerText = String(seconds).padStart(2, '0');
+            }
+
+            updateCounter();
+            countdownInterval = setInterval(updateCounter, 1000);
+        }
+
+        function initializeComponents() {
+
+            /* Kill any previous ScrollTrigger instances so re-renders don't stack */
+            ScrollTrigger.getAll().forEach(st => st.kill());
+
+            gsap.registerPlugin(ScrollTrigger);
+
+            const mobile = matchMedia("(max-width:768px)").matches;
+
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: ".wrap",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 1
+                }
+            });
+
+            if (mobile) {
+                tl.to(".c1", { width: "36vw", height: "65vh", top: "55%", duration: 2, ease: "none" })
+                    .to(".c2", { left: "2%", duration: 1.3, ease: "none" }, "<0.3")
+                    .to(".c3", { right: "2%", duration: 1.3, ease: "none" }, "<")
+                    .to(".c4", { left: "2%", duration: 1.3, ease: "none" }, "+=0.2")
+                    .to(".c5", { right: "2%", duration: 1.3, ease: "none" }, "<");
+            } else {
+                tl.to(".c1", { width: "30vw", height: "42vh", top: "55%", duration: 2, ease: "none" })
+                    .to(".c2", { left: "8%", duration: 1.3, ease: "none" }, "<0.3")
+                    .to(".c3", { right: "8%", duration: 1.3, ease: "none" }, "<")
+                    .to(".c4", { bottom: "8%", duration: 1.3, ease: "none" }, "+=0.2")
+                    .to(".c5", { bottom: "8%", duration: 1.3, ease: "none" }, "<");
+            }
+
+            initCounters();
+        }
+
+
+        /* ───────────────────────────────────────────────
+           5. MASTER RENDERER
+           ─────────────────────────────────────────────── */
+
+        let userInteractedWithMusic = false;
+
+        function initMusic() {
+            const audio = document.getElementById("bg-music");
+            const btn = document.getElementById("music-btn");
+            if (websiteData.music && websiteData.music.url) {
+                if (audio.src !== websiteData.music.url) {
+                    audio.src = websiteData.music.url;
+                    
+                    const tryPlay = () => {
+                        if (userInteractedWithMusic) {
+                            document.removeEventListener("click", tryPlay);
+                            document.removeEventListener("touchstart", tryPlay);
+                            document.removeEventListener("scroll", tryPlay);
+                            return;
+                        }
+                        const playPromise = audio.play();
+                        if (playPromise !== undefined) {
+                            playPromise.then(() => {
+                                btn.classList.add("playing");
+                                document.removeEventListener("click", tryPlay);
+                                document.removeEventListener("touchstart", tryPlay);
+                                document.removeEventListener("scroll", tryPlay);
+                            }).catch(() => {
+                                btn.classList.remove("playing");
+                            });
+                        }
+                    };
+
+                    tryPlay();
+                    
+                    document.addEventListener("click", tryPlay);
+                    document.addEventListener("touchstart", tryPlay);
+                    document.addEventListener("scroll", tryPlay);
+                }
+            }
+        }
+
+        function renderDataAll(data) {
+
+            if (data) {
+                websiteData = data;
+            }
+
+            preloadHeroImage();
+            renderHero();
+            renderGallery();
+            renderEvents();
+            renderCountdown();
+            renderLocation();
+            initializeComponents();
+            initMusic();
+
+        }
+
+
+        /* ───────────────────────────────────────────────
+           6. LIVE UPDATES — postMessage Listener
+           ─────────────────────────────────────────────── */
+
+        window.addEventListener("message", function (event) {
+
+            if (event.data && event.data.type === "UPDATE_DATA") {
+                renderDataAll(event.data.data);
+            }
+
+        });
+
+
+        /* ───────────────────────────────────────────────
+           7. ELEMENT CLICK → PARENT COMMUNICATION
+           ─────────────────────────────────────────────── */
+
+        document.addEventListener("click", function (event) {
+
+            const jsonPath = event.target.dataset.jsonPath;
+            if (!jsonPath) return;
+
+            window.parent.postMessage({
+                type: "ELEMENT_CLICKED",
+                jsonPath
+            }, "*");
+
+        });
+
+
+        /* ───────────────────────────────────────────────
+           8. INITIAL RENDER & SCROLL HEADER
+           ─────────────────────────────────────────────── */
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'manual';
+            }
+
+            const audio = document.getElementById("bg-music");
+            const musicBtn = document.getElementById("music-btn");
+            
+            musicBtn.addEventListener("click", () => {
+                userInteractedWithMusic = true;
+                if (audio.paused) {
+                    audio.play();
+                    musicBtn.classList.add("playing");
+                } else {
+                    audio.pause();
+                    musicBtn.classList.remove("playing");
+                }
+            });
+
+            renderDataAll();
+
+            const images = document.querySelectorAll('img');
+            const imagePromises = Array.from(images).map(img => {
+                if (img.complete) return Promise.resolve();
+                return new Promise(resolve => {
+                    img.addEventListener('load', resolve);
+                    img.addEventListener('error', resolve);
+                });
+            });
+
+            Promise.all(imagePromises).then(() => {
+                const loader = document.getElementById('loader');
+                if (loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        setTimeout(() => {
+                            if (window.scrollY > 0) {
+                                window.scrollTo({
+                                    top: 0,
+                                    behavior: 'smooth',
+                                    duration: 100
+                                });
+                            } else {
+                                document.querySelector("body > section.wrap").scrollIntoView({
+                                    behavior: "smooth",
+                                    block: "end"
+                                });
+                            }
+                        }, 100);
+                    }, 500);
+                }
+            });
+
+        });
+
+        window.addEventListener("scroll", function () {
+            const header = document.getElementById("hero");
+            if (!header) return;
+            if (window.scrollY > (window.innerHeight * 2)) {
+                header.classList.add("header-visible");
+            } else {
+                header.classList.remove("header-visible");
+            }
+        });
+
+
+    </script>
 </body>
+
 </html>
