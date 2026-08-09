@@ -386,10 +386,198 @@
             fill: #333;
         }
 
-        .music-control.playing .play-icon { display: none; }
-        .music-control.playing .pause-icon { display: block; }
-        .music-control:not(.playing) .play-icon { display: block; }
-        .music-control:not(.playing) .pause-icon { display: none; }
+        .music-control.playing .play-icon {
+            display: none;
+        }
+
+        .music-control.playing .pause-icon {
+            display: block;
+        }
+
+        .music-control:not(.playing) .play-icon {
+            display: block;
+        }
+
+        .music-control:not(.playing) .pause-icon {
+            display: none;
+        }
+
+        /* Envelope Styles */
+        #envelope-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #faf7f3;
+            z-index: 9998;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+
+        .envelope-container {
+            position: relative;
+            width: 320px;
+            height: 200px;
+            cursor: pointer;
+            perspective: 1000px;
+            transform: scale(1);
+            transition: transform 0.3s ease;
+        }
+
+        .envelope-container:hover {
+            transform: scale(1.02);
+        }
+
+        .envelope-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #e8dbcf;
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .envelope-letter {
+            position: absolute;
+            top: 5%;
+            left: 5%;
+            width: 90%;
+            height: 90%;
+            background: #fff;
+            border-radius: 4px;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.8s ease 0.4s, z-index 0s linear 0.4s;
+        }
+
+        .envelope-letter h2 {
+            font: 700 1.6rem "Cormorant Garamond", serif;
+            color: #333;
+            margin-bottom: 5px;
+            padding: 0 10px;
+        }
+
+        .envelope-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .envelope-hint {
+            margin-top: 40px;
+            font-size: 0.85rem;
+            color: #888;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            animation: pulse 2s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.4;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.4;
+            }
+        }
+
+        .envelope-front-left {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            background: #f4eae1;
+            border-radius: 4px;
+            z-index: 3;
+            clip-path: polygon(0 0, 50% 50%, 0 100%);
+        }
+
+        .envelope-front-right {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            background: #efe4da;
+            border-radius: 4px;
+            z-index: 3;
+            clip-path: polygon(100% 0, 50% 50%, 100% 100%);
+        }
+
+        .envelope-front {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            background: #faf2ea;
+            border-radius: 4px;
+            z-index: 3;
+            clip-path: polygon(0 100%, 50% 50%, 100% 100%);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: #e4d5c7;
+            border-radius: 4px;
+            z-index: 4;
+            clip-path: polygon(0 0, 100% 0, 50% 50%);
+            transform-origin: top;
+            transition: transform 0.6s ease;
+            backface-visibility: hidden;
+        }
+
+        .envelope-seal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 44px;
+            height: 44px;
+            background: #d8bfa7;
+            border-radius: 50%;
+            z-index: 5;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-size: 1.2rem;
+            transition: opacity 0.3s ease;
+        }
+
+        .envelope-container.open .envelope-flap {
+            transform: rotateX(180deg);
+        }
+
+        .envelope-container.open .envelope-seal {
+            opacity: 0;
+        }
+
+        .envelope-container.open .envelope-letter {
+            transform: translateY(-80px) scale(1.1);
+            z-index: 5;
+        }
+
+        body.locked {
+            overflow: hidden !important;
+        }
 
         @media (prefers-reduced-motion: reduce) {
 
@@ -405,11 +593,29 @@
     </style>
 </head>
 
-<body>
+<body class="locked">
 
     <!-- Loader -->
     <div id="loader">
         <div class="spinner"></div>
+    </div>
+
+    <!-- Envelope Intro -->
+    <div id="envelope-wrapper">
+        <div class="envelope-group">
+            <div class="envelope-container" id="envelope-btn">
+                <div class="envelope-back"></div>
+                <div class="envelope-letter">
+                    <h2 id="env-title">You're Invited</h2>
+                </div>
+                <div class="envelope-front-left"></div>
+                <div class="envelope-front-right"></div>
+                <div class="envelope-front"></div>
+                <div class="envelope-flap"></div>
+                <div class="envelope-seal">♥</div>
+            </div>
+            <p class="envelope-hint">Click to open</p>
+        </div>
     </div>
 
     <!-- Hero Section -->
@@ -435,10 +641,10 @@
     <audio id="bg-music" loop></audio>
     <div id="music-btn" class="music-control">
         <svg class="play-icon" viewBox="0 0 24 24">
-            <path d="M8 5v14l11-7z"/>
+            <path d="M8 5v14l11-7z" />
         </svg>
         <svg class="pause-icon" viewBox="0 0 24 24">
-            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
         </svg>
     </div>
 
@@ -571,6 +777,10 @@
                 data-json-path="hero.date">${hero.date}</p>
         </div>
     `;
+            const envTitle = document.getElementById("env-title");
+            if (envTitle) {
+                envTitle.innerText = hero.title;
+            }
         }
 
 
@@ -729,7 +939,7 @@
             if (websiteData.music && websiteData.music.url) {
                 if (audio.src !== websiteData.music.url) {
                     audio.src = websiteData.music.url;
-                    
+
                     const tryPlay = () => {
                         if (userInteractedWithMusic) {
                             document.removeEventListener("click", tryPlay);
@@ -751,7 +961,7 @@
                     };
 
                     tryPlay();
-                    
+
                     document.addEventListener("click", tryPlay);
                     document.addEventListener("touchstart", tryPlay);
                     document.addEventListener("scroll", tryPlay);
@@ -819,7 +1029,7 @@
 
             const audio = document.getElementById("bg-music");
             const musicBtn = document.getElementById("music-btn");
-            
+
             musicBtn.addEventListener("click", () => {
                 userInteractedWithMusic = true;
                 if (audio.paused) {
@@ -848,7 +1058,33 @@
                     loader.style.opacity = '0';
                     setTimeout(() => {
                         loader.style.display = 'none';
+                    }, 500);
+                }
+            });
+
+            const envelopeBtn = document.getElementById('envelope-btn');
+            const envelopeWrapper = document.getElementById('envelope-wrapper');
+
+            if (envelopeBtn) {
+                envelopeBtn.addEventListener('click', () => {
+                    envelopeBtn.classList.add('open');
+
+                    if (audio && audio.paused && !userInteractedWithMusic) {
+                        userInteractedWithMusic = true;
+                        const playPromise = audio.play();
+                        if (playPromise !== undefined) {
+                            playPromise.then(() => {
+                                musicBtn.classList.add("playing");
+                            }).catch(e => console.log(e));
+                        }
+                    }
+
+                    setTimeout(() => {
+                        envelopeWrapper.style.opacity = '0';
                         setTimeout(() => {
+                            envelopeWrapper.style.display = 'none';
+                            document.body.classList.remove('locked');
+
                             if (window.scrollY > 0) {
                                 window.scrollTo({
                                     top: 0,
@@ -861,17 +1097,17 @@
                                     block: "end"
                                 });
                             }
-                        }, 100);
-                    }, 500);
-                }
-            });
+                        }, 1000);
+                    }, 1500);
+                });
+            }
 
         });
 
         window.addEventListener("scroll", function () {
             const header = document.getElementById("hero");
             if (!header) return;
-            if (window.scrollY > (window.innerHeight * 2)) {
+            if (window.scrollY > (window.innerHeight * 4)) {
                 header.classList.add("header-visible");
             } else {
                 header.classList.remove("header-visible");

@@ -17,6 +17,7 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const path = searchParams.get('path');
+    const projectId = searchParams.get('projectId');
     const type = searchParams.get('type')
     const title = searchParams.get("title") ?? ''
 
@@ -360,12 +361,13 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
                         businessId,
                         path,
                         currentPath: urlInfo.key,
+                        projectId: projectId,
                         versions: [...webSiteData.versions, versionData]
                     });
                 } else {
                     updatedWebsiteData = await createWebsite({
                         businessId,
-                        projectId: null,
+                        projectId: projectId,
                         path,
                         assets: assetsMetadata,
                         currentPath: urlInfo.key,

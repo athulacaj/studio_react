@@ -520,7 +520,7 @@ const ProjectDetailView: React.FC = () => {
                             variant="outlined"
                             startIcon={<ArticleIcon />}
                             // onClick={() => navigate(`/private/portfolio/builder/${projectId}`)}
-                            onClick={() => navigate(`/private/studio/portfolio/manage?path=${encodeURIComponent(projectData.project.id)}&type=${WebsiteTemplateType.weddingInvitation}&name=${project.name}`)}
+                            onClick={() => navigate(`/private/studio/portfolio/manage?path=${encodeURIComponent(projectData.project.name)}&type=${WebsiteTemplateType.weddingInvitation}&name=${project.name}&projectId=${encodeURIComponent(projectData.project.id)}`)}
                             sx={{
                                 flex: { xs: 1, sm: 'initial' },
                                 borderRadius: 2,

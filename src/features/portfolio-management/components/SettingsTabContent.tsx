@@ -15,6 +15,7 @@ import {
 import {
     CloudUpload as UploadIcon,
     InsertDriveFile as FileIcon,
+    SwapHoriz as ChangeTemplateIcon,
 } from '@mui/icons-material';
 import { usePortfolioContext } from '../context/portfolioGlobalContext';
 
@@ -29,7 +30,9 @@ export const SettingsTabContent: React.FC = () => {
         versions,
         selectedVersionPath,
         handlePublish,
-        handleVersionChange } = managePortfolioController;
+        handleVersionChange,
+        setStep,
+    } = managePortfolioController;
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {/* Publish Card */}
@@ -92,6 +95,63 @@ export const SettingsTabContent: React.FC = () => {
                     }}
                 >
                     {isPublishing ? 'Publishing...' : 'Publish Now'}
+                </Button>
+            </Paper>
+
+            {/* Change Template Card */}
+            <Paper sx={{
+                p: 4,
+                borderRadius: 4,
+                bgcolor: 'rgba(59, 130, 246, 0.05)',
+                border: '1px solid rgba(59, 130, 246, 0.2)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                position: 'relative',
+                overflow: 'hidden'
+            }}>
+                <Box sx={{
+                    position: 'absolute',
+                    top: -50,
+                    right: -50,
+                    width: 150,
+                    height: 150,
+                    bgcolor: 'rgba(59, 130, 246, 0.1)',
+                    borderRadius: '50%',
+                    filter: 'blur(40px)',
+                    pointerEvents: 'none'
+                }} />
+
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Avatar sx={{ bgcolor: 'rgba(59, 130, 246, 0.2)', color: '#60A5FA', mr: 2 }}>
+                        <ChangeTemplateIcon />
+                    </Avatar>
+                    <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600 }}>Change Template</Typography>
+                </Box>
+
+                <Typography variant="body2" sx={{ color: '#94A3B8', mb: 4, lineHeight: 1.6, maxWidth: '90%' }}>
+                    Switch to a different template. Note that changing your template will require you to reconfigure some settings and content to fit the new layout.
+                </Typography>
+
+                <Button
+                    variant="contained"
+                    onClick={() => setStep(1)}
+                    startIcon={<ChangeTemplateIcon />}
+                    sx={{
+                        borderRadius: '12px',
+                        background: 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)',
+                        px: 4,
+                        py: 1.5,
+                        fontWeight: 600,
+                        boxShadow: '0 8px 16px rgba(59, 130, 246, 0.25)',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 12px 20px rgba(59, 130, 246, 0.4)',
+                        }
+                    }}
+                >
+                    Change Template
                 </Button>
             </Paper>
 
