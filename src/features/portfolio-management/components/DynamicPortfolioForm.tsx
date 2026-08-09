@@ -197,6 +197,7 @@ const DynamicPortfolioForm: React.FC = () => {
     // will match and be skipped here.
     if (portfolioData !== lastExternalRef.current) {
       lastExternalRef.current = portfolioData;
+      dataRef.current = portfolioData; // Keep dataRef in sync with external changes
       setFormKey(k => k + 1);
     }
   }

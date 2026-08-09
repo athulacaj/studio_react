@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 function scrollToTheId(id: string) {
     // Normalize array notation (e.g. events[0]) to dot notation (events.0)
@@ -41,19 +41,46 @@ export const usePortfolioIframe = (
     setPortfolioData: (data: any) => void
 ) => {
     const iframeDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const previousBlobUrlRef = useRef<string | null>(null);
+    const [blobUrl, setBlobUrl] = useState<string | null>(null);
 
-    // Create and cleanup object URL for HTML content preview
-    const blobUrl = useMemo(() => {
-        if (!htmlContent) return null;
-        const blob = new Blob([htmlContent], { type: 'text/html' });
-        return URL.createObjectURL(blob);
-    }, [htmlContent]);
-
+    // Create blob URL when htmlContent changes, properly revoking the old one.
+    // Using useState + useEffect instead of useMemo so the URL lifecycle is
+    // explicitly controlled and never prematurely revoked.
     useEffect(() => {
+        if (!htmlContent) {
+            // Revoke any existing URL when content is cleared
+            if (previousBlobUrlRef.current) {
+                URL.revokeObjectURL(previousBlobUrlRef.current);
+                previousBlobUrlRef.current = null;
+            }
+            setBlobUrl(null);
+            return;
+        }
+
+        // Create a new blob URL
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const newUrl = URL.createObjectURL(blob);
+
+        // Revoke the old URL only after the new one is ready
+        if (previousBlobUrlRef.current) {
+            URL.revokeObjectURL(previousBlobUrlRef.current);
+        }
+        previousBlobUrlRef.current = newUrl;
+        setBlobUrl(newUrl);
+
+        // Cleanup on unmount: revoke the active URL and clear debounce timer
         return () => {
-            if (blobUrl) URL.revokeObjectURL(blobUrl);
+            if (previousBlobUrlRef.current) {
+                URL.revokeObjectURL(previousBlobUrlRef.current);
+                previousBlobUrlRef.current = null;
+            }
+            if (iframeDebounceRef.current) {
+                clearTimeout(iframeDebounceRef.current);
+                iframeDebounceRef.current = null;
+            }
         };
-    }, [blobUrl]);
+    }, [htmlContent]);
 
     // Handle postMessage communication from iframe
     useEffect(() => {
@@ -73,7 +100,7 @@ export const usePortfolioIframe = (
     }, []);
 
     // Debounced data update to iframe
-    const handleDataChange = (newData: any) => {
+    const handleDataChange = useCallback((newData: any) => {
         setPortfolioData(newData);
         if (iframeDebounceRef.current) clearTimeout(iframeDebounceRef.current);
         iframeDebounceRef.current = setTimeout(() => {
@@ -81,7 +108,7 @@ export const usePortfolioIframe = (
                 iframeRef.current.contentWindow.postMessage({ type: 'UPDATE_DATA', data: newData }, '*');
             }
         }, 100);
-    }
+    }, [setPortfolioData, iframeRef]);
 
     return {
         blobUrl,

@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alex Morgan | Modern Portfolio</title>
-    
+
     <!-- Modern Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;400;500&family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;400;500&family=Outfit:wght@300;500;700;900&display=swap"
+        rel="stylesheet">
 
     <style>
         /* --- CSS Reset & Variables --- */
@@ -20,11 +23,11 @@
             --accent: #ff4757;
             --background: #ffffff;
             --text: #2f3542;
-            
+
             /* Derived RGB variables for rgba() usage (set by JS) */
             --bg-rgb: 255, 255, 255;
             --primary-rgb: 26, 26, 26;
-            
+
             /* Spacing & Layout */
             --container-width: 1200px;
             --section-spacing: 120px;
@@ -51,7 +54,12 @@
             transition: background-color 0.5s ease, color 0.5s ease;
         }
 
-        h1, h2, h3, h4, h5, h6 {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
             font-family: 'Outfit', sans-serif;
             font-weight: 700;
             line-height: 1.1;
@@ -85,7 +93,8 @@
             display: inline-block;
             padding: 16px 32px;
             background-color: var(--primary);
-            color: var(--background); /* Text color inside button contrasts with primary */
+            color: var(--background);
+            /* Text color inside button contrasts with primary */
             border-radius: 50px;
             font-weight: 600;
             font-size: 0.95rem;
@@ -135,7 +144,7 @@
             background: rgba(var(--bg-rgb), 0.95);
             backdrop-filter: blur(10px);
             padding: 1rem 0;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
 
         .nav-inner {
@@ -205,11 +214,10 @@
             width: 100%;
             height: 100%;
             /* Dynamic Gradient Overlay based on Background Color */
-            background: linear-gradient(90deg, 
-                rgba(var(--bg-rgb), 1) 0%, 
-                rgba(var(--bg-rgb), 0.8) 40%, 
-                rgba(var(--bg-rgb), 0.2) 100%
-            );
+            background: linear-gradient(90deg,
+                    rgba(var(--bg-rgb), 1) 0%,
+                    rgba(var(--bg-rgb), 0.8) 40%,
+                    rgba(var(--bg-rgb), 0.2) 100%);
         }
 
         .hero-bg img {
@@ -235,7 +243,7 @@
             font-weight: 600;
             color: var(--accent);
             margin-bottom: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
 
         #hero h1 {
@@ -263,9 +271,22 @@
         }
 
         @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);}
-            40% {transform: translateX(-50%) translateY(-10px);}
-            60% {transform: translateX(-50%) translateY(-5px);}
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            40% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+
+            60% {
+                transform: translateX(-50%) translateY(-5px);
+            }
         }
 
         /* --- About Section --- */
@@ -297,10 +318,10 @@
 
         .stat-card {
             /* Use a very subtle variation of the background/primary for card bg */
-            background: rgba(var(--primary-rgb), 0.03); 
+            background: rgba(var(--primary-rgb), 0.03);
             padding: 2.5rem;
             border-radius: var(--border-radius);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
             text-align: center;
             transition: transform 0.3s;
             border: 1px solid var(--secondary);
@@ -356,7 +377,8 @@
             transition: all 0.3s;
         }
 
-        .filter-btn:hover, .filter-btn.active {
+        .filter-btn:hover,
+        .filter-btn.active {
             background-color: var(--primary);
             color: var(--background);
             border-color: var(--primary);
@@ -374,7 +396,7 @@
             overflow: hidden;
             aspect-ratio: 4/5;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
             background: var(--secondary);
         }
 
@@ -397,7 +419,7 @@
             padding: 2rem;
             /* Gradient must always be dark for text legibility, or adaptive. 
                We'll keep it dark gradient with white text for images. */
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
             color: white;
             opacity: 0;
             transform: translateY(20px);
@@ -425,7 +447,7 @@
         }
 
         .gallery-info p {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
         }
 
         /* --- Services --- */
@@ -442,7 +464,8 @@
         .service-item {
             padding: 3rem 2rem;
             border-radius: var(--border-radius);
-            background: rgba(var(--primary-rgb), 0.03); /* Dynamic card bg */
+            background: rgba(var(--primary-rgb), 0.03);
+            /* Dynamic card bg */
             border: 1px solid var(--secondary);
             transition: all 0.3s;
             position: relative;
@@ -463,7 +486,7 @@
         }
 
         .service-item:hover {
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             transform: translateY(-5px);
             border-color: var(--primary);
         }
@@ -494,7 +517,8 @@
         /* --- Footer --- */
         footer {
             background-color: var(--extra1);
-            color: var(--background); /* Invert for footer */
+            color: var(--background);
+            /* Invert for footer */
             padding: 80px 0 40px;
         }
 
@@ -524,7 +548,8 @@
             font-size: 1.1rem;
         }
 
-        .footer-links a, .footer-links p {
+        .footer-links a,
+        .footer-links p {
             display: block;
             opacity: 0.7;
             margin-bottom: 0.8rem;
@@ -546,14 +571,31 @@
 
         /* --- Mobile --- */
         @media (max-width: 968px) {
-            #hero h1 { font-size: 3.5rem; }
-            .about-wrapper { grid-template-columns: 1fr; }
-            .footer-content { grid-template-columns: 1fr; gap: 3rem; }
-            .nav-links { display: none; } /* Simplified */
-            :root { --section-spacing: 80px; }
+            #hero h1 {
+                font-size: 3.5rem;
+            }
+
+            .about-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            /* Simplified */
+            :root {
+                --section-spacing: 80px;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <nav id="navbar">
@@ -581,7 +623,7 @@
         </div>
         <div class="scroll-indicator">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
+                <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
             </svg>
         </div>
     </header>
@@ -624,7 +666,7 @@
                 <span class="section-subtitle">Portfolio</span>
                 <h2 class="section-title">Selected Works</h2>
             </div>
-            
+
             <div class="filter-nav" id="filter-container">
                 <button class="filter-btn active" data-filter="all">All</button>
                 <!-- Filters injected here -->
@@ -678,7 +720,7 @@
     <script>
         // --- DATA ---
         // Setting to DARK MODE config to demonstrate capability
-    
+
         const data_example = {
             "id": "layxml9UiSRQRcuk0rTX7WeSy0A3",
             "content": {
@@ -725,7 +767,7 @@
         function hexToRgb(hex) {
             // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
             var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-            hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+            hex = hex.replace(shorthandRegex, function (m, r, g, b) {
                 return r + r + g + g + b + b;
             });
             var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -737,7 +779,7 @@
             // Colors
             const root = document.documentElement;
             const c = data.design.customColors;
-            
+
             // Set Standard Variables
             root.style.setProperty('--primary', c.primary);
             root.style.setProperty('--secondary', c.secondary);
@@ -750,8 +792,8 @@
 
             // Set RGB Variables for Opacity Control
             // This is crucial for "dependent on data" overlays
-            if(c.background) root.style.setProperty('--bg-rgb', hexToRgb(c.background));
-            if(c.primary) root.style.setProperty('--primary-rgb', hexToRgb(c.primary));
+            if (c.background) root.style.setProperty('--bg-rgb', hexToRgb(c.background));
+            if (c.primary) root.style.setProperty('--primary-rgb', hexToRgb(c.primary));
 
             // Hero
             document.getElementById('nav-logo').textContent = data.basicInfo.name.toUpperCase();
@@ -765,7 +807,7 @@
             const aboutLines = data.content.aboutSection.split('\n');
             const aboutContainer = document.getElementById('about-text');
             aboutLines.forEach(line => {
-                if(line.trim()) {
+                if (line.trim()) {
                     const p = document.createElement('p');
                     p.textContent = line;
                     aboutContainer.appendChild(p);
@@ -774,7 +816,7 @@
 
             // Stats Logic (Simple extraction from strings)
             document.getElementById('stat-exp').textContent = data.basicInfo.experience + "+";
-            
+
             // Services Grid
             const servicesList = data.content.services.split('\n').filter(s => s.trim());
             const servicesGrid = document.getElementById('services-grid');
@@ -833,10 +875,10 @@
         function filterGallery(cat, btn) {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
+
             const cards = document.querySelectorAll('.gallery-card');
             cards.forEach(card => {
-                if(cat === 'all' || card.classList.contains(cat)) {
+                if (cat === 'all' || card.classList.contains(cat)) {
                     card.style.display = 'block';
                     setTimeout(() => card.style.opacity = '1', 50);
                 } else {
@@ -845,7 +887,7 @@
                 }
             });
         }
-        
+
         // Navbar Scroll Effect
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('navbar');
@@ -857,7 +899,7 @@
         });
 
         // Setup All Filter
-        document.querySelector('[data-filter="all"]').onclick = function() {
+        document.querySelector('[data-filter="all"]').onclick = function () {
             filterGallery('all', this);
         };
 
@@ -865,4 +907,5 @@
 
     </script>
 </body>
+
 </html>

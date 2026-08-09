@@ -40,6 +40,7 @@ import { useToastStore } from '../../../shared/hooks/useToastStore';
 import { DriveFileBrowser, useDriveIntegrationStore } from '../../drive-integration';
 import { ProjectJoinDriveData, ProjectStatus } from '../types';
 import { WebsiteTemplateType } from '../../portfolio-management';
+import { getBusinessByUserId } from '../api/businessService';
 
 const ProjectDetailView: React.FC = () => {
     const { projectId } = useParams<{ projectId: string }>();
@@ -51,6 +52,7 @@ const ProjectDetailView: React.FC = () => {
     const loading = useStudioManagementStore((state) => state.loading);
     const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
     const businessData = useStudioManagementStore((state) => state.businessData);
+    const setBusinessData = useStudioManagementStore((state) => state.setBusinessData);
     const setLoading = useStudioManagementStore((state) => state.setLoading);
 
     // When admin is viewing another user, use that user's ID for links
@@ -74,6 +76,7 @@ const ProjectDetailView: React.FC = () => {
 
 
 
+
     // Drive connection state
     const activeConnection = useDriveIntegrationStore((state) => state.activeConnection);
     const driveLoading = useDriveIntegrationStore((state) => state.loading);
@@ -82,6 +85,14 @@ const ProjectDetailView: React.FC = () => {
     const projectData = currentProject;
     const project = projectData?.project;
 
+
+    useEffect(() => {
+        getBusinessByUserId(currentUser?.userId ?? '').then((res) => {
+            const data = res.data.filter(e => e.typeId = 1)[0];
+            setBusinessData(data)
+
+        })
+    }, [])
 
     useEffect(() => {
         if (projectId) {
@@ -98,14 +109,15 @@ const ProjectDetailView: React.FC = () => {
         }
     }, [project?.source, project?.id, effectiveUserId, fetchConnection]);
 
-    const handleCopyLink = () => {
+
+    const handleInvitationCopyLink = () => {
         if (!effectiveUserId || !project) return;
         let link = '';
         if (businessData?.slug) {
-            link = `${businessData.slug}/view/${project.id}`;
+            link = `${businessData.slug}.mizhiv.com/view/${project.name}`;
         }
         else {
-            showToast('No business domain found for this account', 'error');
+            showToast('No business domain found for this account, try refershin the page', 'error');
             return;
         }
         navigator.clipboard.writeText(link);
@@ -290,21 +302,7 @@ const ProjectDetailView: React.FC = () => {
                         </Button>
                     </Tooltip>
 
-                    <Tooltip title="Copy project link">
-                        <IconButton
-                            onClick={handleCopyLink}
-                            size="small"
-                            sx={{
-                                flex: { xs: 'none', sm: 'initial' },
-                                backgroundColor: (theme) => alpha(theme.palette.info.main, 0.1),
-                                '&:hover': {
-                                    backgroundColor: (theme) => alpha(theme.palette.info.main, 0.2),
-                                },
-                            }}
-                        >
-                            <CopyIcon fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
+
                 </Box>
             </Paper>
 
@@ -576,10 +574,7 @@ const ProjectDetailView: React.FC = () => {
                             </MenuItem>
                             <MenuItem onClick={() => {
                                 handleManageInvitationClose();
-                                if (project) {
-                                    navigator.clipboard.writeText(`https://test.mizhiv.com/view/${project.name}`);
-                                    showToast('Invitation link copied to clipboard!', 'success');
-                                }
+                                handleInvitationCopyLink()
                             }}>
                                 <LinkIcon fontSize="small" sx={{ mr: 1.5, color: 'text.secondary' }} />
                                 Copy Link

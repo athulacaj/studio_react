@@ -1,4 +1,4 @@
-import React, { RefObject } from 'react';
+import React from 'react';
 import { Box } from '@mui/material';
 import { usePortfolioContext } from '../context/portfolioGlobalContext';
 
@@ -21,7 +21,7 @@ export const PortfolioPreview: React.FC = () => {
                     position: 'relative',
                     display: 'flex',
                     alignItems: 'center',
-                    justify: 'center',
+                    justifyContent: 'center',
                     overflowX: 'auto',
                     overflowY: 'hidden',
                     p: previewMode === 'mobile' ? 2 : 0,

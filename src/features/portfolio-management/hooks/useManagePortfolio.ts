@@ -40,7 +40,7 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
         isProcessingFiles, setIsProcessingFiles,
         isUploading, setIsUploading,
         uploadProgress, setUploadProgress,
-        templatesDataList, setTemplatesData, resetStep,
+        templatesDataList, setTemplatesData, resetState,
     } = usePortfolioStore();
 
     const { currentUser } = useAuthStore();
@@ -52,7 +52,7 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
 
     useEffect(() => {
         return () => {
-            resetStep();
+            resetState();
         }
     }, [])
 
@@ -60,7 +60,7 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
     useEffect(() => {
         if (currentUser?.userId) {
             getBusinessByUserId(currentUser.userId).then((res) => {
-                const data = res.data.filter((e) => (e.typeId = 1))[0];
+                const data = res.data.filter((e) => (e.typeId === 1))[0];
                 setBusinessData(data);
             });
         }
