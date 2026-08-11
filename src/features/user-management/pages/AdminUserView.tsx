@@ -21,18 +21,10 @@ import {
 } from '@mui/icons-material';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../config/firebase';
-import { useStudioManagementStore } from '../store/studioManagementStore';
-import StudioDashboard from './StudioDashboard';
+import { useStudioManagementStore } from '../../studio-management';
+import { StudioDashboard } from '../../studio-management';
 import { useAuthStore } from '../../auth';
-
-interface ViewedUser {
-    uid: string;
-    name: string;
-    email: string;
-    photoURL?: string;
-    isAdmin?: boolean;
-    createdAt?: any;
-}
+import { UserListItem } from '../types';
 
 const AdminUserView: React.FC = () => {
     const { userId } = useParams<{ userId: string }>();
@@ -43,7 +35,7 @@ const AdminUserView: React.FC = () => {
     const setViewAsUserId = useStudioManagementStore((state) => state.setViewAsUserId);
     const clearViewAsUserId = useStudioManagementStore((state) => state.clearViewAsUserId);
 
-    const [viewedUser, setViewedUser] = useState<ViewedUser | null>(null);
+    const [viewedUser, setViewedUser] = useState<UserListItem | null>(null);
     const [loadingUser, setLoadingUser] = useState(true);
 
 
@@ -87,7 +79,7 @@ const AdminUserView: React.FC = () => {
                 const userDocRef = doc(db, 'user', userId);
                 const userDoc = await getDoc(userDocRef);
                 if (userDoc.exists()) {
-                    setViewedUser({ uid: userDoc.id, ...userDoc.data() } as ViewedUser);
+                    setViewedUser({ uid: userDoc.id, ...userDoc.data() } as UserListItem);
                 }
             } catch (err: any) {
                 console.error('Error fetching user:', err);

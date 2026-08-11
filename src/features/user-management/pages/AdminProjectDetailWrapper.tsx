@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useStudioManagementStore } from '../store/studioManagementStore';
-import ProjectDetailView from './ProjectDetailView';
+import { useStudioManagementStore } from '../../studio-management';
+import { ProjectDetailView } from '../../studio-management';
 import { useAuthStore } from '../../auth';
 
 /**
