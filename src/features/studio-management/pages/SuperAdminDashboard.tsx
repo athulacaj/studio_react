@@ -278,7 +278,7 @@ const SuperAdminDashboard: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [error, setError] = useState<string | null>(null);
-    const isAdmin = currentUser?.role === "admin";
+    const isAdmin = useAuthStore((state) => state.isAdmin)();
 
 
     // Gate: redirect non-admins away

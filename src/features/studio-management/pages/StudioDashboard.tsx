@@ -20,6 +20,7 @@ import { getBusinessByUserId } from '../api/businessService';
 
 const StudioDashboard: React.FC = () => {
     const { currentUser } = useAuthStore();
+    const isAdmin = useAuthStore((state) => state.isAdmin)();
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -31,7 +32,7 @@ const StudioDashboard: React.FC = () => {
 
 
     // When admin is viewing another user's dashboard, hide management actions
-    const isAdminViewing = !!viewAsUserId && currentUser?.role === "admin";
+    const isAdminViewing = !!viewAsUserId && isAdmin;
 
     const activeProjects = projectJoinDriveData.map(p => p.project).filter(p => p.status === ProjectStatus.ACTIVE).length;
 
@@ -159,7 +160,7 @@ const StudioDashboard: React.FC = () => {
                                     flexWrap: 'wrap',
                                 }}
                             >
-                                {currentUser?.role == "admin" && (
+                                {isAdmin && (
                                     <Button
                                         variant="outlined"
                                         startIcon={<AdminIcon />}

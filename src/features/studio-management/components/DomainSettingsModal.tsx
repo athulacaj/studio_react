@@ -24,12 +24,31 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
 
     const [name, setName] = useState('');
     const [slug, setSlug] = useState('');
+    const [slugError, setSlugError] = useState<string | null>(null);
     const [customDomain, setCustomDomain] = useState('');
 
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+
+    /**
+     * Validates and sets the subdomain slug.
+     * Only lowercase letters (a-z), digits (0-9), and hyphens (-) are allowed.
+     * No dots, spaces, uppercase, or special characters.
+     */
+    const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = e.target.value;
+        const sanitized = raw.replace(/[^a-z0-9-]/g, '');
+
+        if (raw !== sanitized) {
+            setSlugError('Only lowercase letters (a-z), numbers, and hyphens are allowed.');
+        } else {
+            setSlugError(null);
+        }
+
+        setSlug(sanitized);
+    };
 
     useEffect(() => {
         if (open && currentUser?.userId) {
@@ -38,6 +57,7 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
             // Reset fields for new creation
             setName('');
             setSlug('');
+            setSlugError(null);
             setCustomDomain('');
             setError(null);
             setSuccess(null);
@@ -66,6 +86,11 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
 
         if (!name || !slug) {
             setError('Name and Slug are required.');
+            return;
+        }
+
+        if (slugError) {
+            setError('Please fix the subdomain before saving.');
             return;
         }
 
@@ -151,15 +176,16 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
                         />
 
                         <TextField
-                            label="Slug"
+                            label="Subdomain"
                             value={slug}
-                            onChange={(e) => setSlug(e.target.value)}
+                            onChange={handleSlugChange}
                             fullWidth
                             required
                             variant="outlined"
                             disabled={loading}
-                            helperText="Used for your default studio URL"
-                            FormHelperTextProps={{ sx: { color: 'rgba(255,255,255,0.5)' } }}
+                            error={!!slugError}
+                            helperText={slugError || 'Only lowercase letters, numbers, and hyphens allowed'}
+                            FormHelperTextProps={{ sx: { color: slugError ? '#f44336' : 'rgba(255,255,255,0.5)' } }}
                             InputProps={{
                                 sx: { color: '#fff', borderRadius: 2 }
                             }}

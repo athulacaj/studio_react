@@ -17,7 +17,7 @@ const AdminProjectDetailWrapper: React.FC = () => {
     const setViewAsUserId = useStudioManagementStore((state) => state.setViewAsUserId);
     const clearViewAsUserId = useStudioManagementStore((state) => state.clearViewAsUserId);
     const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
-    const isAdmin = currentUser?.role === "admin";
+    const isAdmin = useAuthStore((state) => state.isAdmin)();
 
     // Gate: redirect non-admins
     useEffect(() => {

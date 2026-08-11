@@ -1,3 +1,5 @@
+import { Role } from "../../../types/roles";
+
 export interface UserProfile {
     uid: string;
     email: string;
@@ -14,5 +16,5 @@ export interface User {
     email: string;
     photoUrl: string;
     userId: string;
-    role: string;
+    role: Role;
 }

@@ -38,13 +38,13 @@ const AdminUserView: React.FC = () => {
     const { userId } = useParams<{ userId: string }>();
     const navigate = useNavigate();
     const currentUser = useAuthStore((state) => state.currentUser);
+    const isAdmin = useAuthStore((state) => state.isAdmin)();
 
     const setViewAsUserId = useStudioManagementStore((state) => state.setViewAsUserId);
     const clearViewAsUserId = useStudioManagementStore((state) => state.clearViewAsUserId);
 
     const [viewedUser, setViewedUser] = useState<ViewedUser | null>(null);
     const [loadingUser, setLoadingUser] = useState(true);
-    const isAdmin = currentUser?.role === "admin";
 
 
 

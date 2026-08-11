@@ -69,7 +69,7 @@ export interface CreateWebsiteRequest {
 
 export interface UpdateWebsiteRequest {
     businessId?: number;
-    projectId?: string;
+    projectId?: string | null;
     path?: string;
     assets?: any;
     currentPath?: string;

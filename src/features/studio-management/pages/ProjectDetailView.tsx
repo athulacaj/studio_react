@@ -57,7 +57,7 @@ const ProjectDetailView: React.FC = () => {
 
     // When admin is viewing another user, use that user's ID for links
     const effectiveUserId = viewAsUserId || currentUser?.userId;
-    const isAdminViewing = !!viewAsUserId && currentUser?.role === "admin";
+    const isAdmin = useAuthStore((state) => state.isAdmin)();
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
