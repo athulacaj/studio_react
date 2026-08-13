@@ -17,4 +17,5 @@ export interface User {
     photoUrl: string;
     userId: string;
     role: Role;
+    approved: Boolean;
 }

@@ -136,7 +136,7 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
         if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
         try {
-            await createProject({
+            const data = await createProject({
                 name: projectData.name ?? '',
                 userId: effectiveUid,
                 description: projectData.description,
@@ -148,7 +148,8 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
                 driveData: projectData.driveData ?? {},
                 selectedFolders: projectData.selectedFolders,
             })
-            return '';
+            get().fetchProjects();
+            return data.data.id;
         } catch (err: any) {
             console.error("Error adding project:", err);
             set({ error: err.message });

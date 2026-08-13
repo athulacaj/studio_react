@@ -335,7 +335,7 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
             const file = new File([updatedHtml], 'index.html', { type: 'text/html' });
 
             const urlsResponse = await getUploadUrls({
-                folder: 'portfolios',
+                folder: `users/${effectiveUserId}/websites/${path}`,
                 files: [{ fileName: 'index.html', contentType: 'text/html' }]
             });
 

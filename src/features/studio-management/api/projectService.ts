@@ -26,8 +26,8 @@ export const getPublicProject = async (projectId: string): Promise<{ data: Proje
     return await StudioApiClient.get<{ data: ProjectJoinDriveData[] }>(ApiEndPoints.projects.get.public(projectId));
 };
 
-export const createProject = async (project: Partial<Project>, driveData?: Partial<DriveData>): Promise<string> => {
-    return await StudioApiClient.post<string>(ApiEndPoints.projects.post.projects(), { project, driveData });
+export const createProject = async (project: Partial<Project>, driveData?: Partial<DriveData>): Promise<{ data: Project }> => {
+    return await StudioApiClient.post<{ data: Project }>(ApiEndPoints.projects.post.projects(), { project, driveData });
 };
 
 /**
