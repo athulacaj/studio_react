@@ -118,5 +118,16 @@ This document outlines the development plan for a modern, responsive photo proof
    - Hero header with step indicator badge, ambient background lighting, and glassmorphic navigation button.
 
 
+#### Iteration 10: Convert Admin Users Dashboard to Table Layout
 
-
+1. **Table View Design:**
+   - Redesigned the Super Admin user dashboard list from a card grid layout to a glassmorphic table.
+   - Table columns include: User (Avatar + Name + UID), Email (with icon), Role Chip (with styled indicators for Admin and User), Joined Date, and Action controls.
+   - Built with MUI `Table`, `TableBody`, `TableCell`, `TableContainer`, `TableHead`, and `TableRow` components styled to match the dark theme and neon details of Mizhiv.
+2. **TableRow Click Actions:**
+   - Make the entire row clickable to seamlessly navigate to `/private/user/:userId`.
+   - Included a distinct "View Dashboard" button inside a tooltip in the action column.
+3. **Table Skeleton Loading State:**
+   - Created a modern table row skeleton matching the table structure to replace card-based skeletons.
+4. **Codebase Cleanup:**
+   - Cleaned up unused legacy components `UserCard` and `UserCardSkeleton`.
