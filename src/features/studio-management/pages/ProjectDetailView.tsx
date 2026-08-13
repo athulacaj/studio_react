@@ -50,13 +50,12 @@ const ProjectDetailView: React.FC = () => {
     const setCurrentProject: (project: ProjectJoinDriveData | null) => void = useStudioManagementStore((state) => state.setCurrentProject);
     const fetchCurrentProject: (projectId: string) => void = useStudioManagementStore((state) => state.fetchCurrentProject);
     const loading = useStudioManagementStore((state) => state.loading);
-    const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
     const businessData = useStudioManagementStore((state) => state.businessData);
     const setBusinessData = useStudioManagementStore((state) => state.setBusinessData);
     const setLoading = useStudioManagementStore((state) => state.setLoading);
 
     // When admin is viewing another user, use that user's ID for links
-    const effectiveUserId = viewAsUserId || currentUser?.userId;
+    const effectiveUserId = useAuthStore((state) => state.effectiveUserId);
     const isAdmin = useAuthStore((state) => state.isAdmin)();
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -87,7 +86,8 @@ const ProjectDetailView: React.FC = () => {
 
 
     useEffect(() => {
-        getBusinessByUserId(currentUser?.userId ?? '').then((res) => {
+        const effectiveUserId = useAuthStore.getState().effectiveUserId;
+        getBusinessByUserId(effectiveUserId ?? '').then((res) => {
             const data = res.data.filter(e => e.typeId = 1)[0];
             setBusinessData(data)
 
@@ -156,7 +156,7 @@ const ProjectDetailView: React.FC = () => {
                     </Typography>
                     <Button
                         startIcon={<ArrowBackIcon />}
-                        onClick={() => navigate(isAdminViewing ? `/private/admin/user/${viewAsUserId}` : '/private/studio')}
+                        onClick={() => navigate(`/private/user/${effectiveUserId}`)}
                         sx={{ mt: 2 }}
                     >
                         Back to Projects
@@ -206,9 +206,9 @@ const ProjectDetailView: React.FC = () => {
             >
                 {/* Left side: Back button + Name */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 0 }}>
-                    <Tooltip title={isAdminViewing ? 'Back to user dashboard' : 'Back to projects'}>
+                    <Tooltip title={isAdmin ? 'Back to user dashboard' : 'Back to projects'}>
                         <IconButton
-                            onClick={() => navigate(isAdminViewing ? `/private/admin/user/${viewAsUserId}` : '/private/studio')}
+                            onClick={() => navigate(`/private/user/${effectiveUserId}`)}
                             sx={{
                                 backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.1),
                                 '&:hover': {

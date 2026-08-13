@@ -20,6 +20,7 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
     const projectId = searchParams.get('projectId');
     const type = searchParams.get('type')
     const title = searchParams.get("title") ?? ''
+    const effectiveUserId = useAuthStore.getState().effectiveUserId;
 
     // Global Store State & Setters
     const {
@@ -58,13 +59,13 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
 
     // Fetch initial business details
     useEffect(() => {
-        if (currentUser?.userId) {
-            getBusinessByUserId(currentUser.userId).then((res) => {
+        if (effectiveUserId) {
+            getBusinessByUserId(effectiveUserId).then((res) => {
                 const data = res.data.filter((e) => (e.typeId === 1))[0];
                 setBusinessData(data);
             });
         }
-    }, [currentUser?.userId, setBusinessData]);
+    }, [effectiveUserId, setBusinessData]);
 
     // Fetch website and load portfolio data
     useEffect(() => {

@@ -6,9 +6,15 @@ function makeQueryUrl(obj: Record<string, any>) {
     return Object.keys(obj).map((key: string) => `${key}=${obj[key as keyof typeof obj]}`).join('&')
 }
 const ApiEndPoints = {
+    auth: {
+        get: {
+            me: () => "/auth/me"
+        }
+    },
     users: {
         get: {
-            getAllusers: () => `/users`
+            getAllusers: () => `/users`,
+            getUserById: (id: string) => `/users/${id}`
         }
     },
     projects: {

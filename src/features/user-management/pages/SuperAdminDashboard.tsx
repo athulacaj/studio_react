@@ -20,12 +20,12 @@ import {
     ArrowBack as ArrowBackIcon,
     Person as PersonIcon,
 } from '@mui/icons-material';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { db } from '../../../config/firebase';
 import { useAuthStore } from '../../auth';
 import { UserListItem } from '../types';
 import UserCard from '../components/UserCard';
 import UserCardSkeleton from '../components/UserCardSkeleton';
+import { getAllUsers } from '../services/userService';
+import { Role } from '../../../types/roles';
 
 const SuperAdminDashboard: React.FC = () => {
     const navigate = useNavigate();
@@ -44,22 +44,23 @@ const SuperAdminDashboard: React.FC = () => {
         }
     }, [currentUser, navigate]);
 
-    // Fetch all users from Firestore
+    // Fetch all users from API
     useEffect(() => {
         const fetchUsers = async () => {
-            setLoading(true);
-            setError(null);
             try {
-                const q = query(collection(db, 'user'), orderBy('name', 'asc'));
-                const querySnapshot = await getDocs(q);
-                const usersData: UserListItem[] = querySnapshot.docs.map((doc) => ({
-                    uid: doc.id,
-                    ...doc.data(),
-                })) as UserListItem[];
-                setUsers(usersData);
+                setLoading(true);
+                setError(null);
+                const data = await getAllUsers();
+                const mapped: UserListItem[] = data.map((user) => ({
+                    uid: user.userId,
+                    name: user.name,
+                    email: user.email,
+                    photoURL: user.photoUrl,
+                    isAdmin: user.role === Role.ADMIN,
+                }));
+                setUsers(mapped);
             } catch (err: any) {
-                console.error('Error fetching users:', err);
-                setError(err.message);
+                setError(err?.message || 'Failed to fetch users');
             } finally {
                 setLoading(false);
             }
@@ -81,7 +82,7 @@ const SuperAdminDashboard: React.FC = () => {
     });
 
     const handleUserSelect = (uid: string) => {
-        navigate(`/private/admin/user/${uid}`);
+        navigate(`/private/user/${uid}`);
     };
 
     // Guard while profile loads
@@ -97,7 +98,7 @@ const SuperAdminDashboard: React.FC = () => {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
                         <Tooltip title="Back to my studio">
                             <IconButton
-                                onClick={() => navigate('/private/studio')}
+                                onClick={() => navigate(-1)}
                                 sx={{
                                     background: (theme) => alpha(theme.palette.primary.main, 0.1),
                                     '&:hover': {

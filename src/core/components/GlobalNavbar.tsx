@@ -116,7 +116,7 @@ const GlobalNavbar = () => {
         {/* Mobile Logo */}
         <Box
           component={Link}
-          to="/private/studio"
+          to="/"
           sx={{ display: { xs: 'flex', md: 'none' }, flexGrow: 1, alignItems: 'center', gap: 1, cursor: 'pointer', textDecoration: 'none' }}
         >
           <Box component="img" src="/images/logo_small.png" alt="mizhiv logo" sx={{ height: 32, width: 'auto', borderRadius: '8px' }} />
@@ -139,7 +139,7 @@ const GlobalNavbar = () => {
         {/* Desktop Logo */}
         <Box
           component={Link}
-          to="/private/studio"
+          to="/"
           sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1.5, cursor: 'pointer', textDecoration: 'none', mr: 4 }}
         >
           <Box

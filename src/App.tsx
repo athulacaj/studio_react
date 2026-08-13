@@ -5,7 +5,7 @@ import './features/studio-management/store/studioManagementStore';
 import { useGlobalLoader } from './core/context/globalLoader';
 import GlobalToast from './shared/components/GlobalToast';
 import { useEffect } from 'react';
-import { getMe } from './features/auth/services/userService';
+import { getMe } from './features/auth/services/authService';
 
 
 const mizhivTheme = createTheme({
@@ -119,12 +119,13 @@ const mizhivTheme = createTheme({
 
 function App() {
   const { isLoading } = useGlobalLoader();
-  const { setLoading, setUser } = useAuthStore();
+  const { setLoading, setUser, setEffectiveUserId } = useAuthStore();
 
   useEffect(() => {
     getMe().then(res => {
       if (res) {
         setUser(res)
+        setEffectiveUserId(res.userId)
       }
     }).catch((err) => {
       console.log(err)

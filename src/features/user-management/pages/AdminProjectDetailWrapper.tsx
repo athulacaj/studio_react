@@ -20,11 +20,11 @@ const AdminProjectDetailWrapper: React.FC = () => {
     const isAdmin = useAuthStore((state) => state.isAdmin)();
 
     // Gate: redirect non-admins
-    useEffect(() => {
-        if (currentUser && !isAdmin) {
-            navigate('/private/studio', { replace: true });
-        }
-    }, [currentUser, navigate]);
+    // useEffect(() => {
+    //     if (currentUser && !isAdmin) {
+    //         navigate('/private/studio', { replace: true });
+    //     }
+    // }, [currentUser, navigate]);
 
     // Set viewAsUserId on mount if not already set (e.g., direct URL navigation)
     useEffect(() => {

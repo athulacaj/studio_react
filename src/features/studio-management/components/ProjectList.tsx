@@ -24,6 +24,7 @@ import {
     CameraAlt as CameraAltIcon,
 } from '@mui/icons-material';
 import { Project, ProjectStatus } from '../types';
+import { useAuthStore } from '../../auth';
 
 interface ProjectCardProps {
     project: Project;
@@ -31,7 +32,7 @@ interface ProjectCardProps {
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     const navigate = useNavigate();
-    const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
+    const effectiveUserId = useAuthStore.getState().effectiveUserId;
 
     const formattedDate = project.createdAt?.toDate
         ? project.createdAt.toDate().toLocaleDateString('en-US', {
@@ -92,9 +93,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
 
             <CardActionArea
                 onClick={() => navigate(
-                    viewAsUserId
-                        ? `/private/admin/user/${viewAsUserId}/studio/${project.id}`
-                        : `/private/studio/${project.id}`
+                    `/private/user/${effectiveUserId}/studio/${project.id}`
+
                 )}
                 sx={{
                     flexGrow: 1,

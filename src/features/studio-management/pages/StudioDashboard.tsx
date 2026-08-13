@@ -40,7 +40,7 @@ const StudioDashboard: React.FC = () => {
     useEffect(() => {
         fetchProjects();
 
-        getBusinessByUserId(currentUser?.userId ?? '').then((res) => {
+        getBusinessByUserId(useAuthStore.getState().effectiveUserId ?? '').then((res) => {
             const data = res.data.filter(e => e.typeId = 1)[0];
             setBusinessData(data)
 

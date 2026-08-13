@@ -92,11 +92,9 @@ data layer and re-throw so the hook sets error state for the UI.
 | `/` | `Home` | public |
 | `/login`, `/signup` | `LoginPage`, `SignupPage` | public |
 | `/about` | `About` | public |
-| `/private/studio` | `StudioDashboard` | protected (studio owner) |
-| `/private/studio/:projectId` | `ProjectDetailView` | protected |
 | `/private/admin` | `SuperAdminDashboard` | protected (admin) |
-| `/private/admin/user/:userId` | `AdminUserView` | protected (admin) |
-| `/private/admin/user/:userId/studio/:projectId` | `AdminProjectDetailWrapper` | protected (admin) |
+| `/private/user/:userId` | `AdminUserView` | protected (admin) |
+| `/private/user/:userId/studio/:projectId` | `AdminProjectDetailWrapper` | protected (admin) |
 | `/private/portfolio/builder/:projectId` | `EventPortfolioBuilder` | protected |
 | `/view/:userId/:projectId` | `PublicProjectView` | public (client proofing) |
 | `/share/:userId/:projectId/:linkId` | `PublicProjectView` | public (shared link, scoped folders) |

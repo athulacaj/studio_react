@@ -11,6 +11,7 @@ import { ManageStudioPortfolioViewProvider } from './features/portfolio-manageme
 import Footer from './core/components/Footer';
 import GlobalNavbar from './core/components/GlobalNavbar';
 import { DriveConnectPage, DriveSuccessPage } from './features/drive-integration';
+import AdminUserWrapper from './features/auth/components/AdminUserWrapper';
 
 const AppRouter = () => {
   const location = useLocation();
@@ -28,11 +29,12 @@ const AppRouter = () => {
 
           {/* Protected Routes */}
           <Route path="/private" element={<ProtectedRoute />}>
-            <Route path="studio" element={<StudioDashboard />} />
-            <Route path="studio/:projectId" element={<ProjectDetailView />} />
             <Route path="admin" element={<SuperAdminDashboard />} />
-            <Route path="admin/user/:userId" element={<AdminUserView />} />
-            <Route path="admin/user/:userId/studio/:projectId" element={<AdminProjectDetailWrapper />} />
+            <Route path="user/:userId" element={<AdminUserWrapper />}>
+              <Route path="studio" element={<StudioDashboard />} />
+              <Route path="studio/:projectId" element={<AdminProjectDetailWrapper />} />
+              <Route index element={<AdminUserView />} />
+            </Route>
             <Route path="studio/portfolio/manage" element={<ManageStudioPortfolioViewProvider />} />
           </Route>
 

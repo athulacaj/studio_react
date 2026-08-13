@@ -2,9 +2,11 @@ import React from 'react';
 import { Box, Typography, Button, Container, Grid, Card, CardContent } from '@mui/material';
 import { Camera, Image as ImageIcon, Folder, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../features/auth';
 
 const Home = () => {
   const navigate = useNavigate();
+  const { currentUser, loading: authLoading } = useAuthStore();
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -68,7 +70,7 @@ const Home = () => {
               color="primary"
               size="large"
               endIcon={<ArrowRight />}
-              onClick={() => navigate('/private/studio')}
+              onClick={() => navigate(currentUser ? `/private/user/${currentUser.userId}/studio` : '/login')}
               sx={{ px: 4, py: 1.5, fontSize: '1.1rem' }}
             >
               Go to Studio

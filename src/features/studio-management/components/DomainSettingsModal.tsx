@@ -51,8 +51,9 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
     };
 
     useEffect(() => {
-        if (open && currentUser?.userId) {
-            fetchBusiness(currentUser.userId);
+        const effectiveUserId = useAuthStore.getState().effectiveUserId;
+        if (open && effectiveUserId) {
+            fetchBusiness();
         } else if (open) {
             // Reset fields for new creation
             setName('');
@@ -64,11 +65,13 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
         }
     }, [open, currentUser?.userId]);
 
-    const fetchBusiness = async (id: string) => {
+    const fetchBusiness = async () => {
         setFetching(true);
         setError(null);
         try {
-            const res = await getBusinessByUserId(id);
+            const effectiveUserId = useAuthStore.getState().effectiveUserId;
+            if (!effectiveUserId) return;
+            const res = await getBusinessByUserId(effectiveUserId);
             const data = res.data.filter(e => e.typeId = 1)[0];
             setName(data.name || '');
             setSlug(data.slug || '');

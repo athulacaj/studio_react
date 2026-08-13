@@ -1,11 +1,9 @@
 import { create } from 'zustand';
-import { collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, updateDoc, deleteDoc, limit, startAfter, QueryDocumentSnapshot, DocumentData, getDoc } from 'firebase/firestore';
+import { serverTimestamp, doc, updateDoc, deleteDoc, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { useAuthStore } from '../../auth';
 import { db } from '../../../config/firebase';
 import { Project, ProjectAssets, ProjectJoinDriveData, ProjectStatus, SharedLink, Source } from '../types';
 import { createProject, getProject, getSharedLink, postShareLink } from '../api/projectService';
-import ApiEndPoints from '../../../config/apiEndpoints';
-import { StudioApiClient } from '../../../services/ApiInitalizer';
 import { Business } from '../api/businessService';
 
 const PAGE_LIMIT = 3;
@@ -49,16 +47,7 @@ interface StudioManagementState {
 }
 
 
-/**
- * Returns the effective user ID for Firestore queries.
- * If viewAsUserId is set (admin viewing another user), returns that.
- * Otherwise returns the current authenticated user's uid.
- */
-const getEffectiveUserId = (): string | null => {
-    const viewAsUserId = useAuthStore.getState().currentUser?.userId;
-    if (viewAsUserId) return viewAsUserId;
-    return null
-}
+
 
 export const useStudioManagementStore = create<StudioManagementState>((set, get) => ({
     projects: [],
@@ -101,8 +90,9 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     lastVisibleDoc: null,
     pageStartCursors: [null], // index 0 = page 1 cursor (null = start from beginning)
 
+
     fetchProjects: async () => {
-        const effectiveUid = getEffectiveUserId();
+        const effectiveUid = useAuthStore.getState().effectiveUserId;
         if (!effectiveUid) return;
         set({ loading: true });
         try {
@@ -142,7 +132,7 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     },
 
     addProject: async (projectData: Partial<Project>) => {
-        const effectiveUid = getEffectiveUserId();
+        const effectiveUid = useAuthStore.getState().effectiveUserId;
         if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
         try {
@@ -181,13 +171,13 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
         }
     },
     updateProjectLocalState: async (projectId: string) => {
-        const effectiveUid = getEffectiveUserId();
+
 
         return
     },
 
     createShareLink: async (projectId: string, linkData: Omit<SharedLink, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>) => {
-        const effectiveUid = getEffectiveUserId();
+        const effectiveUid = useAuthStore.getState().effectiveUserId;
         if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
         try {
@@ -210,7 +200,7 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     },
 
     fetchShareLinks: async (projectId: string) => {
-        const effectiveUid = getEffectiveUserId();
+        const effectiveUid = useAuthStore.getState().effectiveUserId;
         if (!effectiveUid) return [];
         set({ loading: true });
         try {
@@ -231,7 +221,7 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     },
 
     updateShareLink: async (projectId: string, linkId: string, updates: Partial<SharedLink>) => {
-        const effectiveUid = getEffectiveUserId();
+        const effectiveUid = useAuthStore.getState().effectiveUserId;
         if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
         try {
@@ -256,7 +246,7 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
     },
 
     deleteShareLink: async (projectId: string, linkId: string) => {
-        const effectiveUid = getEffectiveUserId();
+        const effectiveUid = useAuthStore.getState().effectiveUserId;
         if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
         try {
