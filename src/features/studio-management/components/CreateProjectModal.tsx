@@ -37,6 +37,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
     const addProject = useStudioManagementStore((state) => state.addProject);
     const updateProject = useStudioManagementStore((state) => state.updateProject);
     const currentUser = useAuthStore((state) => state.currentUser);
+    const effectiveUserId = useAuthStore((state) => state.effectiveUserId);
     const [projectName, setProjectName] = useState('');
     const [source, setSource] = useState('google_photos');
     const [driveUrl, setDriveUrl] = useState('');
@@ -185,8 +186,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
 
     const handleDriveUpload = async (projectId: string, folders: string[]) => {
         const viewAsUserId = useStudioManagementStore.getState().viewAsUserId;
-        const effectiveUid = viewAsUserId || currentUser?.userId;
-        if (!effectiveUid) return;
+        if (!effectiveUserId) return;
         const uploadPromises = folders.map(folderId => {
             return uploadDriveData({
                 folderId: folderId,

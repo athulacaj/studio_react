@@ -9,4 +9,6 @@ export interface UserListItem {
     photoURL?: string;
     isAdmin?: boolean;
     createdAt?: any;
+    role?: string;
+    approved?: boolean;
 }

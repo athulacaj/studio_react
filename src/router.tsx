@@ -34,8 +34,8 @@ const AppRouter = () => {
               <Route path="studio" element={<StudioDashboard />} />
               <Route path="studio/:projectId" element={<AdminProjectDetailWrapper />} />
               <Route index element={<AdminUserView />} />
+              <Route path="studio/portfolio/manage" element={<ManageStudioPortfolioViewProvider />} />
             </Route>
-            <Route path="studio/portfolio/manage" element={<ManageStudioPortfolioViewProvider />} />
           </Route>
 
 

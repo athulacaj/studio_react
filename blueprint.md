@@ -131,3 +131,18 @@ This document outlines the development plan for a modern, responsive photo proof
    - Created a modern table row skeleton matching the table structure to replace card-based skeletons.
 4. **Codebase Cleanup:**
    - Cleaned up unused legacy components `UserCard` and `UserCardSkeleton`.
+
+
+#### Iteration 11: Add Option for Add/Edit Users with Modal Dialog & API Integration
+
+1. **API Integration in userService:**
+   - Added `createUser` (POST `/users`) and `updateUser` (PATCH `/users/:id`) to the `userService.ts` layer.
+   - Updated the central `apiEndpoints.ts` config to register user create and update endpoints.
+2. **Dashboard Controls Integration:**
+   - Added an "Add User" button in the Super Admin dashboard header.
+   - Added an "Edit" icon button in the actions column of the users table.
+3. **Add/Edit User Dialog:**
+   - Designed a glassmorphic modal dialog component that supports both create and update operations.
+   - Form fields include: Email (required, text), Name (text), Role (Admin/User select), Approved status (boolean toggle), and Password (optional/override, password text).
+   - Styled to match the neon accents and dark background details of Mizhiv.
+   - Handled server errors, form loading states, and dynamic form reset on successful submit.

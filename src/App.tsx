@@ -119,13 +119,12 @@ const mizhivTheme = createTheme({
 
 function App() {
   const { isLoading } = useGlobalLoader();
-  const { setLoading, setUser, setEffectiveUserId } = useAuthStore();
+  const { setLoading, setUser } = useAuthStore();
 
   useEffect(() => {
     getMe().then(res => {
       if (res) {
         setUser(res)
-        setEffectiveUserId(res.userId)
       }
     }).catch((err) => {
       console.log(err)

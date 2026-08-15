@@ -20,6 +20,18 @@ import {
     TableRow,
     Avatar,
     Skeleton,
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    FormControlLabel,
+    Switch,
+    CircularProgress,
 } from '@mui/material';
 import {
     Search as SearchIcon,
@@ -30,11 +42,14 @@ import {
     CalendarToday as CalendarIcon,
     Shield as ShieldIcon,
     Visibility as VisibilityIcon,
+    Add as AddIcon,
+    Edit as EditIcon,
 } from '@mui/icons-material';
 import { useAuthStore } from '../../auth';
 import { UserListItem } from '../types';
-import { getAllUsers } from '../services/userService';
+import { getAllUsers, createUser, updateUser } from '../services/userService';
 import { Role } from '../../../types/roles';
+import { useToastStore } from '../../../shared/hooks/useToastStore';
 
 const SuperAdminDashboard: React.FC = () => {
     const navigate = useNavigate();
@@ -45,6 +60,45 @@ const SuperAdminDashboard: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const isAdmin = useAuthStore((state) => state.isAdmin)();
 
+    // Dialog state
+    const [openDialog, setOpenDialog] = useState(false);
+    const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
+    const [selectedUser, setSelectedUser] = useState<UserListItem | null>(null);
+
+    // Form fields state
+    const [formEmail, setFormEmail] = useState('');
+    const [formName, setFormName] = useState('');
+    const [formRole, setFormRole] = useState<'Admin' | 'User'>('User');
+    const [formApproved, setFormApproved] = useState(true);
+    const [formPassword, setFormPassword] = useState('');
+
+    const [saving, setSaving] = useState(false);
+    const [formError, setFormError] = useState<string | null>(null);
+
+    const showToast = useToastStore((state) => state.showToast);
+
+    // Fetch all users from API
+    const fetchUsers = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const data = await getAllUsers();
+            const mapped: UserListItem[] = data.map((user) => ({
+                uid: user.userId,
+                name: user.name,
+                email: user.email,
+                photoURL: user.photoUrl,
+                isAdmin: user.role === Role.ADMIN,
+                role: user.role,
+                approved: !!user.approved,
+            }));
+            setUsers(mapped);
+        } catch (err: any) {
+            setError(err?.message || 'Failed to fetch users');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // Gate: redirect non-admins away
     useEffect(() => {
@@ -53,32 +107,84 @@ const SuperAdminDashboard: React.FC = () => {
         }
     }, [currentUser, navigate]);
 
-    // Fetch all users from API
     useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                const data = await getAllUsers();
-                const mapped: UserListItem[] = data.map((user) => ({
-                    uid: user.userId,
-                    name: user.name,
-                    email: user.email,
-                    photoURL: user.photoUrl,
-                    isAdmin: user.role === Role.ADMIN,
-                }));
-                setUsers(mapped);
-            } catch (err: any) {
-                setError(err?.message || 'Failed to fetch users');
-            } finally {
-                setLoading(false);
-            }
-        };
-
         if (isAdmin) {
             fetchUsers();
         }
     }, []);
+
+    const handleOpenAddDialog = () => {
+        setDialogMode('add');
+        setSelectedUser(null);
+        setFormEmail('');
+        setFormName('');
+        setFormRole('User');
+        setFormApproved(true);
+        setFormPassword('');
+        setFormError(null);
+        setOpenDialog(true);
+    };
+
+    const handleOpenEditDialog = (user: UserListItem) => {
+        setDialogMode('edit');
+        setSelectedUser(user);
+        setFormEmail(user.email || '');
+        setFormName(user.name || '');
+        setFormRole(user.role === 'Admin' ? 'Admin' : 'User');
+        setFormApproved(user.approved !== false);
+        setFormPassword('');
+        setFormError(null);
+        setOpenDialog(true);
+    };
+
+    const handleCloseDialog = () => {
+        if (saving) return;
+        setOpenDialog(false);
+        setFormError(null);
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!formEmail) {
+            setFormError('Email is required');
+            return;
+        }
+
+        try {
+            setSaving(true);
+            setFormError(null);
+
+            if (dialogMode === 'add') {
+                await createUser({
+                    email: formEmail,
+                    name: formName || undefined,
+                    role: formRole,
+                    approved: formApproved,
+                    password: formPassword || undefined,
+                });
+                showToast('User created successfully', 'success');
+            } else {
+                if (!selectedUser?.uid) {
+                    throw new Error('No user selected for update');
+                }
+                await updateUser(selectedUser.uid, {
+                    email: formEmail || undefined,
+                    name: formName || undefined,
+                    role: formRole,
+                    approved: formApproved,
+                    password: formPassword || undefined,
+                });
+                showToast('User updated successfully', 'success');
+            }
+
+            setOpenDialog(false);
+            fetchUsers();
+        } catch (err: any) {
+            setFormError(err?.response?.data?.message || err?.message || 'An error occurred while saving the user');
+        } finally {
+            setSaving(false);
+        }
+    };
 
     // Filter users based on search
     const filteredUsers = users.filter((user) => {
@@ -103,8 +209,8 @@ const SuperAdminDashboard: React.FC = () => {
         <Container maxWidth="lg" sx={{ py: 4 }}>
             {/* Header */}
             <Fade in timeout={500}>
-                <Box sx={{ mb: 4 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+                <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                         <Tooltip title="Back to my studio">
                             <IconButton
                                 onClick={() => navigate(-1)}
@@ -148,6 +254,26 @@ const SuperAdminDashboard: React.FC = () => {
                             </Typography>
                         </Box>
                     </Box>
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={handleOpenAddDialog}
+                        sx={{
+                            background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                            fontWeight: 600,
+                            borderRadius: 2.5,
+                            textTransform: 'none',
+                            px: 3,
+                            py: 1,
+                            boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)',
+                            '&:hover': {
+                                background: 'linear-gradient(135deg, #4f46e5 0%, #9333ea 100%)',
+                                boxShadow: '0 6px 20px rgba(99, 102, 241, 0.6)',
+                            },
+                        }}
+                    >
+                        Add User
+                    </Button>
                 </Box>
             </Fade>
 
@@ -443,6 +569,25 @@ const SuperAdminDashboard: React.FC = () => {
                                                     </Typography>
                                                 </TableCell>
                                                 <TableCell align="right" sx={{ py: 1.5, borderBottom: (theme) => `1px solid ${alpha(theme.palette.divider, 0.05)}` }}>
+                                                    <Tooltip title="Edit User">
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleOpenEditDialog(user);
+                                                            }}
+                                                            sx={{
+                                                                color: 'text.secondary',
+                                                                mr: 1,
+                                                                '&:hover': {
+                                                                    background: (theme) => alpha(theme.palette.divider, 0.1),
+                                                                    color: 'primary.main',
+                                                                },
+                                                            }}
+                                                        >
+                                                            <EditIcon sx={{ fontSize: 20 }} />
+                                                        </IconButton>
+                                                    </Tooltip>
                                                     <Tooltip title="View User Dashboard">
                                                         <IconButton
                                                             size="small"
@@ -470,6 +615,161 @@ const SuperAdminDashboard: React.FC = () => {
                     )}
                 </Box>
             </Fade>
+
+            {/* Add/Edit User Dialog */}
+            <Dialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+                maxWidth="xs"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        background: (theme) => alpha(theme.palette.background.paper, 0.9),
+                        backdropFilter: 'blur(12px)',
+                        border: '1px solid',
+                        borderColor: (theme) => alpha(theme.palette.divider, 0.08),
+                        borderRadius: 3,
+                        boxShadow: '0 24px 48px rgba(0, 0, 0, 0.5)',
+                    },
+                }}
+            >
+                <form onSubmit={handleSubmit}>
+                    <DialogTitle sx={{ fontWeight: 700, pb: 1 }}>
+                        {dialogMode === 'add' ? 'Add New User' : 'Edit User'}
+                    </DialogTitle>
+                    <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1.5 }}>
+                        {formError && (
+                            <Paper
+                                sx={{
+                                    p: 1.5,
+                                    backgroundColor: (theme) => alpha(theme.palette.error.main, 0.1),
+                                    border: '1px solid',
+                                    borderColor: (theme) => alpha(theme.palette.error.main, 0.3),
+                                    borderRadius: 2,
+                                }}
+                                elevation={0}
+                            >
+                                <Typography color="error" variant="caption">
+                                    {formError}
+                                </Typography>
+                            </Paper>
+                        )}
+                        <TextField
+                            label="Email Address"
+                            type="email"
+                            fullWidth
+                            size="small"
+                            value={formEmail}
+                            onChange={(e) => setFormEmail(e.target.value)}
+                            required
+                            disabled={saving}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: 2,
+                                },
+                            }}
+                        />
+                        <TextField
+                            label="Full Name"
+                            type="text"
+                            fullWidth
+                            size="small"
+                            value={formName}
+                            onChange={(e) => setFormName(e.target.value)}
+                            disabled={saving}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: 2,
+                                },
+                            }}
+                        />
+                        <FormControl fullWidth size="small">
+                            <InputLabel id="role-select-label">Role</InputLabel>
+                            <Select
+                                labelId="role-select-label"
+                                label="Role"
+                                value={formRole}
+                                onChange={(e) => setFormRole(e.target.value as 'Admin' | 'User')}
+                                disabled={saving}
+                                sx={{ borderRadius: 2 }}
+                            >
+                                <MenuItem value="User">User</MenuItem>
+                                <MenuItem value="Admin">Admin</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={formApproved}
+                                    onChange={(e) => setFormApproved(e.target.checked)}
+                                    color="primary"
+                                    disabled={saving}
+                                />
+                            }
+                            label={
+                                <Typography variant="body2" color="text.secondary">
+                                    Approved / Active
+                                </Typography>
+                            }
+                        />
+                        <TextField
+                            label={dialogMode === 'add' ? 'Password' : 'New Password'}
+                            type="password"
+                            fullWidth
+                            size="small"
+                            value={formPassword}
+                            onChange={(e) => setFormPassword(e.target.value)}
+                            disabled={saving}
+                            helperText={
+                                dialogMode === 'add'
+                                    ? 'Optional - sets password for local account login'
+                                    : 'Leave blank to keep current password'
+                            }
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: 2,
+                                },
+                            }}
+                        />
+                    </DialogContent>
+                    <DialogActions sx={{ px: 3, pb: 3, pt: 1 }}>
+                        <Button
+                            onClick={handleCloseDialog}
+                            disabled={saving}
+                            sx={{
+                                borderRadius: 2,
+                                textTransform: 'none',
+                                fontWeight: 600,
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            disabled={saving}
+                            sx={{
+                                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                                borderRadius: 2,
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                minWidth: 100,
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #4f46e5 0%, #9333ea 100%)',
+                                },
+                            }}
+                        >
+                            {saving ? (
+                                <CircularProgress size={20} color="inherit" />
+                            ) : dialogMode === 'add' ? (
+                                'Create'
+                            ) : (
+                                'Save'
+                            )}
+                        </Button>
+                    </DialogActions>
+                </form>
+            </Dialog>
         </Container>
     );
 };

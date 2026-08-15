@@ -38,6 +38,11 @@ export class BaseApiClient {
     return response.data;
   }
 
+  async patch<T = unknown>(endpoint: string, body?: unknown, config?: ApiRequestConfig): Promise<T> {
+    const response: AxiosResponse<T> = await this.axiosInstance.patch(endpoint, body, config);
+    return response.data;
+  }
+
   async delete<T = unknown>(
     endpoint: string,
     bodyOrConfig?: unknown,

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Typography, Box, Button, Chip } from '@mui/material';
+import { Container, Typography, Box, Button, Chip, CircularProgress } from '@mui/material';
 import {
     Add as AddIcon,
     AdminPanelSettings as AdminIcon,
@@ -11,7 +11,7 @@ import {
     Settings as SettingsIcon,
 } from '@mui/icons-material';
 import CreateProjectModal from '../components/CreateProjectModal';
-import DomainSettingsModal from '../components/DomainSettingsModal';
+import BusinessSettingsModal from '../components/BusinessSettingModal';
 import ProjectList from '../components/ProjectList';
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import { useAuthStore } from '../../auth';
@@ -19,16 +19,19 @@ import { ProjectStatus } from '../types';
 import { getBusinessByUserId } from '../api/businessService';
 
 const StudioDashboard: React.FC = () => {
-    const { currentUser } = useAuthStore();
+    const { currentUser, effectiveUserId } = useAuthStore();
     const isAdmin = useAuthStore((state) => state.isAdmin)();
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
     const navigate = useNavigate();
-    const viewAsUserId = useStudioManagementStore((state) => state.viewAsUserId);
-    const projectJoinDriveData = useStudioManagementStore((state) => state.projects);
-    const fetchProjects = useStudioManagementStore((state) => state.fetchProjects);
-    const setBusinessData = useStudioManagementStore((state) => state.setBusinessData);
+    const {
+        viewAsUserId,
+        projects: projectJoinDriveData,
+        businessData,
+        fetchProjects, setBusinessData
+    } = useStudioManagementStore()
+    const [businessLoaded, setBusinessLoaded] = useState(false);
 
 
     // When admin is viewing another user's dashboard, hide management actions
@@ -39,13 +42,33 @@ const StudioDashboard: React.FC = () => {
 
     useEffect(() => {
         fetchProjects();
-
-        getBusinessByUserId(useAuthStore.getState().effectiveUserId ?? '').then((res) => {
-            const data = res.data.filter(e => e.typeId = 1)[0];
-            setBusinessData(data)
-
-        })
     }, [])
+
+    useEffect(() => {
+        if (!isSettingsModalOpen) {
+            getBusinessByUserId(useAuthStore.getState().effectiveUserId ?? '').then((res) => {
+                const data = res.data.filter(e => e.typeId = 1)[0];
+                setBusinessData(data)
+                if (!data) {
+                    setIsSettingsModalOpen(true)
+                }
+                setBusinessLoaded(true)
+            })
+        }
+    }, [isSettingsModalOpen])
+
+    if (!businessLoaded) {
+        return <Box sx={{
+            height: '400px',
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'column',
+        }}>
+            <CircularProgress />
+        </Box>
+    }
 
     return (
         <Box
@@ -187,7 +210,7 @@ const StudioDashboard: React.FC = () => {
                                 )}
                                 <Button
                                     variant="outlined"
-                                    onClick={() => navigate(`/private/studio/portfolio/manage?path=${encodeURIComponent("/")}`)}
+                                    onClick={() => navigate(`/private/user/${effectiveUserId}/studio/portfolio/manage?path=${encodeURIComponent("/")}`)}
                                     sx={{
                                         flex: { xs: 1, sm: 'initial' },
                                         borderRadius: '16px',
@@ -230,7 +253,7 @@ const StudioDashboard: React.FC = () => {
                                         transition: 'all 0.25s ease',
                                     }}
                                 >
-                                    Domain Settings
+                                    Manage Business
                                 </Button>
                                 <Button
                                     variant="contained"
@@ -387,7 +410,8 @@ const StudioDashboard: React.FC = () => {
                     />
                 )}
                 {!isAdminViewing && (
-                    <DomainSettingsModal
+                    <BusinessSettingsModal
+                        cancalable={!!businessData}
                         open={isSettingsModalOpen}
                         onClose={() => setIsSettingsModalOpen(false)}
                     />

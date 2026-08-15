@@ -25,7 +25,7 @@ export const createBusiness = async (data: BusinessPayload): Promise<Business> =
     return await StudioApiClient.post<Business>(ApiEndPoints.business.post.business(), data);
 };
 
-export const updateBusiness = async (id: string, data: Partial<BusinessPayload>): Promise<Business> => {
+export const updateBusiness = async (id: number, data: Partial<BusinessPayload>): Promise<Business> => {
     return await StudioApiClient.put<Business>(ApiEndPoints.business.put.business(id), data);
 };
 

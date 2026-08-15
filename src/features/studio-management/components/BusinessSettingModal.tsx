@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -11,16 +11,17 @@ import {
     CircularProgress,
     Alert
 } from '@mui/material';
-import { createBusiness, getBusiness, getBusinessByUserId } from '../api/businessService';
+import { createBusiness, getBusiness, getBusinessByUserId, updateBusiness } from '../api/businessService';
 import { useAuthStore } from '../../auth';
 
 interface DomainSettingsModalProps {
     open: boolean;
+    cancalable?: boolean;
     onClose: () => void;
 }
 
-const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose }) => {
-    const { currentUser } = useAuthStore();
+const BusinessSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose, cancalable = true }) => {
+    const { currentUser, effectiveUserId } = useAuthStore();
 
     const [name, setName] = useState('');
     const [slug, setSlug] = useState('');
@@ -31,6 +32,7 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
     const [fetching, setFetching] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    const businessIdRef = useRef<number | null>(null);
 
     /**
      * Validates and sets the subdomain slug.
@@ -73,6 +75,7 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
             if (!effectiveUserId) return;
             const res = await getBusinessByUserId(effectiveUserId);
             const data = res.data.filter(e => e.typeId = 1)[0];
+            businessIdRef.current = data.id;
             setName(data.name || '');
             setSlug(data.slug || '');
             setCustomDomain(data.customDomain || '');
@@ -104,17 +107,26 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
         try {
 
             // Create new
-            await createBusiness({
-                ownerUserId: currentUser.userId,
-                name,
-                slug,
-                customDomain: customDomain || undefined,
-                isActive: true
-            });
+            if (businessIdRef.current) {
+                await updateBusiness(businessIdRef.current, {
+                    name,
+                    slug,
+                    customDomain: customDomain || undefined
+                });
+                setSuccess('Tenant Updated successfully.');
+            }
+            else {
+                await createBusiness({
+                    ownerUserId: effectiveUserId!,
+                    name,
+                    slug,
+                    customDomain: customDomain || undefined,
+                    isActive: true
+                });
 
-            setSuccess('Tenant created successfully.');
+                setSuccess('Tenant created successfully.');
 
-
+            }
             setTimeout(() => {
                 onClose();
             }, 1500);
@@ -129,7 +141,7 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
     return (
         <Dialog
             open={open}
-            onClose={loading ? undefined : onClose}
+            onClose={loading ? undefined : cancalable ? onClose : undefined}
             maxWidth="sm"
             fullWidth
             PaperProps={{
@@ -144,7 +156,7 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
         >
             <DialogTitle sx={{ pb: 1, pt: 3, px: 4 }}>
                 <Typography variant="h5" sx={{ fontWeight: 600, color: '#F8FAFC' }}>
-                    Domain Settings
+                    Manage Business
                 </Typography>
             </DialogTitle>
 
@@ -156,14 +168,14 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
                 ) : (
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mt: 1 }}>
                         <Typography variant="body2" sx={{ color: '#94A3B8', mb: 1 }}>
-                            Configure your studio's custom domain and branding details.
+                            Configure your business custom domain and branding details.
                         </Typography>
 
                         {error && <Alert severity="error" sx={{ borderRadius: 2 }}>{error}</Alert>}
                         {success && <Alert severity="success" sx={{ borderRadius: 2 }}>{success}</Alert>}
 
                         <TextField
-                            label="Studio Name"
+                            label="Business Name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             fullWidth
@@ -217,13 +229,16 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
             </DialogContent>
 
             <DialogActions sx={{ px: 4, pb: 4, pt: 1 }}>
-                <Button
-                    onClick={onClose}
-                    disabled={loading || fetching}
-                    sx={{ color: '#94A3B8' }}
-                >
-                    Cancel
-                </Button>
+                {
+                    cancalable &&
+                    <Button
+                        onClick={onClose}
+                        disabled={loading || fetching}
+                        sx={{ color: '#94A3B8' }}
+                    >
+                        Cancel
+                    </Button>
+                }
                 <Button
                     onClick={handleSave}
                     disabled={loading || fetching}
@@ -245,4 +260,4 @@ const DomainSettingsModal: React.FC<DomainSettingsModalProps> = ({ open, onClose
     );
 };
 
-export default DomainSettingsModal;
+export default BusinessSettingsModal;

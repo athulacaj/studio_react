@@ -15,6 +15,12 @@ const ApiEndPoints = {
         get: {
             getAllusers: () => `/users`,
             getUserById: (id: string) => `/users/${id}`
+        },
+        post: {
+            createUser: () => `/users`
+        },
+        patch: {
+            updateUser: (id: string) => `/users/${id}`
         }
     },
     projects: {
@@ -50,7 +56,7 @@ const ApiEndPoints = {
             business: () => `/business`
         },
         put: {
-            business: (id: string) => `/business/${id}`
+            business: (id: number) => `/business/${id}`
         }
     },
     website: {
