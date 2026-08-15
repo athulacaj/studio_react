@@ -46,7 +46,7 @@ const AdminProjectDetailWrapper: React.FC = () => {
         };
     }, [userId, currentUser]);
 
-    if (!isAdmin) return null;
+    // if (!isAdmin) return null;
 
     return <ProjectDetailView />;
 };

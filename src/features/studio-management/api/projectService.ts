@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../config/firebase';
 import { Project, SharedLink, DriveNode, DriveData, ProjectJoinDriveData, LinkCategory, SyncedFolder, SelectedAlbum } from '../types';
 import { AssetsApiClient, StudioApiClient } from '../../../services/ApiInitalizer';
@@ -28,6 +28,33 @@ export const getPublicProject = async (projectId: string): Promise<{ data: Proje
 
 export const createProject = async (project: Partial<Project>, driveData?: Partial<DriveData>): Promise<{ data: Project }> => {
     return await StudioApiClient.post<{ data: Project }>(ApiEndPoints.projects.post.projects(), { project, driveData });
+};
+
+/**
+ * Updates an existing project and its optional drive data.
+ * @param {string} projectId
+ * @param {Partial<Project> & { driveConnectionId?: string }} [project]
+ * @param {{ driveData?: any; selectedFolders?: string[] }} [driveData]
+ * @returns {Promise<{ data: Project }>} Updated project
+ */
+export const updateProject = async (
+    projectId: string,
+    project?: Partial<Project> & { driveConnectionId?: string },
+    driveData?: {
+        driveData?: any;
+        selectedFolders?: string[];
+    }
+): Promise<{ data: Project }> => {
+    try {
+        const response = await StudioApiClient.put<{ data: Project }>(
+            ApiEndPoints.projects.put.projects(projectId),
+            { project, driveData }
+        );
+        return response;
+    } catch (error) {
+        console.error("Error updating project:", error);
+        throw error;
+    }
 };
 
 /**

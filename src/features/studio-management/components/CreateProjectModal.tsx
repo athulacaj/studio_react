@@ -150,7 +150,6 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
             if (isEditMode && project) {
                 await updateProject(project.id, {
                     name: projectName,
-                    selectedFolders: foldersToSave
                 });
                 if (source === 'google_drive') {
                     await handleDriveUpload(project.id, foldersToSave);

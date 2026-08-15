@@ -18,6 +18,10 @@ This document outlines the development plan for a modern, responsive photo proof
     *   Added a "Select All / Unselect All" checkbox at the top of the `FolderTree` component.
     *   Supports indeterminate state, displaying how many folders are currently selected.
     *   Integrated across `FolderSelectionDialog`, `CreateShareLinkModal`, and `ManageShareLinksModal`.
+*   **Project Update API Integration:**
+    *   Implemented the `updateProject` API function in [projectService.ts](file:///Users/abinjosepph/develop/projects/studio_react/src/features/studio-management/api/projectService.ts) targeting the PUT `/projects/projects/:id` endpoint.
+    *   Configured the endpoint URL mapping in [apiEndpoints.ts](file:///Users/abinjosepph/develop/projects/studio_react/src/config/apiEndpoints.ts).
+    *   Fully integrated the `updateProject`, `updateProjectLocalState`, and `updateShareLink` store actions in [studioManagementStore.ts](file:///Users/abinjosepph/develop/projects/studio_react/src/features/studio-management/store/studioManagementStore.ts) to handle backend synchronization, resolving existing compilation warnings and type mismatches.
 
 ### Current Development Plan
 

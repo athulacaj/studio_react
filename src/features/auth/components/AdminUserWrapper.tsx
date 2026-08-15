@@ -5,6 +5,7 @@ import { Box, CircularProgress } from '@mui/material';
 import GlobalNavbar from '../../../core/components/GlobalNavbar';
 import { useConfigStore } from '../../../core/store/ConifgStore';
 import { getUserById } from '../../user-management/services/userService';
+import { adminSwithUser } from '../services/authService';
 
 const AdminUserWrapper = () => {
     const { currentUser, loading: authLoading, setUser, setEffectiveUserId, setEffectiveUser } = useAuthStore();
@@ -17,8 +18,8 @@ const AdminUserWrapper = () => {
         if (userId) {
             setEffectiveUserId(userId);
             if (userId != currentUser?.userId) {
-                getUserById(userId).then(res => {
-                    setEffectiveUser(res);
+                adminSwithUser(userId).then(res => {
+                    setEffectiveUser(res.user);
                     setLoading(false);
                 })
             } else {

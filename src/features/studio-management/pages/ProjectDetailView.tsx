@@ -357,7 +357,7 @@ const ProjectDetailView: React.FC = () => {
                         )}
 
                         {/* Selected Folders Count */}
-                        {project.selectedFolders && project.selectedFolders.length > 0 && (
+                        {projectData?.driveData?.selectedFolders && projectData.driveData.selectedFolders.length > 0 && (
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                                 <FolderIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                                 <Box>
@@ -365,8 +365,8 @@ const ProjectDetailView: React.FC = () => {
                                         Synced Folders
                                     </Typography>
                                     <Typography variant="body2" fontWeight={500}>
-                                        {project.selectedFolders.length} folder
-                                        {project.selectedFolders.length !== 1 ? 's' : ''}
+                                        {projectData.driveData.selectedFolders.length} folder
+                                        {projectData.driveData.selectedFolders.length !== 1 ? 's' : ''}
                                     </Typography>
                                 </Box>
                             </Box>

@@ -1,12 +1,11 @@
 import { create } from 'zustand';
-import { serverTimestamp, doc, updateDoc, deleteDoc, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { doc, deleteDoc, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { useAuthStore } from '../../auth';
 import { db } from '../../../config/firebase';
 import { Project, ProjectAssets, ProjectJoinDriveData, ProjectStatus, SharedLink, Source } from '../types';
-import { createProject, getProject, getSharedLink, postShareLink } from '../api/projectService';
+import { createProject, getProject, getSharedLink, postShareLink, updateProject, putShareLink } from '../api/projectService';
 import { Business } from '../api/businessService';
 
-const PAGE_LIMIT = 3;
 
 interface StudioManagementState {
     projects: ProjectJoinDriveData[];
@@ -32,8 +31,8 @@ interface StudioManagementState {
     fetchProjects: () => Promise<void>;
     fetchNextPage: () => Promise<void>;
     fetchPreviousPage: () => Promise<void>;
-    addProject: (projectData: Partial<Project>) => Promise<string>;
-    updateProject: (projectId: string, updates: Partial<Project>) => Promise<void>;
+    addProject: (projectData: Partial<Project> & { driveData?: any; selectedFolders?: string[] }) => Promise<string>;
+    updateProject: (projectId: string, updates: Partial<Project> & { driveData?: any; selectedFolders?: string[] }) => Promise<void>;
     createShareLink: (projectId: string, linkData: Omit<SharedLink, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>) => Promise<string>;
     fetchShareLinks: (projectId: string) => Promise<SharedLink[]>;
     updateShareLink: (projectId: string, linkId: string, updates: Partial<SharedLink>) => Promise<void>;
@@ -131,7 +130,7 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
         return;
     },
 
-    addProject: async (projectData: Partial<Project>) => {
+    addProject: async (projectData: Partial<Project> & { driveData?: any; selectedFolders?: string[] }) => {
         const effectiveUid = useAuthStore.getState().effectiveUserId;
         if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
@@ -159,10 +158,24 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
         }
     },
 
-    updateProject: async (projectId: string, updates: Partial<Project>) => {
-
+    updateProject: async (projectId: string, updates: Partial<Project> & { driveData?: any; selectedFolders?: string[] }) => {
+        set({ loading: true });
         try {
-            return;
+            const { driveData, selectedFolders, ...projectFields } = updates;
+
+            const projectPayload = Object.keys(projectFields).length > 0 ? projectFields : undefined;
+            const driveDataPayload = (driveData !== undefined || selectedFolders !== undefined)
+                ? { driveData, selectedFolders }
+                : undefined;
+
+            const response = await updateProject(projectId, projectPayload, driveDataPayload);
+            get().setCurrentProject(
+                {
+                    ...get().currentProject!,
+                    project: response.data
+                }
+            );
+            await get().fetchProjects();
         } catch (err: any) {
             console.error("Error updating project:", err);
             set({ error: err.message });
@@ -172,12 +185,15 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
         }
     },
     updateProjectLocalState: async (projectId: string) => {
-
-
-        return
+        try {
+            await get().fetchCurrentProject(projectId);
+            await get().fetchProjects();
+        } catch (err: any) {
+            console.error("Error updating project local state:", err);
+        }
     },
 
-    createShareLink: async (projectId: string, linkData: Omit<SharedLink, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>) => {
+    createShareLink: async (_projectId: string, linkData: Omit<SharedLink, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>) => {
         const effectiveUid = useAuthStore.getState().effectiveUserId;
         if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
@@ -185,7 +201,7 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
             const shareLinkRef = await postShareLink({
                 name: linkData.name,
                 sourceProjectId: linkData.sourceProjectId,
-                categories: linkData.categories,
+                categories: linkData.categories ?? [],
                 includedFolders: linkData.includedFolders
             })
 
@@ -221,22 +237,16 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
         }
     },
 
-    updateShareLink: async (projectId: string, linkId: string, updates: Partial<SharedLink>) => {
+    updateShareLink: async (_projectId: string, linkId: string, updates: Partial<SharedLink>) => {
         const effectiveUid = useAuthStore.getState().effectiveUserId;
         if (!effectiveUid) throw new Error("No user authenticated");
         set({ loading: true });
         try {
-            const linkRef = doc(db, 'projects', effectiveUid, 'projects', projectId, 'shared_links', linkId);
-            await updateDoc(linkRef, {
-                ...updates,
-                updatedAt: serverTimestamp()
-            });
-            const shareLinkRef = await postShareLink({
+            await putShareLink(linkId, {
                 name: updates.name,
-                sourceProjectId: linkData.sourceProjectId,
-                categories: linkData.categories,
-                includedFolders: linkData.includedFolders
-            })
+                categories: updates.categories,
+                includedFolders: updates.includedFolders
+            });
         } catch (err: any) {
             console.error("Error updating share link:", err);
             set({ error: err.message });

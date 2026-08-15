@@ -11,6 +11,7 @@ export const getUserById = async (id: string): Promise<User> => {
     return await StudioApiClient.get<{ data: User }>(ApiEndPoints.users.get.getUserById(id)).then(res => res.data);
 };
 
+
 export const createUser = async (payload: {
     email: string;
     name?: string;

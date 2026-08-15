@@ -8,7 +8,8 @@ function makeQueryUrl(obj: Record<string, any>) {
 const ApiEndPoints = {
     auth: {
         get: {
-            me: () => "/auth/me"
+            me: () => "/auth/me",
+            adminSwitch: (userId: string) => "/auth/admin/switch/" + userId,
         }
     },
     users: {
@@ -37,6 +38,7 @@ const ApiEndPoints = {
             sharedLinks: () => `/projects/sharedLinks`,
         },
         put: {
+            projects: (id: string) => `/projects/projects/${id}`,
             sharedLinks: (id: string) => `/projects/sharedLinks/${id}`,
             selectedAlbums: () => `/projects/selected-albums`,
         }
