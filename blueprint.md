@@ -150,3 +150,14 @@ This document outlines the development plan for a modern, responsive photo proof
    - Form fields include: Email (required, text), Name (text), Role (Admin/User select), Approved status (boolean toggle), and Password (optional/override, password text).
    - Styled to match the neon accents and dark background details of Mizhiv.
    - Handled server errors, form loading states, and dynamic form reset on successful submit.
+
+
+#### Iteration 12: Project Name Special Character Restriction
+
+1. **Character Constraints on Project Name:**
+   - Added regex restriction `/^[a-zA-Z0-9 _-]+$/` to allow only letters, numbers, spaces, underscores, and hyphens in project names.
+2. **Real-time UX Inline Validation:**
+   - Integrated error states and helper texts into the TextField component inside `CreateProjectModal` to give users immediate feedback while typing.
+3. **Submit-level Safeguards:**
+   - Updated modal submit handlers to reject invalid formats and display user-friendly error banners.
+

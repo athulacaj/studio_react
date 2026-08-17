@@ -1,0 +1,1 @@
+we  keep the assets in share also along with the images bcz to handle via api

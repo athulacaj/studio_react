@@ -36,7 +36,6 @@ interface CreateProjectModalProps {
 const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, projectData = null }) => {
     const addProject = useStudioManagementStore((state) => state.addProject);
     const updateProject = useStudioManagementStore((state) => state.updateProject);
-    const currentUser = useAuthStore((state) => state.currentUser);
     const effectiveUserId = useAuthStore((state) => state.effectiveUserId);
     const [projectName, setProjectName] = useState('');
     const [source, setSource] = useState('google_photos');
@@ -54,6 +53,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
     const driveData = projectData?.driveData;
 
     const isEditMode = !!project;
+    const isNameInvalid = projectName.length > 0 && !/^[a-zA-Z0-9 _-]+$/.test(projectName);
 
     useEffect(() => {
         if (open) {
@@ -90,6 +90,10 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
         setError('');
         if (!projectName.trim()) {
             setError('Project name is required');
+            return;
+        }
+        if (!/^[a-zA-Z0-9 _-]+$/.test(projectName)) {
+            setError('Project name can only contain letters, numbers, spaces, underscores, and hyphens');
             return;
         }
         if (source === 'google_drive' && !driveUrl.trim()) {
@@ -184,7 +188,6 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
     };
 
     const handleDriveUpload = async (projectId: string, folders: string[]) => {
-        const viewAsUserId = useStudioManagementStore.getState().viewAsUserId;
         if (!effectiveUserId) return;
         const uploadPromises = folders.map(folderId => {
             return uploadDriveData({
@@ -238,6 +241,8 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                                 value={projectName}
                                 onChange={(e) => setProjectName(e.target.value)}
                                 autoFocus
+                                error={isNameInvalid}
+                                helperText={isNameInvalid ? 'Only letters, numbers, spaces, underscores, and hyphens are allowed' : ''}
                                 sx={{
                                     '& .MuiOutlinedInput-root': {
                                         borderRadius: '12px',
