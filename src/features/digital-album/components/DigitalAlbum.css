@@ -1,0 +1,307 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Digital Album – Styles
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Container ─────────────────────────────────────────────────────── */
+
+.digital-album-root {
+  position: relative;
+  width: 100%;
+}
+
+.digital-album-grid-wrapper {
+  position: relative;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top center;
+}
+
+.digital-album-grid-wrapper.mobile-view {
+  max-width: 420px;
+  margin: 0 auto;
+  border: 2px solid rgba(157, 78, 221, 0.2);
+  border-radius: 24px;
+  padding: 12px;
+  background: rgba(15, 26, 46, 0.4);
+}
+
+/* ── Toolbar ───────────────────────────────────────────────────────── */
+
+.album-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  background: rgba(15, 26, 46, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  position: sticky;
+  top: 8px;
+  z-index: 100;
+  flex-wrap: wrap;
+}
+
+.album-toolbar .toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.album-toolbar .toolbar-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 6px;
+  flex-shrink: 0;
+}
+
+.album-toolbar .toolbar-spacer {
+  flex: 1;
+}
+
+.album-toolbar .unsaved-chip {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* ── Grid Items ────────────────────────────────────────────────────── */
+
+/* react-grid-layout sets position/size on the direct child divs.
+   These rules ensure the inner content fills the cell. */
+.react-grid-item > div {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.album-grid-item {
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(15, 26, 46, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  cursor: grab;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.album-grid-item:hover {
+  border-color: rgba(157, 78, 221, 0.35);
+  box-shadow: 0 8px 32px rgba(157, 78, 221, 0.15), 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.album-grid-item:active {
+  cursor: grabbing;
+}
+
+.album-grid-item.readonly {
+  cursor: default;
+}
+
+.album-grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+/* ── Item Overlay ──────────────────────────────────────────────────── */
+
+.album-item-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.5) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px;
+  pointer-events: none;
+}
+
+.album-grid-item:hover .album-item-overlay {
+  opacity: 1;
+}
+
+.album-item-overlay .drag-handle {
+  cursor: grab;
+  color: rgba(255, 255, 255, 0.85);
+  pointer-events: auto;
+}
+
+.album-item-overlay .remove-btn {
+  pointer-events: auto;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.album-item-overlay .remove-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* ── RGL Overrides ─────────────────────────────────────────────────── */
+
+.react-grid-layout {
+  position: relative;
+  transition: height 200ms ease;
+}
+
+.react-grid-item.react-grid-placeholder {
+  background: rgba(157, 78, 221, 0.2) !important;
+  border: 2px dashed rgba(157, 78, 221, 0.5) !important;
+  border-radius: 12px !important;
+  opacity: 1 !important;
+  box-shadow: 0 0 20px rgba(157, 78, 221, 0.15) !important;
+}
+
+.react-grid-item > .react-resizable-handle {
+  background: none !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.react-grid-item > .react-resizable-handle::after {
+  content: '' !important;
+  position: absolute;
+  right: 4px !important;
+  bottom: 4px !important;
+  width: 8px !important;
+  height: 8px !important;
+  border-right: 2px solid rgba(157, 78, 221, 0.5) !important;
+  border-bottom: 2px solid rgba(157, 78, 221, 0.5) !important;
+  border-radius: 0 0 2px 0;
+}
+
+.react-grid-item.react-draggable-dragging {
+  z-index: 50 !important;
+  box-shadow: 0 12px 40px rgba(157, 78, 221, 0.3), 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+  border-color: rgba(157, 78, 221, 0.5) !important;
+}
+
+/* ── Unplaced Images Tray ──────────────────────────────────────────── */
+
+.unplaced-tray-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.unplaced-tray-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.unplaced-tray-item:hover {
+  border-color: rgba(157, 78, 221, 0.5);
+  transform: scale(1.05);
+}
+
+.unplaced-tray-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.unplaced-tray-item .add-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(157, 78, 221, 0.25);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.unplaced-tray-item:hover .add-overlay {
+  opacity: 1;
+}
+
+/* ── Reserved Slot Placeholder ─────────────────────────────────────── */
+
+.reserved-slot {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  border: 2px dashed rgba(157, 78, 221, 0.3);
+  background: rgba(157, 78, 221, 0.04);
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.reserved-slot:hover {
+  border-color: rgba(157, 78, 221, 0.5);
+  background: rgba(157, 78, 221, 0.08);
+}
+
+.reserved-slot-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  gap: 4px;
+}
+
+/* ── Empty state ───────────────────────────────────────────────────── */
+
+.album-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 16px;
+  border: 2px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(15, 26, 46, 0.3);
+}
+
+/* ── Animations ────────────────────────────────────────────────────── */
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(157, 78, 221, 0.2); }
+  50%      { box-shadow: 0 0 16px rgba(157, 78, 221, 0.4); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.album-grid-item {
+  animation: fadeIn 0.3s ease both;
+}
+
+/* ── Zoom label ────────────────────────────────────────────────────── */
+
+.zoom-label {
+  font-size: 0.7rem;
+  color: rgba(148, 163, 184, 0.8);
+  min-width: 36px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}

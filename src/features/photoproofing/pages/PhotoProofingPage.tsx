@@ -7,6 +7,8 @@ import { ImageObj } from '../types';
 import { CachedImage } from '../../../shared/utils/MakeGlobalImageCache';
 import CategoryTabs from '../components/CategoryTabs';
 import { useSearchParams } from 'react-router-dom';
+import { DigitalAlbum } from '../../digital-album';
+
 
 const PhotoProofingPage = () => {
     const { albums, images, categories } = usePhotoProofingStore();
@@ -29,8 +31,6 @@ const PhotoProofingPage = () => {
             setReload(false);
         }, 100);
     }, [selectedAlbum]);
-
-
 
     return (
         <Box>
