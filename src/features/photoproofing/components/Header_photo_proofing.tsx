@@ -212,7 +212,7 @@ const HeaderPhotoProofing = ({ allDisplayedImages, selectedAlbum }: HeaderPhotoP
             to="/"
             sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer', textDecoration: 'none' }}
           >
-            <Box component="img" src="/images/logo_small.png" alt="mizhiv logo" sx={{ height: { xs: 28, md: 32 }, width: 'auto', borderRadius: '8px' }} />
+            <Box component="img" src="/share/images/logo_small.png" alt="mizhiv logo" sx={{ height: { xs: 28, md: 32 }, width: 'auto', borderRadius: '8px' }} />
             <Typography
               variant="h6"
               component="div"
@@ -285,7 +285,7 @@ const HeaderPhotoProofing = ({ allDisplayedImages, selectedAlbum }: HeaderPhotoP
           {/* Drawer Header */}
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box component="img" src="/images/logo_small.png" alt="mizhiv logo" sx={{ height: 28, width: 'auto', borderRadius: '8px' }} />
+              <Box component="img" src="/share/images/logo_small.png" alt="mizhiv logo" sx={{ height: 28, width: 'auto', borderRadius: '8px' }} />
               <Box
                 component="span"
                 sx={{

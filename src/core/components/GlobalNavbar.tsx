@@ -155,7 +155,7 @@ const GlobalNavbar = () => {
               overflow: 'hidden'
             }}
           >
-            <Box component="img" src="/images/logo_small.png" alt="mizhiv logo" sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <Box component="img" src="/share/images/logo_small.png" alt="mizhiv logo" sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </Box>
           <Typography
             variant="h6"
