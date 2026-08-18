@@ -247,7 +247,7 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
             setIsProcessingFiles(false);
             setIsUploading(true);
 
-            const folder = 'portfolio-assets';
+            const folder = `websites/${path}/assets`;
             const fileUploadDetails = processedImages.map((pi) => ({
                 fileName: pi.file.name,
                 contentType: pi.file.type
@@ -335,7 +335,7 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
             const file = new File([updatedHtml], 'index.html', { type: 'text/html' });
 
             const urlsResponse = await getUploadUrls({
-                folder: `users/${effectiveUserId}/websites/${path}`,
+                folder: `websites/${path}`,
                 files: [{ fileName: 'index.html', contentType: 'text/html' }]
             });
 

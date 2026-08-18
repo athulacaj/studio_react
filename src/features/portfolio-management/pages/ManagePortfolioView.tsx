@@ -6,7 +6,9 @@ import UploadTemplateStep from '../components/UploadTemplateStep';
 import ManagePortfolioHeader from '../components/ManagePortfolioHeader';
 import AssetsTabContent from '../components/AssetsTabContent';
 import SettingsTabContent from '../components/SettingsTabContent';
+import OgGraphTabContent from '../components/OgGraphTabContent';
 import PortfolioPreview from '../components/PortfolioPreview';
+import OgGraphPreview from '../components/OgGraphPreview';
 
 import { useManagePortfolio } from '../hooks/useManagePortfolio';
 import { PortfolioContext, usePortfolioContext } from '../context/portfolioGlobalContext';
@@ -79,6 +81,7 @@ const ManageStudioPortfolioView: React.FC = () => {
                 >
                     <Tab label="Content" />
                     <Tab label="Upload Assets" />
+                    <Tab label="OG Graph" />
                     <Tab label="Settings" />
                 </Tabs>
 
@@ -90,6 +93,9 @@ const ManageStudioPortfolioView: React.FC = () => {
                         <AssetsTabContent />
                     )}
                     {activeTab === 2 && (
+                        <OgGraphTabContent />
+                    )}
+                    {activeTab === 3 && (
                         <SettingsTabContent />
                     )}
                 </Box>
@@ -111,7 +117,7 @@ const ManageStudioPortfolioView: React.FC = () => {
             />
 
             {/* Main Live Preview Area */}
-            <PortfolioPreview />
+            {activeTab === 2 ? <OgGraphPreview /> : <PortfolioPreview />}
         </Box>
 
     );

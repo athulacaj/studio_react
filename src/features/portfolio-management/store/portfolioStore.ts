@@ -15,6 +15,13 @@ export interface PortfolioVersion {
     publishedAt: string;
 }
 
+export interface OgData {
+    title: string;
+    description: string;
+    image: string;
+    url: string;
+}
+
 // State Interface
 export interface PortfolioState {
     // Content & Data
@@ -24,6 +31,7 @@ export interface PortfolioState {
     webSiteData: Website | null;
     pathData: WebsitePath | null;
     uploadedImages: UploadedImage[];
+    ogData: OgData;
 
     // Steps & UI States
     step: 1 | 2;
@@ -58,6 +66,7 @@ export interface PortfolioActions {
     setBusinessData: (data: Business) => void;
     setWebsiteData: (data: Website) => void;
     setPathData: (data: WebsitePath | null) => void;
+    setOgData: (data: OgData) => void;
 
     // Steps & UI Setters
     setStep: (step: 1 | 2) => void;
@@ -95,6 +104,7 @@ export const initialState: PortfolioState = {
     webSiteData: null,
     pathData: null,
     uploadedImages: [],
+    ogData: { title: '', description: '', image: '', url: '' },
 
     step: 1,
     error: null,
@@ -128,6 +138,7 @@ export const usePortfolioStore = create<PortfolioStore>((set) => ({
     setBusinessData: (data) => set({ businessData: data }),
     setWebsiteData: (data) => set({ webSiteData: data }),
     setPathData: (data: WebsitePath | null) => set({ pathData: data }),
+    setOgData: (ogData) => set({ ogData }),
 
     // Steps & UI Actions
     setStep: (step) => set({ step }),
