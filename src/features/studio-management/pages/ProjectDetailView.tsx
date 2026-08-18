@@ -566,7 +566,7 @@ const ProjectDetailView: React.FC = () => {
                             <MenuItem onClick={() => {
                                 handleManageInvitationClose();
                                 if (projectData && project) {
-                                    navigate(`/private/studio/portfolio/manage?path=${encodeURIComponent(projectData.project.name)}&type=${WebsiteTemplateType.weddingInvitation}&name=${project.name}&projectId=${encodeURIComponent(projectData.project.id)}`);
+                                    navigate(`/private/user/${effectiveUserId}/studio/portfolio/manage?path=${encodeURIComponent(projectData.project.name)}&type=${WebsiteTemplateType.weddingInvitation}&name=${project.name}&projectId=${encodeURIComponent(projectData.project.id)}`);
                                 }
                             }}>
                                 <EditIcon fontSize="small" sx={{ mr: 1.5, color: 'text.secondary' }} />
