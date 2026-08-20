@@ -22,8 +22,9 @@ const ProtectedRoute = () => {
     }
 
     if (!currentUser) {
+        const baseLogin = location.pathname.includes("private/admin") ? true : false;
         // Redirect to login page but save the current location they were trying to go to
-        return <Navigate to="/login" state={{ from: location }} replace />;
+        return <Navigate to={`/login?baseLogin=${baseLogin}`} state={{ from: location }} replace />;
     }
 
     // Wait for user profile to be fetched at least once

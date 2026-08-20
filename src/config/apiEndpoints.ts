@@ -10,6 +10,9 @@ const ApiEndPoints = {
         get: {
             me: () => "/auth/me",
             adminSwitch: (userId: string) => "/auth/admin/switch/" + userId,
+        },
+        post: {
+            login: () => "/auth/login",
         }
     },
     users: {
