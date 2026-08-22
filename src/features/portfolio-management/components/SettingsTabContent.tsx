@@ -34,6 +34,7 @@ export const SettingsTabContent: React.FC = () => {
         handleVersionChange,
         handleDownloadHtml,
         setStep,
+        VERSION_LIMIT
     } = managePortfolioController;
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -174,7 +175,7 @@ export const SettingsTabContent: React.FC = () => {
                     </Box>
 
                     <Typography variant="body2" sx={{ color: '#94A3B8', mb: 4, lineHeight: 1.6 }}>
-                        Easily roll back to previous versions of your portfolio. Selecting a past version will instantly load its layout and configuration into the editor.
+                        Easily roll back to any of your {VERSION_LIMIT} most recent portfolio versions. Selecting a past version will instantly load its layout and configuration into the editor.
                     </Typography>
 
                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>

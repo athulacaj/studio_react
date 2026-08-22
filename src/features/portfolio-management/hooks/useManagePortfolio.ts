@@ -13,6 +13,7 @@ import { getBusinessByUserId } from '../../studio-management/api/businessService
 
 
 
+
 export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement | null>) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -21,6 +22,7 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
     const type = searchParams.get('type')
     const title = searchParams.get("title") ?? ''
     const effectiveUserId = useAuthStore.getState().effectiveUserId;
+    const VERSION_LIMIT = 5;
 
     // Global Store State & Setters
     const {
@@ -332,56 +334,83 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
                 `let websiteData = ${JSON.stringify(portfolioData, null, 2)};`
             );
 
-            const file = new File([updatedHtml], 'index.html', { type: 'text/html' });
+            const existingVersions = webSiteData?.versions || [];
+            const isAtLimit = existingVersions.length >= VERSION_LIMIT;
+
+            // Calculate the next slot number (1-based, cycles through VERSION_LIMIT)
+            let nextSlot: number;
+            if (isAtLimit) {
+                // Extract slot number from the oldest version's path (e.g., ".../3-index.html" → 3)
+                const oldestPath = existingVersions[0].path;
+                const slotMatch = oldestPath.match(/(\d+)-index\.html$/);
+                nextSlot = slotMatch ? parseInt(slotMatch[1], 10) : 1;
+            } else {
+                nextSlot = existingVersions.length + 1;
+            }
+
+            const slotFileName = `${nextSlot}-index.html`;
+            const file = new File([updatedHtml], slotFileName, { type: 'text/html' });
 
             const urlsResponse = await getUploadUrls({
                 folder: `websites/${path}`,
-                files: [{ fileName: 'index.html', contentType: 'text/html' }]
+                files: [{ fileName: slotFileName, contentType: 'text/html' }]
             });
 
             const urlInfo = urlsResponse[0];
-            if (urlInfo) {
-                await uploadFileToR2({ key: urlInfo.key, uploadUrl: urlInfo.uploadUrl }, file);
-
-                const assetsMetadata = uploadedImages.map((img) => ({
-                    id: img.id,
-                    fileKey: img.fileKey,
-                    compressed: img.compressed,
-                    fileName: img.file?.name || 'asset',
-                    contentType: img.file?.type || 'image/webp'
-                }));
-
-                const versionData = {
-                    path: urlInfo.key,
-                    publishedAt: new Date().toISOString()
-                };
-
-                let updatedWebsiteData;
-                if (webSiteData) {
-                    updatedWebsiteData = await updateWebsite(webSiteData.id, {
-                        businessId,
-                        path,
-                        currentPath: urlInfo.key,
-                        projectId: projectId,
-                        versions: [...webSiteData.versions, versionData]
-                    });
-                } else {
-                    updatedWebsiteData = await createWebsite({
-                        businessId,
-                        projectId: projectId,
-                        path,
-                        assets: assetsMetadata,
-                        currentPath: urlInfo.key,
-                        r2BaseUrl: import.meta.env.VITE_R2_BASEURL,
-                        versions: [versionData]
-                    });
-                }
-
-                setVersions((prev) => [...prev, versionData]);
-                setWebsiteData(updatedWebsiteData.data);
-                setSelectedVersionPath(urlInfo.key);
-                alert('Portfolio published successfully!');
+            if (!urlInfo) {
+                throw new Error('Failed to get upload URL');
             }
+
+            // Upload (overwrites existing file in R2 if slot already exists)
+            await uploadFileToR2({ key: urlInfo.key, uploadUrl: urlInfo.uploadUrl }, file);
+
+            const assetsMetadata = uploadedImages.map((img) => ({
+                id: img.id,
+                fileKey: img.fileKey,
+                compressed: img.compressed,
+                fileName: img.file?.name || 'asset',
+                contentType: img.file?.type || 'image/webp'
+            }));
+
+            const versionData = {
+                path: urlInfo.key,
+                publishedAt: new Date().toISOString()
+            };
+
+            // Build the new versions array with rotation
+            let newVersions: typeof existingVersions;
+            if (isAtLimit) {
+                // Drop the oldest (first) version, append the new one
+                newVersions = [...existingVersions.slice(1), versionData];
+            } else {
+                newVersions = [...existingVersions, versionData];
+            }
+
+            let updatedWebsiteData;
+            if (webSiteData) {
+                updatedWebsiteData = await updateWebsite(webSiteData.id, {
+                    businessId,
+                    path,
+                    currentPath: urlInfo.key,
+                    projectId: projectId,
+                    versions: newVersions
+                });
+            } else {
+                updatedWebsiteData = await createWebsite({
+                    businessId,
+                    projectId: projectId,
+                    path,
+                    assets: assetsMetadata,
+                    currentPath: urlInfo.key,
+                    r2BaseUrl: import.meta.env.VITE_R2_BASEURL,
+                    versions: [versionData]
+                });
+            }
+
+            setVersions(newVersions);
+            setWebsiteData(updatedWebsiteData.data);
+            setSelectedVersionPath(urlInfo.key);
+            alert('Portfolio published successfully!');
         } catch (err) {
             console.error('Error publishing portfolio:', err);
             alert('Failed to publish portfolio.');
@@ -467,5 +496,6 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
         handleBack,
         navigate,
         title,
+        VERSION_LIMIT
     };
 };
