@@ -396,6 +396,19 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
         await loadPortfolioFromPath(versionPath);
     };
 
+    const handleDownloadHtml = () => {
+        if (!htmlContent) return;
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'portfolio.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
     const handleBack = () => {
         // if (businessData == null) {
         //     setStep(1);
@@ -450,6 +463,7 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
         handleRemoveAsset,
         handlePublish,
         handleVersionChange,
+        handleDownloadHtml,
         handleBack,
         navigate,
         title,

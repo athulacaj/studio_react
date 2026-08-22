@@ -17,7 +17,11 @@ This architecture is intended for website builders, portfolio generators, AI edi
 All website content must exist inside one object.
 
 ```javascript
-let websiteData = {};
+let websiteData = {
+    hero: {
+        content: {}
+    }
+};
 ```
 
 Nothing displayed on the page may be hardcoded inside HTML templates.
@@ -25,7 +29,7 @@ Nothing displayed on the page may be hardcoded inside HTML templates.
 ### ✅ Good
 
 ```javascript
-<h1>${websiteData.hero.title}</h1>
+<h1>${websiteData.hero.content.title}</h1>
 ```
 
 ### ❌ Bad
@@ -38,49 +42,425 @@ Nothing displayed on the page may be hardcoded inside HTML templates.
 
 ## 2. Data Structure
 
-Organize all content into logical sections.
+Organize all website data into logical sections.
 
-Example
+### Content Block Requirement
+
+**Every section must contain a `content` block. All content belonging to that section must live inside its `content` block.**
+
+The `content` block is the canonical location for the section's editable website content. Do not place section content directly beside `content`.
+
+Example:
 
 ```javascript
 let websiteData = {
 
-    brand: {},
+    brand: {
+        content: {}
+    },
 
-    navigation: [],
+    navigation: {
+        content: []
+    },
 
-    hero: {},
+    hero: {
+        content: {}
+    },
 
-    about: {},
+    about: {
+        content: {}
+    },
 
-    services: [],
+    services: {
+        content: []
+    },
 
-    gallery: [],
+    gallery: {
+        content: []
+    },
 
-    portfolio: [],
+    portfolio: {
+        content: []
+    },
 
-    team: [],
+    team: {
+        content: []
+    },
 
-    testimonials: [],
+    testimonials: {
+        content: []
+    },
 
-    pricing: [],
+    pricing: {
+        content: []
+    },
 
-    faq: [],
+    faq: {
+        content: []
+    },
 
-    contact: {},
+    contact: {
+        content: {}
+    },
 
-    footer: {}
+    footer: {
+        content: {}
+    }
 
 };
 ```
 
-Every visible item on the website must originate from `websiteData`.
+### Rule
+
+Use:
+
+```javascript
+websiteData.hero.content.title
+websiteData.about.content.description
+websiteData.services.content[0].title
+websiteData.gallery.content[0].image
+```
+
+Do **not** use:
+
+```javascript
+websiteData.hero.content.title
+websiteData.services.content[0].title
+websiteData.gallery.content[0].image
+```
+
+Every visible item on the website must originate from `websiteData.<section>.content`.
+
+Section-level configuration that is not website content may exist outside `content` only when required by the renderer. Editable/visible website content must always be inside `content`.
 
 ---
+
+# Required External Script
+
+Every generated website **must always include** the Mizhiv connector script:
+
+```html
+<script src="https://cdn.mizhiv.com/assets/js/mizhiv_connector.js"></script>
+```
+
+The script must be present in every generated HTML file, regardless of which sections exist in `websiteData`.
+
+Place it as a normal external `<script>` element in the HTML. Do not make its inclusion conditional on `websiteData` or on any section.
+
+### Required Rule
+
+The generated HTML must contain exactly this script reference:
+
+```html
+<script src="https://cdn.mizhiv.com/assets/js/mizhiv_connector.js"></script>
+```
+
+Do not:
+
+- Remove the script when a section is missing.
+- Load the script conditionally.
+- Replace the URL with another URL.
+- Hardcode the script contents into the HTML.
+- Add multiple copies of the script.
+
+Example:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- head content -->
+</head>
+
+<body>
+
+    <div id="parent">
+        <!-- generated sections -->
+    </div>
+
+    <script src="https://cdn.mizhiv.com/assets/js/mizhiv_connector.js"></script>
+
+    <!-- other required scripts -->
+
+</body>
+</html>
+```
+
+The Mizhiv connector script is a **global website dependency**, not section content, and must remain present even when `websiteData` is empty or sections are removed during re-rendering.
+
+# Required DOM Root
+
+The generated HTML must have a `<div id="parent">` as the **first element immediately after `<body>`**. All generated website sections must be placed inside this `#parent` container.
+
+Required structure:
+
+```html
+<body>
+    <div id="parent">
+        <!-- Generated sections -->
+    </div>
+</body>
+```
+
+The `#parent` element must always exist, even when sections are missing from `websiteData`. Do not place generated sections directly under `<body>` outside `#parent`.
 
 # Rendering Rules
 
 Every section must have its own render function.
+
+# Conditional Section Rendering
+
+Every section renderer **must conditionally render the section only when that section exists**.
+
+The renderer must first check whether the section is available:
+
+```javascript
+if (!websiteData.hero) return;
+```
+
+or, when using a local variable:
+
+```javascript
+const hero = websiteData.hero;
+
+if (!hero) return;
+```
+
+If the section exists, the renderer must then check the `content` block before rendering any content:
+
+```javascript
+if (!hero.content) return;
+```
+
+### Conditional Rendering of Individual Values
+
+**Every individual content value must also be conditionally checked before it is rendered.**
+
+Do not render empty, missing, `null`, or `undefined` values.
+
+Example:
+
+```javascript
+function renderHero() {
+
+    const hero = websiteData.hero;
+
+    if (!hero) return;
+    if (!hero.content) return;
+
+    const content = hero.content;
+
+    let html = '';
+
+    if (content.name) {
+        html += `
+            <h1
+                class="hero-name"
+                data-json-path="hero.content.name">
+                ${content.name}
+            </h1>
+        `;
+    }
+
+    if (content.description) {
+        html += `
+            <p
+                class="hero-description"
+                data-json-path="hero.content.description">
+                ${content.description}
+            </p>
+        `;
+    }
+
+    if (content.image) {
+        html += `
+            <img
+                src="${content.image}"
+                class="hero-image"
+                data-json-path="hero.content.image"
+                alt="">
+        `;
+    }
+
+    document.getElementById("hero").innerHTML = html;
+}
+```
+
+### Nested Values
+
+Nested values must also be checked before rendering.
+
+```javascript
+if (content.button) {
+
+    if (content.button.text && content.button.href) {
+
+        html += `
+            <a
+                href="${content.button.href}"
+                class="hero-button"
+                data-json-path="hero.content.button">
+                ${content.button.text}
+            </a>
+        `;
+
+    }
+
+}
+```
+
+Do not assume nested objects exist.
+
+### Array Sections
+
+For array-based sections, check the section, the `content` array, each item, and each individual property.
+
+```javascript
+function renderServices() {
+
+    const section = websiteData.services;
+
+    if (!section) return;
+    if (!section.content) return;
+    if (!Array.isArray(section.content)) return;
+
+    const items = section.content;
+
+    let html = '';
+
+    items.forEach((item, index) => {
+
+        if (!item) return;
+
+        let itemHtml = '';
+
+        if (item.title) {
+            itemHtml += `
+                <h3
+                    class="services-title"
+                    data-json-path="services.content[${index}].title">
+                    ${item.title}
+                </h3>
+            `;
+        }
+
+        if (item.description) {
+            itemHtml += `
+                <p
+                    class="services-description"
+                    data-json-path="services.content[${index}].description">
+                    ${item.description}
+                </p>
+            `;
+        }
+
+        if (item.image) {
+            itemHtml += `
+                <img
+                    src="${item.image}"
+                    class="services-image"
+                    data-json-path="services.content[${index}].image"
+                    alt="">
+            `;
+        }
+
+        if (itemHtml) {
+            html += `
+                <article
+                    class="services-item services-item-${index}"
+                    data-json-path="services.content[${index}]">
+                    ${itemHtml}
+                </article>
+            `;
+        }
+
+    });
+
+    if (html) {
+        document.getElementById("services").innerHTML = html;
+    }
+}
+```
+
+### Empty Sections
+
+If a section does not exist, has no `content`, or has no renderable content, **do not render an empty section into the page**.
+
+For example:
+
+```javascript
+if (!websiteData.about) return;
+if (!websiteData.about.content) return;
+```
+
+For arrays:
+
+```javascript
+if (!websiteData.services) return;
+if (!websiteData.services.content) return;
+if (!Array.isArray(websiteData.services.content)) return;
+if (websiteData.services.content.length === 0) return;
+```
+
+Individual array items should also be skipped when they are missing or contain no renderable values.
+
+### Required Pattern
+
+Every section renderer should follow this general pattern:
+
+```javascript
+function renderSection() {
+
+    const section = websiteData.section;
+
+    // 1. Check section
+    if (!section) return;
+
+    // 2. Check content
+    if (!section.content) return;
+
+    // 3. Check content type when required
+    // if (!Array.isArray(section.content)) return;
+
+    // 4. Check every value before rendering
+    if (section.content.title) {
+        // render title
+    }
+
+    if (section.content.description) {
+        // render description
+    }
+
+}
+```
+
+**Never blindly access or render optional content.**
+
+Bad:
+
+```javascript
+<h1>${content.title}</h1>
+<p>${content.description}</p>
+<img src="${content.image}">
+```
+
+Good:
+
+```javascript
+if (content.title) {
+    // render title
+}
+
+if (content.description) {
+    // render description
+}
+
+if (content.image) {
+    // render image
+}
+```
+
+This rule applies to **every section, every nested object, every array item, and every individual content value**.
 
 Example
 
@@ -111,6 +491,8 @@ renderFooter();
 ```
 
 Each renderer should only read data from `websiteData`.
+
+Each renderer must conditionally check the section and its `content` block before rendering. Every optional content value must also be checked before it is rendered.
 
 Example
 
@@ -203,13 +585,13 @@ Whenever rendering arrays, always use loops.
 Preferred
 
 ```javascript
-websiteData.services.map(...)
+websiteData.services.content.map(...)
 ```
 
 or
 
 ```javascript
-websiteData.services.forEach(...)
+websiteData.services.content.forEach(...)
 ```
 
 Never manually duplicate cards.
@@ -265,11 +647,11 @@ Every image URL must come from `websiteData`.
 Example
 
 ```javascript
-websiteData.hero.image
+websiteData.hero.content.image
 
-websiteData.gallery[0].image
+websiteData.gallery.content[0].image
 
-websiteData.team[0].photo
+websiteData.team.content[0].photo
 ```
 
 Never hardcode image URLs inside HTML.
@@ -351,10 +733,29 @@ This enables visual editors to determine exactly which JSON property generated a
 
 When a user clicks an element, the editor should be able to determine the corresponding JSON field simply by reading the element's CSS classes.
 
+## Content Block Path Rule
+
+Because every section has a `content` block, JSON paths must include the `content` segment.
+
+Examples:
+
+```text
+hero.content.title
+hero.content.button.text
+services.content[0].title
+gallery.content[4].image
+```
+
+For array sections, the array is always `websiteData.<section>.content`.
+
+For object sections, editable fields are always `websiteData.<section>.content.<field>`.
+
+This rule must be followed by renderers, CSS path classes, and `data-json-path` attributes.
+
 Example:
 
 ```javascript
-websiteData.hero.title
+websiteData.hero.content.title
 ```
 
 renders
@@ -366,7 +767,7 @@ renders
 Likewise,
 
 ```javascript
-websiteData.about.description
+websiteData.about.content.description
 ```
 
 renders
@@ -384,7 +785,7 @@ Nested properties should concatenate keys using hyphens.
 Example
 
 ```javascript
-websiteData.hero.button.text
+websiteData.hero.content.button.text
 ```
 
 becomes
@@ -412,7 +813,7 @@ Array items should include both:
 Example
 
 ```javascript
-websiteData.services[0].title
+websiteData.services.content[0].title
 ```
 
 renders
@@ -424,7 +825,7 @@ renders
 Another example
 
 ```javascript
-websiteData.team[2].name
+websiteData.team.content[2].name
 ```
 
 renders
@@ -436,7 +837,7 @@ renders
 Gallery
 
 ```javascript
-websiteData.gallery[4].image
+websiteData.gallery.content[4].image
 ```
 
 renders
@@ -472,7 +873,7 @@ Example
 ```html
 <h1
     class="hero-title"
-    data-json-path="hero.title">
+    data-json-path="hero.content.title">
 </h1>
 ```
 
@@ -481,7 +882,7 @@ Button
 ```html
 <a
     class="hero-button-text"
-    data-json-path="hero.button.text">
+    data-json-path="hero.content.button.text">
 </a>
 ```
 
@@ -490,7 +891,7 @@ Service
 ```html
 <h3
     class="services-title"
-    data-json-path="services[0].title">
+    data-json-path="services.content[0].title">
 </h3>
 ```
 
@@ -534,21 +935,21 @@ function renderHero() {
     document.getElementById("hero").innerHTML = `
         <h1
             class="hero-title"
-            data-json-path="hero.title">
-            ${websiteData.hero.title}
+            data-json-path="hero.content.title">
+            ${websiteData.hero.content.title}
         </h1>
 
         <p
             class="hero-description"
             data-json-path="hero.description">
-            ${websiteData.hero.description}
+            ${websiteData.hero.content.description}
         </p>
 
         <a
-            href="${websiteData.hero.button.href}"
+            href="${websiteData.hero.content.button.href}"
             class="hero-button hero-button-text"
-            data-json-path="hero.button.text">
-            ${websiteData.hero.button.text}
+            data-json-path="hero.content.button.text">
+            ${websiteData.hero.content.button.text}
         </a>
     `;
 
@@ -610,7 +1011,7 @@ Adding a new section should only require:
 1.
 
 ```javascript
-websiteData.blog
+websiteData.blog.content
 ```
 
 2.
@@ -632,7 +1033,7 @@ The same JSON path naming rules automatically apply to all new sections.
 Example
 
 ```javascript
-websiteData.blog[0].title
+websiteData.blog.content[0].title
 ```
 
 renders
@@ -713,7 +1114,9 @@ js/
 The generated website **must**:
 
 - Use a single `websiteData` object as the only source of truth.
-- Read all website content from `websiteData`.
+- Every website section must contain a `content` block.
+- Read all editable/visible website content from `websiteData.<section>.content`.
+- For array sections, iterate over `websiteData.<section>.content`.
 - Never hardcode visible text, images, links, colors, branding, or icons.
 - Create a `renderDataAll(data)` function.
 - Support live updates using:
@@ -729,6 +1132,11 @@ window.addEventListener("message", function (event) {
 ```
 
 - Render all array-based sections dynamically.
+- Check that each section exists before rendering it.
+- Check that each section's `content` block exists before rendering its content.
+- Check every individual content value before rendering it.
+- Check nested objects and array items before accessing their properties.
+- Do not render empty sections or empty content elements.
 - Reinitialize interactive components after every render.
 - Add CSS classes representing the JSON path of every rendered value.
 - Add `data-json-path` to every rendered element.
@@ -930,7 +1338,7 @@ The hero image is the largest contentful paint element. Always preload it so the
 Add this inside `<head>`, before any scripts:
 
 ```html
-<link rel="preload" as="image" href="{websiteData.hero.image}" />
+<link rel="preload" as="image" href="{websiteData.hero.content.image}" />
 ```
 
 If the image URL comes from data, inject this tag dynamically right before `renderHero()` runs:
@@ -940,7 +1348,7 @@ function preloadHeroImage() {
     const link = document.createElement('link');
     link.rel = 'preload';
     link.as = 'image';
-    link.href = websiteData.hero.image;
+    link.href = websiteData.hero.content.image;
     document.head.appendChild(link);
 }
 ```
@@ -1237,3 +1645,54 @@ Apply this checklist to every generated website before delivery.
 | All gallery images use `loading="lazy"` | ✅ |
 | `prefers-reduced-motion` block included | ✅ |
 | Loader hidden only after all rendering completes | ✅ |
+
+
+
+## DOM Removal for Missing Sections
+
+When a section is missing from the new `websiteData`, the renderer must **remove the existing section element from the DOM**, not merely return. This is required because `renderDataAll(data)` may replace previously rendered data.
+
+Required pattern:
+
+```javascript
+function renderHero() {
+    const hero = websiteData.hero;
+
+    if (!hero) {
+        document.getElementById("hero")?.remove();
+        return;
+    }
+
+    if (!hero.content) {
+        document.getElementById("hero")?.remove();
+        return;
+    }
+
+    // render hero...
+}
+```
+
+Prefer a shared helper:
+
+```javascript
+function removeSection(sectionId) {
+    document.getElementById(sectionId)?.remove();
+}
+```
+
+Then:
+
+```javascript
+if (!hero) {
+    removeSection("hero");
+    return;
+}
+```
+
+For array sections, also remove the section when `content` is missing, is not an array, is empty, or produces no renderable HTML.
+
+Every renderer must therefore handle both states:
+
+- Section exists → render/update it.
+- Section does not exist → remove its old DOM element.
+

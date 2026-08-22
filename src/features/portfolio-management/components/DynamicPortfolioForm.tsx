@@ -242,6 +242,16 @@ const DynamicPortfolioForm: React.FC = () => {
     setFormKey(k => k + 1);
   }, [handleDataChange]);
 
+  const handleSectionRemove = useCallback((sectionKey: string) => {
+    const current = dataRef.current;
+    if (!current || typeof current !== 'object') return;
+    const { [sectionKey]: _, ...rest } = current;
+    dataRef.current = rest;
+    lastExternalRef.current = rest;
+    handleDataChange(rest);
+    setFormKey(k => k + 1);
+  }, [handleDataChange]);
+
   const renderField = (key: string, value: any, path: string[], detailedPath: string = '') => {
     const fieldId = path.join('.');
 
@@ -351,11 +361,40 @@ const DynamicPortfolioForm: React.FC = () => {
 
   return (
     <Box key={formKey}>
-      {Object.entries(portfolioData).map(([key, value]) => (
-        <Box key={key} sx={{ mb: 4, background: 'rgba(15, 26, 46, 0.4)', p: 3, borderRadius: 2 }}>
-          {renderField(key, value, [key], key)}
-        </Box>
-      ))}
+      {Object.entries(portfolioData).map(([key, value]) => {
+        const sectionContent = value && typeof value === 'object' && 'content' in value
+          ? (value as any).content
+          : value;
+
+        return (
+          <Box key={key} sx={{ mb: 4, background: 'rgba(15, 26, 46, 0.4)', p: 3, borderRadius: 2, position: 'relative' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" sx={{ color: '#F8FAFC', textTransform: 'capitalize' }}>
+                {key}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => handleSectionRemove(key)}
+                sx={{
+                  color: '#94A3B8',
+                  '&:hover': { color: '#EF4444', bgcolor: 'rgba(239, 68, 68, 0.1)' },
+                }}
+                title={`Delete ${key} section`}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Box>
+            <Box sx={{ pl: 2, borderLeft: '2px solid rgba(192, 132, 252, 0.3)' }}>
+              {sectionContent && typeof sectionContent === 'object' && !Array.isArray(sectionContent)
+                ? Object.entries(sectionContent).map(([subKey, subValue]) =>
+                    renderField(subKey, subValue, [key, 'content', subKey], `${key}.content.${subKey}`)
+                  )
+                : renderField(key, sectionContent, [key, 'content'], `${key}.content`)
+              }
+            </Box>
+          </Box>
+        );
+      })}
 
       <Dialog
         open={isAssetDialogOpen}
