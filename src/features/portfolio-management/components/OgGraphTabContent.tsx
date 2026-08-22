@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Box, TextField, Typography, Button, Paper } from '@mui/material';
-import { Save as SaveIcon } from '@mui/icons-material';
+import {
+    Box, TextField, Typography, Button, Paper, IconButton,
+    Dialog, DialogTitle, DialogContent, DialogActions, List,
+    ListItem, ListItemButton, ListItemAvatar, Avatar, ListItemText
+} from '@mui/material';
+import { Save as SaveIcon, Image as ImageIcon, InsertDriveFile as FileIcon } from '@mui/icons-material';
 import { usePortfolioStore } from '../store/portfolioStore';
 
 const OgGraphTabContent: React.FC = () => {
-    const { htmlContent, setHtmlContent, ogData, setOgData } = usePortfolioStore();
+    const { htmlContent, setHtmlContent, ogData, setOgData, uploadedImages } = usePortfolioStore();
+    const [isAssetDialogOpen, setIsAssetDialogOpen] = useState(false);
+    const [webpageTitle, setWebpageTitle] = useState('');
 
     useEffect(() => {
         if (!htmlContent) return;
@@ -13,6 +19,9 @@ const OgGraphTabContent: React.FC = () => {
             const el = doc.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
             return el ? el.content : '';
         };
+
+        const titleEl = doc.querySelector('title');
+        setWebpageTitle(titleEl ? titleEl.innerText : '');
 
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setOgData({
@@ -40,6 +49,13 @@ const OgGraphTabContent: React.FC = () => {
             el.setAttribute('content', content);
         };
 
+        let titleEl = doc.querySelector('title');
+        if (!titleEl) {
+            titleEl = doc.createElement('title');
+            doc.head.appendChild(titleEl);
+        }
+        titleEl.innerText = webpageTitle;
+
         setMetaContent('og:title', ogData.title);
         setMetaContent('og:description', ogData.description);
         setMetaContent('og:image', ogData.image);
@@ -59,6 +75,22 @@ const OgGraphTabContent: React.FC = () => {
                 </Typography>
                 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <TextField
+                        label="Webpage Title"
+                        value={webpageTitle}
+                        onChange={(e) => setWebpageTitle(e.target.value)}
+                        fullWidth
+                        variant="outlined"
+                        InputProps={{ sx: { color: '#fff' } }}
+                        InputLabelProps={{ sx: { color: '#94A3B8' } }}
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                                '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                                '&.Mui-focused fieldset': { borderColor: '#C084FC', borderWidth: '1px' }
+                            }
+                        }}
+                    />
                     <TextField
                         label="OG Title"
                         value={ogData.title}
@@ -93,22 +125,35 @@ const OgGraphTabContent: React.FC = () => {
                             }
                         }}
                     />
-                    <TextField
-                        label="OG Image URL"
-                        value={ogData.image}
-                        onChange={handleChange('image')}
-                        fullWidth
-                        variant="outlined"
-                        InputProps={{ sx: { color: '#fff' } }}
-                        InputLabelProps={{ sx: { color: '#94A3B8' } }}
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
-                                '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
-                                '&.Mui-focused fieldset': { borderColor: '#C084FC', borderWidth: '1px' }
-                            }
-                        }}
-                    />
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <TextField
+                            label="OG Image URL"
+                            value={ogData.image}
+                            onChange={handleChange('image')}
+                            fullWidth
+                            variant="outlined"
+                            InputProps={{ sx: { color: '#fff' } }}
+                            InputLabelProps={{ sx: { color: '#94A3B8' } }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                                    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                                    '&.Mui-focused fieldset': { borderColor: '#C084FC', borderWidth: '1px' }
+                                }
+                            }}
+                        />
+                        <IconButton
+                            onClick={() => setIsAssetDialogOpen(true)}
+                            sx={{
+                                color: '#C084FC',
+                                bgcolor: 'rgba(192, 132, 252, 0.1)',
+                                '&:hover': { bgcolor: 'rgba(192, 132, 252, 0.2)' },
+                            }}
+                            title="Choose Asset"
+                        >
+                            <ImageIcon />
+                        </IconButton>
+                    </Box>
                     <TextField
                         label="OG URL"
                         value={ogData.url}
@@ -141,6 +186,56 @@ const OgGraphTabContent: React.FC = () => {
                     </Button>
                 </Box>
             </Paper>
+
+            <Dialog
+                open={isAssetDialogOpen}
+                onClose={() => setIsAssetDialogOpen(false)}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{ sx: { bgcolor: '#0f172a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } }}
+            >
+                <DialogTitle sx={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Select an Asset</DialogTitle>
+                <DialogContent sx={{ p: 0 }}>
+                    {uploadedImages.length === 0 ? (
+                        <Box sx={{ p: 4, textAlign: 'center' }}>
+                            <Typography sx={{ color: '#94A3B8' }}>No assets uploaded yet.</Typography>
+                        </Box>
+                    ) : (
+                        <List sx={{ p: 0 }}>
+                            {uploadedImages.map((img) => (
+                                <ListItem key={img.id} disablePadding sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                    <ListItemButton onClick={() => {
+                                        const finalUrl = img.fileKey
+                                            ? `${import.meta.env.VITE_R2_BASEURL}/${img.fileKey}`
+                                            : img.url;
+                                        setOgData({ ...ogData, image: finalUrl });
+                                        setIsAssetDialogOpen(false);
+                                    }}>
+                                        <ListItemAvatar>
+                                            <Avatar sx={{ bgcolor: 'transparent', borderRadius: 1 }}>
+                                                {img.file?.type.startsWith('image/') || img.url.endsWith('.webp') || img.url.match(/\.(jpeg|jpg|gif|png)$/) ? (
+                                                    <img src={img.url} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                ) : (
+                                                    <FileIcon sx={{ color: '#94A3B8' }} />
+                                                )}
+                                            </Avatar>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={img.file?.name || img.fileKey || 'Asset'}
+                                            secondary={img.file && img.file.size > 0 ? (img.file.size / 1024).toFixed(2) + ' KB' : ''}
+                                            primaryTypographyProps={{ color: '#fff', noWrap: true }}
+                                            secondaryTypographyProps={{ color: '#94A3B8' }}
+                                        />
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
+                        </List>
+                    )}
+                </DialogContent>
+                <DialogActions sx={{ borderTop: '1px solid rgba(255,255,255,0.1)', p: 2 }}>
+                    <Button onClick={() => setIsAssetDialogOpen(false)} sx={{ color: '#94A3B8' }}>Cancel</Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };
