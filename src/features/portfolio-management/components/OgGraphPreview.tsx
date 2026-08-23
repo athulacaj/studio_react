@@ -46,7 +46,7 @@ const OgGraphPreview: React.FC = () => {
                     width: '100%',
                     height: 200,
                     bgcolor: '#111B21', // Darker bg for image placeholder
-                    backgroundImage: ogData.image ? `url(${ogData.image})` : 'none',
+                    backgroundImage: ogData.image ? `url('${ogData.image}')` : 'none',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     borderBottom: '1px solid rgba(255,255,255,0.05)',

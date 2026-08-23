@@ -21,7 +21,7 @@ const OgGraphTabContent: React.FC = () => {
         };
 
         const titleEl = doc.querySelector('title');
-        setWebpageTitle(titleEl ? titleEl.innerText : '');
+        setWebpageTitle(titleEl ? titleEl.textContent || '' : '');
 
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setOgData({
@@ -54,7 +54,7 @@ const OgGraphTabContent: React.FC = () => {
             titleEl = doc.createElement('title');
             doc.head.appendChild(titleEl);
         }
-        titleEl.innerText = webpageTitle;
+        titleEl.textContent = webpageTitle;
 
         setMetaContent('og:title', ogData.title);
         setMetaContent('og:description', ogData.description);

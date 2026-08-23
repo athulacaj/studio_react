@@ -1648,6 +1648,114 @@ Apply this checklist to every generated website before delivery.
 
 
 
+---
+
+# Image Object Position
+
+All rendered images must support a configurable `object-position` value driven by `websiteData`.
+
+## Rule
+
+Every image rendered from JSON must read its `object-position` from the corresponding image data in JSON. The JSON property name must be `objectPosition`.
+
+The default value must be `50% 50%` when `objectPosition` is missing, empty, `null`, or `undefined`.
+
+### Example JSON
+
+```javascript
+let websiteData = {
+    hero: {
+        content: {
+            image: "https://example.com/hero.jpg",
+            objectPosition: "30% 20%"
+        }
+    },
+    gallery: {
+        content: [
+            {
+                image: "https://example.com/photo.jpg",
+                objectPosition: "70% 40%"
+            }
+        ]
+    }
+};
+```
+
+### Rendering Rule
+
+For every rendered image, use the JSON value with a `50% 50%` fallback:
+
+```javascript
+const objectPosition = content.objectPosition || "50% 50%";
+```
+
+Then apply it to the image:
+
+```html
+<img
+    src="${content.image}"
+    style="object-position: ${objectPosition};"
+    data-json-path="hero.content.image"
+    alt="">
+```
+
+For array items:
+
+```javascript
+const objectPosition = item.objectPosition || "50% 50%";
+```
+
+```html
+<img
+    src="${item.image}"
+    style="object-position: ${objectPosition};"
+    data-json-path="gallery.content[${index}].image"
+    alt="">
+```
+
+### Requirements
+
+- Every rendered image must support JSON-driven `object-position`.
+- Each image must be independently customizable through its JSON data.
+- Default to `50% 50%` when `objectPosition` is not provided.
+- Do not hardcode a different image position in individual renderers.
+- This applies to hero, gallery, portfolio, team, service, and all other images rendered from `websiteData`.
+- When the image uses `object-fit: cover`, `object-position` must control which portion of the image remains visible.
+- The image URL and `objectPosition` must come from `websiteData`.
+
+### CSS
+
+Images that are cropped should support the position normally:
+
+```css
+img {
+    object-fit: cover;
+    object-position: 50% 50%;
+}
+```
+
+The renderer-provided inline `object-position` must override the default CSS position.
+
+### Complete Example
+
+```javascript
+if (content.image) {
+    const objectPosition = content.objectPosition || "50% 50%";
+
+    html += `
+        <img
+            src="${content.image}"
+            class="hero-image"
+            style="object-position: ${objectPosition};"
+            data-json-path="hero.content.image"
+            alt="">
+    `;
+}
+```
+
+The renderer must always use the JSON value when provided and `50% 50%` only as the fallback.
+
+
 ## DOM Removal for Missing Sections
 
 When a section is missing from the new `websiteData`, the renderer must **remove the existing section element from the DOM**, not merely return. This is required because `renderDataAll(data)` may replace previously rendered data.
