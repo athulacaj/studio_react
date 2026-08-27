@@ -1,349 +1,422 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Apple Style Scroll Gallery</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
-
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Aris &amp; Mira - Wedding Invitation</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#fff8f4",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#e5e2df",
+                        "surface-dim": "#e1d8d2",
+                        "on-secondary-fixed-variant": "#524436",
+                        "on-surface-variant": "#434843",
+                        "on-tertiary-fixed": "#1c1c1a",
+                        "inverse-primary": "#b4cdb8",
+                        "secondary": "#6b5c4c",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#0b2013",
+                        "inverse-on-surface": "#f8efe8",
+                        "inverse-surface": "#34302b",
+                        "primary": "#061b0e",
+                        "surface": "#fff8f4",
+                        "on-error": "#ffffff",
+                        "secondary-fixed": "#f4dfcb",
+                        "secondary-fixed-dim": "#d7c3b0",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#c3c8c1",
+                        "tertiary-container": "#2c2c2a",
+                        "background": "#fff8f4",
+                        "tertiary": "#171816",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#474745",
+                        "on-background": "#1f1b17",
+                        "surface-container-low": "#fbf2eb",
+                        "on-secondary-fixed": "#241a0e",
+                        "on-tertiary-container": "#949391",
+                        "on-surface": "#1f1b17",
+                        "primary-container": "#1b3022",
+                        "primary-fixed": "#d0e9d4",
+                        "surface-variant": "#eae1da",
+                        "primary-fixed-dim": "#b4cdb8",
+                        "tertiary-fixed-dim": "#c8c6c3",
+                        "surface-container-high": "#f0e7df",
+                        "on-primary": "#ffffff",
+                        "outline": "#737973",
+                        "secondary-container": "#f4dfcb",
+                        "on-primary-container": "#819986",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#364c3c",
+                        "surface-container-highest": "#eae1da",
+                        "on-secondary-container": "#716252",
+                        "surface-tint": "#4d6453",
+                        "surface-container": "#f5ece5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-max": "1140px",
+                        "unit": "8px",
+                        "margin-mobile": "24px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "section-gap": "120px"
+                    },
+                    "fontFamily": {
+                        "body-md": [
+                            "Plus Jakarta Sans"
+                        ],
+                        "label-sm": [
+                            "Plus Jakarta Sans"
+                        ],
+                        "headline-lg-mobile": [
+                            "Playfair Display"
+                        ],
+                        "headline-lg": [
+                            "Playfair Display"
+                        ],
+                        "body-lg": [
+                            "Plus Jakarta Sans"
+                        ],
+                        "display-lg": [
+                            "Playfair Display"
+                        ],
+                        "headline-md": [
+                            "Playfair Display"
+                        ]
+                    },
+                    "fontSize": {
+                        "body-md": [
+                            "16px",
+                            {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                            }
+                        ],
+                        "label-sm": [
+                            "12px",
+                            {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.1em",
+                                "fontWeight": "600"
+                            }
+                        ],
+                        "headline-lg-mobile": [
+                            "32px",
+                            {
+                                "lineHeight": "40px",
+                                "fontWeight": "400"
+                            }
+                        ],
+                        "headline-lg": [
+                            "40px",
+                            {
+                                "lineHeight": "48px",
+                                "fontWeight": "400"
+                            }
+                        ],
+                        "body-lg": [
+                            "18px",
+                            {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                            }
+                        ],
+                        "display-lg": [
+                            "64px",
+                            {
+                                "lineHeight": "72px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "400"
+                            }
+                        ],
+                        "headline-md": [
+                            "28px",
+                            {
+                                "lineHeight": "36px",
+                                "fontWeight": "400"
+                            }
+                        ]
+                    }
+                },
+            },
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .glass-panel {
+            background: rgba(255, 248, 244, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(217, 197, 178, 0.3);
         }
 
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            overflow-x: hidden;
-            background: #fafafa;
-            color: #111;
+        .thin-border {
+            border: 0.5px solid rgba(107, 92, 76, 0.3);
         }
 
-        section {
-            width: 100%;
+        .img-mat {
+            padding: 16px;
+            background-color: theme('colors.surface');
+            border: 1px solid rgba(217, 197, 178, 0.5);
         }
 
-        .hero {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 5vw;
-            font-weight: bold;
-        }
-
-        .scroll-gallery {
-            position: relative;
-            height: 400vh;
-        }
-
-        .pin {
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            overflow: hidden;
-            background: white;
-        }
-
-        .gallery {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
-        .image {
-            position: absolute;
-            overflow: hidden;
-            border-radius: 28px;
-            box-shadow: 0 40px 80px rgba(0, 0, 0, .18);
-        }
-
-        .image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        /* ---------------- HERO ---------------- */
-
-        .img1 {
-            width: 100vw;
-            height: 100vh;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-        }
-
-        /* Final size */
-
-        .img2,
-        .img3,
-        .img4,
-        .img5 {
-            width: 22vw;
-            height: 28vh;
-        }
-
-        /* Initial Offscreen */
-
-        .img2 {
-            left: -40vw;
-            top: 18%;
-        }
-
-        .img3 {
-            right: -40vw;
-            top: 18%;
-        }
-
-        .img4 {
-            left: 8%;
-            bottom: -45vh;
-        }
-
-        .img5 {
-            right: 8%;
-            top: -45vh;
-        }
-
-        .content {
-            padding: 120px 12vw;
-        }
-
-        .content h2 {
-            font-size: 64px;
-            margin-bottom: 30px;
-        }
-
-        .content p {
-            max-width: 800px;
-            line-height: 1.8;
-            font-size: 20px;
-            margin-bottom: 20px;
-        }
-
-        /* ---------------- MOBILE ---------------- */
-
-        @media(max-width:768px) {
-
-            .scroll-gallery {
-                height: auto;
-            }
-
-            .pin {
-                position: relative;
-                height: auto;
-                overflow: visible;
-                padding-bottom: 80px;
-            }
-
-            .gallery {
-                display: flex;
-                flex-direction: column;
-                gap: 24px;
-                align-items: center;
-                padding: 40px 20px;
-            }
-
-            .image {
-                position: relative !important;
-                left: auto !important;
-                right: auto !important;
-                top: auto !important;
-                bottom: auto !important;
-                transform: none !important;
-                width: 100% !important;
-                max-width: 420px;
-                height: 260px;
-            }
-
-            .img1 {
-                height: 70vh !important;
-            }
-
+        html {
+            scroll-behavior: smooth;
         }
     </style>
-
 </head>
 
-<body>
-
-    <section class="hero">
-        Scroll Down
-    </section>
-
-    <section class="scroll-gallery">
-
-        <div class="pin">
-
-            <div class="gallery">
-
-                <div class="image img1">
-                    <img
-                        src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=80">
-                </div>
-
-                <div class="image img2">
-                    <img
-                        src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=80">
-                </div>
-
-                <div class="image img3">
-                    <img
-                        src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1200&q=80">
-                </div>
-
-                <div class="image img4">
-                    <img
-                        src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80">
-                </div>
-
-                <div class="image img5">
-                    <img
-                        src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80">
-                </div>
-
+<body class="bg-surface text-on-surface antialiased font-body-md overflow-x-hidden">
+    <!-- TopAppBar -->
+    <header
+        class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md text-primary dark:text-primary-fixed font-headline-md text-headline-md docked full-width top-0 sticky z-50 border-b border-outline-variant/50 hidden md:flex">
+        <div class="flex justify-between items-center px-margin-desktop py-4 max-w-container-max mx-auto w-full">
+            <div
+                class="font-headline-md text-headline-md text-primary dark:text-primary-fixed font-bold tracking-tight">
+                A&amp;M
             </div>
-
+            <nav class="flex gap-8 items-center">
+                <a class="text-primary dark:text-primary-fixed border-b-2 border-primary pb-1 hover:text-primary transition-colors duration-300 scale-95 transition-transform duration-200"
+                    href="#our-story">Our Story</a>
+                <a class="text-on-surface-variant dark:text-on-surface-variant/80 font-body-md hover:text-primary transition-colors duration-300 scale-95 transition-transform duration-200"
+                    href="#details">Details</a>
+                <a class="text-on-surface-variant dark:text-on-surface-variant/80 font-body-md hover:text-primary transition-colors duration-300 scale-95 transition-transform duration-200"
+                    href="#rsvp">RSVP</a>
+                <a class="text-on-surface-variant dark:text-on-surface-variant/80 font-body-md hover:text-primary transition-colors duration-300 scale-95 transition-transform duration-200"
+                    href="#registry">Registry</a>
+            </nav>
+            <a class="bg-primary text-on-primary px-6 py-2 rounded-full font-label-sm text-label-sm uppercase tracking-wider hover:bg-primary-container hover:text-on-primary-container transition-colors duration-300"
+                href="#rsvp">
+                RSVP NOW
+            </a>
         </div>
-
+    </header>
+    <!-- Mobile Nav (Simplified for example) -->
+    <header
+        class="bg-surface/90 backdrop-blur-md fixed top-0 w-full z-50 md:hidden border-b border-outline-variant/30 py-4 px-margin-mobile flex justify-between items-center">
+        <div class="font-headline-md text-headline-md text-primary font-bold tracking-tight">
+            A&amp;M
+        </div>
+        <a class="text-primary font-label-sm text-label-sm uppercase tracking-widest border-b border-primary pb-0.5"
+            href="#rsvp">RSVP</a>
+    </header>
+    <!-- Hero Section -->
+    <section class="relative w-full h-screen flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img alt="Aris &amp; Mira walking in the forest" class="w-full h-full object-cover object-center"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjDECIsjgUq_DLTjERWqKLQwQFoZEngpTvClPT_884atLJiSh_drcWiWC0EQMgY6mwn5HRar2zQqh84Z-jnUoeUg6TckTFVAPY5mP6L_c2c8VNXtAcG4LjjOcYwi5eIsBwMN44z3iQNiBrHQNIuCdxc59dQ-wUaQ0KSU8Rhv-Z_qpNAtYqvWybLxuWTJbqHumbH8Bet3gCYNLgKVXYP_wjhd7A0Qn6MG83kkVhk_tW3ZDKUW8h0i-RMCgtZ3ZNQvKvwA" />
+            <div class="absolute inset-0 bg-gradient-to-b from-primary/20 via-transparent to-surface"></div>
+        </div>
+        <div class="relative z-10 text-center flex flex-col items-center mt-32 md:mt-0 px-margin-mobile">
+            <span
+                class="font-label-sm text-label-sm text-surface-bright uppercase tracking-[0.2em] mb-6 drop-shadow-md">We
+                invite you to celebrate</span>
+            <h1
+                class="font-display-lg text-display-lg text-surface-bright md:text-[96px] md:leading-[100px] mb-4 drop-shadow-lg">
+                Aris &amp; Mira</h1>
+            <p
+                class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-surface-bright italic opacity-90 drop-shadow-md">
+                August 22, 2026</p>
+        </div>
     </section>
-
-    <section class="content">
-
-        <h2>Beautiful Scroll Experience</h2>
-
-        <p>
-            This section exists to demonstrate the release of the pinned gallery.
-            Once the five-image composition is complete, the ScrollTrigger finishes
-            and normal scrolling resumes exactly like Apple's product pages.
-        </p>
-
-        <p>
-            The animation is fully scrubbed, reversible, and tied directly to the
-            scroll position.
-        </p>
-
-        <p>
-            Scroll back upward and every movement reverses smoothly.
-        </p>
-
-    </section>
-
-    <script>
-
-        gsap.registerPlugin(ScrollTrigger);
-
-        if (window.innerWidth > 768) {
-
-            const tl = gsap.timeline({
-
-                scrollTrigger: {
-                    trigger: ".scroll-gallery",
-                    start: "top top",
-                    end: "+=3000",
-                    scrub: 1,
-                    pin: ".pin",
-                    anticipatePin: 1
-                }
-
-            });
-
-            /* -----------------------------
-            PHASE 1
-            Shrink Hero
-            ------------------------------*/
-
-            tl.to(".img1", {
-
-                width: "30vw",
-                height: "42vh",
-                duration: 2,
-                ease: "none"
-
-            });
-
-            /* -----------------------------
-            PHASE 2
-            Left + Right
-            ------------------------------*/
-
-            tl.to(".img2", {
-
-                left: "8%",
-                duration: 1.6,
-                ease: "none"
-
-            }, "<0.3");
-
-            tl.to(".img3", {
-
-                right: "8%",
-                duration: 1.6,
-                ease: "none"
-
-            }, "<");
-
-            /* -----------------------------
-            PHASE 3
-            Top / Bottom
-            ------------------------------*/
-
-            tl.to(".img4", {
-
-                bottom: "12%",
-                duration: 1.4,
-                ease: "none"
-
-            }, "+=0.2");
-
-            tl.to(".img5", {
-
-                top: "12%",
-                duration: 1.4,
-                ease: "none"
-
-            }, "<");
-
-            /* -----------------------------
-            Small polish
-            ------------------------------*/
-
-            tl.to(".image", {
-
-                borderRadius: 36,
-                duration: 0.8
-
-            });
-
-        } else {
-
-            gsap.to(".img1", {
-
-                scale: .88,
-
-                scrollTrigger: {
-                    trigger: ".img1",
-                    start: "top top",
-                    end: "bottom top",
-                    scrub: true
-                }
-
-            });
-
-        }
-
-    </script>
-
+    <main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-section-gap space-y-section-gap">
+        <!-- Our Story -->
+        <section class="scroll-mt-32" id="our-story">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
+                <div class="md:col-span-5 md:col-start-2 order-2 md:order-1 flex flex-col justify-center space-y-6">
+                    <div class="flex items-center space-x-4 mb-2">
+                        <div class="h-[1px] w-12 bg-secondary-fixed-dim"></div>
+                        <span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest">The
+                            Journey</span>
+                    </div>
+                    <h2
+                        class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary">
+                        Our Story</h2>
+                    <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                        It began with a shared umbrella in a sudden downpour and evolved into countless coffee dates,
+                        forest hikes, and late-night conversations. Through every season, our connection deepened,
+                        rooted in a mutual love for simple moments and grand adventures. We are so thrilled to gather
+                        our favorite people to witness the next chapter of our lives together.
+                    </p>
+                </div>
+                <div class="md:col-span-5 md:col-start-8 order-1 md:order-2 mb-8 md:mb-0">
+                    <div class="img-mat rotate-2 hover:rotate-0 transition-transform duration-700 ease-out">
+                        <img class="w-full aspect-[4/5] object-cover"
+                            data-alt="A candid, beautifully lit photograph of a couple laughing together at a rustic café table. Warm, natural sunlight streaming through a nearby window. High-quality editorial style photography emphasizing genuine connection and an elegant, earthy color palette of deep greens and warm creams."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgcP_p54OXe1P_6BCn14tyevbGpgpMT52Q8TPz7adsnXA5RTsbmkhr_UAh69H4Zpy426fB6WsbxANCxe82rx_KcbcTexytL0S8PExEWnoF80BMmPH4zdPWUVzbcwaMrkkUsF-NcXsybzNvFNgN_nnFrsypBKnS6F9p-iceDVpp1GkMaY-jVIAksIVbiUpb7q8pErElEJ0CMubP3l7upDyjsJ0q_JNoXJVpZ9R0tAdAb2VCk7w8lVoj" />
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- The Big Day Details -->
+        <section class="scroll-mt-32" id="details">
+            <div class="text-center mb-16 flex flex-col items-center">
+                <span class="material-symbols-outlined text-secondary mb-4 opacity-70"
+                    style="font-variation-settings: 'FILL' 0;">local_florist</span>
+                <h2
+                    class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-2">
+                    The Big Day</h2>
+                <div class="w-24 h-[0.5px] bg-secondary-fixed-dim mt-4"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-4xl mx-auto">
+                <!-- Ceremony Card -->
+                <div
+                    class="bg-surface-container-lowest thin-border p-8 md:p-12 text-center flex flex-col items-center group hover:bg-surface-bright transition-colors duration-500">
+                    <span
+                        class="material-symbols-outlined text-primary-container mb-6 text-4xl group-hover:scale-110 transition-transform duration-500"
+                        style="font-variation-settings: 'FILL' 0;">church</span>
+                    <h3 class="font-headline-md text-headline-md text-primary mb-2">The Ceremony</h3>
+                    <p class="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-6">4:00 PM</p>
+                    <p class="font-body-lg text-body-lg text-on-surface mb-2">St. Andrews Forest Chapel</p>
+                    <p class="font-body-md text-body-md text-on-surface-variant mb-8">123 Woodland Avenue<br />Pine
+                        Ridge, CA 90210</p>
+                    <a class="mt-auto text-primary border-b border-primary pb-1 font-label-sm text-label-sm uppercase tracking-wider hover:text-secondary hover:border-secondary transition-colors"
+                        href="#">View Map</a>
+                </div>
+                <!-- Reception Card -->
+                <div
+                    class="bg-surface-container-lowest thin-border p-8 md:p-12 text-center flex flex-col items-center group hover:bg-surface-bright transition-colors duration-500">
+                    <span
+                        class="material-symbols-outlined text-primary-container mb-6 text-4xl group-hover:scale-110 transition-transform duration-500"
+                        style="font-variation-settings: 'FILL' 0;">wine_bar</span>
+                    <h3 class="font-headline-md text-headline-md text-primary mb-2">The Reception</h3>
+                    <p class="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-6">6:30 PM</p>
+                    <p class="font-body-lg text-body-lg text-on-surface mb-2">The Glass House Gardens</p>
+                    <p class="font-body-md text-body-md text-on-surface-variant mb-8">456 Conservatory Drive<br />Pine
+                        Ridge, CA 90210</p>
+                    <a class="mt-auto text-primary border-b border-primary pb-1 font-label-sm text-label-sm uppercase tracking-wider hover:text-secondary hover:border-secondary transition-colors"
+                        href="#">View Map</a>
+                </div>
+            </div>
+        </section>
+        <!-- RSVP Section -->
+        <section class="scroll-mt-32 relative py-24" id="rsvp">
+            <div class="absolute inset-0 z-0 flex justify-center items-center opacity-30 pointer-events-none">
+                <img class="w-full h-full object-cover"
+                    data-alt="Abstract, soft-focus botanical background featuring blurred eucalyptus leaves and warm sunlight filtering through branches. The aesthetic is extremely light, ethereal, and airy, acting as a subtle texture rather than a distinct image. High key lighting, creamy tones."
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-YX9FSg3Qih-OXh9wSShOzn5JXAUeojwUinVi2r_XLm7axHiDoIfx0aonM2RiscGcwkcUcF9C8qISr0hTqDZa_4nFdl7seJawoGrK9ROoXsCI5USKbjHYbx8fMQJDgCfR1u5lPO9FeR36ZQgjZg4p-qDsH0yljA7PfygkqBWeRLiCI5zVYXPOwYqRBtRoMQ0a9GV0Fv9HTVlLdPxxoeIDFIaYRB6bPPzlW99SQ7eiC6fQvF0LMzRt" />
+            </div>
+            <div class="relative z-10 max-w-2xl mx-auto glass-panel p-8 md:p-16">
+                <div class="text-center mb-10">
+                    <h2
+                        class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-4">
+                        RSVP</h2>
+                    <p class="font-body-md text-body-md text-on-surface-variant">Kindly reply by July 1st, 2026</p>
+                </div>
+                <form class="space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-2">
+                            <label class="block font-headline-md text-[20px] text-primary" for="firstName">First
+                                Name</label>
+                            <input
+                                class="w-full bg-transparent border-0 border-b border-secondary-fixed-dim focus:ring-0 focus:border-primary px-0 py-2 font-body-md text-on-surface placeholder-on-surface-variant/50 transition-colors"
+                                id="firstName" placeholder="Jane" type="text" />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block font-headline-md text-[20px] text-primary" for="lastName">Last
+                                Name</label>
+                            <input
+                                class="w-full bg-transparent border-0 border-b border-secondary-fixed-dim focus:ring-0 focus:border-primary px-0 py-2 font-body-md text-on-surface placeholder-on-surface-variant/50 transition-colors"
+                                id="lastName" placeholder="Doe" type="text" />
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block font-headline-md text-[20px] text-primary" for="email">Email Address</label>
+                        <input
+                            class="w-full bg-transparent border-0 border-b border-secondary-fixed-dim focus:ring-0 focus:border-primary px-0 py-2 font-body-md text-on-surface placeholder-on-surface-variant/50 transition-colors"
+                            id="email" placeholder="jane@example.com" type="email" />
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-2">
+                            <label class="block font-headline-md text-[20px] text-primary" for="guests">Number of
+                                Guests</label>
+                            <select
+                                class="w-full bg-transparent border-0 border-b border-secondary-fixed-dim focus:ring-0 focus:border-primary px-0 py-2 font-body-md text-on-surface transition-colors"
+                                id="guests">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block font-headline-md text-[20px] text-primary" for="meal">Meal
+                                Preference</label>
+                            <select
+                                class="w-full bg-transparent border-0 border-b border-secondary-fixed-dim focus:ring-0 focus:border-primary px-0 py-2 font-body-md text-on-surface transition-colors"
+                                id="meal">
+                                <option value="standard">Standard (Beef/Chicken)</option>
+                                <option value="vegetarian">Vegetarian</option>
+                                <option value="vegan">Vegan</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="pt-8 text-center">
+                        <button
+                            class="bg-primary text-on-primary px-10 py-4 font-label-sm text-label-sm uppercase tracking-widest hover:bg-primary-container hover:text-on-primary-container transition-colors duration-300 w-full md:w-auto"
+                            type="submit">
+                            Confirm Attendance
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+        <!-- Registry -->
+        <section class="scroll-mt-32 text-center flex flex-col items-center" id="registry">
+            <span class="material-symbols-outlined text-secondary mb-4 opacity-70"
+                style="font-variation-settings: 'FILL' 0;">card_giftcard</span>
+            <h2
+                class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-6">
+                Registry</h2>
+            <p class="font-body-md text-body-md text-on-surface-variant max-w-lg mb-10">
+                Your presence is the greatest gift of all. However, should you wish to help us celebrate with a gift, we
+                are registered at the following places.
+            </p>
+            <div class="flex flex-wrap justify-center gap-6">
+                <a class="px-8 py-3 border border-secondary-fixed-dim text-primary font-label-sm text-label-sm uppercase tracking-widest hover:bg-surface-bright hover:border-secondary transition-all"
+                    href="#">Williams Sonoma</a>
+                <a class="px-8 py-3 border border-secondary-fixed-dim text-primary font-label-sm text-label-sm uppercase tracking-widest hover:bg-surface-bright hover:border-secondary transition-all"
+                    href="#">Crate &amp; Barrel</a>
+                <a class="px-8 py-3 border border-secondary-fixed-dim text-primary font-label-sm text-label-sm uppercase tracking-widest hover:bg-surface-bright hover:border-secondary transition-all"
+                    href="#">Honeymoon Fund</a>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer
+        class="bg-surface-container-low dark:bg-tertiary-container text-on-surface dark:text-on-tertiary-container font-body-md text-body-md full-width py-section-gap border-t border-secondary-fixed-dim/30 flex flex-col items-center gap-unit px-margin-mobile text-center mt-section-gap">
+        <div class="font-headline-md text-headline-md text-primary mb-4">A&amp;M</div>
+        <p class="mb-6 opacity-80">© 2024 Aris &amp; Mira. Made with love.</p>
+        <div class="flex gap-6">
+            <a class="text-on-secondary-fixed-variant hover:opacity-70 transition-opacity" href="#">Privacy Policy</a>
+            <a class="text-on-secondary-fixed-variant hover:opacity-70 transition-opacity" href="#">Contact
+                Organizer</a>
+        </div>
+    </footer>
 </body>
 
 </html>

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { Box, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import GlobalNavbar from '../../../core/components/GlobalNavbar';
 import { useConfigStore } from '../../../core/store/ConifgStore';
 
@@ -34,6 +34,17 @@ const ProtectedRoute = () => {
                 <CircularProgress />
             </Box>
         );
+    }
+
+    if (!currentUser.approved) {
+        return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
+            <Typography variant="h6">Account not approved yet</Typography>
+            <Box height={16}></Box>
+            <Typography variant="body2">Please contact admin for approval</Typography>
+            <Box height={16}></Box>
+
+            <Typography variant="body2">Mail : studio.mizhiv@gmail.com</Typography>
+        </Box>
     }
 
     return (

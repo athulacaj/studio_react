@@ -1,0 +1,2241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jhon&amp;Anu</title>
+
+  <!-- Google Fonts Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&amp;family=Josefin+Sans:wght@200;300;400;500&amp;display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --forest: #173d2c;
+      --forest-deep: #0e2a1d;
+      --cream: #f7f4ec;
+      --cream-warm: #faf6ee;
+      --gold: #c8a86b;
+      --gold-light: #e2cfa0;
+      --gold-dark: #a68b4b;
+      --sage: #8fa88a;
+      --sage-light: #c5d5c0;
+      --blush: #f0ddd1;
+      --charcoal: #2c3e35;
+      --text-muted: #526458;
+
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Josefin Sans', 'Helvetica Neue', Arial, sans-serif;
+
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: auto;
+    }
+
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--forest);
+      font-family: var(--font-body);
+      font-weight: 300;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* SCROLL REVEAL */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.9s var(--ease-out-expo), transform 0.9s var(--ease-out-expo);
+    }
+
+    .reveal.animating {
+      will-change: opacity, transform;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+      will-change: auto;
+    }
+
+    .reveal-delay-1 {
+      transition-delay: 0.12s;
+    }
+
+    .reveal-delay-2 {
+      transition-delay: 0.24s;
+    }
+
+    .reveal-delay-3 {
+      transition-delay: 0.36s;
+    }
+
+    .reveal-delay-4 {
+      transition-delay: 0.48s;
+    }
+
+    /* HERO / WALK STAGE */
+    .walk-section {
+      position: relative;
+      height: 500vh;
+    }
+
+    .walk-stage {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      isolation: isolate;
+      background: #17251d;
+    }
+
+    .layer {
+      position: absolute;
+      inset: -8%;
+      width: 116%;
+      height: 116%;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .far-background {
+      z-index: 1;
+      background-position: center center;
+      background-size: cover;
+      transform: scale(1.08);
+      filter: saturate(.92);
+    }
+
+    .mid-background {
+      z-index: 2;
+      background-position: center center;
+      background-size: cover;
+      transform: scale(1.04);
+      opacity: .94;
+    }
+
+    .couple-wrap {
+      position: absolute;
+      z-index: 5;
+      left: 50%;
+      bottom: 3vh;
+      width: min(45vw, 720px);
+      min-width: 360px;
+      transform: translate3d(-50%, 0, 0) scale(1);
+      transform-origin: 50% 90%;
+      pointer-events: none;
+    }
+
+    .ground-shadow {
+      position: absolute;
+      bottom: 0%;
+      left: 10%;
+      width: 80%;
+      height: 22px;
+      background: radial-gradient(ellipse at center, rgba(14, 37, 24, 0.75) 0%, rgba(14, 37, 24, 0.3) 50%, transparent 80%);
+      filter: blur(6px);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .couple {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 18px 22px rgba(0, 0, 0, .28)) drop-shadow(0 4px 6px rgba(0, 0, 0, .18)) brightness(0.97) contrast(1.02);
+    }
+
+    .atmosphere {
+      position: absolute;
+      z-index: 7;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 38%, rgba(7, 25, 16, .08) 70%, rgba(4, 18, 11, .34) 100%);
+    }
+
+    .sun-glow {
+      position: absolute;
+      z-index: 6;
+      width: 55vw;
+      height: 55vw;
+      max-width: 900px;
+      max-height: 900px;
+      left: 50%;
+      top: 5%;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 236, 178, .16), rgba(255, 236, 178, 0) 68%);
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    #globalParticleCanvas {
+      position: fixed;
+      z-index: 12;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+    }
+
+    .story-copy {
+      position: absolute;
+      z-index: 10;
+      left: 50%;
+      top: 13vh;
+      width: min(90vw, 720px);
+      transform: translateX(-50%);
+      text-align: center;
+      color: white;
+      opacity: 0;
+      pointer-events: none;
+      text-shadow: 0 2px 18px rgba(0, 0, 0, .35);
+    }
+
+    .eyebrow {
+      margin-bottom: 14px;
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: .32em;
+      text-transform: uppercase;
+      opacity: .85;
+    }
+
+    .story-copy h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(48px, 7vw, 108px);
+      line-height: .92;
+      font-weight: 300;
+      font-style: italic;
+    }
+
+    .story-copy p {
+      margin: 24px auto 0;
+      max-width: 460px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 200;
+      line-height: 1.7;
+      letter-spacing: .05em;
+      opacity: .9;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      z-index: 11;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%);
+      color: white;
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 300;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      opacity: .78;
+      transition: opacity .3s ease;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 48px;
+      margin: 10px auto 0;
+      background: rgba(255, 255, 255, .65);
+      transform-origin: top;
+      animation: scrollLine 1.8s ease-in-out infinite;
+    }
+
+    @keyframes scrollLine {
+
+      0%,
+      100% {
+        transform: scaleY(.45);
+        opacity: .35;
+      }
+
+      50% {
+        transform: scaleY(1);
+        opacity: 1;
+      }
+    }
+
+    /* DIVIDERS */
+    .divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 0 24px;
+      margin: 0 auto;
+      max-width: 400px;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+    }
+
+    .divider-diamond {
+      width: 8px;
+      height: 8px;
+      border: 1px solid var(--gold);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -200% center;
+      }
+
+      100% {
+        background-position: 200% center;
+      }
+    }
+
+    .shimmer-line {
+      height: 1px;
+      max-width: 260px;
+      margin: 28px auto;
+      background: linear-gradient(90deg, transparent 0%, var(--gold-light) 25%, var(--gold) 50%, var(--gold-light) 75%, transparent 100%);
+      background-size: 200% 100%;
+      animation: shimmer 4s ease-in-out infinite;
+    }
+
+    /* NAMES & DATE SECTION */
+    .names-section {
+      position: relative;
+      padding: 120px 24px 100px;
+      text-align: center;
+      background: var(--cream-warm);
+      overflow: hidden;
+    }
+
+    .names-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 180px;
+      background: linear-gradient(to bottom, var(--forest-deep), transparent);
+      opacity: 0.04;
+      pointer-events: none;
+    }
+
+    .names-eyebrow {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: .4em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .couple-names {
+      font-family: var(--font-display);
+      font-size: clamp(52px, 9vw, 120px);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1;
+      color: var(--forest);
+      margin: 0;
+    }
+
+    .couple-names .amp {
+      display: inline-block;
+      font-size: 0.55em;
+      font-style: normal;
+      color: var(--gold);
+      margin: 0 0.15em;
+      vertical-align: 0.08em;
+    }
+
+    .wedding-date {
+      margin-top: 36px;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 300;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+    }
+
+    .save-the-date {
+      display: inline-block;
+      margin-top: 32px;
+      padding: 12px 36px;
+      border: 1px solid var(--gold);
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      background: transparent;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.4s var(--ease-out-quart);
+    }
+
+    .save-the-date:hover {
+      background: var(--gold);
+      color: white;
+      transform: scale(1.03);
+      box-shadow: 0 8px 32px rgba(200, 168, 107, 0.25);
+    }
+
+    /* TIMELINE */
+    .timeline-section {
+      position: relative;
+      padding: 100px 24px 120px;
+      background: var(--cream);
+      overflow: hidden;
+    }
+
+    .section-heading {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .section-heading span {
+      display: block;
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(38px, 5.5vw, 72px);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--forest);
+      line-height: 1.1;
+    }
+
+    .timeline {
+      position: relative;
+      max-width: 700px;
+      margin: 0 auto;
+      padding-left: 40px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 16px;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--gold-light) 15%, var(--gold-light) 85%, transparent);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 56px;
+      padding: 32px 36px;
+      background: white;
+      border-radius: 2px;
+      box-shadow: 0 2px 24px rgba(23, 61, 44, 0.05), 0 1px 4px rgba(23, 61, 44, 0.04);
+      transition: transform 0.4s var(--ease-out-quart), box-shadow 0.4s var(--ease-out-quart);
+    }
+
+    .timeline-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 40px rgba(23, 61, 44, 0.08), 0 2px 8px rgba(23, 61, 44, 0.05);
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -32px;
+      top: 36px;
+      width: 10px;
+      height: 10px;
+      background: var(--gold);
+      border: 2px solid var(--cream);
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px var(--gold-light);
+    }
+
+    .timeline-year {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      margin-bottom: 8px;
+    }
+
+    .timeline-title {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 500;
+      font-style: italic;
+      color: var(--forest);
+      margin-bottom: 10px;
+    }
+
+    .timeline-desc {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 300;
+      line-height: 1.8;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    /* VENUE / CELEBRATION */
+    .venue-section {
+      position: relative;
+      padding: 100px 24px 120px;
+      background: var(--forest-deep);
+      color: white;
+      overflow: hidden;
+    }
+
+    .venue-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 20%, rgba(200, 168, 107, 0.06), transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(200, 168, 107, 0.04), transparent 50%);
+      pointer-events: none;
+    }
+
+    .venue-section .section-heading span {
+      color: var(--gold-light);
+      opacity: 0.7;
+    }
+
+    .venue-section .section-heading h2 {
+      color: white;
+    }
+
+    .venue-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .venue-card {
+      position: relative;
+      padding: 48px 36px;
+      border: 1px solid rgba(200, 168, 107, 0.2);
+      border-radius: 2px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    @supports (backdrop-filter: blur(6px)) {
+      .venue-card {
+        backdrop-filter: blur(6px);
+      }
+    }
+
+    .venue-card:hover {
+      border-color: rgba(200, 168, 107, 0.45);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+    }
+
+    .venue-icon {
+      font-size: 28px;
+      margin-bottom: 20px;
+      opacity: 0.8;
+    }
+
+    .venue-label {
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 16px;
+    }
+
+    .venue-name {
+      font-family: var(--font-display);
+      font-size: clamp(24px, 3vw, 32px);
+      font-weight: 400;
+      font-style: italic;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .venue-details {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 200;
+      line-height: 1.9;
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .venue-time {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 8px 20px;
+      border: 1px solid rgba(200, 168, 107, 0.3);
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: .2em;
+      color: var(--gold-light);
+    }
+
+    /* GALLERY */
+    .gallery-section {
+      padding: 120px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      margin-top: 56px;
+    }
+
+    .gallery-card {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      aspect-ratio: 4 / 3;
+      background: var(--forest-deep);
+      border: 1px solid rgba(200, 168, 107, 0.25);
+      box-shadow: 0 12px 32px rgba(14, 42, 29, 0.08);
+      cursor: pointer;
+      transition: transform 0.5s var(--ease-out-expo), box-shadow 0.5s var(--ease-out-expo), border-color 0.4s ease;
+    }
+
+    .gallery-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 24px 48px rgba(14, 42, 29, 0.22);
+      border-color: var(--gold);
+    }
+
+    .gallery-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.7s var(--ease-out-expo), filter 0.5s ease;
+      filter: brightness(0.95);
+    }
+
+    .gallery-card:hover img {
+      transform: scale(1.08);
+      filter: brightness(1.03);
+    }
+
+    .gallery-card-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(14, 42, 29, 0.85) 0%, rgba(14, 42, 29, 0.2) 60%, transparent 100%);
+      opacity: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 24px;
+      transition: opacity 0.4s var(--ease-out-expo);
+    }
+
+    .gallery-card:hover .gallery-card-overlay {
+      opacity: 1;
+    }
+
+    .gallery-card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(200, 168, 107, 0.9);
+      color: var(--forest-deep);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 12px;
+      transform: translateY(12px) scale(0.9);
+      transition: transform 0.4s var(--ease-out-expo);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .gallery-card:hover .gallery-card-icon {
+      transform: translateY(0) scale(1);
+    }
+
+    .gallery-card-caption {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 400;
+      color: var(--cream);
+      letter-spacing: 0.04em;
+      transform: translateY(12px);
+      transition: transform 0.4s var(--ease-out-expo);
+    }
+
+    .gallery-card:hover .gallery-card-caption {
+      transform: translateY(0);
+    }
+
+    /* LIGHTBOX MODAL */
+    .lightbox-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: rgba(10, 28, 19, 0.94);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.4s var(--ease-out-expo), visibility 0.4s var(--ease-out-expo);
+      user-select: none;
+    }
+
+    @supports (backdrop-filter: blur(20px)) {
+      .lightbox-modal {
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+    }
+
+    .lightbox-modal.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .lightbox-content {
+      position: relative;
+      max-width: 90vw;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox-image-wrap {
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(200, 168, 107, 0.3);
+      max-height: 75vh;
+      max-width: 88vw;
+    }
+
+    .lightbox-img {
+      max-width: 100%;
+      max-height: 75vh;
+      object-fit: contain;
+      display: block;
+      transform: scale(0.96);
+      opacity: 0;
+      transition: transform 0.4s var(--ease-out-expo), opacity 0.4s var(--ease-out-expo);
+    }
+
+    .lightbox-modal.active .lightbox-img {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .lightbox-caption-bar {
+      margin-top: 20px;
+      text-align: center;
+      color: var(--cream);
+    }
+
+    .lightbox-title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--gold-light);
+      letter-spacing: 0.05em;
+      margin: 0 0 4px 0;
+    }
+
+    .lightbox-counter {
+      font-family: var(--font-body);
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+    }
+
+    .lightbox-close,
+    .lightbox-nav {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(200, 168, 107, 0.3);
+      color: var(--cream);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+      z-index: 100000;
+    }
+
+    .lightbox-close {
+      top: 24px;
+      right: 28px;
+      width: 48px;
+      height: 48px;
+      font-size: 22px;
+    }
+
+    .lightbox-nav {
+      top: 50%;
+      transform: translateY(-50%);
+      width: 54px;
+      height: 54px;
+      font-size: 24px;
+    }
+
+    .lightbox-close:hover,
+    .lightbox-nav:hover {
+      background: rgba(200, 168, 107, 0.25);
+      border-color: var(--gold);
+      transform: translateY(-50%) scale(1.08);
+    }
+
+    .lightbox-close:hover {
+      transform: scale(1.08);
+    }
+
+    .lightbox-prev {
+      left: 28px;
+    }
+
+    .lightbox-next {
+      right: 28px;
+    }
+
+    /* COUNTDOWN */
+    .countdown-section {
+      position: relative;
+      padding: 100px 24px;
+      text-align: center;
+      background: linear-gradient(to bottom, var(--cream-warm), var(--cream));
+      overflow: hidden;
+    }
+
+    .countdown-grid {
+      display: flex;
+      justify-content: center;
+      gap: clamp(16px, 4vw, 40px);
+      margin-top: 48px;
+      flex-wrap: wrap;
+    }
+
+    .countdown-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 90px;
+    }
+
+    .countdown-number {
+      font-family: var(--font-display);
+      font-size: clamp(48px, 8vw, 80px);
+      font-weight: 300;
+      color: var(--forest);
+      line-height: 1;
+      transition: transform 0.3s var(--ease-out-quart);
+    }
+
+    .countdown-number.tick {
+      transform: scale(1.08);
+    }
+
+    .countdown-label {
+      margin-top: 10px;
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .countdown-separator {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 6vw, 56px);
+      font-weight: 300;
+      color: var(--gold-light);
+      align-self: flex-start;
+      margin-top: 8px;
+    }
+
+    /* RSVP */
+    .rsvp-section {
+      position: relative;
+      padding: 120px 24px;
+      text-align: center;
+      background: var(--cream);
+      overflow: hidden;
+    }
+
+    .rsvp-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 50%, rgba(200, 168, 107, 0.06), transparent 60%);
+      pointer-events: none;
+    }
+
+    .rsvp-text {
+      max-width: 520px;
+      margin: 24px auto 0;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 200;
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+
+    .rsvp-btn {
+      display: inline-block;
+      margin-top: 40px;
+      padding: 18px 56px;
+      background: var(--gold);
+      color: white;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.45s var(--ease-out-quart);
+    }
+
+    .rsvp-btn:hover {
+      background: var(--gold-dark);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 40px rgba(200, 168, 107, 0.3);
+    }
+
+    /* FOOTER */
+    .footer {
+      padding: 80px 24px 48px;
+      text-align: center;
+      background: var(--forest-deep);
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .footer-monogram {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--gold);
+      margin-bottom: 24px;
+    }
+
+    .footer-hashtag {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 300;
+      letter-spacing: .2em;
+      color: var(--gold-light);
+      margin-bottom: 8px;
+    }
+
+    .footer-note {
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 200;
+      letter-spacing: .1em;
+      margin-top: 48px;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .footer-note span {
+      color: #e86f6f;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .walk-section {
+        height: 430vh;
+      }
+
+      .layer {
+        inset: -14%;
+        width: 128%;
+        height: 128%;
+      }
+
+      .far-background {
+        background-position: center 60%;
+      }
+
+      .mid-background {
+        background-position: center 60%;
+      }
+
+      .couple-wrap {
+        width: min(96vw, 460px);
+        min-width: 320px;
+        bottom: 35%;
+      }
+
+      .story-copy {
+        top: 11vh;
+      }
+
+      .story-copy h1 {
+        font-size: clamp(46px, 14vw, 76px);
+      }
+
+      .names-section {
+        padding: 80px 20px 70px;
+      }
+
+      .venue-cards {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      .venue-card {
+        padding: 36px 24px;
+      }
+
+      .timeline {
+        padding-left: 32px;
+      }
+
+      .timeline::before {
+        left: 10px;
+      }
+
+      .timeline-item {
+        padding: 24px;
+        margin-bottom: 40px;
+      }
+
+      .timeline-item::before {
+        left: -28px;
+        width: 8px;
+        height: 8px;
+      }
+
+      .countdown-separator {
+        display: none;
+      }
+
+      .countdown-unit {
+        min-width: 70px;
+      }
+
+      .gallery-section {
+        padding: 80px 16px;
+      }
+
+      .gallery-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .lightbox-prev {
+        left: 12px;
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+      }
+
+      .lightbox-next {
+        right: 12px;
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+      }
+
+      .lightbox-close {
+        top: 16px;
+        right: 16px;
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+      }
+    }
+
+    /* ACCESSIBILITY: REDUCED MOTION */
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+
+  <meta property="og:title" content="Jhon&amp;Anu">
+  <meta property="og:description" content="December 20, 2026">
+  <meta property="og:image" content="">
+  <meta property="og:url" content="">
+</head>
+
+<body>
+
+  <div id="parent">
+    <!-- Generated sections will be injected here -->
+    <!-- Global Lightbox Modal -->
+    <div class="lightbox-modal" id="lightboxModal" role="dialog" aria-modal="true" data-json-path="gallery">
+      <button class="lightbox-close" id="lightboxClose" aria-label="Close fullscreen view"
+        data-json-path="gallery">✕</button>
+      <button class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Previous image"
+        data-json-path="gallery">‹</button>
+      <button class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Next image"
+        data-json-path="gallery">›</button>
+
+      <div class="lightbox-content" data-json-path="gallery">
+        <div class="lightbox-image-wrap" data-json-path="gallery">
+          <img class="lightbox-img" id="lightboxImg" src="" alt="" data-json-path="gallery">
+        </div>
+        <div class="lightbox-caption-bar" data-json-path="gallery">
+          <div class="lightbox-title" id="lightboxTitle" data-json-path="gallery"></div>
+          <div class="lightbox-counter" id="lightboxCounter" data-json-path="gallery"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="overlay">
+    hi
+
+  </div>
+
+
+
+  <!-- REQUIRED CONNECTOR SCRIPT -->
+  <script src="https://cdn.mizhiv.com/assets/js/mizhiv_connector.js"></script>
+
+  <script>
+    /* ==========================================================
+     * SINGLE SOURCE OF TRUTH: websiteData
+     * ========================================================== */
+    let websiteData = {
+      "hero": {
+        "content": {
+          "farBackground": "https://cdn.mizhiv.com/users/5fbfdab0-a592-43dc-9a0f-f7de15445955/websites/john-anu/assets/far-background.png",
+          "midBackground": "https://cdn.mizhiv.com/users/5fbfdab0-a592-43dc-9a0f-f7de15445955/websites/john-anu/assets/mid-background.png",
+          "coupleImage": "https://cdn.mizhiv.com/users/5fbfdab0-a592-43dc-9a0f-f7de15445955/websites/john-anu/assets/couple2.png",
+          "objectPosition": "50% 50%",
+          "eyebrow": "A journey together",
+          "title": "Our Story<br>Begins",
+          "description": "Every step brought us closer to this moment.",
+          "scrollHint": "Scroll to walk"
+        }
+      },
+      "names": {
+        "content": {
+          "eyebrow": "Together with their families",
+          "name1": "John",
+          "ampersand": "&",
+          "name2": "Anu",
+          "dateText": "December 20, 2026",
+          "button": {
+            "text": "Save the Date",
+            "href": "#rsvpSection"
+          }
+        }
+      },
+      "timeline": {
+        "content": [
+          {
+            "year": "2020",
+            "title": "First Met",
+            "description": "Two strangers at a coffee shop, not knowing that this chance encounter would change everything forever."
+          },
+          {
+            "year": "2021",
+            "title": "First Date",
+            "description": "A long walk under the stars, endless conversations, and the beautiful realization that we had found something special."
+          },
+          {
+            "year": "2024",
+            "title": "The Proposal",
+            "description": "On a misty morning trail, surrounded by nature's beauty, the question was asked — and the answer was a tearful \"Yes!\""
+          },
+          {
+            "year": "2026",
+            "title": "Forever Begins",
+            "description": "And now, we invite you to join us as we begin the most beautiful chapter of our lives together."
+          }
+        ],
+        "sectionMeta": {
+          "eyebrow": "Our love story",
+          "title": "How It All<br>Happened"
+        }
+      },
+      "venue": {
+        "content": [
+          {
+            "icon": "🕊️",
+            "label": "The Ceremony",
+            "name": "St. Mary's Church",
+            "address": "123 Chapel Lane<br>Kochi, Kerala 682001",
+            "time": "10:00 AM"
+          },
+          {
+            "icon": "✨",
+            "label": "The Reception",
+            "name": "Grand Hyatt Ballroom",
+            "address": "456 Celebration Drive<br>Kochi, Kerala 682002",
+            "time": "6:00 PM"
+          }
+        ],
+        "sectionMeta": {
+          "eyebrow": "Join us to celebrate",
+          "title": "The Celebration"
+        }
+      },
+      "gallery": {
+        "content": [
+          {
+            "image": "https://cdn.mizhiv.com/users/5fbfdab0-a592-43dc-9a0f-f7de15445955/websites/john-anu/assets/ChatGPT Image Aug 25, 2026, 12_12_50 AM.png",
+            "title": "The Promise",
+            "objectPosition": "50% 50%"
+          },
+          {
+            "image": "https://cdn.mizhiv.com/users/5fbfdab0-a592-43dc-9a0f-f7de15445955/websites/john-anu/assets/ChatGPT Image Aug 25, 2026, 12_12_56 AM.png",
+            "title": "Together Forever",
+            "objectPosition": "50%  0%"
+          },
+          {
+            "image": "https://cdn.mizhiv.com/users/5fbfdab0-a592-43dc-9a0f-f7de15445955/websites/john-anu/assets/WhatsApp Image 2026-08-22 at 11.38.54 PM.jpeg",
+            "title": "Joyful Celebration",
+            "objectPosition": "50% 0%"
+          },
+          {
+            "image": "https://cdn.mizhiv.com/users/5fbfdab0-a592-43dc-9a0f-f7de15445955/websites/john-anu/assets/ChatGPT Image Aug 25, 2026, 12_13_00 AM.png",
+            "title": "Rings of Devotion",
+            "objectPosition": "50% 0%"
+          },
+          {
+            "image": "https://cdn.mizhiv.com/users/5fbfdab0-a592-43dc-9a0f-f7de15445955/websites/john-anu/assets/ChatGPT Image Aug 25, 2026, 12_13_05 AM.png",
+            "title": "Golden Hour Walk",
+            "objectPosition": "50% 50%"
+          },
+          {
+            "image": "https://cdn.mizhiv.com/users/5fbfdab0-a592-43dc-9a0f-f7de15445955/websites/john-anu/assets/ChatGPT Image Aug 25, 2026, 12_13_10 AM.png",
+            "title": "",
+            "objectPosition": "40% 0%"
+          }
+        ],
+        "sectionMeta": {
+          "eyebrow": "Captured Moments",
+          "title": "Our Photo<br>Gallery"
+        }
+      },
+      "countdown": {
+        "content": {
+          "targetDate": "2026-10-20T10:00:00",
+          "eyebrow": "Counting every moment",
+          "title": "Until We Say<br>&ldquo;I Do&rdquo;"
+        }
+      },
+      "rsvp": {
+        "content": {
+          "eyebrow": "We would be honored",
+          "title": "Kindly Respond",
+          "text": "Your presence would mean the world to us. Please let us know if you will be joining our celebration of love.",
+          "button": {
+            "text": "RSVP Now",
+            "href": "#"
+          }
+        }
+      },
+      "footer": {
+        "content": {
+          "monogram": "J & A",
+          "hashtag": "#JohnAndAnu",
+          "note": "Made with special care for our special day"
+        }
+      }
+    };
+
+    /* Helper: Remove DOM Element if missing */
+    function removeSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    }
+
+    /* Dynamic Hero Image Preload */
+    function preloadHeroImage() {
+      if (websiteData.hero && websiteData.hero.content && websiteData.hero.content.coupleImage) {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'image';
+        link.href = websiteData.hero.content.coupleImage;
+        document.head.appendChild(link);
+      }
+    }
+
+    /* ==========================================================
+     * SECTION RENDERERS
+     * ========================================================== */
+
+    function getOrCreateSection(id, tagName = 'section', className = '') {
+      let el = document.getElementById(id);
+      if (!el) {
+        el = document.createElement(tagName);
+        el.id = id;
+        if (className) el.className = className;
+        document.getElementById('parent').appendChild(el);
+      }
+      return el;
+    }
+
+    function renderHero() {
+      const hero = websiteData.hero;
+      if (!hero || !hero.content) {
+        removeSection("walk");
+        return;
+      }
+      const c = hero.content;
+      const sec = getOrCreateSection("walk", "section", "walk-section hero");
+      sec.setAttribute("data-json-path", "hero");
+
+      const couplePos = c.objectPosition || "50% 50%";
+
+      let html = `
+        <canvas id="globalParticleCanvas" class="hero-canvas" data-json-path="hero"></canvas>
+        <div class="walk-stage hero-stage" id="walkStage" data-json-path="hero">
+          <div class="layer far-background hero-far-bg" id="farBackground" style="${c.farBackground ? `background-image: url('${c.farBackground}');` : ''}" data-json-path="hero.content.farBackground"></div>
+          <div class="layer mid-background hero-mid-bg" id="midBackground" style="${c.midBackground ? `background-image: url('${c.midBackground}');` : ''}" data-json-path="hero.content.midBackground"></div>
+
+          <div class="couple-wrap hero-couple-wrap" id="coupleWrap" data-json-path="hero">
+            <div class="ground-shadow" data-json-path="hero"></div>
+            ${c.coupleImage ? `<img class="couple hero-image hero-couple-image" id="couple" src="${c.coupleImage}" style="object-position: ${couplePos};" alt="The couple walking" draggable="false" data-json-path="hero.content.coupleImage" />` : ''}
+          </div>
+
+          <div class="sun-glow hero-glow" id="sunGlow" data-json-path="hero"></div>
+          <div class="atmosphere hero-atmosphere" data-json-path="hero"></div>
+
+          <div class="story-copy hero-story" id="storyCopy" data-json-path="hero">
+            ${c.eyebrow ? `<div class="eyebrow hero-eyebrow" data-json-path="hero.content.eyebrow">${c.eyebrow}</div>` : ''}
+            ${c.title ? `<h1 class="hero-title" data-json-path="hero.content.title">${c.title}</h1>` : ''}
+            ${c.description ? `<p class="hero-description" data-json-path="hero.content.description">${c.description}</p>` : ''}
+          </div>
+
+          ${c.scrollHint ? `
+            <div class="scroll-hint hero-scroll-hint" id="scrollHint" data-json-path="hero.content.scrollHint">
+              ${c.scrollHint}
+              <div class="scroll-line" data-json-path="hero.content.scrollHint"></div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+
+      sec.innerHTML = html;
+    }
+
+    function renderNames() {
+      const names = websiteData.names;
+      if (!names || !names.content) {
+        removeSection("namesSection");
+        return;
+      }
+      const c = names.content;
+      const sec = getOrCreateSection("namesSection", "section", "names-section names");
+      sec.setAttribute("data-json-path", "names");
+
+      let html = '';
+      if (c.eyebrow) {
+        html += `<div class="names-eyebrow reveal" data-json-path="names.content.eyebrow">${c.eyebrow}</div>`;
+      }
+
+      html += `
+        <div class="divider reveal reveal-delay-1" data-json-path="names">
+          <div class="divider-line" data-json-path="names"></div>
+          <div class="divider-diamond" data-json-path="names"></div>
+          <div class="divider-line" data-json-path="names"></div>
+        </div>
+      `;
+
+      if (c.name1 || c.name2) {
+        html += `
+          <h1 class="couple-names reveal reveal-delay-2" data-json-path="names">
+            ${c.name1 ? `<span class="names-name1" data-json-path="names.content.name1">${c.name1}</span>` : ''}
+            ${c.ampersand ? `<span class="amp names-amp" data-json-path="names.content.ampersand">${c.ampersand}</span>` : ''}
+            ${c.name2 ? `<span class="names-name2" data-json-path="names.content.name2">${c.name2}</span>` : ''}
+          </h1>
+        `;
+      }
+
+      html += `<div class="shimmer-line reveal reveal-delay-3" data-json-path="names"></div>`;
+
+      if (c.dateText) {
+        html += `<p class="wedding-date reveal reveal-delay-3 names-date" data-json-path="names.content.dateText">${c.dateText}</p>`;
+      }
+
+      if (c.button && c.button.text && c.button.href) {
+        html += `
+          <div class="reveal reveal-delay-4" style="margin-top:8px;" data-json-path="names.content.button">
+            <a href="${c.button.href}" class="save-the-date names-button names-button-text" id="saveDate" data-json-path="names.content.button.text">${c.button.text}</a>
+          </div>
+        `;
+      }
+
+      sec.innerHTML = html;
+    }
+
+    function renderTimeline() {
+      const timeline = websiteData.timeline;
+      if (!timeline || !timeline.content || !Array.isArray(timeline.content) || timeline.content.length === 0) {
+        removeSection("timelineSection");
+        return;
+      }
+      const sec = getOrCreateSection("timelineSection", "section", "timeline-section timeline-container");
+      sec.setAttribute("data-json-path", "timeline");
+
+      let metaHtml = '';
+      if (timeline.sectionMeta) {
+        metaHtml = `
+          <div class="section-heading reveal" data-json-path="timeline">
+            ${timeline.sectionMeta.eyebrow ? `<span class="timeline-meta-eyebrow" data-json-path="timeline">${timeline.sectionMeta.eyebrow}</span>` : ''}
+            ${timeline.sectionMeta.title ? `<h2 class="timeline-meta-title" data-json-path="timeline">${timeline.sectionMeta.title}</h2>` : ''}
+          </div>
+        `;
+      }
+
+      let itemsHtml = '';
+      timeline.content.forEach((item, index) => {
+        if (!item) return;
+        let itemBody = '';
+        if (item.year) {
+          itemBody += `<div class="timeline-year timeline-item-${index}-year" data-json-path="timeline.content[${index}].year">${item.year}</div>`;
+        }
+        if (item.title) {
+          itemBody += `<div class="timeline-title timeline-item-${index}-title" data-json-path="timeline.content[${index}].title">${item.title}</div>`;
+        }
+        if (item.description) {
+          itemBody += `<p class="timeline-desc timeline-item-${index}-desc" data-json-path="timeline.content[${index}].description">${item.description}</p>`;
+        }
+
+        if (itemBody) {
+          itemsHtml += `
+            <div class="timeline-item timeline-item-${index} reveal" data-json-path="timeline.content[${index}]">
+              ${itemBody}
+            </div>
+          `;
+        }
+      });
+
+      if (!itemsHtml) {
+        removeSection("timelineSection");
+        return;
+      }
+
+      sec.innerHTML = `
+        ${metaHtml}
+        <div class="shimmer-line reveal" data-json-path="timeline"></div>
+        <div class="timeline" data-json-path="timeline">
+          ${itemsHtml}
+        </div>
+      `;
+    }
+
+    function renderVenue() {
+      const venue = websiteData.venue;
+      if (!venue || !venue.content || !Array.isArray(venue.content) || venue.content.length === 0) {
+        removeSection("venueSection");
+        return;
+      }
+      const sec = getOrCreateSection("venueSection", "section", "venue-section venue-container");
+      sec.setAttribute("data-json-path", "venue");
+
+      let metaHtml = '';
+      if (venue.sectionMeta) {
+        metaHtml = `
+          <div class="section-heading reveal" data-json-path="venue">
+            ${venue.sectionMeta.eyebrow ? `<span class="venue-meta-eyebrow" data-json-path="venue">${venue.sectionMeta.eyebrow}</span>` : ''}
+            ${venue.sectionMeta.title ? `<h2 class="venue-meta-title" data-json-path="venue">${venue.sectionMeta.title}</h2>` : ''}
+          </div>
+        `;
+      }
+
+      let cardsHtml = '';
+      venue.content.forEach((item, index) => {
+        if (!item) return;
+        let cardBody = '';
+        if (item.icon) {
+          cardBody += `<div class="venue-icon venue-item-${index}-icon" data-json-path="venue.content[${index}].icon">${item.icon}</div>`;
+        }
+        if (item.label) {
+          cardBody += `<div class="venue-label venue-item-${index}-label" data-json-path="venue.content[${index}].label">${item.label}</div>`;
+        }
+        if (item.name) {
+          cardBody += `<div class="venue-name venue-item-${index}-name" data-json-path="venue.content[${index}].name">${item.name}</div>`;
+        }
+        if (item.address) {
+          cardBody += `<div class="venue-details venue-item-${index}-details" data-json-path="venue.content[${index}].address">${item.address}</div>`;
+        }
+        if (item.time) {
+          cardBody += `<div class="venue-time venue-item-${index}-time" data-json-path="venue.content[${index}].time">${item.time}</div>`;
+        }
+
+        if (cardBody) {
+          const delayClass = index % 2 === 1 ? 'reveal-delay-2' : '';
+          cardsHtml += `
+            <div class="venue-card venue-item venue-item-${index} reveal ${delayClass}" data-json-path="venue.content[${index}]">
+              ${cardBody}
+            </div>
+          `;
+        }
+      });
+
+      if (!cardsHtml) {
+        removeSection("venueSection");
+        return;
+      }
+
+      sec.innerHTML = `
+        ${metaHtml}
+        <div class="shimmer-line reveal" style="margin-bottom: 56px;" data-json-path="venue"></div>
+        <div class="venue-cards" data-json-path="venue">
+          ${cardsHtml}
+        </div>
+      `;
+    }
+
+    function renderGallery() {
+      const gallery = websiteData.gallery;
+      if (!gallery || !gallery.content || !Array.isArray(gallery.content) || gallery.content.length === 0) {
+        removeSection("gallerySection");
+        return;
+      }
+      const sec = getOrCreateSection("gallerySection", "section", "gallery-section gallery-container");
+      sec.setAttribute("data-json-path", "gallery");
+
+      let metaHtml = '';
+      if (gallery.sectionMeta) {
+        metaHtml = `
+          <div class="section-heading reveal" data-json-path="gallery">
+            ${gallery.sectionMeta.eyebrow ? `<span class="gallery-meta-eyebrow" data-json-path="gallery">${gallery.sectionMeta.eyebrow}</span>` : ''}
+            ${gallery.sectionMeta.title ? `<h2 class="gallery-meta-title" data-json-path="gallery">${gallery.sectionMeta.title}</h2>` : ''}
+          </div>
+        `;
+      }
+
+      let gridHtml = '';
+      gallery.content.forEach((item, index) => {
+        if (!item || !item.image) return;
+        const objectPosition = item.objectPosition || "50% 50%";
+        const delayClass = index % 3 === 1 ? 'reveal-delay-1' : index % 3 === 2 ? 'reveal-delay-2' : '';
+
+        gridHtml += `
+          <div class="gallery-card gallery-item gallery-item-${index} reveal ${delayClass}" data-index="${index}" data-json-path="gallery.content[${index}]">
+            <img src="${item.image}" alt="${item.title || 'Gallery image'}" style="object-position: ${objectPosition};" loading="lazy" width="400" height="300" class="gallery-image gallery-item-${index}-image" data-json-path="gallery.content[${index}].image" />
+            <div class="gallery-card-overlay" data-json-path="gallery.content[${index}]">
+              <div class="gallery-card-icon" data-json-path="gallery.content[${index}]">🔍</div>
+              ${item.title ? `<div class="gallery-card-caption gallery-item-${index}-title" data-json-path="gallery.content[${index}].title">${item.title}</div>` : ''}
+            </div>
+          </div>
+        `;
+      });
+
+      if (!gridHtml) {
+        removeSection("gallerySection");
+        return;
+      }
+
+      sec.innerHTML = `
+        ${metaHtml}
+        <div class="shimmer-line reveal" data-json-path="gallery"></div>
+        <div class="gallery-grid" data-json-path="gallery">
+          ${gridHtml}
+        </div>
+      `;
+    }
+
+    function renderCountdown() {
+      const countdown = websiteData.countdown;
+      if (!countdown || !countdown.content) {
+        removeSection("countdownSection");
+        return;
+      }
+      const c = countdown.content;
+      const sec = getOrCreateSection("countdownSection", "section", "countdown-section countdown");
+      sec.setAttribute("data-json-path", "countdown");
+
+      let metaHtml = '';
+      if (c.eyebrow || c.title) {
+        metaHtml = `
+          <div class="section-heading reveal" data-json-path="countdown">
+            ${c.eyebrow ? `<span class="countdown-eyebrow" data-json-path="countdown.content.eyebrow">${c.eyebrow}</span>` : ''}
+            ${c.title ? `<h2 class="countdown-title" data-json-path="countdown.content.title">${c.title}</h2>` : ''}
+          </div>
+        `;
+      }
+
+      sec.innerHTML = `
+        ${metaHtml}
+        <div class="shimmer-line reveal" data-json-path="countdown"></div>
+        <div class="countdown-grid reveal" data-json-path="countdown">
+          <div class="countdown-unit" data-json-path="countdown">
+            <div class="countdown-number" id="cdDays" data-json-path="countdown">000</div>
+            <div class="countdown-label" data-json-path="countdown">Days</div>
+          </div>
+          <div class="countdown-separator" data-json-path="countdown">:</div>
+          <div class="countdown-unit" data-json-path="countdown">
+            <div class="countdown-number" id="cdHours" data-json-path="countdown">00</div>
+            <div class="countdown-label" data-json-path="countdown">Hours</div>
+          </div>
+          <div class="countdown-separator" data-json-path="countdown">:</div>
+          <div class="countdown-unit" data-json-path="countdown">
+            <div class="countdown-number" id="cdMinutes" data-json-path="countdown">00</div>
+            <div class="countdown-label" data-json-path="countdown">Minutes</div>
+          </div>
+          <div class="countdown-separator" data-json-path="countdown">:</div>
+          <div class="countdown-unit" data-json-path="countdown">
+            <div class="countdown-number" id="cdSeconds" data-json-path="countdown">00</div>
+            <div class="countdown-label" data-json-path="countdown">Seconds</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRsvp() {
+      const rsvp = websiteData.rsvp;
+      if (!rsvp || !rsvp.content) {
+        removeSection("rsvpSection");
+        return;
+      }
+      const c = rsvp.content;
+      const sec = getOrCreateSection("rsvpSection", "section", "rsvp-section rsvp");
+      sec.setAttribute("data-json-path", "rsvp");
+
+      let metaHtml = '';
+      if (c.eyebrow || c.title) {
+        metaHtml = `
+          <div class="section-heading reveal" data-json-path="rsvp">
+            ${c.eyebrow ? `<span class="rsvp-eyebrow" data-json-path="rsvp.content.eyebrow">${c.eyebrow}</span>` : ''}
+            ${c.title ? `<h2 class="rsvp-title" data-json-path="rsvp.content.title">${c.title}</h2>` : ''}
+          </div>
+        `;
+      }
+
+      let btnHtml = '';
+      if (c.button && c.button.text && c.button.href) {
+        btnHtml = `
+          <div class="reveal" data-json-path="rsvp.content.button">
+            <a href="${c.button.href}" class="rsvp-btn rsvp-button rsvp-button-text" id="rsvpBtn" data-json-path="rsvp.content.button.text">${c.button.text}</a>
+          </div>
+        `;
+      }
+
+      sec.innerHTML = `
+        ${metaHtml}
+        <div class="shimmer-line reveal" data-json-path="rsvp"></div>
+        ${c.text ? `<p class="rsvp-text reveal" data-json-path="rsvp.content.text">${c.text}</p>` : ''}
+        ${btnHtml}
+      `;
+    }
+
+    function renderFooter() {
+      const footer = websiteData.footer;
+      if (!footer || !footer.content) {
+        removeSection("footer");
+        return;
+      }
+      const c = footer.content;
+      const sec = getOrCreateSection("footer", "footer", "footer");
+      sec.setAttribute("data-json-path", "footer");
+
+      sec.innerHTML = `
+        ${c.monogram ? `<div class="footer-monogram reveal" data-json-path="footer.content.monogram">${c.monogram}</div>` : ''}
+        ${c.hashtag ? `<div class="footer-hashtag reveal" data-json-path="footer.content.hashtag">${c.hashtag}</div>` : ''}
+        <div class="divider reveal" style="margin-top: 36px; margin-bottom: 0;" data-json-path="footer">
+          <div class="divider-line" style="background: linear-gradient(90deg, transparent, rgba(200,168,107,0.3), transparent);" data-json-path="footer"></div>
+          <div class="divider-diamond" style="border-color: rgba(200,168,107,0.35);" data-json-path="footer"></div>
+          <div class="divider-line" style="background: linear-gradient(90deg, transparent, rgba(200,168,107,0.3), transparent);" data-json-path="footer"></div>
+        </div>
+        ${c.note ? `<p class="footer-note reveal" data-json-path="footer.content.note">${c.note}</p>` : ''}
+      `;
+    }
+
+    /* ==========================================================
+     * MASTER RENDERER
+     * ========================================================== */
+    function renderDataAll(data) {
+      if (data) {
+        websiteData = data;
+      }
+
+      preloadHeroImage();
+
+      renderHero();
+      renderNames();
+      renderTimeline();
+      renderVenue();
+      renderGallery();
+      renderCountdown();
+      renderRsvp();
+      renderFooter();
+
+      initializeComponents();
+    }
+
+    /* ==========================================================
+     * COMPONENT INITIALIZATIONS
+     * ========================================================== */
+    let countdownInterval = null;
+    let particleAnimationId = null;
+
+    function initializeComponents() {
+      initScrollAnimations();
+      initHeroParallax();
+      initParticles();
+      initCountdown();
+      initLightbox();
+    }
+
+    function initScrollAnimations() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animating');
+            requestAnimationFrame(() => {
+              entry.target.classList.add('visible');
+              entry.target.classList.remove('animating');
+            });
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    }
+
+    function initHeroParallax() {
+      const section = document.getElementById("walk");
+      const far = document.getElementById("farBackground");
+      const mid = document.getElementById("midBackground");
+      const coupleEl = document.getElementById("coupleWrap");
+      const coupleImage = document.getElementById("couple");
+      const story = document.getElementById("storyCopy");
+      const sun = document.getElementById("sunGlow");
+      const hint = document.getElementById("scrollHint");
+
+      if (!section || !far || !mid || !coupleEl) return;
+
+      let targetProgress = 0;
+      let currentProgress = 0;
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function easeInOut(t) {
+        return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      }
+
+      function getProgress() {
+        const rect = section.getBoundingClientRect();
+        const scrollable = section.offsetHeight - window.innerHeight;
+        if (scrollable <= 0) return 0;
+        return clamp(-rect.top / scrollable, 0, 1);
+      }
+
+      let ticking = false;
+      function onScroll() {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            targetProgress = getProgress();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }
+
+      function renderFrame() {
+        if (!document.getElementById("walk")) return;
+
+        currentProgress += (targetProgress - currentProgress) * 0.04;
+        const p = currentProgress;
+
+        const farX = (p - .5) * -18;
+        const farY = p * -20;
+        const farScale = 1.08 + p * .06;
+        far.style.transform = `translate3d(${farX}px, ${farY}px, 0) scale(${farScale})`;
+
+        const midX = (p - .5) * -38;
+        const midY = p * -62;
+        const midScale = 1.04 + p * .11;
+        mid.style.transform = `translate3d(${midX}px, ${midY}px, 0) scale(${midScale})`;
+
+        const isMobile = window.innerWidth <= 700;
+        const cameraP = easeInOut(clamp(p * 1.12, 0, 1));
+        const coupleY = isMobile ? cameraP * 200 : cameraP * -8;
+        const coupleX = Math.sin(p * Math.PI) * (isMobile ? 12 : 18);
+        const baseScale = isMobile ? 0.5 : 1.0;
+        const coupleScale = baseScale + cameraP * (isMobile ? 1.2 : 0.26);
+        const bob = Math.sin(p * Math.PI * 8) * 2.2 * Math.sin(p * Math.PI);
+        const rotate = Math.sin(p * Math.PI * 8) * .35 * Math.sin(p * Math.PI);
+        const blurAmt = (1 - cameraP) * (isMobile ? 1.8 : .5);
+
+        coupleEl.style.transform = `translate3d(calc(-50% + ${coupleX}px), ${coupleY + bob}px, 0) scale(${coupleScale}) rotate(${rotate}deg)`;
+        coupleImage.style.filter = `blur(${blurAmt}px)`;
+
+        if (story) {
+          const textProgress = clamp((p - .52) / .25, 0, 1);
+          const textOpacity = easeInOut(textProgress);
+          const textY = 35 - textProgress * 35;
+          story.style.opacity = textOpacity;
+          story.style.transform = `translate3d(-50%, ${textY}px, 0)`;
+        }
+
+        if (sun) {
+          const textProgress = clamp((p - .52) / .25, 0, 1);
+          sun.style.opacity = .10 + textProgress * .18;
+        }
+
+        if (hint) {
+          hint.style.opacity = p < .08 ? ".78" : "0";
+        }
+
+        requestAnimationFrame(renderFrame);
+      }
+
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll);
+      onScroll();
+      renderFrame();
+    }
+
+    function initParticles() {
+      const canvas = document.getElementById('globalParticleCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      let particles = [];
+      const PARTICLE_COUNT = 48;
+      let lastScrollY = window.scrollY;
+
+      const PETAL_PALETTES = [
+        { core: 'rgba(225, 65, 85, ', edge: 'rgba(155, 25, 40, ' },
+        { core: 'rgba(240, 120, 145, ', edge: 'rgba(190, 60, 90, ' },
+        { core: 'rgba(248, 195, 175, ', edge: 'rgba(210, 130, 110, ' },
+        { core: 'rgba(210, 45, 65, ', edge: 'rgba(125, 15, 30, ' },
+        { core: 'rgba(255, 225, 215, ', edge: 'rgba(225, 170, 150, ' }
+      ];
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      function createParticle(randomY = true) {
+        const isPetal = Math.random() > 0.25;
+        const depth = Math.random();
+        const depthScale = 0.5 + depth * 0.85;
+        const palette = PETAL_PALETTES[Math.floor(Math.random() * PETAL_PALETTES.length)];
+
+        return {
+          type: isPetal ? 'petal' : 'ember',
+          x: Math.random() * window.innerWidth,
+          y: randomY ? Math.random() * window.innerHeight : -25,
+          depth: depthScale,
+          length: (4.5 + Math.random() * 6) * depthScale,
+          width: (3 + Math.random() * 4.5) * depthScale,
+          angle: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.015,
+          flipPhase: Math.random() * Math.PI * 2,
+          flipSpeed: 0.008 + Math.random() * 0.02,
+          fallSpeed: (0.25 + Math.random() * 0.45) * depthScale,
+          swayPhase: Math.random() * Math.PI * 2,
+          swaySpeed: 0.005 + Math.random() * 0.012,
+          swayAmp: 0.4 + Math.random() * 0.9,
+          opacity: (0.25 + Math.random() * 0.45),
+          colorCore: palette.core,
+          colorEdge: palette.edge,
+          emberColor: 'rgba(226, 207, 160, ',
+          size: (0.7 + Math.random() * 1.1) * depthScale,
+          pulse: Math.random() * Math.PI * 2
+        };
+      }
+
+      particles = [];
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push(createParticle(true));
+      }
+
+      function drawPetal(p) {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        p.flipPhase += p.flipSpeed;
+        ctx.scale(Math.cos(p.flipPhase), 1);
+        const l = p.length;
+        const w = p.width;
+
+        ctx.beginPath();
+        ctx.moveTo(0, -l * 0.5);
+        ctx.bezierCurveTo(w * 1.8, -l * 0.25, w * 1.6, l * 0.45, 0, l * 0.5);
+        ctx.bezierCurveTo(-w * 1.6, l * 0.45, -w * 1.8, -l * 0.25, 0, -l * 0.5);
+        ctx.closePath();
+
+        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, l * 0.55);
+        grad.addColorStop(0, p.colorCore + p.opacity + ')');
+        grad.addColorStop(0.7, p.colorEdge + (p.opacity * 0.9) + ')');
+        grad.addColorStop(1, p.colorEdge + (p.opacity * 0.65) + ')');
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawEmber(p) {
+        ctx.save();
+        p.pulse += 0.018;
+        const currentOpacity = p.opacity * (0.6 + 0.4 * Math.sin(p.pulse));
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = p.emberColor + currentOpacity + ')';
+        ctx.fill();
+        ctx.restore();
+      }
+
+      if (particleAnimationId) cancelAnimationFrame(particleAnimationId);
+
+      function animate() {
+        if (!document.getElementById('globalParticleCanvas')) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const currentScrollY = window.scrollY;
+        const scrollDelta = currentScrollY - lastScrollY;
+        lastScrollY = currentScrollY;
+
+        particles.forEach((p, idx) => {
+          p.y += p.fallSpeed + scrollDelta * p.depth * 0.04;
+          p.swayPhase += p.swaySpeed;
+          p.x += Math.sin(p.swayPhase) * p.swayAmp;
+          p.angle += p.rotationSpeed;
+
+          if (p.type === 'petal') {
+            drawPetal(p);
+          } else {
+            drawEmber(p);
+          }
+
+          if (p.y > canvas.height + 35) particles[idx] = createParticle(false);
+          else if (p.y < -45) p.y = canvas.height + 25;
+          if (p.x < -35) p.x = canvas.width + 25;
+          if (p.x > canvas.width + 35) p.x = -25;
+        });
+
+        particleAnimationId = requestAnimationFrame(animate);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+      animate();
+    }
+
+    function initCountdown() {
+      if (countdownInterval) clearInterval(countdownInterval);
+
+      const countdown = websiteData.countdown;
+      if (!countdown || !countdown.content || !countdown.content.targetDate) return;
+
+      const weddingDate = new Date(countdown.content.targetDate).getTime();
+      const daysEl = document.getElementById('cdDays');
+      const hoursEl = document.getElementById('cdHours');
+      const minutesEl = document.getElementById('cdMinutes');
+      const secondsEl = document.getElementById('cdSeconds');
+
+      if (!daysEl || !hoursEl || !minutesEl || !secondsEl) return;
+
+      function padZero(n, length) {
+        return String(n).padStart(length, '0');
+      }
+
+      function tick() {
+        const now = Date.now();
+        const diff = Math.max(0, weddingDate - now);
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diff / (1000 * 60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+
+        const newDays = padZero(days, 3);
+        const newHours = padZero(hours, 2);
+        const newMins = padZero(minutes, 2);
+        const newSecs = padZero(seconds, 2);
+
+        if (daysEl.textContent !== newDays) {
+          daysEl.textContent = newDays;
+          daysEl.classList.add('tick');
+          setTimeout(() => daysEl.classList.remove('tick'), 250);
+        }
+        if (hoursEl.textContent !== newHours) {
+          hoursEl.textContent = newHours;
+          hoursEl.classList.add('tick');
+          setTimeout(() => hoursEl.classList.remove('tick'), 250);
+        }
+        if (minutesEl.textContent !== newMins) {
+          minutesEl.textContent = newMins;
+          minutesEl.classList.add('tick');
+          setTimeout(() => minutesEl.classList.remove('tick'), 250);
+        }
+        if (secondsEl.textContent !== newSecs) {
+          secondsEl.textContent = newSecs;
+          secondsEl.classList.add('tick');
+          setTimeout(() => secondsEl.classList.remove('tick'), 250);
+        }
+      }
+
+      tick();
+      countdownInterval = setInterval(tick, 1000);
+    }
+
+    function initLightbox() {
+      const galleryCards = document.querySelectorAll('.gallery-card');
+      const modal = document.getElementById('lightboxModal');
+      const modalImg = document.getElementById('lightboxImg');
+      const modalTitle = document.getElementById('lightboxTitle');
+      const modalCounter = document.getElementById('lightboxCounter');
+      const closeBtn = document.getElementById('lightboxClose');
+      const prevBtn = document.getElementById('lightboxPrev');
+      const nextBtn = document.getElementById('lightboxNext');
+
+      if (!modal || !modalImg) return;
+
+      const gallery = websiteData.gallery;
+      if (!gallery || !gallery.content || !Array.isArray(gallery.content)) return;
+      const items = gallery.content;
+
+      let currentIndex = 0;
+
+      function updateLightbox(index) {
+        currentIndex = index;
+        const item = items[currentIndex];
+        if (!item) return;
+
+        modalImg.style.opacity = '0';
+        modalImg.style.transform = 'scale(0.96)';
+
+        setTimeout(() => {
+          modalImg.src = item.image || '';
+          modalImg.alt = item.title || 'Gallery photo';
+          if (modalTitle) modalTitle.textContent = item.title || '';
+          if (modalCounter) modalCounter.textContent = `${currentIndex + 1} / ${items.length}`;
+          modalImg.style.opacity = '1';
+          modalImg.style.transform = 'scale(1)';
+        }, 150);
+      }
+
+      function openLightbox(index) {
+        updateLightbox(index);
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeLightbox() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      function nextImage() {
+        const newIndex = (currentIndex + 1) % items.length;
+        updateLightbox(newIndex);
+      }
+
+      function prevImage() {
+        const newIndex = (currentIndex - 1 + items.length) % items.length;
+        updateLightbox(newIndex);
+      }
+
+      galleryCards.forEach(card => {
+        card.onclick = () => {
+          const idx = parseInt(card.getAttribute('data-index'), 10);
+          openLightbox(idx);
+        };
+      });
+
+      if (closeBtn) closeBtn.onclick = closeLightbox;
+      if (prevBtn) prevBtn.onclick = (e) => { e.stopPropagation(); prevImage(); };
+      if (nextBtn) nextBtn.onclick = (e) => { e.stopPropagation(); nextImage(); };
+
+      modal.onclick = (e) => {
+        if (e.target === modal || e.target.classList.contains('lightbox-content')) {
+          closeLightbox();
+        }
+      };
+
+      document.onkeydown = (e) => {
+        if (!modal.classList.contains('active')) return;
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') prevImage();
+        if (e.key === 'ArrowRight') nextImage();
+      };
+    }
+
+    /* ==========================================================
+     * PARENT COMMUNICATION & LIVE UPDATES
+     * ========================================================== */
+    window.addEventListener("message", function (event) {
+      if (event.data && event.data.type === "UPDATE_DATA") {
+        renderDataAll(event.data.data);
+      }
+    });
+
+    document.addEventListener("click", function (event) {
+      let target = event.target;
+      let jsonPath = target.dataset.jsonPath;
+
+      while (!jsonPath && target && target !== document.body) {
+        target = target.parentElement;
+        if (target) jsonPath = target.dataset.jsonPath;
+      }
+
+      if (!jsonPath) return;
+
+      window.parent.postMessage({
+        type: "ELEMENT_CLICKED",
+        jsonPath: jsonPath
+      }, "*");
+    });
+
+    /* Initial Render */
+    document.addEventListener("DOMContentLoaded", function () {
+      renderDataAll();
+    });
+
+
+
+  </script>
+
+  <script>
+    let scrolling = false;
+    let animationFrame = null;
+
+    function stopAutoScroll() {
+      if (!scrolling) return;
+
+      scrolling = false;
+
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+        animationFrame = null;
+      }
+
+      console.log("Auto-scroll stopped by user");
+    }
+
+    function scroll() {
+      const walkStage = document.querySelector("#walkStage");
+      const target = walkStage.scrollHeight * 2.85;
+
+      const duration = 5000;
+
+      const start = window.scrollY;
+      const distance = target - start;
+      const startTime = performance.now();
+
+      scrolling = true;
+
+      function slowScroll(currentTime) {
+        if (!scrolling) return;
+
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        const eased = progress * (2 - progress);
+
+        window.scrollTo(0, start + distance * eased);
+
+        if (progress < 1) {
+          animationFrame = requestAnimationFrame(slowScroll);
+        } else {
+          scrolling = false;
+          animationFrame = null;
+        }
+      }
+
+      animationFrame = requestAnimationFrame(slowScroll);
+    }
+
+    // Stop when the user manually interacts with scrolling
+    window.addEventListener("wheel", stopAutoScroll, { passive: true });
+    window.addEventListener("touchstart", stopAutoScroll, { passive: true });
+    window.addEventListener("touchmove", stopAutoScroll, { passive: true });
+
+    // Keyboard scrolling
+    window.addEventListener("keydown", function (e) {
+      const keys = [
+        "ArrowUp",
+        "ArrowDown",
+        "PageUp",
+        "PageDown",
+        "Home",
+        "End",
+        " "
+      ];
+
+      if (keys.includes(e.key)) {
+        stopAutoScroll();
+      }
+    });
+
+    window.onload = function () {
+      scroll();
+    };
+  </script>
+
+
+</body>
+
+</html>
