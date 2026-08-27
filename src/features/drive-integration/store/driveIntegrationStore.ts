@@ -1,7 +1,5 @@
 import { create } from 'zustand';
 import {
-    listDriveContents as listDriveContentsApi,
-    createDriveFolder as createDriveFolderApi,
     uploadToDrive as uploadToDriveApi,
     revokeDriveAccess as revokeDriveAccessApi,
     ensureDriveFolderTree as ensureDriveFolderTreeApi,
@@ -20,8 +18,8 @@ import type {
 import { fileRelPath, dirOfPath, guessMimeType } from '../utils';
 import { indexFolder, runUploadTask, refreshFolderSync } from '../services/uploadTaskManager';
 import { driveIndexedDBService } from '../services/driveIndexedDBService';
-import { updateProjectSyncFolder } from '../../studio-management/api/projectService';
-import { getDriveConnection, listDriveContents } from '../../studio-management/api/GoogleService';
+import { updateProject, updateProjectSyncFolder } from '../../studio-management/api/projectService';
+import { createDriveFolder, ensureDriveFolderTree, getDriveConnection, listDriveContents } from '../../studio-management/api/GoogleService';
 
 /** Convert a File to a base64 string (data part only). */
 const fileToBase64 = (file: File): Promise<string> => {
@@ -124,7 +122,7 @@ export const useDriveIntegrationStore = create<DriveIntegrationState>((set, get)
     createFolder: async (connectionId: string, parentFolderId: string, folderName: string) => {
         set({ loading: true, error: null });
         try {
-            await createDriveFolderApi({ connectionId, parentFolderId, folderName });
+            await createDriveFolder({ connectionId, parentFolderId, folderName });
             // Refresh the current folder contents
             await get().listContents(connectionId, parentFolderId);
         } catch (error: any) {
@@ -212,11 +210,11 @@ export const useDriveIntegrationStore = create<DriveIntegrationState>((set, get)
             const folderPaths = Array.from(
                 new Set(newFiles.map((f) => dirOfPath(fileRelPath(f))).filter(Boolean))
             );
-            const { pathToId } = await ensureDriveFolderTreeApi({
+            const { pathToId } = (await ensureDriveFolderTree({
                 connectionId,
                 baseFolderId,
                 folderPaths,
-            });
+            })).data;
 
             // 3. Upload each new file into its mirrored folder.
             const records: SyncedFileRecord[] = [];
@@ -299,7 +297,7 @@ export const useDriveIntegrationStore = create<DriveIntegrationState>((set, get)
             });
 
             // Persist the selected folder name to Firestore for resume capabilities across sessions
-            await updateProjectSyncFolder(studioUserId, projectId, folderName);
+            await updateProject(projectId, { localSyncFolderName: folderName });
 
             set({
                 scanning: false,

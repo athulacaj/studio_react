@@ -32,14 +32,14 @@
 /**
  * Get a short-lived Google Drive access token for the client to use.
  */
-export const getDriveAccessToken = async (connectionId: string): Promise<string> => {
-    const getAccessTokenFn = httpsCallable<{ connectionId: string }, { accessToken: string }>(
-        functions,
-        'getDriveAccessToken'
-    );
-    const result = await getAccessTokenFn({ connectionId });
-    return result.data.accessToken;
-};
+// export const getDriveAccessToken = async (connectionId: string): Promise<string> => {
+//     const getAccessTokenFn = httpsCallable<{ connectionId: string }, { accessToken: string }>(
+//         functions,
+//         'getDriveAccessToken'
+//     );
+//     const result = await getAccessTokenFn({ connectionId });
+//     return result.data.accessToken;
+// };
 
 /**
  * Fetch a Drive connection by its ID.

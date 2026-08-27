@@ -3,7 +3,7 @@ import { doc, deleteDoc, QueryDocumentSnapshot, DocumentData } from 'firebase/fi
 import { useAuthStore } from '../../auth';
 import { db } from '../../../config/firebase';
 import { Project, ProjectAssets, ProjectJoinDriveData, ProjectStatus, SharedLink, Source } from '../types';
-import { createProject, getProject, getSharedLink, postShareLink, updateProject, putShareLink } from '../api/projectService';
+import { createProject, getProject, getSharedLink, postShareLink, updateProject, putShareLink, UpdateProjectRequestData } from '../api/projectService';
 import { Business } from '../api/businessService';
 
 
@@ -32,7 +32,7 @@ interface StudioManagementState {
     fetchNextPage: () => Promise<void>;
     fetchPreviousPage: () => Promise<void>;
     addProject: (projectData: Partial<Project> & { driveData?: any; selectedFolders?: string[] }) => Promise<string>;
-    updateProject: (projectId: string, updates: Partial<Project> & { driveData?: any; selectedFolders?: string[] }) => Promise<void>;
+    updateProject: (projectId: string, updates: UpdateProjectRequestData & { driveData?: any; selectedFolders?: string[] }) => Promise<void>;
     createShareLink: (projectId: string, linkData: Omit<SharedLink, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>) => Promise<string>;
     fetchShareLinks: (projectId: string) => Promise<SharedLink[]>;
     updateShareLink: (projectId: string, linkId: string, updates: Partial<SharedLink>) => Promise<void>;
@@ -158,7 +158,7 @@ export const useStudioManagementStore = create<StudioManagementState>((set, get)
         }
     },
 
-    updateProject: async (projectId: string, updates: Partial<Project> & { driveData?: any; selectedFolders?: string[] }) => {
+    updateProject: async (projectId: string, updates: UpdateProjectRequestData & { driveData?: any; selectedFolders?: string[] }) => {
         set({ loading: true });
         try {
             const { driveData, selectedFolders, ...projectFields } = updates;

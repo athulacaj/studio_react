@@ -17,9 +17,8 @@ import { pickAndScanFolder, scanDirectory } from './fileIndexService';
 import type { ScanProgressCallback } from './fileIndexService';
 import { driveIndexedDBService } from './driveIndexedDBService';
 import { indexFiles, upsertFile } from '../api/fileApiService';
-import { ensureDriveFolderTree as ensureDriveFolderTreeApi } from '../api/driveFileService';
-import { getDriveAccessToken } from '../api/driveAuthService';
 import { guessMimeType } from '../utils';
+import { ensureDriveFolderTree, getDriveAccessToken } from '../../studio-management/api/GoogleService';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -138,7 +137,7 @@ export const refreshFolderSync = async (
     }
 
     const queueItems = await persistScannedFiles(projectId, files, callbacks);
-    
+
     return { folderName: dirHandle.name, handle: dirHandle, files, queueItems };
 };
 
@@ -154,7 +153,7 @@ export const runUploadTask = async (
     fileEntries: IndexedFileEntry[] | undefined,
     callbacks: UploadTaskCallbacks
 ): Promise<{ uploaded: number; failed: number }> => {
-    
+
     const pending = await driveIndexedDBService.getFilesByStatus(projectId, 'NOT_UPLOADED');
     if (pending.length === 0) {
         return { uploaded: 0, failed: 0 };
@@ -166,8 +165,8 @@ export const runUploadTask = async (
 
     if (uniquePaths.length > 0) {
         callbacks.onProgress({ total: pending.length, completed: 0, failed: 0, currentFile: 'Creating folder structure in Google Drive...' });
-        const treeRes = await ensureDriveFolderTreeApi({ connectionId, baseFolderId, folderPaths: uniquePaths });
-        pathToId = { ...pathToId, ...treeRes.pathToId };
+        const treeRes = await ensureDriveFolderTree({ connectionId, baseFolderId, folderPaths: uniquePaths });
+        pathToId = { ...pathToId, ...treeRes.data.pathToId };
     }
 
     // 2. Map files to handles
@@ -185,7 +184,7 @@ export const runUploadTask = async (
 
     // 3. Obtain Google Drive Access Token
     callbacks.onProgress({ total: pending.length, completed: 0, failed: 0, currentFile: 'Securing upload token...' });
-    let accessToken = await getDriveAccessToken(connectionId);
+    let accessToken = (await getDriveAccessToken({ connectionId })).data.accessToken;
 
     const progress: FolderUploadProgress = {
         total: pending.length,
@@ -236,7 +235,7 @@ export const runUploadTask = async (
 
             // Handle token expiration
             if (initRes.status === 401) {
-                accessToken = await getDriveAccessToken(connectionId);
+                accessToken = (await getDriveAccessToken({ connectionId })).data.accessToken;
                 throw new Error('Token expired, retrying on next pass...'); // naive retry for this file
             }
 
@@ -263,7 +262,7 @@ export const runUploadTask = async (
             }
 
             const driveData = await uploadRes.json();
-            
+
             // The resumable upload API doesn't return webViewLink by default unless we use fields, 
             // but we can query it or construct a fallback if missing. We'll use a direct fetch to get it if needed.
             let driveUrl = driveData.webViewLink;

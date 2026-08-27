@@ -52,7 +52,13 @@ const ApiEndPoints = {
             uploadDriveData: () => `/google/upload-drive-data`,
             exchangeDriveToken: () => `/google/exchange-token`,
             connection: () => `/google/connection`,
-            listContents: () => `/google/list-contents`
+            listContents: () => `/google/list-contents`,
+            createFolder: () => `/google/create-folder`,
+            uploadToDrive: () => `/google/upload-to-drive`,
+            ensureFolderTree: () => `/google/ensure-folder-tree`,
+            driveTree: () => `/google/drive-tree`,
+            revokeAccess: () => `/google/revoke-access`,
+            accessToken: () => `/google/access-token`
         }
     },
     business: {

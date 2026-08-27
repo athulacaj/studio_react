@@ -60,21 +60,21 @@ export const listDriveContents = async (
 /**
  * Create a new folder in the connected Drive.
  */
-export const createDriveFolder = async (
-    data: CreateDriveFolderRequest
-): Promise<CreateDriveFolderResponse> => {
-    try {
-        const fn = httpsCallable<CreateDriveFolderRequest, CreateDriveFolderResponse>(
-            functions,
-            'createDriveFolder'
-        );
-        const result = await fn(data);
-        return result.data;
-    } catch (error) {
-        console.error('Error creating Drive folder:', error);
-        throw error;
-    }
-};
+// export const createDriveFolder = async (
+//     data: CreateDriveFolderRequest
+// ): Promise<CreateDriveFolderResponse> => {
+//     try {
+//         const fn = httpsCallable<CreateDriveFolderRequest, CreateDriveFolderResponse>(
+//             functions,
+//             'createDriveFolder'
+//         );
+//         const result = await fn(data);
+//         return result.data;
+//     } catch (error) {
+//         console.error('Error creating Drive folder:', error);
+//         throw error;
+//     }
+// };
 
 /**
  * Upload a file to the connected Drive.
@@ -98,21 +98,21 @@ export const uploadToDrive = async (
 /**
  * Recreate a set of relative folder paths under a base folder (mirroring a local tree).
  */
-export const ensureDriveFolderTree = async (
-    data: EnsureDriveFolderTreeRequest
-): Promise<EnsureDriveFolderTreeResponse> => {
-    try {
-        const fn = httpsCallable<EnsureDriveFolderTreeRequest, EnsureDriveFolderTreeResponse>(
-            functions,
-            'ensureDriveFolderTree'
-        );
-        const result = await fn(data);
-        return result.data;
-    } catch (error) {
-        console.error('Error ensuring Drive folder tree:', error);
-        throw error;
-    }
-};
+// export const ensureDriveFolderTree = async (
+//     data: EnsureDriveFolderTreeRequest
+// ): Promise<EnsureDriveFolderTreeResponse> => {
+//     try {
+//         const fn = httpsCallable<EnsureDriveFolderTreeRequest, EnsureDriveFolderTreeResponse>(
+//             functions,
+//             'ensureDriveFolderTree'
+//         );
+//         const result = await fn(data);
+//         return result.data;
+//     } catch (error) {
+//         console.error('Error ensuring Drive folder tree:', error);
+//         throw error;
+//     }
+// };
 
 /**
  * Fetch the tracking records of files already synced to the connected Drive.

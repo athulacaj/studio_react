@@ -37,9 +37,20 @@ export const createProject = async (project: Partial<Project>, driveData?: Parti
  * @param {{ driveData?: any; selectedFolders?: string[] }} [driveData]
  * @returns {Promise<{ data: Project }>} Updated project
  */
+export interface UpdateProjectRequestData {
+    name?: string;
+    description?: string;
+    source?: 'google_photos' | 'google_drive' | string;
+    status?: 'ready_for_sync' | 'synced' | 'failed' | 'initializing' | string;
+    projectAssets?: 'gdrive' | 'storage' | string;
+    driveUrl?: string;
+    driveConnectionId?: string;
+    localSyncFolderName?: string;
+}
+
 export const updateProject = async (
     projectId: string,
-    project?: Partial<Project> & { driveConnectionId?: string },
+    project?: UpdateProjectRequestData,
     driveData?: {
         driveData?: any;
         selectedFolders?: string[];
