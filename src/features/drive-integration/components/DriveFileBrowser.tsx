@@ -317,9 +317,9 @@ const DriveFileBrowser: React.FC<DriveFileBrowserProps> = ({ studioUserId, proje
                             <Button size="small" color="inherit" onClick={() => setConfirmUnlink(false)}>
                                 Cancel
                             </Button>
-                            <Button size="small" color="warning" variant="outlined" onClick={handleUnlink}>
+                            {/* <Button size="small" color="warning" variant="outlined" onClick={handleUnlink}>
                                 Unlink
-                            </Button>
+                            </Button> */}
                         </Box>
                     }
                 >

@@ -1,8 +1,6 @@
 import { create } from 'zustand';
 import {
     uploadToDrive as uploadToDriveApi,
-    revokeDriveAccess as revokeDriveAccessApi,
-    ensureDriveFolderTree as ensureDriveFolderTreeApi,
     getDriveManifest as getDriveManifestApi,
     recordDriveUploads as recordDriveUploadsApi,
 } from '../api/driveFileService';
@@ -19,7 +17,7 @@ import { fileRelPath, dirOfPath, guessMimeType } from '../utils';
 import { indexFolder, runUploadTask, refreshFolderSync } from '../services/uploadTaskManager';
 import { driveIndexedDBService } from '../services/driveIndexedDBService';
 import { updateProject, updateProjectSyncFolder } from '../../studio-management/api/projectService';
-import { createDriveFolder, ensureDriveFolderTree, getDriveConnection, listDriveContents } from '../../studio-management/api/GoogleService';
+import { createDriveFolder, ensureDriveFolderTree, getDriveConnection, listDriveContents, revokeDriveAccess } from '../../studio-management/api/GoogleService';
 
 /** Convert a File to a base64 string (data part only). */
 const fileToBase64 = (file: File): Promise<string> => {
@@ -267,7 +265,7 @@ export const useDriveIntegrationStore = create<DriveIntegrationState>((set, get)
     revokeAccess: async (connectionId: string) => {
         set({ loading: true, error: null });
         try {
-            await revokeDriveAccessApi({ connectionId });
+            await revokeDriveAccess({ connectionId });
             set({
                 ...initialState,
                 loading: false,

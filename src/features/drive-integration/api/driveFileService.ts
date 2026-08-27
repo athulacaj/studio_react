@@ -155,18 +155,18 @@ export const recordDriveUploads = async (
 /**
  * Revoke Drive access and delete the connection.
  */
-export const revokeDriveAccess = async (
-    data: RevokeDriveAccessRequest
-): Promise<RevokeDriveAccessResponse> => {
-    try {
-        const fn = httpsCallable<RevokeDriveAccessRequest, RevokeDriveAccessResponse>(
-            functions,
-            'revokeDriveAccess'
-        );
-        const result = await fn(data);
-        return result.data;
-    } catch (error) {
-        console.error('Error revoking Drive access:', error);
-        throw error;
-    }
-};
+// export const revokeDriveAccess = async (
+//     data: RevokeDriveAccessRequest
+// ): Promise<RevokeDriveAccessResponse> => {
+//     try {
+//         const fn = httpsCallable<RevokeDriveAccessRequest, RevokeDriveAccessResponse>(
+//             functions,
+//             'revokeDriveAccess'
+//         );
+//         const result = await fn(data);
+//         return result.data;
+//     } catch (error) {
+//         console.error('Error revoking Drive access:', error);
+//         throw error;
+//     }
+// };

@@ -131,6 +131,16 @@ export const refreshFolderSync = async (
         throw new Error('Permission to read the folder was denied. Please select the folder again.');
     }
 
+    // Reset all FAILED files back to NOT_UPLOADED so they are retried on the next upload run.
+    const failedFiles = await driveIndexedDBService.getFilesByStatus(projectId, 'FAILED');
+    if (failedFiles.length > 0) {
+        await Promise.all(
+            failedFiles.map((f) =>
+                driveIndexedDBService.updateFileStatus(projectId, f.id, 'NOT_UPLOADED')
+            )
+        );
+    }
+
     const files = await scanDirectory(dirHandle, '', callbacks?.onScanProgress);
     if (files.length === 0) {
         throw new Error('No supported image files were found in the selected folder.');
