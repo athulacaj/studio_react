@@ -70,7 +70,7 @@ const Home = () => {
               color="primary"
               size="large"
               endIcon={<ArrowRight />}
-              onClick={() => navigate(currentUser ? `/private/user/${currentUser.userId}/studio` : '/login')}
+              onClick={() => navigate(currentUser ? `/private/studio/${currentUser.userId}/studio` : '/login')}
               sx={{ px: 4, py: 1.5, fontSize: '1.1rem' }}
             >
               Go to Studio

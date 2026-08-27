@@ -20,23 +20,23 @@ import type {
 } from '../types';
 
 /**
- * Exchange an OAuth authorization code for tokens and create the Drive connection.
- */
-export const exchangeDriveToken = async (
-    data: ExchangeTokenRequest
-): Promise<ExchangeTokenResponse> => {
-    try {
-        const fn = httpsCallable<ExchangeTokenRequest, ExchangeTokenResponse>(
-            functions,
-            'exchangeDriveToken'
-        );
-        const result = await fn(data);
-        return result.data;
-    } catch (error) {
-        console.error('Error exchanging Drive token:', error);
-        throw error;
-    }
-};
+//  * Exchange an OAuth authorization code for tokens and create the Drive connection.
+//  */
+// export const exchangeDriveToken = async (
+//     data: ExchangeTokenRequest
+// ): Promise<ExchangeTokenResponse> => {
+//     try {
+//         const fn = httpsCallable<ExchangeTokenRequest, ExchangeTokenResponse>(
+//             functions,
+//             'exchangeDriveToken'
+//         );
+//         const result = await fn(data);
+//         return result.data;
+//     } catch (error) {
+//         console.error('Error exchanging Drive token:', error);
+//         throw error;
+//     }
+// };
 
 /**
  * List files and folders in a specific Drive folder.

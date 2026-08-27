@@ -50,6 +50,9 @@ const ApiEndPoints = {
         post: {
             folderStructure: () => `/google/folder-structure`,
             uploadDriveData: () => `/google/upload-drive-data`,
+            exchangeDriveToken: () => `/google/exchange-token`,
+            connection: () => `/google/connection`,
+            listContents: () => `/google/list-contents`
         }
     },
     business: {

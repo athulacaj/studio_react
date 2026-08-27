@@ -156,7 +156,7 @@ const ProjectDetailView: React.FC = () => {
                     </Typography>
                     <Button
                         startIcon={<ArrowBackIcon />}
-                        onClick={() => navigate(`/private/user/${effectiveUserId}`)}
+                        onClick={() => navigate(`/private/studio/${effectiveUserId}`)}
                         sx={{ mt: 2 }}
                     >
                         Back to Projects
@@ -208,7 +208,7 @@ const ProjectDetailView: React.FC = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 0 }}>
                     <Tooltip title={isAdmin ? 'Back to user dashboard' : 'Back to projects'}>
                         <IconButton
-                            onClick={() => navigate(`/private/user/${effectiveUserId}`)}
+                            onClick={() => navigate(`/private/studio/${effectiveUserId}`)}
                             sx={{
                                 backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.1),
                                 '&:hover': {
@@ -566,7 +566,7 @@ const ProjectDetailView: React.FC = () => {
                             <MenuItem onClick={() => {
                                 handleManageInvitationClose();
                                 if (projectData && project) {
-                                    navigate(`/private/user/${effectiveUserId}/studio/portfolio/manage?path=${encodeURIComponent(projectData.project.name)}&type=${WebsiteTemplateType.weddingInvitation}&name=${project.name}&projectId=${encodeURIComponent(projectData.project.id)}`);
+                                    navigate(`/private/studio/${effectiveUserId}/studio/portfolio/manage?path=${encodeURIComponent(projectData.project.name)}&type=${WebsiteTemplateType.weddingInvitation}&name=${project.name}&projectId=${encodeURIComponent(projectData.project.id)}`);
                                 }
                             }}>
                                 <EditIcon fontSize="small" sx={{ mr: 1.5, color: 'text.secondary' }} />

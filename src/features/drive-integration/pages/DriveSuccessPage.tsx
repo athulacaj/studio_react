@@ -12,7 +12,7 @@ import {
     CheckCircleOutline as CheckIcon,
     ErrorOutline as ErrorIcon,
 } from '@mui/icons-material';
-import { exchangeDriveToken } from '../api/driveFileService';
+import { exchangeDriveToken } from '../../studio-management/api/GoogleService';
 
 type SuccessStatus = 'processing' | 'success' | 'error';
 

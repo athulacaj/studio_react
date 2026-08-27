@@ -20,6 +20,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../config/firebase';
 
 import type { Project } from '../../studio-management/types';
+import { getPublicProject } from '../../studio-management/api/projectService';
 
 const GOOGLE_DRIVE_CLIENT_ID = import.meta.env.VITE_GOOGLE_DRIVE_CLIENT_ID;
 const SCOPES = 'https://www.googleapis.com/auth/drive.file';
@@ -43,14 +44,17 @@ const DriveConnectPage: React.FC = () => {
             }
 
             try {
-                const projectDoc = await getDoc(doc(db, 'projects', userId, 'projects', projectId));
-                if (!projectDoc.exists()) {
+                // const projectDoc = await getDoc(doc(db, 'projects', userId, 'projects', projectId));
+                const projectDataRes = await getPublicProject(projectId)
+                if (!projectDataRes || !projectDataRes.data) {
                     setError('Project not found. Please check the link and try again.');
                     setStatus('error');
                     return;
                 }
 
-                const projectData = { id: projectDoc.id, ...projectDoc.data() } as Project;
+                const projectData = projectDataRes.data[0].project as Project;
+
+                // const projectData = { id: projectDoc.id, ...projectDoc.data() } as Project;
                 setProject(projectData);
 
                 // Check if already connected

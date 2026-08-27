@@ -30,7 +30,7 @@ const AppRouter = () => {
           {/* Protected Routes */}
           <Route path="/private" element={<ProtectedRoute />}>
             <Route path="admin" element={<SuperAdminDashboard />} />
-            <Route path="user/:userId" element={<AdminUserWrapper />}>
+            <Route path="studio/:userId" element={<AdminUserWrapper />}>
               <Route path="studio" element={<StudioDashboard />} />
               <Route path="studio/:projectId" element={<AdminProjectDetailWrapper />} />
               <Route index element={<AdminUserView />} />

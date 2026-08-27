@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { fetchDriveConnection } from '../api/driveAuthService';
 import {
     listDriveContents as listDriveContentsApi,
     createDriveFolder as createDriveFolderApi,
@@ -22,6 +21,7 @@ import { fileRelPath, dirOfPath, guessMimeType } from '../utils';
 import { indexFolder, runUploadTask, refreshFolderSync } from '../services/uploadTaskManager';
 import { driveIndexedDBService } from '../services/driveIndexedDBService';
 import { updateProjectSyncFolder } from '../../studio-management/api/projectService';
+import { getDriveConnection, listDriveContents } from '../../studio-management/api/GoogleService';
 
 /** Convert a File to a base64 string (data part only). */
 const fileToBase64 = (file: File): Promise<string> => {
@@ -63,7 +63,10 @@ export const useDriveIntegrationStore = create<DriveIntegrationState>((set, get)
     fetchConnection: async (studioUserId: string, projectId: string) => {
         set({ loading: true, error: null });
         try {
-            const connection = await fetchDriveConnection(studioUserId, projectId);
+            const response = await getDriveConnection(undefined, projectId);
+
+            const connection = response.data as DriveConnection | null;
+
             set({ activeConnection: connection, loading: false });
 
             // If we have a connection, auto-load root folder contents
@@ -83,7 +86,7 @@ export const useDriveIntegrationStore = create<DriveIntegrationState>((set, get)
     listContents: async (connectionId: string, folderId: string) => {
         set({ loading: true, error: null });
         try {
-            const result = await listDriveContentsApi({ connectionId, folderId });
+            const result = (await listDriveContents({ connectionId, folderId })).data;
             set({
                 currentFiles: result.files,
                 currentFolderId: folderId,
@@ -294,7 +297,7 @@ export const useDriveIntegrationStore = create<DriveIntegrationState>((set, get)
                     set({ scanProgress: { found: total, currentDir: `Saving… ${indexed}/${total}` } });
                 },
             });
-            
+
             // Persist the selected folder name to Firestore for resume capabilities across sessions
             await updateProjectSyncFolder(studioUserId, projectId, folderName);
 

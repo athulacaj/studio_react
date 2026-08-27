@@ -70,6 +70,7 @@ export interface Project {
     createdAt?: string;
     updatedAt?: string;
     driveUrl?: string;
+    driveConnectionId?: string;
 }
 
 

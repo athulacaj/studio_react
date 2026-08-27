@@ -129,7 +129,7 @@ This document outlines the development plan for a modern, responsive photo proof
    - Table columns include: User (Avatar + Name + UID), Email (with icon), Role Chip (with styled indicators for Admin and User), Joined Date, and Action controls.
    - Built with MUI `Table`, `TableBody`, `TableCell`, `TableContainer`, `TableHead`, and `TableRow` components styled to match the dark theme and neon details of Mizhiv.
 2. **TableRow Click Actions:**
-   - Make the entire row clickable to seamlessly navigate to `/private/user/:userId`.
+   - Make the entire row clickable to seamlessly navigate to `/private/studio/:userId`.
    - Included a distinct "View Dashboard" button inside a tooltip in the action column.
 3. **Table Skeleton Loading State:**
    - Created a modern table row skeleton matching the table structure to replace card-based skeletons.

@@ -93,7 +93,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
 
             <CardActionArea
                 onClick={() => navigate(
-                    `/private/user/${effectiveUserId}/studio/${project.id}`
+                    `/private/studio/${effectiveUserId}/studio/${project.id}`
 
                 )}
                 sx={{

@@ -197,7 +197,7 @@ const SuperAdminDashboard: React.FC = () => {
     });
 
     const handleUserSelect = (uid: string) => {
-        navigate(`/private/user/${uid}`);
+        navigate(`/private/studio/${uid}`);
     };
 
     // Guard while profile loads
@@ -468,7 +468,7 @@ const SuperAdminDashboard: React.FC = () => {
                                         const initials = user.name
                                             ? user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
                                             : user.email?.[0]?.toUpperCase() || '?';
-                                        
+
                                         const formattedDate = user.createdAt?.toDate
                                             ? user.createdAt.toDate().toLocaleDateString('en-US', {
                                                 year: 'numeric',
