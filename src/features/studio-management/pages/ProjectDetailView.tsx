@@ -38,7 +38,7 @@ import CreateProjectModal from '../components/CreateProjectModal';
 import ManageShareLinksModal from '../components/ManageShareLinksModal';
 import { useToastStore } from '../../../shared/hooks/useToastStore';
 import { DriveFileBrowser, useDriveIntegrationStore } from '../../drive-integration';
-import { ProjectJoinDriveData, ProjectStatus } from '../types';
+import { ProjectJoinDriveData, ProjectStatus, Source, SourceOptions } from '../types';
 import { WebsiteTemplateType } from '../../portfolio-management';
 import { getBusinessByUserId } from '../api/businessService';
 
@@ -104,7 +104,7 @@ const ProjectDetailView: React.FC = () => {
 
     // Fetch Drive connection for google_photos projects
     useEffect(() => {
-        if (project?.source === 'google_photos' && effectiveUserId && project.id) {
+        if (project?.source === Source.GOOGLE_PHOTOS && effectiveUserId && project.id) {
             fetchConnection(effectiveUserId, project.id);
         }
     }, [project?.source, project?.id, effectiveUserId, fetchConnection]);
@@ -232,16 +232,19 @@ const ProjectDetailView: React.FC = () => {
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
                             <Chip
                                 icon={
-                                    project.source === 'google_photos' ? (
+                                    project.source === Source.GOOGLE_PHOTOS ? (
                                         <GoogleIcon sx={{ fontSize: 16 }} />
                                     ) : (
                                         <CloudIcon sx={{ fontSize: 16 }} />
                                     )
                                 }
                                 label={
-                                    project.source === 'google_photos'
-                                        ? 'Google Photos'
-                                        : 'Google Drive'
+                                    SourceOptions.find((opt) => opt.id === project.source)?.label
+                                    // project.source === Source.GOOGLE_PHOTOS
+                                    //     ? 'Link Google Drive'
+                                    //     : project.source === Source.GOOGLE_DRIVE
+                                    //         ? 'Google Drive URL'
+                                    //         : 'None'
                                 }
                                 size="small"
                                 variant="outlined"
@@ -407,7 +410,7 @@ const ProjectDetailView: React.FC = () => {
                     )}
 
                     {/* Google Drive Connection Status (for google_photos source) */}
-                    {project.source === 'google_photos' && (
+                    {project.source === Source.GOOGLE_PHOTOS && (
                         <>
                             <Divider sx={{ my: 2.5 }} />
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -584,7 +587,7 @@ const ProjectDetailView: React.FC = () => {
                 </Paper>
 
                 {/* Drive Integration (for Google Photos source) */}
-                {project.source === 'google_photos' && (
+                {project.source === Source.GOOGLE_PHOTOS && (
                     <Box sx={{ mt: 2 }}>
                         <DriveFileBrowser
                             studioUserId={effectiveUserId!}

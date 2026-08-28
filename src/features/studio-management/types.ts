@@ -37,7 +37,13 @@ export enum ProjectStatus {
 export enum Source {
     GOOGLE_PHOTOS = 'google_photos',
     GOOGLE_DRIVE = 'google_drive',
+    NONE = 'none',
 }
+export const SourceOptions = [
+    { id: Source.NONE, label: 'None' },
+    { id: Source.GOOGLE_PHOTOS, label: 'Google Photos' },
+    { id: Source.GOOGLE_DRIVE, label: 'Google Drive' },
+]
 
 export enum ProjectAssets {
     GDRIVE = 'gdrive',

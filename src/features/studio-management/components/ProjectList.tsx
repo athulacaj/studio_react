@@ -23,7 +23,7 @@ import {
     NavigateNext as NavigateNextIcon,
     CameraAlt as CameraAltIcon,
 } from '@mui/icons-material';
-import { Project, ProjectStatus } from '../types';
+import { Project, ProjectStatus, Source } from '../types';
 import { useAuthStore } from '../../auth';
 
 interface ProjectCardProps {
@@ -130,13 +130,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                background: project.source === 'google_photos'
+                                background: project.source === Source.GOOGLE_PHOTOS
                                     ? 'rgba(157, 78, 221, 0.12)'
                                     : 'rgba(56, 189, 248, 0.12)',
                                 flexShrink: 0,
                             }}
                         >
-                            {project.source === 'google_photos' ? (
+                            {project.source === Source.GOOGLE_PHOTOS ? (
                                 <GoogleIcon sx={{ fontSize: 18, color: '#C084FC' }} />
                             ) : (
                                 <CloudIcon sx={{ fontSize: 18, color: '#38BDF8' }} />
@@ -148,9 +148,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                     <Box sx={{ display: 'flex', gap: 0.75, mb: 2.5, flexWrap: 'wrap' }}>
                         <Chip
                             label={
-                                project.source === 'google_photos'
-                                    ? 'Google Photos'
-                                    : 'Google Drive'
+                                project.source === Source.GOOGLE_PHOTOS
+                                    ? 'Link Google Drive'
+                                    : 'Google Drive URL'
                             }
                             size="small"
                             sx={{

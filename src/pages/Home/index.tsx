@@ -64,17 +64,60 @@ const Home = () => {
             Luxury wedding memories delivered through modern technology.
           </Typography>
 
-          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Button
-              variant="contained"
-              color="primary"
-              size="large"
-              endIcon={<ArrowRight />}
-              onClick={() => navigate(currentUser ? `/private/studio/${currentUser.userId}/studio` : '/login')}
-              sx={{ px: 4, py: 1.5, fontSize: '1.1rem' }}
+          <Box sx={{ mt: 4, display: 'flex', gap: 4, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Card
+              sx={{
+                width: { xs: '100%', sm: 320 },
+                p: 2,
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                '&:hover': {
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 12px 40px rgba(157, 78, 221, 0.2)',
+                  borderColor: 'rgba(157, 78, 221, 0.5)',
+                }
+              }}
+              onClick={() => navigate('/user/login')}
             >
-              Go to Studio
-            </Button>
+              <CardContent sx={{ textAlign: 'center' }}>
+                <Typography variant="h4" sx={{ mb: 2, color: 'white', fontWeight: 600 }}>
+                  Client
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  You are an individual person and manage your projects.
+                </Typography>
+              </CardContent>
+            </Card>
+
+            <Card
+              sx={{
+                width: { xs: '100%', sm: 320 },
+                p: 2,
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                '&:hover': {
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 12px 40px rgba(157, 78, 221, 0.2)',
+                  borderColor: 'rgba(157, 78, 221, 0.5)',
+                }
+              }}
+              onClick={() => navigate(currentUser ? `/private/studio/${currentUser.userId}/studio` : '/login')}
+            >
+              <CardContent sx={{ textAlign: 'center' }}>
+                <Typography variant="h4" sx={{ mb: 2, color: 'white', fontWeight: 600 }}>
+                  Studio
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  You have a studio and want to manage your projects.
+                </Typography>
+              </CardContent>
+            </Card>
           </Box>
         </Container>
       </Box>

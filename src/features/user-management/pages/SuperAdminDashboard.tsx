@@ -68,7 +68,7 @@ const SuperAdminDashboard: React.FC = () => {
     // Form fields state
     const [formEmail, setFormEmail] = useState('');
     const [formName, setFormName] = useState('');
-    const [formRole, setFormRole] = useState<'Admin' | 'User'>('User');
+    const [formRole, setFormRole] = useState<'Admin' | 'User' | 'Studio'>('User');
     const [formApproved, setFormApproved] = useState(true);
     const [formPassword, setFormPassword] = useState('');
 
@@ -689,12 +689,13 @@ const SuperAdminDashboard: React.FC = () => {
                                 labelId="role-select-label"
                                 label="Role"
                                 value={formRole}
-                                onChange={(e) => setFormRole(e.target.value as 'Admin' | 'User')}
+                                onChange={(e) => setFormRole(e.target.value as 'Admin' | 'User' | 'Studio')}
                                 disabled={saving}
                                 sx={{ borderRadius: 2 }}
                             >
                                 <MenuItem value="User">User</MenuItem>
                                 <MenuItem value="Admin">Admin</MenuItem>
+                                <MenuItem value="Studio">Studio</MenuItem>
                             </Select>
                         </FormControl>
                         <FormControlLabel

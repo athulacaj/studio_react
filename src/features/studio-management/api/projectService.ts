@@ -1,6 +1,6 @@
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../config/firebase';
-import { Project, SharedLink, DriveNode, DriveData, ProjectJoinDriveData, LinkCategory, SyncedFolder, SelectedAlbum } from '../types';
+import { Project, SharedLink, DriveNode, DriveData, ProjectJoinDriveData, LinkCategory, SyncedFolder, SelectedAlbum, Source } from '../types';
 import { AssetsApiClient, StudioApiClient } from '../../../services/ApiInitalizer';
 import ApiEndPoints from '../../../config/apiEndpoints';
 import { SharedLinksParams, SelectedAlbumsParams } from '../../../types/apiEndPointTypes';
@@ -40,7 +40,7 @@ export const createProject = async (project: Partial<Project>, driveData?: Parti
 export interface UpdateProjectRequestData {
     name?: string;
     description?: string;
-    source?: 'google_photos' | 'google_drive' | string;
+    source?: Source;
     status?: 'ready_for_sync' | 'synced' | 'failed' | 'initializing' | string;
     projectAssets?: 'gdrive' | 'storage' | string;
     driveUrl?: string;

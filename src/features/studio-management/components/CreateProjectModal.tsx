@@ -23,7 +23,7 @@ import {
 import { useStudioManagementStore } from '../store/studioManagementStore';
 import { useAuthStore } from '../../auth';
 import FolderSelectionDialog from './FolderSelectionDialog';
-import { DriveNode, ProjectJoinDriveData } from '../types';
+import { DriveNode, ProjectJoinDriveData, Source, SourceOptions } from '../types';
 import { useGlobalLoader } from '../../../core/context/globalLoader';
 import { getFolderStructure, uploadDriveData } from '../api/GoogleService';
 
@@ -38,7 +38,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
     const updateProject = useStudioManagementStore((state) => state.updateProject);
     const effectiveUserId = useAuthStore((state) => state.effectiveUserId);
     const [projectName, setProjectName] = useState('');
-    const [source, setSource] = useState('google_photos');
+    const [source, setSource] = useState(Source.GOOGLE_PHOTOS);
     const [driveUrl, setDriveUrl] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -53,8 +53,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
     const driveData = projectData?.driveData;
 
     const isEditMode = !!project;
-    const isNameInvalid = projectName.length > 0 && !/^[a-zA-Z0-9 _-]+$/.test(projectName);
-
+    const isNameInvalid = projectName.length > 0 && !/^[a-zA-Z0-9 _@-]+$/.test(projectName);
     useEffect(() => {
         if (open) {
             if (project) {
@@ -66,7 +65,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
             } else {
                 // Reset for create mode
                 setProjectName('');
-                setSource('google_photos');
+                setSource(Source.GOOGLE_PHOTOS);
                 setDriveUrl('');
                 setFolderStructure(null);
                 setSelectedFolders([]);
@@ -77,7 +76,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
 
     const handleClose = () => {
         setProjectName('');
-        setSource('google_photos');
+        setSource(Source.GOOGLE_PHOTOS);
         setDriveUrl('');
         setError('');
         setFolderSelectionOpen(false);
@@ -92,18 +91,18 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
             setError('Project name is required');
             return;
         }
-        if (!/^[a-zA-Z0-9 _-]+$/.test(projectName)) {
-            setError('Project name can only contain letters, numbers, spaces, underscores, and hyphens');
+        if (!/^[a-zA-Z0-9 _@-]+$/.test(projectName)) {
+            setError('Project name can only contain letters, numbers, spaces, underscores, @ and hyphens');
             return;
         }
-        if (source === 'google_drive' && !driveUrl.trim()) {
+        if (source === Source.GOOGLE_DRIVE && !driveUrl.trim()) {
             setError('Google Drive URL is required');
             return;
         }
 
         setLoading(true);
         try {
-            if (source === 'google_drive') {
+            if (source === Source.GOOGLE_DRIVE) {
                 if (isEditMode && project && driveData?.driveData) {
                     // Use existing structure for edit
                     setFolderStructure(driveData?.driveData);
@@ -149,13 +148,13 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
         setLoading(true);
         setGlobalLoading(true);
         try {
-            const foldersToSave = source === 'google_drive' ? newSelectedFolders : [];
+            const foldersToSave = source === Source.GOOGLE_DRIVE ? newSelectedFolders : [];
 
             if (isEditMode && project) {
                 await updateProject(project.id, {
                     name: projectName,
                 });
-                if (source === 'google_drive') {
+                if (source === Source.GOOGLE_DRIVE) {
                     await handleDriveUpload(project.id, foldersToSave);
                 }
             } else {
@@ -164,7 +163,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                     source,
                     selectedFolders: foldersToSave,
                 };
-                if (source === 'google_drive' && driveUrl) {
+                if (source === Source.GOOGLE_DRIVE && driveUrl) {
                     newProjectData.driveUrl = driveUrl;
                 }
                 if (folderStructure) {
@@ -173,7 +172,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
 
                 const projectId = await addProject(newProjectData);
 
-                if (projectId && source === 'google_drive' && foldersToSave.length > 0) {
+                if (projectId && source === Source.GOOGLE_DRIVE && foldersToSave.length > 0) {
                     await handleDriveUpload(projectId, foldersToSave);
                 }
             }
@@ -257,11 +256,17 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                                     onChange={handleSourceChange}
                                     sx={{ borderRadius: '12px' }}
                                 >
-                                    <MenuItem value="google_photos">Google Photos</MenuItem>
-                                    <MenuItem value="google_drive">Google Drive</MenuItem>
+                                    {
+                                        SourceOptions.map((item) => (
+                                            <MenuItem key={item.id} value={item.id}>
+                                                {item.label}
+                                            </MenuItem>
+                                        ))
+                                    }
+
                                 </Select>
                             </FormControl>
-                            {source === 'google_drive' && (
+                            {source === Source.GOOGLE_DRIVE && (
                                 <TextField
                                     label="Google Drive Public URL"
                                     variant="outlined"
@@ -300,7 +305,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                             boxShadow: 2
                         }}
                     >
-                        {loading ? <CircularProgress size={24} color="inherit" /> : (source === 'google_drive' ? 'Next' : (isEditMode ? 'Update Project' : 'Create Project'))}
+                        {loading ? <CircularProgress size={24} color="inherit" /> : (source === Source.GOOGLE_DRIVE ? 'Next' : (isEditMode ? 'Update Project' : 'Create Project'))}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -314,7 +319,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                 initialSelection={selectedFolders}
                 syncedFolders={driveData?.syncedFolders}
                 projectId={project?.id}
-                onReload={source === 'google_drive' ? handleReload : undefined}
+                onReload={source === Source.GOOGLE_DRIVE ? handleReload : undefined}
             />
         </>
     );
