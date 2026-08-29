@@ -600,45 +600,272 @@ Never manually duplicate cards.
 
 # Theme System
 
-All branding must come from JSON.
+[L601] All branding and theme colors must come from `websiteData`.
 
-Example
+[L603] The website must have a top-level `theme` key containing an array of theme objects.
 
-```javascript
-brand: {
+[L605] The `theme` key is a list of available color themes. Each theme object must contain a stable identifier, a human-readable name, and a `colors` object containing the semantic colors used by that theme.
 
-    name,
+[L607] Example:
 
-    logo,
+[L609] ```javascript
+[L610] let websiteData = {
 
-    theme: {
+[L612]     activeTheme: "green",
 
-        primary,
+[L614]     theme: [
+[L616]         {
+[L618]             id: "green",
+[L620]             name: "Green",
+[L622]             colors: {
+[L624]                 primary: "#2F6B4F",
+[L626]                 secondary: "#E8F3EC",
+[L628]                 accent: "#C8A96B",
+[L630]                 background: "#F8FBF9",
+[L632]                 surface: "#FFFFFF",
+[L634]                 text: "#1F2A24",
+[L636]                 muted: "#6B776F",
+[L638]                 border: "#D5E3DA",
+[L640]                 gradient: "linear-gradient(135deg, #2F6B4F, #6FAF8A)"
+[L642]             }
+[L644]         },
+[L646]         {
+[L648]             id: "rose",
+[L650]             name: "Rose",
+[L652]             colors: {
+[L654]                 primary: "#9B4D67",
+[L656]                 secondary: "#F8E9EF",
+[L658]                 accent: "#C997A8",
+[L660]                 background: "#FFF9FB",
+[L662]                 surface: "#FFFFFF",
+[L664]                 text: "#2E2026",
+[L666]                 muted: "#7A6870",
+[L668]                 border: "#EAD5DE",
+[L670]                 gradient: "linear-gradient(135deg, #9B4D67, #D58BA5)"
+[L672]             }
+[L674]         },
+[L676]         {
+[L678]             id: "blue",
+[L680]             name: "Blue",
+[L682]             colors: {
+[L684]                 primary: "#315E8C",
+[L686]                 secondary: "#E8F1FA",
+[L688]                 accent: "#7DA9D1",
+[L690]                 background: "#F8FBFF",
+[L692]                 surface: "#FFFFFF",
+[L694]                 text: "#1D2733",
+[L696]                 muted: "#687585",
+[L698]                 border: "#D4E0EC",
+[L700]                 gradient: "linear-gradient(135deg, #315E8C, #6E9FCB)"
+[L702]             }
+[L704]         }
+[L706]     ],
 
-        secondary,
+[L708]     brand: {
+[L710]         content: {
+[L712]             name: "Brand Name",
+[L714]             logo: "logo-url"
+[L716]         }
+[L718]     }
 
-        gradient,
+};
+```
 
-        accent,
+[L722] ### Theme Object Requirements
 
-        font,
+[L724] - `websiteData.theme` must be an array.
+[L726] - Each item in `websiteData.theme` must be an object.
+[L728] - Each theme object must contain `id`, `name`, and `colors`.
+[L730] - Generated websites must contain **at least 3 suitable themes**.
+[L732] - Themes should be visually distinct and appropriate for the website. Examples include green, rose, blue, neutral, gold, or similar palettes.
+[L734] - Every theme should provide the same required semantic color keys so the renderer can switch themes without missing values.
+[L736] - Prefer semantic color names such as `primary`, `secondary`, `accent`, `background`, `surface`, `text`, `muted`, `border`, and `gradient`.
+[L738] - Additional semantic colors may be added when required, such as `success`, `error`, `overlay`, `heading`, or `card`.
+[L740] - Do not hardcode color values in HTML, CSS, JavaScript, or component styles when the value can come from `websiteData.theme`.
+[L742] - Do not create a separate hardcoded theme object outside `websiteData`.
+[L744] - Do not duplicate the same palette under multiple theme names.
 
-        border
+[L746] ### Active Theme
 
+[L748] `websiteData.activeTheme` must contain the `id` of the currently selected theme.
+
+[L750] Resolve the active theme from the `websiteData.theme` array instead of duplicating its colors elsewhere.
+
+[L752] Example:
+
+[L754] ```javascript
+[L755] function getActiveTheme() {
+[L756]     if (!Array.isArray(websiteData.theme)) return null;
+
+[L758]     const themes = websiteData.theme.filter(Boolean);
+
+[L760]     if (!themes.length) return null;
+
+[L762]     return themes.find(theme => theme.id === websiteData.activeTheme) || themes[0];
+[L763] }
+```
+
+[L767] If `activeTheme` is missing or invalid, use the first valid theme as the fallback.
+
+[L769] Apply the active theme through CSS custom properties:
+
+[L771] ```javascript
+[L772] function applyActiveTheme() {
+[L773]     const theme = getActiveTheme();
+
+[L775]     if (!theme || !theme.colors) return;
+
+[L777]     const root = document.documentElement;
+
+[L779]     Object.entries(theme.colors).forEach(([key, value]) => {
+[L781]         if (value) {
+[L782]             root.style.setProperty(`--theme-${key}`, value);
+[L783]         }
+[L784]     });
+[L785] }
+```
+
+[L789] Components must consume these variables rather than hardcoded colors:
+
+[L791] ```css
+[L792] .hero {
+[L793]     background: var(--theme-background);
+[L794]     color: var(--theme-text);
+[L795] }
+
+[L797] .button {
+[L798]     background: var(--theme-primary);
+[L799]     color: var(--theme-surface);
+[L800] }
+
+[L802] .accent {
+[L803]     color: var(--theme-accent);
+[L804] }
+```
+
+[L808] Call `applyActiveTheme()` from `renderDataAll()` before rendering the website sections. This ensures changing `activeTheme` through live data updates immediately changes the site's colors.
+
+[L810] Example:
+
+[L812] ```javascript
+[L813] function renderDataAll(data) {
+
+[L815]     if (data) {
+[L816]         websiteData = data;
     }
+
+[L819]     applyActiveTheme();
+
+[L821]     renderNavbar();
+[L822]     renderHero();
+[L823]     renderAbout();
+[L824]     renderServices();
+[L825]     renderGallery();
+[L826]     renderPortfolio();
+[L827]     renderTeam();
+[L828]     renderTestimonials();
+[L829]     renderPricing();
+[L830]     renderFaq();
+[L831]     renderContact();
+[L832]     renderFooter();
+
+[L834]     initializeComponents();
 
 }
 ```
 
-Never hardcode:
+[L838] ### URL Query Parameter Theme Override
 
-- Colors
-- Gradients
-- Fonts
-- Logos
-- Branding
+The generated website must support selecting the active theme through the `theme` query parameter in the current page URL.
 
----
+On initial page load, read the `theme` query parameter and check whether its value matches an existing theme `id` in `websiteData.theme`.
+
+If the parameter exists and matches a valid theme, update `websiteData.activeTheme` to that theme `id`.
+
+If the parameter is missing, empty, or does not match any existing theme `id`, do not change `websiteData.activeTheme`.
+
+Example:
+
+```javascript
+// 1. Read query parameters from the current URL
+const urlParams = new URLSearchParams(window.location.search);
+const themeParam = urlParams.get('theme');
+
+// 2. Validate the theme parameter against websiteData.theme
+if (themeParam && Array.isArray(websiteData.theme)) {
+    const isValidTheme = websiteData.theme.some(
+        theme => theme && theme.id === themeParam
+    );
+
+    if (isValidTheme) {
+        websiteData.activeTheme = themeParam;
+    }
+}
+```
+
+This URL-based override must happen before `applyActiveTheme()` and before the initial page rendering so the correct palette is applied from the first render.
+
+A URL theme override must only select a theme that already exists in `websiteData.theme`. Never create a new theme or accept arbitrary color values from the URL.
+
+Example URL:
+
+```text
+https://example.com/?theme=rose
+```
+
+When the URL contains `?theme=rose` and a theme with `id: "rose"` exists, the renderer must set:
+
+```javascript
+websiteData.activeTheme = "rose";
+```
+
+Then `applyActiveTheme()` must apply the colors from the matching `websiteData.theme` object.
+
+### Theme Selection and Live Editing
+
+[L840] External editors may change `websiteData.activeTheme` and send the complete object through the existing `UPDATE_DATA` message.
+
+[L842] Example:
+
+[L844] ```javascript
+{
+    type: "UPDATE_DATA",
+    data: {
+        activeTheme: "rose",
+        theme: [
+            // theme objects
+        ]
+    }
+}
+```
+
+[L854] Theme selection must never require modifying individual section content. Changing the active theme should be enough to update the visual palette across the website.
+
+[L856] ### Branding Separation
+
+[L858] Brand identity and color themes are separate concerns.
+
+[L860] Store brand information in `websiteData.brand.content`, while available color palettes remain in `websiteData.theme`.
+
+[L862] Example:
+
+[L864] ```javascript
+brand: {
+    content: {
+        name: "Brand Name",
+        logo: "logo-url"
+    }
+}
+```
+
+[L874] Never hardcode:
+
+[L876] - Colors
+[L877] - Gradients
+[L878] - Fonts
+[L879] - Logos
+[L880] - Branding
+[L881] - Theme palettes
 
 # Images
 
