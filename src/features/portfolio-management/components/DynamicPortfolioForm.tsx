@@ -18,20 +18,28 @@ import {
   ListItemButton,
   ListItemAvatar,
   Avatar,
-  ListItemText
+  ListItemText,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
   Delete as DeleteIcon,
   Add as AddIcon,
   Image as ImageIcon,
-  InsertDriveFile as FileIcon
+  InsertDriveFile as FileIcon,
+  Palette as PaletteIcon
 } from '@mui/icons-material';
 import { useConfigStore } from '../../../core/store/ConifgStore';
 import { usePortfolioStore } from '../store/portfolioStore';
 import { usePortfolioContext } from '../context/portfolioGlobalContext';
 import { scrollToJsonPath } from '../functions/scrollToJsonPath';
 
+// Reserved top-level keys that are handled specially (not rendered as content sections)
+const RESERVED_KEYS = new Set(['activeTheme', 'theme']);
 
 // ---------------------------------------------------------------------------
 // LeafField — isolated, memoized text field.
@@ -359,42 +367,127 @@ const DynamicPortfolioForm: React.FC = () => {
 
   if (!portfolioData) return null;
 
+  // Extract theme data for the dropdown
+  const themeArray: any[] = Array.isArray(portfolioData.theme) ? portfolioData.theme : [];
+  const activeTheme: string = portfolioData.activeTheme ?? '';
+  const hasThemeSupport = themeArray.length > 0;
+
+  const handleThemeChange = (e: SelectChangeEvent<string>) => {
+    const newData = setByPath(dataRef.current, ['activeTheme'], e.target.value);
+    dataRef.current = newData;
+    lastExternalRef.current = newData;
+    handleDataChange(newData);
+  };
+
   return (
     <Box key={formKey}>
-      {Object.entries(portfolioData).map(([key, value]) => {
-        const sectionContent = value && typeof value === 'object' && 'content' in value
-          ? (value as any).content
-          : value;
-
-        return (
-          <Box key={key} sx={{ mb: 4, background: 'rgba(15, 26, 46, 0.4)', p: 3, borderRadius: 2, position: 'relative' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6" sx={{ color: '#F8FAFC', textTransform: 'capitalize' }}>
-                {key}
-              </Typography>
-              <IconButton
-                size="small"
-                onClick={() => handleSectionRemove(key)}
-                sx={{
-                  color: '#94A3B8',
-                  '&:hover': { color: '#EF4444', bgcolor: 'rgba(239, 68, 68, 0.1)' },
-                }}
-                title={`Delete ${key} section`}
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Box>
-            <Box sx={{ pl: 2, borderLeft: '2px solid rgba(192, 132, 252, 0.3)' }}>
-              {sectionContent && typeof sectionContent === 'object' && !Array.isArray(sectionContent)
-                ? Object.entries(sectionContent).map(([subKey, subValue]) =>
-                    renderField(subKey, subValue, [key, 'content', subKey], `${key}.content.${subKey}`)
-                  )
-                : renderField(key, sectionContent, [key, 'content'], `${key}.content`)
-              }
-            </Box>
+      {/* ── Theme Selector (only if theme data exists) ── */}
+      {hasThemeSupport && (
+        <Box
+          sx={{
+            mb: 4,
+            background: 'rgba(15, 26, 46, 0.4)',
+            p: 3,
+            borderRadius: 2,
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <PaletteIcon sx={{ color: '#C084FC' }} />
+            <Typography variant="h6" sx={{ color: '#F8FAFC' }}>
+              Theme
+            </Typography>
           </Box>
-        );
-      })}
+          <FormControl fullWidth variant="outlined">
+            <InputLabel
+              sx={{
+                color: 'rgba(255,255,255,0.7)',
+                '&.Mui-focused': { color: '#C084FC' },
+              }}
+            >
+              Active Theme
+            </InputLabel>
+            <Select
+              value={activeTheme}
+              label="Active Theme"
+              onChange={handleThemeChange}
+              sx={{
+                color: '#fff',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(255,255,255,0.2)',
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(255,255,255,0.4)',
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#C084FC',
+                },
+                '& .MuiSvgIcon-root': { color: '#C084FC' },
+              }}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    bgcolor: '#0f172a',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    '& .MuiMenuItem-root': {
+                      color: '#fff',
+                      '&:hover': { bgcolor: 'rgba(192, 132, 252, 0.15)' },
+                      '&.Mui-selected': {
+                        bgcolor: 'rgba(192, 132, 252, 0.25)',
+                        '&:hover': { bgcolor: 'rgba(192, 132, 252, 0.35)' },
+                      },
+                    },
+                  },
+                },
+              }}
+            >
+              {themeArray.map((t: any) => (
+                <MenuItem key={t.id} value={t.id}>
+                  {t.name || t.id}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+      )}
+
+      {/* ── Content Sections (skip reserved keys) ── */}
+      {Object.entries(portfolioData)
+        .filter(([key]) => !RESERVED_KEYS.has(key))
+        .map(([key, value]) => {
+          const sectionContent = value && typeof value === 'object' && 'content' in value
+            ? (value as any).content
+            : value;
+
+          return (
+            <Box key={key} sx={{ mb: 4, background: 'rgba(15, 26, 46, 0.4)', p: 3, borderRadius: 2, position: 'relative' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6" sx={{ color: '#F8FAFC', textTransform: 'capitalize' }}>
+                  {key}
+                </Typography>
+                <IconButton
+                  size="small"
+                  onClick={() => handleSectionRemove(key)}
+                  sx={{
+                    color: '#94A3B8',
+                    '&:hover': { color: '#EF4444', bgcolor: 'rgba(239, 68, 68, 0.1)' },
+                  }}
+                  title={`Delete ${key} section`}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Box>
+              <Box sx={{ pl: 2, borderLeft: '2px solid rgba(192, 132, 252, 0.3)' }}>
+                {sectionContent && typeof sectionContent === 'object' && !Array.isArray(sectionContent)
+                  ? Object.entries(sectionContent).map(([subKey, subValue]) =>
+                      renderField(subKey, subValue, [key, 'content', subKey], `${key}.content.${subKey}`)
+                    )
+                  : renderField(key, sectionContent, [key, 'content'], `${key}.content`)
+                }
+              </Box>
+            </Box>
+          );
+        })}
+
 
       <Dialog
         open={isAssetDialogOpen}
