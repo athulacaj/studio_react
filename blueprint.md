@@ -152,13 +152,24 @@ This document outlines the development plan for a modern, responsive photo proof
    - Handled server errors, form loading states, and dynamic form reset on successful submit.
 
 
-#### Iteration 15: 2-Column Desktop Features Grid Layout
+#### Iteration 17: Interactive Contact Section & Social Community Channels
 
-1. **Features Section 2-Column Grid (`FeaturesSection.tsx`):**
-   - Converted the features showcase into a responsive 2-column grid on desktop screens (`gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }`).
-   - Standardized features 1 to 4 into balanced glassmorphic cards with window frames, artwork previews, bullet highlights, and call-to-action buttons.
-   - Expanded the 5th card ("Live Photo Delivery - Coming Soon") across both columns on desktop as a wide featured AI banner.
+1. **Contact Section Component (`ContactSection.tsx`):**
+   - Created a dedicated, glassmorphic contact section (`#contact-section`) on the Home page.
+   - **Direct Email Card**: Displays `studio.mizhiv@gmail.com` with a one-click clipboard copy button (with snackbar alert feedback) and a "Compose Email" `mailto:` launcher.
+   - **Instagram Community Card**: Displays `@mizhiv_app` with an "Official" badge and a direct link to `https://www.instagram.com/mizhiv_app`.
+   - **Studio Response Guarantee**: Highlighted fast support turnaround note for photographers and studios.
+2. **Navigation & Footer Updates:**
+   - Linked `#contact-section` into `GlobalNavbar.tsx` (desktop nav & mobile drawer) with active scroll spy tracking.
+   - Updated `Footer.tsx` with `studio.mizhiv@gmail.com` and the official Instagram link.
 
+#### Iteration 18: Enhanced Bottom CTA Banner with Cameraman Illustration
 
-
-
+1. **Dedicated CTA Section Component (`CtaSection.tsx`):**
+   - Redesigned the bottom CTA banner from a plain centered box into a vibrant, high-conversion two-column showcase banner.
+   - Built with MUI and dark cyber glassmorphism design tokens matching Mizhiv's visual identity.
+   - **Showcase Visual**: Embedded the high-resolution `/images/illustrations/cameraman.png` illustration showing modern studio workflows (Google Drive proofing, AI wedding invitations, custom studio domain websites) with an ambient radial glow and floating platform badge.
+   - **Feature Highlights**: Included interactive micro-badges highlighting Custom Domain branding, Zero Client Downloads, and AI-Powered Invitations.
+   - **Action Area**: High-impact gradient button ("Get Started Now" / "Go to Studio Dashboard") with trust signals ("Instant setup • No credit card required").
+2. **Integration (`Home/index.tsx`):**
+   - Replaced inline CTA code with the modularized `<CtaSection />` component.

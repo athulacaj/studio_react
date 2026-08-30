@@ -6,6 +6,8 @@ import { useAuthStore } from '../../features/auth';
 import { getWebsiteTemplatesByType, WebsiteTemplate, WebsiteTemplateType } from '../../features/portfolio-management/api/WebsiteService';
 import FeaturesSection from './components/FeaturesSection';
 import InteractiveTemplatesSection from './components/InteractiveTemplatesSection';
+import ContactSection from './components/ContactSection';
+import CtaSection from './components/CtaSection';
 
 // Swiper imports
 import type { Swiper as SwiperClass } from 'swiper';
@@ -81,6 +83,7 @@ const Home = () => {
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#030912' }}>
       {/* 1. HERO SECTION */}
       <Box
+        id="hero-section"
         sx={{
           position: 'relative',
           pt: { xs: 14, md: 20 },
@@ -261,6 +264,7 @@ const Home = () => {
 
       {/* 2. CAPABILITIES CAROUSEL SECTION (COVERFLOW) */}
       <Box
+        id="capabilities-section"
         sx={{
           py: { xs: 8, md: 12 },
           overflow: 'hidden',
@@ -481,82 +485,13 @@ const Home = () => {
       {/* 4. INTERACTIVE TEMPLATES SECTION WITH SMARTPHONE PREVIEW & DROPDOWN */}
       <InteractiveTemplatesSection templates={templates} loading={loadingTemplates} />
 
-      {/* 5. BOTTOM CALL TO ACTION BANNER */}
-      <Box
-        sx={{
-          py: { xs: 10, md: 14 },
-          background: 'linear-gradient(180deg, #070F1E 0%, #030912 100%)',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        <Container maxWidth="md">
-          <Box
-            sx={{
-              position: 'relative',
-              p: { xs: 4, sm: 6, md: 8 },
-              borderRadius: '24px',
-              background: 'linear-gradient(135deg, rgba(157, 78, 221, 0.15) 0%, rgba(15, 26, 46, 0.8) 100%)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(192, 132, 252, 0.25)',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(157, 78, 221, 0.2)',
-              textAlign: 'center',
-            }}
-          >
-            <Typography
-              variant="h3"
-              sx={{
-                fontSize: { xs: '1.85rem', sm: '2.5rem', md: '3rem' },
-                fontWeight: 800,
-                color: '#FFF',
-                mb: 2,
-                lineHeight: 1.2,
-              }}
-            >
-              Ready to Upgrade Your Studio Experience?
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                color: '#CBD5E1',
-                fontSize: { xs: '0.95rem', md: '1.1rem' },
-                maxWidth: 600,
-                mx: 'auto',
-                mb: 4,
-                lineHeight: 1.6,
-              }}
-            >
-              Join the new era of wedding photography. Delight your clients with custom domains, effortless Google
-              Drive photo proofing, and AI-powered invitations.
-            </Typography>
+      {/* 5. CONTACT SECTION (EMAIL & INSTAGRAM) */}
+      <ContactSection />
 
-            <Button
-              variant="contained"
-              size="large"
-              onClick={handleGetStarted}
-              endIcon={<ArrowRight size={18} />}
-              sx={{
-                background: 'linear-gradient(90deg, #7C3AED 0%, #A855F7 100%)',
-                color: '#FFF',
-                px: 5,
-                py: 1.6,
-                fontSize: '1.05rem',
-                borderRadius: 999,
-                fontWeight: 700,
-                boxShadow: '0 0 30px rgba(157, 78, 221, 0.4)',
-                '&:hover': {
-                  background: 'linear-gradient(90deg, #6D28D9 0%, #9D4EDD 100%)',
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 0 45px rgba(157, 78, 221, 0.6)',
-                },
-              }}
-            >
-              {currentUser ? 'Go to Studio Dashboard' : 'Get Started Now'}
-            </Button>
-          </Box>
-        </Container>
-      </Box>
+      {/* 6. BOTTOM CALL TO ACTION BANNER */}
+      <CtaSection />
     </Box>
+
   );
 };
 

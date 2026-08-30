@@ -15,12 +15,15 @@ import AdminUserWrapper from './features/auth/components/AdminUserWrapper';
 
 const AppRouter = () => {
   const location = useLocation();
-  // const isPublicRoute = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/about' || location.pathname.includes('/portfolio') || location.pathname.includes('/p/');
-
-
+  const isFullscreen =
+    location.pathname.includes('/portfolio') ||
+    location.pathname.includes('/view/') ||
+    location.pathname.includes('/share/');
+  const isPrivate = location.pathname.startsWith('/private');
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      {!isFullscreen && !isPrivate && <GlobalNavbar />}
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Routes>
           <Route path="/" element={<Home />} />

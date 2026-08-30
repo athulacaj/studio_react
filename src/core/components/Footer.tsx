@@ -55,8 +55,20 @@ const Footer = () => {
             <Typography variant="h6" sx={{ color: '#F8FAFC', fontWeight: 600, mb: 1.5, fontSize: '0.95rem' }}>
               Contact
             </Typography>
-            <Typography variant="body2" sx={{ color: '#64748B', lineHeight: 1.8 }}>
-              hello@mizhiv.com
+            <Typography
+              component="a"
+              href="mailto:studio.mizhiv@gmail.com"
+              variant="body2"
+              sx={{
+                color: '#94A3B8',
+                lineHeight: 1.8,
+                textDecoration: 'none',
+                display: 'block',
+                transition: 'color 0.2s ease',
+                '&:hover': { color: '#C084FC' },
+              }}
+            >
+              studio.mizhiv@gmail.com
             </Typography>
           </Grid>
 
@@ -64,26 +76,31 @@ const Footer = () => {
             <Typography variant="h6" sx={{ color: '#F8FAFC', fontWeight: 600, mb: 1.5, fontSize: '0.95rem' }}>
               Follow Us
             </Typography>
-            <Box sx={{ display: 'flex', gap: 0.5 }}>
-              {[InstagramIcon, TwitterIcon, FacebookIcon].map((Icon, i) => (
-                <IconButton
-                  key={i}
-                  sx={{
-                    color: '#64748B',
-                    width: 40,
-                    height: 40,
-                    borderRadius: '12px',
-                    transition: 'all 0.25s ease',
-                    '&:hover': {
-                      color: '#C084FC',
-                      background: 'rgba(157, 78, 221, 0.1)',
-                      boxShadow: '0 0 16px rgba(157, 78, 221, 0.15)',
-                    },
-                  }}
-                >
-                  <Icon sx={{ fontSize: 20 }} />
-                </IconButton>
-              ))}
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <IconButton
+                component="a"
+                href="https://www.instagram.com/mizhiv_app"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                sx={{
+                  color: '#64748B',
+                  width: 40,
+                  height: 40,
+                  borderRadius: '12px',
+                  bgcolor: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  transition: 'all 0.25s ease',
+                  '&:hover': {
+                    color: '#F472B6',
+                    background: 'rgba(236, 72, 153, 0.15)',
+                    borderColor: 'rgba(236, 72, 153, 0.4)',
+                    boxShadow: '0 0 16px rgba(236, 72, 153, 0.3)',
+                  },
+                }}
+              >
+                <InstagramIcon sx={{ fontSize: 20 }} />
+              </IconButton>
             </Box>
           </Grid>
         </Grid>
