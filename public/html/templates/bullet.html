@@ -15,19 +15,6 @@
 
   <style>
     :root {
-      --forest: #173d2c;
-      --forest-deep: #0e2a1d;
-      --cream: #f7f4ec;
-      --cream-warm: #faf6ee;
-      --gold: #c8a86b;
-      --gold-light: #e2cfa0;
-      --gold-dark: #a68b4b;
-      --sage: #8fa88a;
-      --sage-light: #c5d5c0;
-      --blush: #f0ddd1;
-      --charcoal: #2c3e35;
-      --text-muted: #526458;
-
       --font-display: 'Cormorant Garamond', Georgia, serif;
       --font-body: 'Josefin Sans', 'Helvetica Neue', Arial, sans-serif;
 
@@ -45,8 +32,8 @@
 
     body {
       margin: 0;
-      background: var(--cream);
-      color: var(--forest);
+      background: var(--theme-background);
+      color: var(--theme-primary);
       font-family: var(--font-body);
       font-weight: 300;
       overflow-x: hidden;
@@ -99,7 +86,7 @@
       height: 100vh;
       overflow: hidden;
       isolation: isolate;
-      background: #17251d;
+      background: var(--theme-primary-deep);
     }
 
     .layer {
@@ -133,9 +120,9 @@
       position: absolute;
       z-index: 5;
       left: 0;
-      bottom: 0%;
-      width: min(45vw, 720px);
-      min-width: 360px;
+      bottom: 22%;
+      width: min(30vw, 450px);
+      min-width: 280px;
       transform: translate3d(0, 0, 0) scale(1);
       transform-origin: 50% 90%;
       pointer-events: none;
@@ -147,7 +134,7 @@
       left: 10%;
       width: 80%;
       height: 22px;
-      background: radial-gradient(ellipse at center, rgba(14, 37, 24, 0.75) 0%, rgba(14, 37, 24, 0.3) 50%, transparent 80%);
+      background: radial-gradient(ellipse at center, var(--theme-ground-shadow) 0%, var(--theme-ground-shadow-soft) 50%, transparent 80%);
       filter: blur(6px);
       border-radius: 50%;
       pointer-events: none;
@@ -159,7 +146,7 @@
       width: 100%;
       height: auto;
       object-fit: contain;
-      filter: drop-shadow(0 18px 22px rgba(0, 0, 0, .28)) drop-shadow(0 4px 6px rgba(0, 0, 0, .18)) brightness(0.97) contrast(1.02);
+      filter: drop-shadow(0 18px 22px var(--theme-shadow)) drop-shadow(0 4px 6px var(--theme-shadow-soft)) brightness(0.97) contrast(1.02);
     }
 
     .atmosphere {
@@ -167,7 +154,7 @@
       z-index: 7;
       inset: 0;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 38%, rgba(7, 25, 16, .08) 70%, rgba(4, 18, 11, .34) 100%);
+      background: radial-gradient(ellipse at center, transparent 38%, var(--theme-overlay-soft) 70%, var(--theme-overlay) 100%);
     }
 
     .sun-glow {
@@ -181,7 +168,7 @@
       top: 5%;
       transform: translateX(-50%);
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 236, 178, .16), rgba(255, 236, 178, 0) 68%);
+      background: radial-gradient(circle, var(--theme-glow), transparent 68%);
       pointer-events: none;
       mix-blend-mode: screen;
     }
@@ -203,10 +190,10 @@
       width: min(90vw, 720px);
       transform: translateX(-50%);
       text-align: center;
-      color: white;
+      color: var(--theme-on-dark);
       opacity: 0;
       pointer-events: none;
-      text-shadow: 0 2px 18px rgba(0, 0, 0, .35);
+      text-shadow: 0 2px 18px var(--theme-shadow-strong);
     }
 
     .eyebrow {
@@ -245,7 +232,7 @@
       left: 50%;
       bottom: 28px;
       transform: translateX(-50%);
-      color: white;
+      color: var(--theme-on-dark);
       font-family: var(--font-body);
       font-size: 10px;
       font-weight: 300;
@@ -259,7 +246,7 @@
       width: 1px;
       height: 48px;
       margin: 10px auto 0;
-      background: rgba(255, 255, 255, .65);
+      background: var(--theme-on-dark65);
       transform-origin: top;
       animation: scrollLine 1.8s ease-in-out infinite;
     }
@@ -292,13 +279,13 @@
     .divider-line {
       flex: 1;
       height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+      background: linear-gradient(90deg, transparent, var(--theme-accent-light), transparent);
     }
 
     .divider-diamond {
       width: 8px;
       height: 8px;
-      border: 1px solid var(--gold);
+      border: 1px solid var(--theme-accent);
       transform: rotate(45deg);
       flex-shrink: 0;
     }
@@ -317,7 +304,7 @@
       height: 1px;
       max-width: 260px;
       margin: 28px auto;
-      background: linear-gradient(90deg, transparent 0%, var(--gold-light) 25%, var(--gold) 50%, var(--gold-light) 75%, transparent 100%);
+      background: linear-gradient(90deg, transparent 0%, var(--theme-accent-light) 25%, var(--theme-accent) 50%, var(--theme-accent-light) 75%, transparent 100%);
       background-size: 200% 100%;
       animation: shimmer 4s ease-in-out infinite;
     }
@@ -327,7 +314,7 @@
       position: relative;
       padding: 120px 24px 100px;
       text-align: center;
-      background: var(--cream-warm);
+      background: var(--theme-surface);
       overflow: hidden;
     }
 
@@ -338,7 +325,7 @@
       left: 0;
       right: 0;
       height: 180px;
-      background: linear-gradient(to bottom, var(--forest-deep), transparent);
+      background: linear-gradient(to bottom, var(--theme-primary-deep), transparent);
       opacity: 0.04;
       pointer-events: none;
     }
@@ -349,7 +336,7 @@
       font-weight: 300;
       letter-spacing: .4em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--theme-muted);
       margin-bottom: 28px;
     }
 
@@ -359,7 +346,7 @@
       font-weight: 300;
       font-style: italic;
       line-height: 1;
-      color: var(--forest);
+      color: var(--theme-primary);
       margin: 0;
     }
 
@@ -367,7 +354,7 @@
       display: inline-block;
       font-size: 0.55em;
       font-style: normal;
-      color: var(--gold);
+      color: var(--theme-accent);
       margin: 0 0.15em;
       vertical-align: 0.08em;
     }
@@ -379,20 +366,20 @@
       font-weight: 300;
       letter-spacing: .22em;
       text-transform: uppercase;
-      color: var(--gold-dark);
+      color: var(--theme-accent-dark);
     }
 
     .save-the-date {
       display: inline-block;
       margin-top: 32px;
       padding: 12px 36px;
-      border: 1px solid var(--gold);
+      border: 1px solid var(--theme-accent);
       font-family: var(--font-body);
       font-size: 11px;
       font-weight: 400;
       letter-spacing: .3em;
       text-transform: uppercase;
-      color: var(--gold-dark);
+      color: var(--theme-accent-dark);
       background: transparent;
       text-decoration: none;
       cursor: pointer;
@@ -400,17 +387,17 @@
     }
 
     .save-the-date:hover {
-      background: var(--gold);
-      color: white;
+      background: var(--theme-accent);
+      color: var(--theme-on-dark);
       transform: scale(1.03);
-      box-shadow: 0 8px 32px rgba(200, 168, 107, 0.25);
+      box-shadow: 0 8px 32px var(--theme-accent25);
     }
 
     /* TIMELINE */
     .timeline-section {
       position: relative;
       padding: 100px 24px 120px;
-      background: var(--cream);
+      background: var(--theme-background);
       overflow: hidden;
     }
 
@@ -426,7 +413,7 @@
       font-weight: 300;
       letter-spacing: .35em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--theme-muted);
       margin-bottom: 16px;
     }
 
@@ -436,7 +423,7 @@
       font-size: clamp(38px, 5.5vw, 72px);
       font-weight: 300;
       font-style: italic;
-      color: var(--forest);
+      color: var(--theme-primary);
       line-height: 1.1;
     }
 
@@ -454,22 +441,22 @@
       bottom: 0;
       left: 16px;
       width: 1px;
-      background: linear-gradient(to bottom, transparent, var(--gold-light) 15%, var(--gold-light) 85%, transparent);
+      background: linear-gradient(to bottom, transparent, var(--theme-accent-light) 15%, var(--theme-accent-light) 85%, transparent);
     }
 
     .timeline-item {
       position: relative;
       margin-bottom: 56px;
       padding: 32px 36px;
-      background: white;
+      background: var(--theme-surface);
       border-radius: 2px;
-      box-shadow: 0 2px 24px rgba(23, 61, 44, 0.05), 0 1px 4px rgba(23, 61, 44, 0.04);
+      box-shadow: 0 2px 24px var(--theme-shadow-soft), 0 1px 4px var(--theme-shadow-faint);
       transition: transform 0.4s var(--ease-out-quart), box-shadow 0.4s var(--ease-out-quart);
     }
 
     .timeline-item:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 40px rgba(23, 61, 44, 0.08), 0 2px 8px rgba(23, 61, 44, 0.05);
+      box-shadow: 0 8px 40px var(--theme-shadow), 0 2px 8px var(--theme-shadow-soft);
     }
 
     .timeline-item::before {
@@ -479,10 +466,10 @@
       top: 36px;
       width: 10px;
       height: 10px;
-      background: var(--gold);
-      border: 2px solid var(--cream);
+      background: var(--theme-accent);
+      border: 2px solid var(--theme-background);
       border-radius: 50%;
-      box-shadow: 0 0 0 3px var(--gold-light);
+      box-shadow: 0 0 0 3px var(--theme-accent-light);
     }
 
     .timeline-year {
@@ -491,7 +478,7 @@
       font-weight: 400;
       letter-spacing: .25em;
       text-transform: uppercase;
-      color: var(--gold-dark);
+      color: var(--theme-accent-dark);
       margin-bottom: 8px;
     }
 
@@ -500,7 +487,7 @@
       font-size: 26px;
       font-weight: 500;
       font-style: italic;
-      color: var(--forest);
+      color: var(--theme-primary);
       margin-bottom: 10px;
     }
 
@@ -509,7 +496,7 @@
       font-size: 14px;
       font-weight: 300;
       line-height: 1.8;
-      color: var(--text-muted);
+      color: var(--theme-muted);
       margin: 0;
     }
 
@@ -517,8 +504,8 @@
     .venue-section {
       position: relative;
       padding: 100px 24px 120px;
-      background: var(--forest-deep);
-      color: white;
+      background: var(--theme-primary-deep);
+      color: var(--theme-on-dark);
       overflow: hidden;
     }
 
@@ -526,18 +513,18 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse at 30% 20%, rgba(200, 168, 107, 0.06), transparent 50%),
-        radial-gradient(ellipse at 70% 80%, rgba(200, 168, 107, 0.04), transparent 50%);
+      background: radial-gradient(ellipse at 30% 20%, var(--theme-accent06), transparent 50%),
+        radial-gradient(ellipse at 70% 80%, var(--theme-accent04), transparent 50%);
       pointer-events: none;
     }
 
     .venue-section .section-heading span {
-      color: var(--gold-light);
+      color: var(--theme-accent-light);
       opacity: 0.7;
     }
 
     .venue-section .section-heading h2 {
-      color: white;
+      color: var(--theme-on-dark);
     }
 
     .venue-cards {
@@ -551,10 +538,10 @@
     .venue-card {
       position: relative;
       padding: 48px 36px;
-      border: 1px solid rgba(200, 168, 107, 0.2);
+      border: 1px solid var(--theme-accent20);
       border-radius: 2px;
       text-align: center;
-      background: rgba(255, 255, 255, 0.02);
+      background: var(--theme-glass);
     }
 
     @supports (backdrop-filter: blur(6px)) {
@@ -564,9 +551,9 @@
     }
 
     .venue-card:hover {
-      border-color: rgba(200, 168, 107, 0.45);
+      border-color: var(--theme-accent45);
       transform: translateY(-4px);
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 16px 48px var(--theme-shadow);
     }
 
     .venue-icon {
@@ -581,7 +568,7 @@
       font-weight: 400;
       letter-spacing: .35em;
       text-transform: uppercase;
-      color: var(--gold-light);
+      color: var(--theme-accent-light);
       margin-bottom: 16px;
     }
 
@@ -599,19 +586,19 @@
       font-size: 13px;
       font-weight: 200;
       line-height: 1.9;
-      color: rgba(255, 255, 255, 0.65);
+      color: var(--theme-on-dark65);
     }
 
     .venue-time {
       display: inline-block;
       margin-top: 20px;
       padding: 8px 20px;
-      border: 1px solid rgba(200, 168, 107, 0.3);
+      border: 1px solid var(--theme-accent30);
       font-family: var(--font-body);
       font-size: 11px;
       font-weight: 300;
       letter-spacing: .2em;
-      color: var(--gold-light);
+      color: var(--theme-accent-light);
     }
 
     /* GALLERY */
@@ -634,17 +621,17 @@
       border-radius: 16px;
       overflow: hidden;
       aspect-ratio: 4 / 3;
-      background: var(--forest-deep);
-      border: 1px solid rgba(200, 168, 107, 0.25);
-      box-shadow: 0 12px 32px rgba(14, 42, 29, 0.08);
+      background: var(--theme-primary-deep);
+      border: 1px solid var(--theme-accent25);
+      box-shadow: 0 12px 32px var(--theme-shadow-soft);
       cursor: pointer;
       transition: transform 0.5s var(--ease-out-expo), box-shadow 0.5s var(--ease-out-expo), border-color 0.4s ease;
     }
 
     .gallery-card:hover {
       transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 24px 48px rgba(14, 42, 29, 0.22);
-      border-color: var(--gold);
+      box-shadow: 0 24px 48px var(--theme-shadow);
+      border-color: var(--theme-accent);
     }
 
     .gallery-card img {
@@ -664,7 +651,7 @@
     .gallery-card-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top, rgba(14, 42, 29, 0.85) 0%, rgba(14, 42, 29, 0.2) 60%, transparent 100%);
+      background: linear-gradient(to top, var(--theme-overlay-strong) 0%, var(--theme-overlay-soft2) 60%, transparent 100%);
       opacity: 0;
       display: flex;
       flex-direction: column;
@@ -682,8 +669,8 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: rgba(200, 168, 107, 0.9);
-      color: var(--forest-deep);
+      background: var(--theme-accent90);
+      color: var(--theme-primary-deep);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -691,7 +678,7 @@
       margin-bottom: 12px;
       transform: translateY(12px) scale(0.9);
       transition: transform 0.4s var(--ease-out-expo);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 12px var(--theme-shadow);
     }
 
     .gallery-card:hover .gallery-card-icon {
@@ -702,7 +689,7 @@
       font-family: var(--font-display);
       font-size: 1.25rem;
       font-weight: 400;
-      color: var(--cream);
+      color: var(--theme-background);
       letter-spacing: 0.04em;
       transform: translateY(12px);
       transition: transform 0.4s var(--ease-out-expo);
@@ -717,7 +704,7 @@
       position: fixed;
       inset: 0;
       z-index: 99999;
-      background: rgba(10, 28, 19, 0.94);
+      background: var(--theme-modal);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -756,7 +743,7 @@
       position: relative;
       overflow: hidden;
       border-radius: 12px;
-      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(200, 168, 107, 0.3);
+      box-shadow: 0 32px 80px var(--theme-shadow-strong), 0 0 0 1px var(--theme-accent30);
       max-height: 75vh;
       max-width: 88vw;
     }
@@ -779,13 +766,13 @@
     .lightbox-caption-bar {
       margin-top: 20px;
       text-align: center;
-      color: var(--cream);
+      color: var(--theme-background);
     }
 
     .lightbox-title {
       font-family: var(--font-display);
       font-size: 1.4rem;
-      color: var(--gold-light);
+      color: var(--theme-accent-light);
       letter-spacing: 0.05em;
       margin: 0 0 4px 0;
     }
@@ -794,7 +781,7 @@
       font-family: var(--font-body);
       font-size: 12px;
       letter-spacing: 0.2em;
-      color: rgba(255, 255, 255, 0.5);
+      color: var(--theme-on-dark50);
       text-transform: uppercase;
     }
 
@@ -802,9 +789,9 @@
     .lightbox-nav {
       position: absolute;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(200, 168, 107, 0.3);
-      color: var(--cream);
+      background: var(--theme-glass-strong);
+      border: 1px solid var(--theme-accent30);
+      color: var(--theme-background);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -831,8 +818,8 @@
 
     .lightbox-close:hover,
     .lightbox-nav:hover {
-      background: rgba(200, 168, 107, 0.25);
-      border-color: var(--gold);
+      background: var(--theme-accent25);
+      border-color: var(--theme-accent);
       transform: translateY(-50%) scale(1.08);
     }
 
@@ -853,7 +840,7 @@
       position: relative;
       padding: 100px 24px;
       text-align: center;
-      background: linear-gradient(to bottom, var(--cream-warm), var(--cream));
+      background: linear-gradient(to bottom, var(--theme-surface), var(--theme-background));
       overflow: hidden;
     }
 
@@ -876,7 +863,7 @@
       font-family: var(--font-display);
       font-size: clamp(48px, 8vw, 80px);
       font-weight: 300;
-      color: var(--forest);
+      color: var(--theme-primary);
       line-height: 1;
       transition: transform 0.3s var(--ease-out-quart);
     }
@@ -892,14 +879,14 @@
       font-weight: 400;
       letter-spacing: .3em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--theme-muted);
     }
 
     .countdown-separator {
       font-family: var(--font-display);
       font-size: clamp(36px, 6vw, 56px);
       font-weight: 300;
-      color: var(--gold-light);
+      color: var(--theme-accent-light);
       align-self: flex-start;
       margin-top: 8px;
     }
@@ -909,7 +896,7 @@
       position: relative;
       padding: 120px 24px;
       text-align: center;
-      background: var(--cream);
+      background: var(--theme-background);
       overflow: hidden;
     }
 
@@ -917,7 +904,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse at 50% 50%, rgba(200, 168, 107, 0.06), transparent 60%);
+      background: radial-gradient(ellipse at 50% 50%, var(--theme-accent06), transparent 60%);
       pointer-events: none;
     }
 
@@ -928,15 +915,15 @@
       font-size: 15px;
       font-weight: 200;
       line-height: 1.8;
-      color: var(--text-muted);
+      color: var(--theme-muted);
     }
 
     .rsvp-btn {
       display: inline-block;
       margin-top: 40px;
       padding: 18px 56px;
-      background: var(--gold);
-      color: white;
+      background: var(--theme-accent);
+      color: var(--theme-on-dark);
       font-family: var(--font-body);
       font-size: 12px;
       font-weight: 400;
@@ -951,17 +938,17 @@
     }
 
     .rsvp-btn:hover {
-      background: var(--gold-dark);
+      background: var(--theme-accent-dark);
       transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 12px 40px rgba(200, 168, 107, 0.3);
+      box-shadow: 0 12px 40px var(--theme-accent30);
     }
 
     /* FOOTER */
     .footer {
       padding: 80px 24px 48px;
       text-align: center;
-      background: var(--forest-deep);
-      color: rgba(255, 255, 255, 0.5);
+      background: var(--theme-primary-deep);
+      color: var(--theme-on-dark50);
     }
 
     .footer-monogram {
@@ -969,7 +956,7 @@
       font-size: 48px;
       font-weight: 300;
       font-style: italic;
-      color: var(--gold);
+      color: var(--theme-accent);
       margin-bottom: 24px;
     }
 
@@ -978,7 +965,7 @@
       font-size: 13px;
       font-weight: 300;
       letter-spacing: .2em;
-      color: var(--gold-light);
+      color: var(--theme-accent-light);
       margin-bottom: 8px;
     }
 
@@ -988,11 +975,11 @@
       font-weight: 200;
       letter-spacing: .1em;
       margin-top: 48px;
-      color: rgba(255, 255, 255, 0.3);
+      color: var(--theme-on-dark30);
     }
 
     .footer-note span {
-      color: #e86f6f;
+      color: var(--theme-danger);
     }
 
 
@@ -1007,8 +994,8 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      background: var(--forest-deep);
-      color: var(--cream);
+      background: var(--theme-primary-deep);
+      color: var(--theme-background);
       transition: opacity 0.9s ease, visibility 0.9s ease;
     }
 
@@ -1023,15 +1010,15 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(circle at 50% 42%, rgba(200, 168, 107, .14), transparent 34%),
-        radial-gradient(circle at 50% 100%, rgba(143, 168, 138, .10), transparent 45%);
+        radial-gradient(circle at 50% 42%, var(--theme-accent14), transparent 34%),
+        radial-gradient(circle at 50% 100%, var(--theme-secondary10), transparent 45%);
       pointer-events: none;
     }
 
     .opening-vignette {
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse at center, transparent 20%, rgba(0, 0, 0, .28) 100%);
+      background: radial-gradient(ellipse at center, transparent 20%, var(--theme-shadow) 100%);
       pointer-events: none;
     }
 
@@ -1042,23 +1029,23 @@
       width: 52%;
       z-index: 2;
       background:
-        linear-gradient(90deg, rgba(5, 22, 14, .95), rgba(23, 61, 44, .98) 30%, rgba(14, 42, 29, .98) 72%, rgba(4, 20, 12, .98));
-      box-shadow: inset 0 0 80px rgba(0, 0, 0, .32);
+        linear-gradient(90deg, var(--theme-primary-deep95), var(--theme-primary98) 30%, var(--theme-primary-deep98) 72%, var(--theme-primary-deeper98));
+      box-shadow: inset 0 0 80px var(--theme-shadow-strong);
       transition: transform 1.45s var(--ease-out-expo);
     }
 
     .opening-curtain.left {
       left: 0;
       transform-origin: left center;
-      border-right: 1px solid rgba(200, 168, 107, .18);
+      border-right: 1px solid var(--theme-accent18);
     }
 
     .opening-curtain.right {
       right: 0;
       transform-origin: right center;
-      border-left: 1px solid rgba(200, 168, 107, .18);
+      border-left: 1px solid var(--theme-accent18);
       background:
-        linear-gradient(90deg, rgba(4, 20, 12, .98), rgba(14, 42, 29, .98) 28%, rgba(23, 61, 44, .98) 70%, rgba(5, 22, 14, .95));
+        linear-gradient(90deg, var(--theme-primary-deeper98), var(--theme-primary-deep98) 28%, var(--theme-primary98) 70%, var(--theme-primary-deep95));
     }
 
     .opening-screen.opening .opening-curtain.left {
@@ -1078,7 +1065,7 @@
         repeating-linear-gradient(90deg,
           transparent 0,
           transparent 26px,
-          rgba(255, 255, 255, .035) 28px,
+          var(--theme-pattern) 28px,
           transparent 31px);
     }
 
@@ -1101,7 +1088,7 @@
       font-size: 10px;
       letter-spacing: .42em;
       text-transform: uppercase;
-      color: var(--gold-light);
+      color: var(--theme-accent-light);
       margin-bottom: 22px;
     }
 
@@ -1109,7 +1096,7 @@
       width: 86px;
       height: 86px;
       margin: 0 auto 26px;
-      border: 1px solid rgba(200, 168, 107, .75);
+      border: 1px solid var(--theme-accent75);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -1117,10 +1104,10 @@
       font-family: var(--font-display);
       font-size: 31px;
       font-style: italic;
-      color: var(--gold-light);
+      color: var(--theme-accent-light);
       box-shadow:
-        0 0 0 8px rgba(200, 168, 107, .035),
-        0 0 45px rgba(200, 168, 107, .10);
+        0 0 0 8px var(--theme-accent035),
+        0 0 45px var(--theme-accent10);
     }
 
     .opening-title {
@@ -1130,7 +1117,7 @@
       line-height: .92;
       font-weight: 300;
       font-style: italic;
-      color: var(--cream);
+      color: var(--theme-background);
     }
 
     .opening-subtitle {
@@ -1140,7 +1127,7 @@
       font-size: 12px;
       line-height: 1.8;
       letter-spacing: .08em;
-      color: rgba(247, 244, 236, .68);
+      color: var(--theme-on-dark68);
     }
 
     .opening-button {
@@ -1148,9 +1135,9 @@
       margin-top: 34px;
       min-width: 190px;
       padding: 15px 28px;
-      border: 1px solid var(--gold);
-      background: rgba(200, 168, 107, .08);
-      color: var(--cream);
+      border: 1px solid var(--theme-accent);
+      background: var(--theme-accent08);
+      color: var(--theme-background);
       font-family: var(--font-body);
       font-size: 10px;
       letter-spacing: .3em;
@@ -1165,7 +1152,7 @@
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      color: var(--gold);
+      color: var(--theme-accent);
       font-size: 9px;
     }
 
@@ -1178,10 +1165,10 @@
     }
 
     .opening-button:hover {
-      background: var(--gold);
-      color: var(--forest-deep);
+      background: var(--theme-accent);
+      color: var(--theme-primary-deep);
       transform: translateY(-2px);
-      box-shadow: 0 12px 40px rgba(200, 168, 107, .22);
+      box-shadow: 0 12px 40px var(--theme-accent22);
     }
 
     .opening-hint {
@@ -1190,7 +1177,7 @@
       font-size: 9px;
       letter-spacing: .22em;
       text-transform: uppercase;
-      color: rgba(247, 244, 236, .42);
+      color: var(--theme-on-dark42);
     }
 
     .opening-screen.opening .opening-hint {
@@ -1205,8 +1192,8 @@
       opacity: .28;
       pointer-events: none;
       border-radius: 100% 0 100% 0;
-      border-left: 1px solid rgba(200, 168, 107, .5);
-      border-bottom: 1px solid rgba(200, 168, 107, .5);
+      border-left: 1px solid var(--theme-accent50);
+      border-bottom: 1px solid var(--theme-accent50);
       transform: rotate(35deg);
     }
 
@@ -1278,9 +1265,9 @@
       }
 
       .couple-wrap {
-        width: min(96vw, 460px);
-        min-width: 320px;
-        bottom: 10%;
+        width: min(75vw, 360px);
+        min-width: 240px;
+        bottom: 24%;
       }
 
       .story-copy {
@@ -1386,26 +1373,26 @@
 <body>
 
 
-  <!-- CLICK-TO-OPEN INTRO: content is rendered from websiteData.opening -->
-  <div class="opening-screen" id="openingScreen" aria-label="Wedding invitation">
-    <div class="opening-curtain left"></div>
-    <div class="opening-curtain right"></div>
-    <div class="opening-vignette"></div>
-    <div class="opening-leaf top-left"></div>
-    <div class="opening-leaf bottom-right"></div>
-
-    <div class="opening-center">
-      <div class="opening-eyebrow" id="openingEyebrow" data-json-path="opening.content.eyebrow"></div>
-      <div class="opening-monogram" id="openingMonogram" data-json-path="opening.content.monogram"></div>
-      <h1 class="opening-title" id="openingTitle" data-json-path="opening.content.title"></h1>
-      <p class="opening-subtitle" id="openingDescription" data-json-path="opening.content.description"></p>
-      <button class="opening-button" id="openInvitation" type="button"
-        data-json-path="opening.content.buttonText"></button>
-      <div class="opening-hint" id="openingHint" data-json-path="opening.content.hint"></div>
-    </div>
-  </div>
-
   <div id="parent">
+    <!-- CLICK-TO-OPEN INTRO: content is rendered from websiteData.opening -->
+    <div class="opening-screen" id="openingScreen" aria-label="Wedding invitation">
+      <div class="opening-curtain left"></div>
+      <div class="opening-curtain right"></div>
+      <div class="opening-vignette"></div>
+      <div class="opening-leaf top-left"></div>
+      <div class="opening-leaf bottom-right"></div>
+
+      <div class="opening-center">
+        <div class="opening-eyebrow" id="openingEyebrow" data-json-path="opening.content.eyebrow"></div>
+        <div class="opening-monogram" id="openingMonogram" data-json-path="opening.content.monogram"></div>
+        <h1 class="opening-title" id="openingTitle" data-json-path="opening.content.title"></h1>
+        <p class="opening-subtitle" id="openingDescription" data-json-path="opening.content.description"></p>
+        <button class="opening-button" id="openInvitation" type="button"
+          data-json-path="opening.content.buttonText"></button>
+        <div class="opening-hint" id="openingHint" data-json-path="opening.content.hint"></div>
+      </div>
+    </div>
+
     <!-- Generated sections will be injected here -->
     <!-- Global Lightbox Modal -->
     <div class="lightbox-modal" id="lightboxModal" role="dialog" aria-modal="true" data-json-path="gallery">
@@ -1427,10 +1414,7 @@
       </div>
     </div>
   </div>
-  <div class="overlay">
-    hi
 
-  </div>
 
 
 
@@ -1442,6 +1426,211 @@
      * SINGLE SOURCE OF TRUTH: websiteData
      * ========================================================== */
     let websiteData = {
+      "activeTheme": "forest",
+      "theme": [
+        {
+          "id": "sunset",
+          "name": "Sunset Glow",
+          "colors": {
+            "primary": "#B85C38", "primaryDeep": "#54251D",
+            "secondary": "#D58B62", "secondaryLight": "#F0C3A0",
+            "accent": "#E6B56A", "accentLight": "#F5D9A8", "accentDark": "#A86C3F",
+            "tertiary": "#F8E0D2", "background": "#FFF7F1", "surface": "#FFFCF8",
+            "text": "#382824", "muted": "#7A6861", "border": "#EAD8CE",
+            "heading": "#8E4934", "gradient": "linear-gradient(135deg, #B85C38, #E49A65)",
+            "onPrimary": "#FFFCF8", "onDark": "#FFF7F1",
+            "shadow": "rgba(84,37,29,.14)", "shadowSoft": "rgba(84,37,29,.07)", "shadowFaint": "rgba(84,37,29,.04)",
+            "shadowStrong": "rgba(45,17,13,.38)", "modal": "rgba(30,10,8,.95)",
+            "overlay": "rgba(45,17,13,.34)", "overlaySoft": "rgba(45,17,13,.08)", "overlayStrong": "rgba(84,37,29,.85)", "overlaySoft2": "rgba(84,37,29,.20)",
+            "glass": "rgba(255,252,248,.03)", "glassStrong": "rgba(255,252,248,.09)", "pattern": "rgba(255,252,248,.04)",
+            "onDark65": "rgba(255,247,241,.65)", "onDark68": "rgba(255,247,241,.68)", "onDark50": "rgba(255,247,241,.50)", "onDark30": "rgba(255,247,241,.30)", "onDark42": "rgba(255,247,241,.42)",
+            "accent25": "rgba(230,181,106,.25)", "accent20": "rgba(230,181,106,.20)", "accent30": "rgba(230,181,106,.30)", "accent35": "rgba(230,181,106,.35)", "accent45": "rgba(230,181,106,.45)", "accent50": "rgba(230,181,106,.50)", "accent90": "rgba(230,181,106,.90)",
+            "accent14": "rgba(230,181,106,.14)", "accent18": "rgba(230,181,106,.18)", "accent75": "rgba(230,181,106,.75)", "accent035": "rgba(230,181,106,.035)", "accent10": "rgba(230,181,106,.10)", "accent08": "rgba(230,181,106,.08)", "accent22": "rgba(230,181,106,.22)", "accent06": "rgba(230,181,106,.06)", "accent04": "rgba(230,181,106,.04)",
+            "secondary10": "rgba(213,139,98,.10)", "glow": "rgba(245,217,168,.20)",
+            "groundShadow": "rgba(84,37,29,.75)", "groundShadowSoft": "rgba(84,37,29,.30)",
+            "primary98": "rgba(184,92,56,.98)", "primaryDeep98": "rgba(84,37,29,.98)", "primaryDeep95": "rgba(63,25,20,.95)", "primaryDeeper98": "rgba(45,17,13,.98)",
+            "danger": "#B84D4D", "particleCore": "rgba(244,135,79,", "particleEdge": "rgba(184,75,48,", "particleEmber": "rgba(245,217,168,"
+          }
+        },
+        {
+          "id": "forest",
+          "name": "Forest Garden",
+          "colors": {
+            "primary": "#173D2C", "primaryDeep": "#0E2A1D",
+            "secondary": "#8FA88A", "secondaryLight": "#C5D5C0",
+            "accent": "#C8A86B", "accentLight": "#E2CFA0", "accentDark": "#A68B4B",
+            "tertiary": "#F0DDD1", "background": "#F7F4EC", "surface": "#FAF6EE",
+            "text": "#2C3E35", "muted": "#526458", "border": "#D8DED6",
+            "heading": "#173D2C", "gradient": "linear-gradient(135deg, #173D2C, #6F9A7C)",
+            "onPrimary": "#FAF6EE", "onDark": "#FAF6EE",
+            "shadow": "rgba(14,42,29,.14)", "shadowSoft": "rgba(14,42,29,.07)", "shadowFaint": "rgba(14,42,29,.04)",
+            "shadowStrong": "rgba(7,25,16,.38)", "modal": "rgba(4,18,11,.95)",
+            "overlay": "rgba(4,18,11,.34)", "overlaySoft": "rgba(7,25,16,.08)", "overlayStrong": "rgba(14,42,29,.85)", "overlaySoft2": "rgba(14,42,29,.20)",
+            "glass": "rgba(250,246,238,.02)", "glassStrong": "rgba(250,246,238,.08)", "pattern": "rgba(250,246,238,.035)",
+            "onDark65": "rgba(250,246,238,.65)", "onDark68": "rgba(250,246,238,.68)", "onDark50": "rgba(250,246,238,.50)", "onDark30": "rgba(250,246,238,.30)", "onDark42": "rgba(250,246,238,.42)",
+            "accent25": "rgba(200,168,107,.25)", "accent20": "rgba(200,168,107,.20)", "accent30": "rgba(200,168,107,.30)", "accent35": "rgba(200,168,107,.35)", "accent45": "rgba(200,168,107,.45)", "accent50": "rgba(200,168,107,.50)", "accent90": "rgba(200,168,107,.90)",
+            "accent14": "rgba(200,168,107,.14)", "accent18": "rgba(200,168,107,.18)", "accent75": "rgba(200,168,107,.75)", "accent035": "rgba(200,168,107,.035)", "accent10": "rgba(200,168,107,.10)", "accent08": "rgba(200,168,107,.08)", "accent22": "rgba(200,168,107,.22)", "accent06": "rgba(200,168,107,.06)", "accent04": "rgba(200,168,107,.04)",
+            "secondary10": "rgba(143,168,138,.10)", "glow": "rgba(255,236,178,.16)",
+            "groundShadow": "rgba(14,37,24,.75)", "groundShadowSoft": "rgba(14,37,24,.30)",
+            "primary98": "rgba(23,61,44,.98)", "primaryDeep98": "rgba(14,42,29,.98)", "primaryDeep95": "rgba(5,22,14,.95)", "primaryDeeper98": "rgba(4,20,12,.98)",
+            "danger": "#C95C67", "particleCore": "rgba(225,65,85,", "particleEdge": "rgba(155,25,40,", "particleEmber": "rgba(226,207,160,"
+          }
+        },
+        {
+          "id": "rose",
+          "name": "Dusty Rose",
+          "colors": {
+            "primary": "#9B4D67", "primaryDeep": "#55283A",
+            "secondary": "#C997A8", "secondaryLight": "#E9C9D4",
+            "accent": "#C997A8", "accentLight": "#F1DCE4", "accentDark": "#9A5C72",
+            "tertiary": "#F8E9EF", "background": "#FFF9FB", "surface": "#FFFFFF",
+            "text": "#33232A", "muted": "#76656C", "border": "#EAD5DE",
+            "heading": "#7D3853", "gradient": "linear-gradient(135deg, #9B4D67, #D58BA5)",
+            "onPrimary": "#FFFFFF", "onDark": "#FFF9FB",
+            "shadow": "rgba(85,40,58,.14)", "shadowSoft": "rgba(85,40,58,.07)", "shadowFaint": "rgba(85,40,58,.04)", "shadowStrong": "rgba(55,20,34,.38)", "modal": "rgba(42,15,27,.95)",
+            "overlay": "rgba(55,20,34,.34)", "overlaySoft": "rgba(55,20,34,.08)", "overlayStrong": "rgba(85,40,58,.85)", "overlaySoft2": "rgba(85,40,58,.20)",
+            "glass": "rgba(255,255,255,.03)", "glassStrong": "rgba(255,255,255,.09)", "pattern": "rgba(255,255,255,.04)",
+            "onDark65": "rgba(255,249,251,.65)", "onDark68": "rgba(255,249,251,.68)", "onDark50": "rgba(255,249,251,.50)", "onDark30": "rgba(255,249,251,.30)", "onDark42": "rgba(255,249,251,.42)",
+            "accent25": "rgba(201,151,168,.25)", "accent20": "rgba(201,151,168,.20)", "accent30": "rgba(201,151,168,.30)", "accent35": "rgba(201,151,168,.35)", "accent45": "rgba(201,151,168,.45)", "accent50": "rgba(201,151,168,.50)", "accent90": "rgba(201,151,168,.90)",
+            "accent14": "rgba(201,151,168,.14)", "accent18": "rgba(201,151,168,.18)", "accent75": "rgba(201,151,168,.75)", "accent035": "rgba(201,151,168,.035)", "accent10": "rgba(201,151,168,.10)", "accent08": "rgba(201,151,168,.08)", "accent22": "rgba(201,151,168,.22)", "accent06": "rgba(201,151,168,.06)", "accent04": "rgba(201,151,168,.04)",
+            "secondary10": "rgba(201,151,168,.10)", "glow": "rgba(241,220,228,.20)",
+            "groundShadow": "rgba(85,40,58,.75)", "groundShadowSoft": "rgba(85,40,58,.30)", "primary98": "rgba(155,77,103,.98)", "primaryDeep98": "rgba(85,40,58,.98)", "primaryDeep95": "rgba(68,30,45,.95)", "primaryDeeper98": "rgba(55,20,34,.98)",
+            "danger": "#B44D61", "particleCore": "rgba(218,91,122,", "particleEdge": "rgba(142,48,76,", "particleEmber": "rgba(241,220,228,"
+          }
+        },
+        {
+          "id": "ocean",
+          "name": "Coastal Blue",
+          "colors": {
+            "primary": "#315E8C", "primaryDeep": "#173A5A",
+            "secondary": "#7DA9D1", "secondaryLight": "#C8DCEE",
+            "accent": "#A9C8DF", "accentLight": "#DCEBF5", "accentDark": "#6E94B7",
+            "tertiary": "#E8F1FA", "background": "#F8FBFF", "surface": "#FFFFFF",
+            "text": "#1D2733", "muted": "#687585", "border": "#D4E0EC",
+            "heading": "#244D76", "gradient": "linear-gradient(135deg, #315E8C, #6E9FCB)",
+            "onPrimary": "#FFFFFF", "onDark": "#F8FBFF",
+            "shadow": "rgba(23,58,90,.14)", "shadowSoft": "rgba(23,58,90,.07)", "shadowFaint": "rgba(23,58,90,.04)", "shadowStrong": "rgba(12,34,54,.38)", "modal": "rgba(8,25,41,.95)",
+            "overlay": "rgba(12,34,54,.34)", "overlaySoft": "rgba(12,34,54,.08)", "overlayStrong": "rgba(23,58,90,.85)", "overlaySoft2": "rgba(23,58,90,.20)",
+            "glass": "rgba(255,255,255,.03)", "glassStrong": "rgba(255,255,255,.09)", "pattern": "rgba(255,255,255,.04)",
+            "onDark65": "rgba(248,251,255,.65)", "onDark68": "rgba(248,251,255,.68)", "onDark50": "rgba(248,251,255,.50)", "onDark30": "rgba(248,251,255,.30)", "onDark42": "rgba(248,251,255,.42)",
+            "accent25": "rgba(169,200,223,.25)", "accent20": "rgba(169,200,223,.20)", "accent30": "rgba(169,200,223,.30)", "accent35": "rgba(169,200,223,.35)", "accent45": "rgba(169,200,223,.45)", "accent50": "rgba(169,200,223,.50)", "accent90": "rgba(169,200,223,.90)",
+            "accent14": "rgba(169,200,223,.14)", "accent18": "rgba(169,200,223,.18)", "accent75": "rgba(169,200,223,.75)", "accent035": "rgba(169,200,223,.035)", "accent10": "rgba(169,200,223,.10)", "accent08": "rgba(169,200,223,.08)", "accent22": "rgba(169,200,223,.22)", "accent06": "rgba(169,200,223,.06)", "accent04": "rgba(169,200,223,.04)",
+            "secondary10": "rgba(125,169,209,.10)", "glow": "rgba(220,235,245,.20)",
+            "groundShadow": "rgba(23,58,90,.75)", "groundShadowSoft": "rgba(23,58,90,.30)", "primary98": "rgba(49,94,140,.98)", "primaryDeep98": "rgba(23,58,90,.98)", "primaryDeep95": "rgba(16,45,70,.95)", "primaryDeeper98": "rgba(12,34,54,.98)",
+            "danger": "#B54F67", "particleCore": "rgba(121,177,220,", "particleEdge": "rgba(49,104,153,", "particleEmber": "rgba(220,235,245,"
+          }
+        },
+        {
+          "id": "champagne",
+          "name": "Champagne",
+          "colors": {
+            "primary": "#765B3E", "primaryDeep": "#3F3021",
+            "secondary": "#B69A72", "secondaryLight": "#DCC9A9",
+            "accent": "#C8A86B", "accentLight": "#E9D8B5", "accentDark": "#967845",
+            "tertiary": "#F2E8D8", "background": "#FBF7EF", "surface": "#FFFDF8",
+            "text": "#342A21", "muted": "#756A5D", "border": "#E5D8C5",
+            "heading": "#62482F", "gradient": "linear-gradient(135deg, #765B3E, #B69A72)",
+            "onPrimary": "#FFFDF8", "onDark": "#FBF7EF",
+            "shadow": "rgba(63,48,33,.14)", "shadowSoft": "rgba(63,48,33,.07)", "shadowFaint": "rgba(63,48,33,.04)", "shadowStrong": "rgba(35,25,16,.38)", "modal": "rgba(25,18,11,.95)",
+            "overlay": "rgba(35,25,16,.34)", "overlaySoft": "rgba(35,25,16,.08)", "overlayStrong": "rgba(63,48,33,.85)", "overlaySoft2": "rgba(63,48,33,.20)",
+            "glass": "rgba(255,253,248,.03)", "glassStrong": "rgba(255,253,248,.09)", "pattern": "rgba(255,253,248,.04)",
+            "onDark65": "rgba(251,247,239,.65)", "onDark68": "rgba(251,247,239,.68)", "onDark50": "rgba(251,247,239,.50)", "onDark30": "rgba(251,247,239,.30)", "onDark42": "rgba(251,247,239,.42)",
+            "accent25": "rgba(200,168,107,.25)", "accent20": "rgba(200,168,107,.20)", "accent30": "rgba(200,168,107,.30)", "accent35": "rgba(200,168,107,.35)", "accent45": "rgba(200,168,107,.45)", "accent50": "rgba(200,168,107,.50)", "accent90": "rgba(200,168,107,.90)",
+            "accent14": "rgba(200,168,107,.14)", "accent18": "rgba(200,168,107,.18)", "accent75": "rgba(200,168,107,.75)", "accent035": "rgba(200,168,107,.035)", "accent10": "rgba(200,168,107,.10)", "accent08": "rgba(200,168,107,.08)", "accent22": "rgba(200,168,107,.22)", "accent06": "rgba(200,168,107,.06)", "accent04": "rgba(200,168,107,.04)",
+            "secondary10": "rgba(182,154,114,.10)", "glow": "rgba(233,216,181,.20)",
+            "groundShadow": "rgba(63,48,33,.75)", "groundShadowSoft": "rgba(63,48,33,.30)", "primary98": "rgba(118,91,62,.98)", "primaryDeep98": "rgba(63,48,33,.98)", "primaryDeep95": "rgba(48,36,24,.95)", "primaryDeeper98": "rgba(35,25,16,.98)",
+            "danger": "#B85B55", "particleCore": "rgba(205,130,89,", "particleEdge": "rgba(131,73,45,", "particleEmber": "rgba(233,216,181,"
+          }
+        },
+        {
+          "id": "terracotta",
+          "name": "Terracotta",
+          "colors": {
+            "primary": "#9A5141", "primaryDeep": "#542B24",
+            "secondary": "#C98B79", "secondaryLight": "#E7C0B5",
+            "accent": "#D5A06B", "accentLight": "#F0D5B7", "accentDark": "#9F6A43",
+            "tertiary": "#F7E7DE", "background": "#FFF8F4", "surface": "#FFFFFF",
+            "text": "#352522", "muted": "#78645F", "border": "#EAD8D1",
+            "heading": "#7E3E33", "gradient": "linear-gradient(135deg, #9A5141, #D28B73)",
+            "onPrimary": "#FFFFFF", "onDark": "#FFF8F4",
+            "shadow": "rgba(84,43,36,.14)", "shadowSoft": "rgba(84,43,36,.07)", "shadowFaint": "rgba(84,43,36,.04)", "shadowStrong": "rgba(50,23,19,.38)", "modal": "rgba(34,15,12,.95)",
+            "overlay": "rgba(50,23,19,.34)", "overlaySoft": "rgba(50,23,19,.08)", "overlayStrong": "rgba(84,43,36,.85)", "overlaySoft2": "rgba(84,43,36,.20)",
+            "glass": "rgba(255,255,255,.03)", "glassStrong": "rgba(255,255,255,.09)", "pattern": "rgba(255,255,255,.04)",
+            "onDark65": "rgba(255,248,244,.65)", "onDark68": "rgba(255,248,244,.68)", "onDark50": "rgba(255,248,244,.50)", "onDark30": "rgba(255,248,244,.30)", "onDark42": "rgba(255,248,244,.42)",
+            "accent25": "rgba(213,160,107,.25)", "accent20": "rgba(213,160,107,.20)", "accent30": "rgba(213,160,107,.30)", "accent35": "rgba(213,160,107,.35)", "accent45": "rgba(213,160,107,.45)", "accent50": "rgba(213,160,107,.50)", "accent90": "rgba(213,160,107,.90)",
+            "accent14": "rgba(213,160,107,.14)", "accent18": "rgba(213,160,107,.18)", "accent75": "rgba(213,160,107,.75)", "accent035": "rgba(213,160,107,.035)", "accent10": "rgba(213,160,107,.10)", "accent08": "rgba(213,160,107,.08)", "accent22": "rgba(213,160,107,.22)", "accent06": "rgba(213,160,107,.06)", "accent04": "rgba(213,160,107,.04)",
+            "secondary10": "rgba(201,139,121,.10)", "glow": "rgba(240,213,183,.20)",
+            "groundShadow": "rgba(84,43,36,.75)", "groundShadowSoft": "rgba(84,43,36,.30)", "primary98": "rgba(154,81,65,.98)", "primaryDeep98": "rgba(84,43,36,.98)", "primaryDeep95": "rgba(63,30,25,.95)", "primaryDeeper98": "rgba(50,23,19,.98)",
+            "danger": "#B74E4E", "particleCore": "rgba(218,108,92,", "particleEdge": "rgba(134,56,45,", "particleEmber": "rgba(240,213,183,"
+          }
+        },
+        {
+          "id": "lavender",
+          "name": "Lavender Mist",
+          "colors": {
+            "primary": "#65547A", "primaryDeep": "#342A43",
+            "secondary": "#A99ABA", "secondaryLight": "#D8CEE4",
+            "accent": "#B9A1D1", "accentLight": "#E4D9EF", "accentDark": "#806B99",
+            "tertiary": "#F0EAF5", "background": "#FBF9FD", "surface": "#FFFFFF",
+            "text": "#2F2935", "muted": "#706979", "border": "#DED7E6",
+            "heading": "#55436B", "gradient": "linear-gradient(135deg, #65547A, #9A82B5)",
+            "onPrimary": "#FFFFFF", "onDark": "#FBF9FD",
+            "shadow": "rgba(52,42,67,.14)", "shadowSoft": "rgba(52,42,67,.07)", "shadowFaint": "rgba(52,42,67,.04)", "shadowStrong": "rgba(29,21,38,.38)", "modal": "rgba(20,14,28,.95)",
+            "overlay": "rgba(29,21,38,.34)", "overlaySoft": "rgba(29,21,38,.08)", "overlayStrong": "rgba(52,42,67,.85)", "overlaySoft2": "rgba(52,42,67,.20)",
+            "glass": "rgba(255,255,255,.03)", "glassStrong": "rgba(255,255,255,.09)", "pattern": "rgba(255,255,255,.04)",
+            "onDark65": "rgba(251,249,253,.65)", "onDark68": "rgba(251,249,253,.68)", "onDark50": "rgba(251,249,253,.50)", "onDark30": "rgba(251,249,253,.30)", "onDark42": "rgba(251,249,253,.42)",
+            "accent25": "rgba(185,161,209,.25)", "accent20": "rgba(185,161,209,.20)", "accent30": "rgba(185,161,209,.30)", "accent35": "rgba(185,161,209,.35)", "accent45": "rgba(185,161,209,.45)", "accent50": "rgba(185,161,209,.50)", "accent90": "rgba(185,161,209,.90)",
+            "accent14": "rgba(185,161,209,.14)", "accent18": "rgba(185,161,209,.18)", "accent75": "rgba(185,161,209,.75)", "accent035": "rgba(185,161,209,.035)", "accent10": "rgba(185,161,209,.10)", "accent08": "rgba(185,161,209,.08)", "accent22": "rgba(185,161,209,.22)", "accent06": "rgba(185,161,209,.06)", "accent04": "rgba(185,161,209,.04)",
+            "secondary10": "rgba(169,154,186,.10)", "glow": "rgba(228,217,239,.20)",
+            "groundShadow": "rgba(52,42,67,.75)", "groundShadowSoft": "rgba(52,42,67,.30)", "primary98": "rgba(101,84,122,.98)", "primaryDeep98": "rgba(52,42,67,.98)", "primaryDeep95": "rgba(41,33,52,.95)", "primaryDeeper98": "rgba(29,21,38,.98)",
+            "danger": "#A94F67", "particleCore": "rgba(190,143,214,", "particleEdge": "rgba(103,70,132,", "particleEmber": "rgba(228,217,239,"
+          }
+        },
+        {
+          "id": "sage",
+          "name": "Soft Sage",
+          "colors": {
+            "primary": "#4F6B5A", "primaryDeep": "#263D31",
+            "secondary": "#91AD9A", "secondaryLight": "#C9D8CD",
+            "accent": "#B9A16B", "accentLight": "#E0D0A8", "accentDark": "#8D774C",
+            "tertiary": "#EAF2EC", "background": "#F8FBF8", "surface": "#FFFFFF",
+            "text": "#28352D", "muted": "#68756D", "border": "#D6E1D9",
+            "heading": "#3E594A", "gradient": "linear-gradient(135deg, #4F6B5A, #87A892)",
+            "onPrimary": "#FFFFFF", "onDark": "#F8FBF8",
+            "shadow": "rgba(38,61,49,.14)", "shadowSoft": "rgba(38,61,49,.07)", "shadowFaint": "rgba(38,61,49,.04)", "shadowStrong": "rgba(17,31,24,.38)", "modal": "rgba(11,22,16,.95)",
+            "overlay": "rgba(17,31,24,.34)", "overlaySoft": "rgba(17,31,24,.08)", "overlayStrong": "rgba(38,61,49,.85)", "overlaySoft2": "rgba(38,61,49,.20)",
+            "glass": "rgba(255,255,255,.03)", "glassStrong": "rgba(255,255,255,.09)", "pattern": "rgba(255,255,255,.04)",
+            "onDark65": "rgba(248,251,248,.65)", "onDark68": "rgba(248,251,248,.68)", "onDark50": "rgba(248,251,248,.50)", "onDark30": "rgba(248,251,248,.30)", "onDark42": "rgba(248,251,248,.42)",
+            "accent25": "rgba(185,161,107,.25)", "accent20": "rgba(185,161,107,.20)", "accent30": "rgba(185,161,107,.30)", "accent35": "rgba(185,161,107,.35)", "accent45": "rgba(185,161,107,.45)", "accent50": "rgba(185,161,107,.50)", "accent90": "rgba(185,161,107,.90)",
+            "accent14": "rgba(185,161,107,.14)", "accent18": "rgba(185,161,107,.18)", "accent75": "rgba(185,161,107,.75)", "accent035": "rgba(185,161,107,.035)", "accent10": "rgba(185,161,107,.10)", "accent08": "rgba(185,161,107,.08)", "accent22": "rgba(185,161,107,.22)", "accent06": "rgba(185,161,107,.06)", "accent04": "rgba(185,161,107,.04)",
+            "secondary10": "rgba(145,173,154,.10)", "glow": "rgba(224,208,168,.20)",
+            "groundShadow": "rgba(38,61,49,.75)", "groundShadowSoft": "rgba(38,61,49,.30)", "primary98": "rgba(79,107,90,.98)", "primaryDeep98": "rgba(38,61,49,.98)", "primaryDeep95": "rgba(29,47,37,.95)", "primaryDeeper98": "rgba(17,31,24,.98)",
+            "danger": "#B85B62", "particleCore": "rgba(178,199,168,", "particleEdge": "rgba(80,111,79,", "particleEmber": "rgba(224,208,168,"
+          }
+        },
+        {
+          "id": "midnight",
+          "name": "Midnight Plum",
+          "colors": {
+            "primary": "#6D536F", "primaryDeep": "#2D2031",
+            "secondary": "#9D829E", "secondaryLight": "#CBBACD",
+            "accent": "#D4AF83", "accentLight": "#EAD4B5", "accentDark": "#9F7950",
+            "tertiary": "#F2EAF2", "background": "#FAF7FA", "surface": "#FFFFFF",
+            "text": "#302832", "muted": "#706773", "border": "#E0D7E1",
+            "heading": "#59415B", "gradient": "linear-gradient(135deg, #6D536F, #A77FA8)",
+            "onPrimary": "#FFFFFF", "onDark": "#FAF7FA",
+            "shadow": "rgba(45,32,49,.14)", "shadowSoft": "rgba(45,32,49,.07)", "shadowFaint": "rgba(45,32,49,.04)", "shadowStrong": "rgba(23,15,25,.38)", "modal": "rgba(16,10,18,.95)",
+            "overlay": "rgba(23,15,25,.34)", "overlaySoft": "rgba(23,15,25,.08)", "overlayStrong": "rgba(45,32,49,.85)", "overlaySoft2": "rgba(45,32,49,.20)",
+            "glass": "rgba(255,255,255,.03)", "glassStrong": "rgba(255,255,255,.09)", "pattern": "rgba(255,255,255,.04)",
+            "onDark65": "rgba(250,247,250,.65)", "onDark68": "rgba(250,247,250,.68)", "onDark50": "rgba(250,247,250,.50)", "onDark30": "rgba(250,247,250,.30)", "onDark42": "rgba(250,247,250,.42)",
+            "accent25": "rgba(212,175,131,.25)", "accent20": "rgba(212,175,131,.20)", "accent30": "rgba(212,175,131,.30)", "accent35": "rgba(212,175,131,.35)", "accent45": "rgba(212,175,131,.45)", "accent50": "rgba(212,175,131,.50)", "accent90": "rgba(212,175,131,.90)",
+            "accent14": "rgba(212,175,131,.14)", "accent18": "rgba(212,175,131,.18)", "accent75": "rgba(212,175,131,.75)", "accent035": "rgba(212,175,131,.035)", "accent10": "rgba(212,175,131,.10)", "accent08": "rgba(212,175,131,.08)", "accent22": "rgba(212,175,131,.22)", "accent06": "rgba(212,175,131,.06)", "accent04": "rgba(212,175,131,.04)",
+            "secondary10": "rgba(157,130,158,.10)", "glow": "rgba(234,212,181,.20)",
+            "groundShadow": "rgba(45,32,49,.75)", "groundShadowSoft": "rgba(45,32,49,.30)", "primary98": "rgba(109,83,111,.98)", "primaryDeep98": "rgba(45,32,49,.98)", "primaryDeep95": "rgba(34,23,37,.95)", "primaryDeeper98": "rgba(23,15,25,.98)",
+            "danger": "#B64F67", "particleCore": "rgba(205,151,187,", "particleEdge": "rgba(105,63,102,", "particleEmber": "rgba(234,212,181,"
+          }
+        }
+      ],
       "opening": {
         "content": {
           "eyebrow": "A journey together",
@@ -1455,7 +1644,7 @@
       "hero": {
         "content": {
           "farBackground": "./image.png",
-          "midBackground": "./image.png",
+          "midBackground": "./image1.png",
           "coupleImage": "./bike.png",
           "objectPosition": "50% 50%",
           "eyebrow": "A journey together",
@@ -1974,9 +2163,9 @@
         ${c.monogram ? `<div class="footer-monogram reveal" data-json-path="footer.content.monogram">${c.monogram}</div>` : ''}
         ${c.hashtag ? `<div class="footer-hashtag reveal" data-json-path="footer.content.hashtag">${c.hashtag}</div>` : ''}
         <div class="divider reveal" style="margin-top: 36px; margin-bottom: 0;" data-json-path="footer">
-          <div class="divider-line" style="background: linear-gradient(90deg, transparent, rgba(200,168,107,0.3), transparent);" data-json-path="footer"></div>
-          <div class="divider-diamond" style="border-color: rgba(200,168,107,0.35);" data-json-path="footer"></div>
-          <div class="divider-line" style="background: linear-gradient(90deg, transparent, rgba(200,168,107,0.3), transparent);" data-json-path="footer"></div>
+          <div class="divider-line" style="background: linear-gradient(90deg, transparent, var(--theme-accent30), transparent);" data-json-path="footer"></div>
+          <div class="divider-diamond" style="border-color: var(--theme-accent35);" data-json-path="footer"></div>
+          <div class="divider-line" style="background: linear-gradient(90deg, transparent, var(--theme-accent30), transparent);" data-json-path="footer"></div>
         </div>
         ${c.note ? `<p class="footer-note reveal" data-json-path="footer.content.note">${c.note}</p>` : ''}
       `;
@@ -2039,12 +2228,42 @@
     }
 
     /* ==========================================================
+     * THEME SYSTEM
+     * ========================================================== */
+    function getActiveTheme() {
+      if (!Array.isArray(websiteData.theme)) return null;
+      const themes = websiteData.theme.filter(Boolean);
+      if (!themes.length) return null;
+      return themes.find(theme => theme.id === websiteData.activeTheme) || themes[0];
+    }
+
+    function applyThemeFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const themeParam = params.get("theme");
+      if (!themeParam || !Array.isArray(websiteData.theme)) return;
+      if (websiteData.theme.some(theme => theme && theme.id === themeParam)) {
+        websiteData.activeTheme = themeParam;
+      }
+    }
+
+    function applyActiveTheme() {
+      const theme = getActiveTheme();
+      if (!theme || !theme.colors) return;
+      const root = document.documentElement;
+      Object.entries(theme.colors).forEach(([key, value]) => {
+        if (value) root.style.setProperty(`--theme-${key.replace(/([A-Z])/g, "-$1").toLowerCase()}`, value);
+      });
+    }
+
+    /* ==========================================================
      * MASTER RENDERER
      * ========================================================== */
     function renderDataAll(data) {
       if (data) {
         websiteData = data;
       }
+
+      applyActiveTheme();
 
       renderOpeningIntro();
       preloadHeroImage();
@@ -2197,13 +2416,15 @@
       const PARTICLE_COUNT = 48;
       let lastScrollY = window.scrollY;
 
-      const PETAL_PALETTES = [
-        { core: 'rgba(225, 65, 85, ', edge: 'rgba(155, 25, 40, ' },
-        { core: 'rgba(240, 120, 145, ', edge: 'rgba(190, 60, 90, ' },
-        { core: 'rgba(248, 195, 175, ', edge: 'rgba(210, 130, 110, ' },
-        { core: 'rgba(210, 45, 65, ', edge: 'rgba(125, 15, 30, ' },
-        { core: 'rgba(255, 225, 215, ', edge: 'rgba(225, 170, 150, ' }
-      ];
+      function getParticlePalette() {
+        const theme = getActiveTheme();
+        if (!theme || !theme.colors) return null;
+        return {
+          core: theme.colors.particleCore,
+          edge: theme.colors.particleEdge,
+          ember: theme.colors.particleEmber
+        };
+      }
 
       function resize() {
         canvas.width = window.innerWidth;
@@ -2214,7 +2435,8 @@
         const isPetal = Math.random() > 0.25;
         const depth = Math.random();
         const depthScale = 0.5 + depth * 0.85;
-        const palette = PETAL_PALETTES[Math.floor(Math.random() * PETAL_PALETTES.length)];
+        const palette = getParticlePalette();
+        if (!palette) return null;
 
         return {
           type: isPetal ? 'petal' : 'ember',
@@ -2234,7 +2456,7 @@
           opacity: (0.25 + Math.random() * 0.45),
           colorCore: palette.core,
           colorEdge: palette.edge,
-          emberColor: 'rgba(226, 207, 160, ',
+          emberColor: palette.ember,
           size: (0.7 + Math.random() * 1.1) * depthScale,
           pulse: Math.random() * Math.PI * 2
         };
@@ -2484,6 +2706,7 @@
 
     /* Initial Render */
     document.addEventListener("DOMContentLoaded", function () {
+      applyThemeFromUrl();
       renderDataAll();
     });
 
