@@ -152,12 +152,13 @@ This document outlines the development plan for a modern, responsive photo proof
    - Handled server errors, form loading states, and dynamic form reset on successful submit.
 
 
-#### Iteration 12: Project Name Special Character Restriction
+#### Iteration 15: 2-Column Desktop Features Grid Layout
 
-1. **Character Constraints on Project Name:**
-   - Added regex restriction `/^[a-zA-Z0-9 _-]+$/` to allow only letters, numbers, spaces, underscores, and hyphens in project names.
-2. **Real-time UX Inline Validation:**
-   - Integrated error states and helper texts into the TextField component inside `CreateProjectModal` to give users immediate feedback while typing.
-3. **Submit-level Safeguards:**
-   - Updated modal submit handlers to reject invalid formats and display user-friendly error banners.
+1. **Features Section 2-Column Grid (`FeaturesSection.tsx`):**
+   - Converted the features showcase into a responsive 2-column grid on desktop screens (`gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }`).
+   - Standardized features 1 to 4 into balanced glassmorphic cards with window frames, artwork previews, bullet highlights, and call-to-action buttons.
+   - Expanded the 5th card ("Live Photo Delivery - Coming Soon") across both columns on desktop as a wide featured AI banner.
+
+
+
 

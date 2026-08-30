@@ -6,7 +6,6 @@ import FacebookIcon from '@mui/icons-material/Facebook';
 import CameraIcon from '@mui/icons-material/Camera';
 
 const Footer = () => {
-  return <div></div>
   return (
     <Box
       component="footer"
