@@ -248,13 +248,20 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                             </Typography>
                         </Box>
                     ) : (
-                        <Grid container spacing={3} paddingTop={6}>
+                        <Box 
+                            sx={{ 
+                                display: 'grid', 
+                                gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, 
+                                gap: 3, 
+                                pt: 6 
+                            }}
+                        >
                             {filteredTemplates.map((template) => {
                                 const previewImg = template.desktopScreenshotUrl || template.mobileScreenshotUrl;
                                 const isSelected = selectedTemplateId === template.id;
 
                                 return (
-                                    <Grid item xs={12} sm={6} md={4} key={template.id}>
+                                    <Box key={template.id}>
                                         <Card
                                             sx={{
                                                 p: 3,
@@ -468,10 +475,10 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                                 </Button>
                                             </CardContent>
                                         </Card>
-                                    </Grid>
+                                    </Box>
                                 );
                             })}
-                        </Grid>
+                        </Box>
                     )}
                 </DialogContent>
             </Dialog>
