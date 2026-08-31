@@ -340,7 +340,7 @@ export const GlobalNavbar: React.FC = () => {
           {/* 2. DESKTOP NAVIGATION LINKS WITH ACTIVE SECTION INDICATOR */}
           <Box
             sx={{
-              display: { xs: 'none', md: 'flex' },
+              display: location.pathname === '/' ? { xs: 'none', md: 'flex' } : 'none',
               alignItems: 'center',
               gap: 1,
               bgcolor: 'rgba(255, 255, 255, 0.03)',
@@ -728,8 +728,10 @@ export const GlobalNavbar: React.FC = () => {
           </Box>
 
           {/* Navigation Section Items */}
-          <Typography
-            variant="caption"
+          {location.pathname === '/' && (
+            <>
+              <Typography
+                variant="caption"
             sx={{
               color: '#64748B',
               fontWeight: 700,
@@ -854,6 +856,8 @@ export const GlobalNavbar: React.FC = () => {
               );
             })}
           </Stack>
+            </>
+          )}
         </Box>
 
         {/* Drawer Bottom Actions */}
