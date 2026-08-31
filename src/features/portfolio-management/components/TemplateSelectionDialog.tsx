@@ -8,7 +8,6 @@ import {
     IconButton,
     TextField,
     InputAdornment,
-    Grid,
     Card,
     CardMedia,
     CardContent,
@@ -16,6 +15,8 @@ import {
     Chip,
     CircularProgress,
     Tooltip,
+    useTheme,
+    useMediaQuery,
 } from '@mui/material';
 import {
     Close as CloseIcon,
@@ -43,6 +44,8 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
     onSelectTemplate,
     isLoading = false,
 }) => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedTypeId, setSelectedTypeId] = useState<string>('all');
     const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
@@ -92,14 +95,16 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                 onClose={onClose}
                 maxWidth="lg"
                 fullWidth
+                fullScreen={isMobile}
                 PaperProps={{
                     sx: {
-                        borderRadius: 5,
+                        borderRadius: isMobile ? 0 : 5,
                         bgcolor: '#0B132B',
                         backgroundImage: 'radial-gradient(ellipse at top, rgba(124, 58, 237, 0.15), transparent 70%)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        border: isMobile ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
                         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
-                        maxHeight: '90vh',
+                        maxHeight: isMobile ? '100dvh' : '90vh',
+                        m: isMobile ? 0 : 2,
                         overflow: 'hidden',
                     },
                 }}
@@ -107,8 +112,8 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                 {/* Dialog Header */}
                 <DialogTitle
                     sx={{
-                        p: 3,
-                        pb: 2,
+                        p: { xs: 2, sm: 3 },
+                        pb: { xs: 1.5, sm: 2 },
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 2,
@@ -179,7 +184,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                 endAdornment: searchQuery ? (
                                     <InputAdornment position="end">
                                         <IconButton size="small" onClick={() => setSearchQuery('')} sx={{ color: '#94A3B8' }}>
-                                            <ClearIcon size="small" />
+                                            <ClearIcon fontSize="small" />
                                         </IconButton>
                                     </InputAdornment>
                                 ) : null,
@@ -187,7 +192,16 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                         />
 
                         {/* Category Filter Chips */}
-                        <Box sx={{ display: 'flex', gap: 1, overflowX: 'auto', py: 0.5 }}>
+                        <Box sx={{
+                            display: 'flex',
+                            gap: 1,
+                            overflowX: 'auto',
+                            maxWidth: '100%',
+                            py: 0.5,
+                            pb: 1,
+                            scrollbarWidth: 'none',
+                            '&::-webkit-scrollbar': { display: 'none' }
+                        }}>
                             {categories.map((cat) => {
                                 const isSelected = selectedTypeId === cat;
                                 return (
@@ -200,6 +214,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                             fontSize: '0.75rem',
                                             borderRadius: 2,
                                             px: 1,
+                                            flexShrink: 0,
                                             bgcolor: isSelected
                                                 ? 'linear-gradient(90deg, #7C3AED 0%, #A855F7 100%)'
                                                 : 'rgba(255, 255, 255, 0.05)',
@@ -220,7 +235,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                 </DialogTitle>
 
                 {/* Dialog Content Grid */}
-                <DialogContent sx={{ p: 3, pt: 3, bgcolor: 'rgba(3, 9, 18, 0.4)' }}>
+                <DialogContent sx={{ p: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 }, bgcolor: 'rgba(3, 9, 18, 0.4)' }}>
                     {isLoading ? (
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 10, gap: 2 }}>
                             <CircularProgress sx={{ color: '#C084FC' }} />
@@ -252,8 +267,8 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                             sx={{ 
                                 display: 'grid', 
                                 gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, 
-                                gap: 3, 
-                                pt: 6 
+                                gap: { xs: 2, sm: 3 }, 
+                                pt: { xs: 1, sm: 2 } 
                             }}
                         >
                             {filteredTemplates.map((template) => {
@@ -264,7 +279,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                     <Box key={template.id}>
                                         <Card
                                             sx={{
-                                                p: 3,
+                                                p: { xs: 2, sm: 3 },
                                                 height: '100%',
                                                 display: 'flex',
                                                 flexDirection: 'column',

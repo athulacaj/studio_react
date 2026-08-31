@@ -37,6 +37,7 @@ export interface PortfolioState {
     step: 1 | 2;
     error: string | null;
     previewMode: 'desktop' | 'mobile';
+    mobileView: 'editor' | 'preview';
     activeTab: number;
 
     // Loading & Async States
@@ -72,6 +73,7 @@ export interface PortfolioActions {
     setStep: (step: 1 | 2) => void;
     setError: (error: string | null) => void;
     setPreviewMode: (mode: 'desktop' | 'mobile') => void;
+    setMobileView: (mode: 'editor' | 'preview') => void;
     setActiveTab: (tab: number) => void;
 
     // Loading & Async Setters
@@ -109,6 +111,7 @@ export const initialState: PortfolioState = {
     step: 1,
     error: null,
     previewMode: 'desktop',
+    mobileView: 'editor',
     activeTab: 0,
 
     isInitialLoading: true,
@@ -144,6 +147,7 @@ export const usePortfolioStore = create<PortfolioStore>((set) => ({
     setStep: (step) => set({ step }),
     setError: (error) => set({ error }),
     setPreviewMode: (previewMode) => set({ previewMode }),
+    setMobileView: (mobileView) => set({ mobileView }),
     setActiveTab: (activeTab) => set({ activeTab }),
 
     // Loading & Async Actions

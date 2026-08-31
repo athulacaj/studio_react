@@ -5,9 +5,6 @@ import {
     CloudUpload as UploadIcon,
     AutoAwesome as SparklesIcon,
     ArrowForward as ArrowForwardIcon,
-    CheckCircle as CheckIcon,
-    Lock as LockIcon,
-    Star as StarIcon,
 } from '@mui/icons-material';
 import { usePortfolioContext } from '../context/portfolioGlobalContext';
 import { WebsiteTemplate } from '../api/WebsiteService';
@@ -81,8 +78,15 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
         >
             <Container maxWidth="xl" sx={{ my: 'auto' }}>
                 {/* Header Navigation & Title */}
-                <Box sx={{ mb: 5 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                <Box sx={{ mb: { xs: 3, sm: 5 } }}>
+                    <Box sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column-reverse', sm: 'row' },
+                        alignItems: { xs: 'flex-start', sm: 'center' },
+                        justifyContent: 'space-between',
+                        gap: 2,
+                        mb: 3
+                    }}>
                         <Button
                             startIcon={<ArrowBackIcon />}
                             onClick={onNavigateBack}
@@ -153,11 +157,11 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                             elevation={0}
                             sx={{
                                 width: '100%',
-                                p: { xs: 3, sm: 4 },
+                                p: { xs: 2.5, sm: 4 },
                                 display: 'flex',
                                 flexDirection: 'column',
                                 justifyContent: 'space-between',
-                                borderRadius: 5,
+                                borderRadius: { xs: 4, sm: 5 },
                                 bgcolor: 'rgba(15, 23, 42, 0.5)',
                                 backdropFilter: 'blur(20px)',
                                 border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -179,8 +183,8 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                 <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2.5 }}>
                                     <Box
                                         sx={{
-                                            width: 56,
-                                            height: 56,
+                                            width: { xs: 48, sm: 56 },
+                                            height: { xs: 48, sm: 56 },
                                             borderRadius: 3.5,
                                             bgcolor: 'rgba(255, 255, 255, 0.04)',
                                             border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -189,7 +193,7 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                             justifyContent: 'center',
                                         }}
                                     >
-                                        <UploadIcon sx={{ color: '#38BDF8', fontSize: 30 }} />
+                                        <UploadIcon sx={{ color: '#38BDF8', fontSize: { xs: 24, sm: 30 } }} />
                                     </Box>
                                     <Chip
                                         label="ADVANCED / CUSTOM"
@@ -205,7 +209,7 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                     />
                                 </Box>
 
-                                <Typography variant="h5" sx={{ color: '#FFF', fontWeight: 700, mb: 1, fontSize: { xs: '1.4rem', sm: '1.65rem' } }}>
+                                <Typography variant="h5" sx={{ color: '#FFF', fontWeight: 700, mb: 1, fontSize: { xs: '1.25rem', sm: '1.65rem' } }}>
                                     Upload HTML File or Select from template
                                 </Typography>
 
@@ -218,7 +222,7 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                     component="label"
                                     sx={{
                                         mb: 3,
-                                        p: 3,
+                                        p: { xs: 2, sm: 3 },
                                         borderRadius: 3,
                                         bgcolor: isDragOver ? 'rgba(56, 189, 248, 0.08)' : 'rgba(9, 13, 22, 0.7)',
                                         border: `2px dashed ${isDragOver ? '#38BDF8' : 'rgba(255, 255, 255, 0.12)'}`,
@@ -229,7 +233,7 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                         textAlign: 'center',
                                         cursor: 'pointer',
                                         transition: 'all 0.25s ease',
-                                        minHeight: 140,
+                                        minHeight: { xs: 120, sm: 140 },
                                         '&:hover': {
                                             borderColor: '#38BDF8',
                                             bgcolor: 'rgba(56, 189, 248, 0.04)',
@@ -242,30 +246,32 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                         accept=".html,text/html"
                                         onChange={onFileUpload}
                                     />
-                                    <UploadIcon sx={{ color: isDragOver ? '#38BDF8' : '#64748B', fontSize: 38, mb: 1, transition: 'color 0.2s ease' }} />
-                                    <Typography variant="body2" sx={{ color: '#E2E8F0', fontWeight: 600, mb: 0.5 }}>
+                                    <UploadIcon sx={{ color: isDragOver ? '#38BDF8' : '#64748B', fontSize: { xs: 32, sm: 38 }, mb: 1, transition: 'color 0.2s ease' }} />
+                                    <Typography variant="body2" sx={{ color: '#E2E8F0', fontWeight: 600, mb: 0.5, fontSize: { xs: '0.8125rem', sm: '0.875rem' } }}>
                                         Drop your .html file here, or <Box component="span" sx={{ color: '#38BDF8', textDecoration: 'underline' }}>browse</Box>
                                     </Typography>
-                                    <Typography variant="caption" sx={{ color: '#64748B' }}>
+                                    <Typography variant="caption" sx={{ color: '#64748B', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
                                         Supports HTML5 files up to 10MB
                                     </Typography>
                                 </Paper>
                             </Box>
 
-                            <Stack direction="row" spacing={2} justifyContent={"space-between"}>
+                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ width: '100%' }}>
                                 <Button
                                     variant="outlined"
                                     component="label"
                                     size="large"
                                     startIcon={<UploadIcon />}
                                     sx={{
+                                        flex: 1,
+                                        width: { xs: '100%', sm: 'auto' },
                                         borderRadius: 3.5,
                                         borderColor: 'rgba(56, 189, 248, 0.4)',
                                         color: '#E2E8F0',
-                                        py: 1.8,
+                                        py: { xs: 1.5, sm: 1.8 },
                                         px: 3,
                                         fontWeight: 700,
-                                        fontSize: '0.975rem',
+                                        fontSize: { xs: '0.875rem', sm: '0.975rem' },
                                         textTransform: 'none',
                                         letterSpacing: '0.01em',
                                         transition: 'all 0.25s ease',
@@ -285,7 +291,6 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                         onChange={onFileUpload}
                                     />
                                 </Button>
-                                <Box height={"20px"}></Box>
                                 <Button
                                     variant="contained"
                                     size="large"
@@ -293,12 +298,14 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                     endIcon={<ArrowForwardIcon />}
                                     onClick={() => setIsDialogOpen(true)}
                                     sx={{
+                                        flex: 1,
+                                        width: { xs: '100%', sm: 'auto' },
                                         borderRadius: 3.5,
                                         background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)',
-                                        py: 1.8,
+                                        py: { xs: 1.5, sm: 1.8 },
                                         px: 3,
                                         fontWeight: 700,
-                                        fontSize: '0.975rem',
+                                        fontSize: { xs: '0.875rem', sm: '0.975rem' },
                                         textTransform: 'none',
                                         letterSpacing: '0.01em',
                                         boxShadow: '0 6px 24px rgba(124, 58, 237, 0.4)',

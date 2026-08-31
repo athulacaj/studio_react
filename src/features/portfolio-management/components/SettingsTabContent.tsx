@@ -10,7 +10,6 @@ import {
     InputLabel,
     Select,
     MenuItem,
-    SelectChangeEvent,
 } from '@mui/material';
 import {
     CloudUpload as UploadIcon,
@@ -37,11 +36,11 @@ export const SettingsTabContent: React.FC = () => {
         VERSION_LIMIT
     } = managePortfolioController;
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2.5, sm: 4 } }}>
             {/* Publish Card */}
             <Paper sx={{
-                p: 4,
-                borderRadius: 4,
+                p: { xs: 2.5, sm: 4 },
+                borderRadius: 3.5,
                 bgcolor: 'rgba(124, 58, 237, 0.05)',
                 border: '1px solid rgba(124, 58, 237, 0.2)',
                 display: 'flex',
@@ -66,10 +65,12 @@ export const SettingsTabContent: React.FC = () => {
                     <Avatar sx={{ bgcolor: 'rgba(124, 58, 237, 0.2)', color: '#C084FC', mr: 2 }}>
                         <UploadIcon />
                     </Avatar>
-                    <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600 }}>Publish Portfolio</Typography>
+                    <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600, fontSize: { xs: '1.05rem', sm: '1.25rem' } }}>
+                        Publish Portfolio
+                    </Typography>
                 </Box>
 
-                <Typography variant="body2" sx={{ color: '#94A3B8', mb: 4, lineHeight: 1.6, maxWidth: '90%' }}>
+                <Typography variant="body2" sx={{ color: '#94A3B8', mb: 3, lineHeight: 1.6, maxWidth: '95%', fontSize: { xs: '0.8125rem', sm: '0.875rem' } }}>
                     Make your portfolio live and accessible to the world. Publishing will securely save your current configuration, images, and layout, generating a new snapshot in your version history.
                 </Typography>
 
@@ -79,6 +80,7 @@ export const SettingsTabContent: React.FC = () => {
                     disabled={isPublishing}
                     startIcon={isPublishing ? <CircularProgress size={20} color="inherit" /> : <UploadIcon />}
                     sx={{
+                        width: { xs: '100%', sm: 'auto' },
                         borderRadius: '12px',
                         background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)',
                         px: 4,
@@ -103,8 +105,8 @@ export const SettingsTabContent: React.FC = () => {
 
             {/* Change Template Card */}
             <Paper sx={{
-                p: 4,
-                borderRadius: 4,
+                p: { xs: 2.5, sm: 4 },
+                borderRadius: 3.5,
                 bgcolor: 'rgba(59, 130, 246, 0.05)',
                 border: '1px solid rgba(59, 130, 246, 0.2)',
                 display: 'flex',
@@ -129,10 +131,12 @@ export const SettingsTabContent: React.FC = () => {
                     <Avatar sx={{ bgcolor: 'rgba(59, 130, 246, 0.2)', color: '#60A5FA', mr: 2 }}>
                         <ChangeTemplateIcon />
                     </Avatar>
-                    <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600 }}>Change Template</Typography>
+                    <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600, fontSize: { xs: '1.05rem', sm: '1.25rem' } }}>
+                        Change Template
+                    </Typography>
                 </Box>
 
-                <Typography variant="body2" sx={{ color: '#94A3B8', mb: 4, lineHeight: 1.6, maxWidth: '90%' }}>
+                <Typography variant="body2" sx={{ color: '#94A3B8', mb: 3, lineHeight: 1.6, maxWidth: '95%', fontSize: { xs: '0.8125rem', sm: '0.875rem' } }}>
                     Switch to a different template. Note that changing your template will require you to reconfigure some settings and content to fit the new layout.
                 </Typography>
 
@@ -141,6 +145,7 @@ export const SettingsTabContent: React.FC = () => {
                     onClick={() => setStep(1)}
                     startIcon={<ChangeTemplateIcon />}
                     sx={{
+                        width: { xs: '100%', sm: 'auto' },
                         borderRadius: '12px',
                         background: 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)',
                         px: 4,
@@ -161,8 +166,8 @@ export const SettingsTabContent: React.FC = () => {
             {/* Version History Card */}
             {versions.length > 0 && (
                 <Paper sx={{
-                    p: 4,
-                    borderRadius: 4,
+                    p: { xs: 2.5, sm: 4 },
+                    borderRadius: 3.5,
                     bgcolor: 'rgba(15, 26, 46, 0.6)',
                     backdropFilter: 'blur(12px)',
                     border: '1px solid rgba(255,255,255,0.05)'
@@ -171,14 +176,16 @@ export const SettingsTabContent: React.FC = () => {
                         <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#94A3B8', mr: 2 }}>
                             <FileIcon />
                         </Avatar>
-                        <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600 }}>Version History</Typography>
+                        <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600, fontSize: { xs: '1.05rem', sm: '1.25rem' } }}>
+                            Version History
+                        </Typography>
                     </Box>
 
-                    <Typography variant="body2" sx={{ color: '#94A3B8', mb: 4, lineHeight: 1.6 }}>
+                    <Typography variant="body2" sx={{ color: '#94A3B8', mb: 3, lineHeight: 1.6, fontSize: { xs: '0.8125rem', sm: '0.875rem' } }}>
                         Easily roll back to any of your {VERSION_LIMIT} most recent portfolio versions. Selecting a past version will instantly load its layout and configuration into the editor.
                     </Typography>
 
-                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: { xs: 'stretch', sm: 'center' } }}>
                         <FormControl fullWidth variant="outlined" sx={{
                             '& .MuiOutlinedInput-root': {
                                 color: '#fff',
@@ -254,7 +261,7 @@ export const SettingsTabContent: React.FC = () => {
                                 }
                             }}
                         >
-
+                            Download HTML
                         </Button>
                     </Box>
                 </Paper>

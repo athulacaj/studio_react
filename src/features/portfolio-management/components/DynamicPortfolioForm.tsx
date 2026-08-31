@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
   Typography,
@@ -23,7 +23,9 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  SelectChangeEvent
+  SelectChangeEvent,
+  InputAdornment,
+  Chip,
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -31,7 +33,12 @@ import {
   Add as AddIcon,
   Image as ImageIcon,
   InsertDriveFile as FileIcon,
-  Palette as PaletteIcon
+  Palette as PaletteIcon,
+  Search as SearchIcon,
+  Clear as ClearIcon,
+  SearchOff as SearchOffIcon,
+  NavigateNext as ChevronRightIcon,
+  Layers as LayersIcon
 } from '@mui/icons-material';
 import { useConfigStore } from '../../../core/store/ConifgStore';
 import { usePortfolioStore } from '../store/portfolioStore';
@@ -40,6 +47,19 @@ import { scrollToJsonPath } from '../functions/scrollToJsonPath';
 
 // Reserved top-level keys that are handled specially (not rendered as content sections)
 const RESERVED_KEYS = new Set(['activeTheme', 'theme']);
+
+// ---------------------------------------------------------------------------
+// Searchable Field Item Interface
+// ---------------------------------------------------------------------------
+interface SearchableFieldItem {
+  fieldId: string;
+  fieldKey: string;
+  value: any;
+  path: string[];
+  detailedPath: string;
+  breadcrumbs: string[];
+  sectionName: string;
+}
 
 // ---------------------------------------------------------------------------
 // LeafField — isolated, memoized text field.
@@ -73,7 +93,9 @@ const LeafField = React.memo(({
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Keep path in a ref so the debounce closure always has the latest path
   const pathRef = useRef(path);
-  pathRef.current = path;
+  useEffect(() => {
+    pathRef.current = path;
+  }, [path]);
 
   // The last value we committed upward — used to detect genuine external changes
   const committedRef = useRef<string>(initialValue ?? '');
@@ -84,6 +106,7 @@ const LeafField = React.memo(({
     const incoming = initialValue ?? '';
     if (incoming !== committedRef.current) {
       committedRef.current = incoming;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLocalValue(incoming);
     }
   }, [initialValue]);
@@ -105,7 +128,7 @@ const LeafField = React.memo(({
         value={localValue}
         onChange={handleChange}
         onFocus={() => {
-          scrollToJsonPath(iframeRef, detailedPath)
+          scrollToJsonPath(iframeRef, detailedPath);
         }}
         fullWidth
         margin="normal"
@@ -178,12 +201,15 @@ const DynamicPortfolioForm: React.FC = () => {
     portfolioData,
     handleDataChange } = managePortfolioController;
 
-
   const { setShowNavBar } = useConfigStore();
   const { uploadedImages } = usePortfolioStore();
 
   const [isAssetDialogOpen, setIsAssetDialogOpen] = useState(false);
   const [activeFieldPath, setActiveFieldPath] = useState<string[] | null>(null);
+
+  // Search & Filter State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSectionFilter, setSelectedSectionFilter] = useState('all');
 
   // Mutable ref holding the latest full data object.
   // Text-field commits update this WITHOUT triggering a form re-render.
@@ -260,6 +286,133 @@ const DynamicPortfolioForm: React.FC = () => {
     setFormKey(k => k + 1);
   }, [handleDataChange]);
 
+  // Extract all searchable leaf fields with their breadcrumb paths
+  const searchableFields = useMemo(() => {
+    if (!portfolioData || typeof portfolioData !== 'object') return [];
+    const results: SearchableFieldItem[] = [];
+
+    const crawl = (
+      node: any,
+      path: string[],
+      detailedPath: string,
+      breadcrumbs: string[],
+      sectionName: string
+    ) => {
+      if (node === null || typeof node !== 'object') {
+        const fieldKey = breadcrumbs[breadcrumbs.length - 1] || path[path.length - 1] || 'field';
+        results.push({
+          fieldId: path.join('.'),
+          fieldKey,
+          value: node,
+          path,
+          detailedPath,
+          breadcrumbs,
+          sectionName,
+        });
+        return;
+      }
+
+      if (Array.isArray(node)) {
+        node.forEach((item, index) => {
+          const isPrimitive = item === null || typeof item !== 'object';
+          const itemLabel = isPrimitive
+            ? `Item ${index + 1}`
+            : `Item ${index + 1}${item.title || item.name ? ` (${item.title || item.name})` : ''}`;
+          const itemPath = [...path, index.toString()];
+          const itemDetailedPath = `${detailedPath}[${index}]`;
+
+          crawl(item, itemPath, itemDetailedPath, [...breadcrumbs, itemLabel], sectionName);
+        });
+        return;
+      }
+
+      Object.entries(node).forEach(([k, v]) => {
+        crawl(
+          v,
+          [...path, k],
+          detailedPath ? `${detailedPath}.${k}` : k,
+          [...breadcrumbs, k],
+          sectionName
+        );
+      });
+    };
+
+    Object.entries(portfolioData)
+      .filter(([key]) => !RESERVED_KEYS.has(key))
+      .forEach(([sectionKey, sectionVal]) => {
+        const sectionContent =
+          sectionVal && typeof sectionVal === 'object' && 'content' in sectionVal
+            ? (sectionVal as any).content
+            : sectionVal;
+        const basePath =
+          sectionVal && typeof sectionVal === 'object' && 'content' in sectionVal
+            ? [sectionKey, 'content']
+            : [sectionKey];
+        const baseDetailed =
+          sectionVal && typeof sectionVal === 'object' && 'content' in sectionVal
+            ? `${sectionKey}.content`
+            : sectionKey;
+
+        crawl(sectionContent, basePath, baseDetailed, [sectionKey], sectionKey);
+      });
+
+    return results;
+  }, [portfolioData]);
+
+  // Filtered fields matching query and active section filter
+  const filteredFields = useMemo(() => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return [];
+
+    return searchableFields.filter((item) => {
+      const keyMatch = item.fieldKey.toLowerCase().includes(query);
+      const valueMatch = String(item.value ?? '').toLowerCase().includes(query);
+      const sectionMatch = item.sectionName.toLowerCase().includes(query);
+      const breadcrumbMatch = item.breadcrumbs.some((b) => b.toLowerCase().includes(query));
+      const pathMatch = item.detailedPath.toLowerCase().includes(query);
+
+      const matchesQuery = keyMatch || valueMatch || sectionMatch || breadcrumbMatch || pathMatch;
+      if (!matchesQuery) return false;
+
+      if (selectedSectionFilter !== 'all') {
+        return item.sectionName.toLowerCase() === selectedSectionFilter.toLowerCase();
+      }
+
+      return true;
+    });
+  }, [searchQuery, searchableFields, selectedSectionFilter]);
+
+  // Sections that contain matches
+  const matchedSections = useMemo(() => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return [];
+    const set = new Set<string>();
+    searchableFields.forEach((item) => {
+      const keyMatch = item.fieldKey.toLowerCase().includes(query);
+      const valueMatch = String(item.value ?? '').toLowerCase().includes(query);
+      const sectionMatch = item.sectionName.toLowerCase().includes(query);
+      const breadcrumbMatch = item.breadcrumbs.some((b) => b.toLowerCase().includes(query));
+      const pathMatch = item.detailedPath.toLowerCase().includes(query);
+
+      if (keyMatch || valueMatch || sectionMatch || breadcrumbMatch || pathMatch) {
+        set.add(item.sectionName);
+      }
+    });
+    return Array.from(set);
+  }, [searchQuery, searchableFields]);
+
+  // Group filtered results by sectionName
+  const groupedMatches = useMemo(() => {
+    const groups: { [section: string]: SearchableFieldItem[] } = {};
+    filteredFields.forEach((item) => {
+      if (!groups[item.sectionName]) {
+        groups[item.sectionName] = [];
+      }
+      groups[item.sectionName].push(item);
+    });
+    return groups;
+  }, [filteredFields]);
+
   const renderField = (key: string, value: any, path: string[], detailedPath: string = '') => {
     const fieldId = path.join('.');
 
@@ -292,40 +445,75 @@ const DynamicPortfolioForm: React.FC = () => {
             const detailedPathNew = `${detailedPath}[${index}]`;
 
             return (
-              <Accordion key={index} sx={{ background: 'rgba(255,255,255,0.05)', mb: 1, color: '#fff' }}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#fff' }} />}>
-                  <Typography>
+              <Accordion
+                key={index}
+                sx={{
+                  background: 'rgba(255,255,255,0.04)',
+                  mb: 1.5,
+                  color: '#fff',
+                  borderRadius: '12px !important',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  overflow: 'hidden',
+                  '&:before': { display: 'none' },
+                  '&.Mui-expanded': {
+                    bgcolor: 'rgba(255,255,255,0.06)',
+                    borderColor: 'rgba(192, 132, 252, 0.3)'
+                  }
+                }}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon sx={{ color: '#C084FC' }} />}
+                  sx={{
+                    px: { xs: 1.5, sm: 2 },
+                    minHeight: 48,
+                    '& .MuiAccordionSummary-content': { my: 1 }
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 600, fontSize: { xs: '0.875rem', sm: '0.95rem' } }}>
                     Item {index + 1}{!isPrimitive && (item.title || item.name) ? ` - ${item.title || item.name}` : ''}
                   </Typography>
                 </AccordionSummary>
-                <AccordionDetails>
-                  <Box sx={{ position: 'relative' }}>
-                    <IconButton
+                <AccordionDetails sx={{ px: { xs: 1.5, sm: 2 }, pb: 2, pt: 0 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                    <Button
                       size="small"
-                      color="error"
-                      sx={{ position: 'absolute', top: -10, right: 0 }}
+                      startIcon={<DeleteIcon sx={{ fontSize: 16 }} />}
                       onClick={() => handleArrayRemove(path, index)}
+                      sx={{
+                        color: '#EF4444',
+                        bgcolor: 'rgba(239, 68, 68, 0.08)',
+                        fontSize: '0.75rem',
+                        textTransform: 'none',
+                        px: 1.5,
+                        py: 0.5,
+                        borderRadius: 2,
+                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                        '&:hover': {
+                          bgcolor: 'rgba(239, 68, 68, 0.18)',
+                          borderColor: 'rgba(239, 68, 68, 0.4)'
+                        }
+                      }}
                     >
-                      <DeleteIcon />
-                    </IconButton>
-                    <Box sx={{ pt: 2 }}>
-                      {isPrimitive ? (
-                        <LeafField
-                          key={itemId}
-                          fieldId={itemId}
-                          fieldKey={`Item ${index + 1}`}
-                          initialValue={item}
-                          path={itemPath}
-                          onCommit={handleLeafCommit}
-                          onAssetPick={handleAssetPick}
-                          detailedPath={detailedPathNew}
-                        />
-                      ) : (
-                        Object.entries(item).map(([subKey, subValue]) =>
-                          renderField(subKey, subValue, [...itemPath, subKey], detailedPathNew + '.' + subKey)
-                        )
-                      )}
-                    </Box>
+                      Delete Item
+                    </Button>
+                  </Box>
+                  <Box>
+                    {isPrimitive ? (
+                      <LeafField
+                        key={itemId}
+                        fieldId={itemId}
+                        fieldKey={`Item ${index + 1}`}
+                        initialValue={item}
+                        path={itemPath}
+                        onCommit={handleLeafCommit}
+                        onAssetPick={handleAssetPick}
+                        detailedPath={detailedPathNew}
+                      />
+                    ) : (
+                      Object.entries(item).map(([subKey, subValue]) =>
+                        renderField(subKey, subValue, [...itemPath, subKey], detailedPathNew + '.' + subKey)
+                      )
+                    )}
                   </Box>
                 </AccordionDetails>
               </Accordion>
@@ -338,10 +526,10 @@ const DynamicPortfolioForm: React.FC = () => {
     if (typeof value === 'object' && value !== null) {
       return (
         <Box key={fieldId} id={fieldId} sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ mb: 2, color: '#F8FAFC', textTransform: 'capitalize' }}>
+          <Typography variant="h6" sx={{ mb: 1.5, color: '#F8FAFC', textTransform: 'capitalize', fontSize: { xs: '1rem', sm: '1.125rem' } }}>
             {key}
           </Typography>
-          <Box sx={{ pl: 2, borderLeft: '2px solid rgba(192, 132, 252, 0.3)' }}>
+          <Box sx={{ pl: { xs: 1.5, sm: 2 }, borderLeft: '2px solid rgba(192, 132, 252, 0.3)' }}>
             {Object.entries(value).map(([subKey, subValue]) =>
               renderField(subKey, subValue, [...path, subKey], detailedPath + '.' + subKey)
             )}
@@ -367,6 +555,8 @@ const DynamicPortfolioForm: React.FC = () => {
 
   if (!portfolioData) return null;
 
+  const isSearchActive = searchQuery.trim().length > 0;
+
   // Extract theme data for the dropdown
   const themeArray: any[] = Array.isArray(portfolioData.theme) ? portfolioData.theme : [];
   const activeTheme: string = portfolioData.activeTheme ?? '';
@@ -380,123 +570,414 @@ const DynamicPortfolioForm: React.FC = () => {
   };
 
   return (
-    <Box key={formKey}>
-      {/* ── Theme Selector (only if theme data exists) ── */}
-      {hasThemeSupport && (
-        <Box
-          sx={{
-            mb: 4,
-            background: 'rgba(15, 26, 46, 0.4)',
-            p: 3,
-            borderRadius: 2,
+    <Box key={formKey} sx={{ display: 'flex', flexDirection: 'column' }}>
+      {/* ── Sticky Search & Filter Bar ── */}
+      <Box
+        sx={{
+          mb: 3,
+          position: 'sticky',
+          top: -16,
+          zIndex: 10,
+          bgcolor: 'rgba(15, 26, 46, 0.96)',
+          backdropFilter: 'blur(12px)',
+          py: 1,
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        }}
+      >
+        <TextField
+          fullWidth
+          size="small"
+          placeholder="Search fields or values (e.g. title, bio, image)..."
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setSelectedSectionFilter('all');
           }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-            <PaletteIcon sx={{ color: '#C084FC' }} />
-            <Typography variant="h6" sx={{ color: '#F8FAFC' }}>
-              Theme
-            </Typography>
-          </Box>
-          <FormControl fullWidth variant="outlined">
-            <InputLabel
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon sx={{ color: '#C084FC', fontSize: 20 }} />
+              </InputAdornment>
+            ),
+            endAdornment: searchQuery ? (
+              <InputAdornment position="end">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedSectionFilter('all');
+                  }}
+                  sx={{ color: '#94A3B8', '&:hover': { color: '#FFF' } }}
+                >
+                  <ClearIcon fontSize="small" />
+                </IconButton>
+              </InputAdornment>
+            ) : null,
+          }}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              bgcolor: 'rgba(3, 9, 18, 0.65)',
+              borderRadius: '12px',
+              color: '#fff',
+              fontSize: '0.875rem',
+              '& fieldset': { borderColor: 'rgba(255,255,255,0.12)' },
+              '&:hover fieldset': { borderColor: 'rgba(192, 132, 252, 0.4)' },
+              '&.Mui-focused fieldset': { borderColor: '#C084FC', borderWidth: '1.5px' },
+            }
+          }}
+        />
+
+        {/* Search Status & Section Filter Tabs */}
+        {isSearchActive && (
+          <Box sx={{ mt: 1.5, display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+            <Chip
+              size="small"
+              label={`${filteredFields.length} field${filteredFields.length === 1 ? '' : 's'} found`}
               sx={{
-                color: 'rgba(255,255,255,0.7)',
-                '&.Mui-focused': { color: '#C084FC' },
+                bgcolor: 'rgba(124, 58, 237, 0.2)',
+                color: '#C084FC',
+                border: '1px solid rgba(168, 85, 247, 0.4)',
+                fontWeight: 700,
+                fontSize: '0.72rem',
+                height: 24,
+              }}
+            />
+
+            {matchedSections.length > 1 && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 0.75,
+                  overflowX: 'auto',
+                  maxWidth: '100%',
+                  py: 0.5,
+                  scrollbarWidth: 'none',
+                  '&::-webkit-scrollbar': { display: 'none' }
+                }}
+              >
+                <Chip
+                  size="small"
+                  label={`All (${searchableFields.filter(f => f.fieldKey.toLowerCase().includes(searchQuery.toLowerCase()) || String(f.value).toLowerCase().includes(searchQuery.toLowerCase()) || f.breadcrumbs.some(b => b.toLowerCase().includes(searchQuery.toLowerCase()))).length})`}
+                  onClick={() => setSelectedSectionFilter('all')}
+                  sx={{
+                    height: 24,
+                    fontSize: '0.72rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    bgcolor: selectedSectionFilter === 'all' ? 'rgba(192, 132, 252, 0.25)' : 'rgba(255, 255, 255, 0.04)',
+                    color: selectedSectionFilter === 'all' ? '#FFF' : '#94A3B8',
+                    border: selectedSectionFilter === 'all' ? '1px solid #C084FC' : '1px solid rgba(255, 255, 255, 0.08)',
+                  }}
+                />
+                {matchedSections.map((sec) => {
+                  const isSelected = selectedSectionFilter.toLowerCase() === sec.toLowerCase();
+                  return (
+                    <Chip
+                      key={sec}
+                      size="small"
+                      label={sec}
+                      onClick={() => setSelectedSectionFilter(sec)}
+                      sx={{
+                        height: 24,
+                        fontSize: '0.72rem',
+                        fontWeight: 600,
+                        textTransform: 'capitalize',
+                        cursor: 'pointer',
+                        bgcolor: isSelected ? 'rgba(192, 132, 252, 0.25)' : 'rgba(255, 255, 255, 0.04)',
+                        color: isSelected ? '#FFF' : '#94A3B8',
+                        border: isSelected ? '1px solid #C084FC' : '1px solid rgba(255, 255, 255, 0.08)',
+                      }}
+                    />
+                  );
+                })}
+              </Box>
+            )}
+          </Box>
+        )}
+      </Box>
+
+      {/* ── SEARCH RESULTS MODE ── */}
+      {isSearchActive ? (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          {filteredFields.length === 0 ? (
+            <Box
+              sx={{
+                textAlign: 'center',
+                py: 8,
+                px: 2,
+                bgcolor: 'rgba(15, 23, 42, 0.4)',
+                borderRadius: 4,
+                border: '1px dashed rgba(255, 255, 255, 0.1)',
               }}
             >
-              Active Theme
-            </InputLabel>
-            <Select
-              value={activeTheme}
-              label="Active Theme"
-              onChange={handleThemeChange}
+              <SearchOffIcon sx={{ fontSize: 48, color: '#475569', mb: 1.5 }} />
+              <Typography variant="h6" sx={{ color: '#F8FAFC', fontWeight: 600, mb: 1, fontSize: '1rem' }}>
+                No Fields Matching &ldquo;{searchQuery}&rdquo;
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#94A3B8', maxWidth: 360, mx: 'auto', mb: 2, fontSize: '0.8125rem' }}>
+                Try searching by section name (e.g. hero, about), field name (e.g. title, bio), or content text.
+              </Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedSectionFilter('all');
+                }}
+                sx={{
+                  color: '#C084FC',
+                  borderColor: 'rgba(192, 132, 252, 0.4)',
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                }}
+              >
+                Clear Search
+              </Button>
+            </Box>
+          ) : (
+            Object.entries(groupedMatches).map(([sectionKey, fields]) => (
+              <Box
+                key={sectionKey}
+                sx={{
+                  mb: 1,
+                  background: 'rgba(15, 26, 46, 0.45)',
+                  p: { xs: 2, sm: 2.5 },
+                  borderRadius: 3,
+                  border: '1px solid rgba(192, 132, 252, 0.2)',
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
+                  position: 'relative'
+                }}
+              >
+                {/* Section Header with Icon and Result Count */}
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, pb: 1, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <LayersIcon sx={{ color: '#C084FC', fontSize: 18 }} />
+                    <Typography variant="h6" sx={{ color: '#F8FAFC', textTransform: 'capitalize', fontSize: { xs: '0.95rem', sm: '1.05rem' }, fontWeight: 700 }}>
+                      {sectionKey} Section
+                    </Typography>
+                  </Box>
+                  <Chip
+                    size="small"
+                    label={`${fields.length} match${fields.length === 1 ? '' : 'es'}`}
+                    sx={{
+                      bgcolor: 'rgba(192, 132, 252, 0.15)',
+                      color: '#C084FC',
+                      border: '1px solid rgba(192, 132, 252, 0.3)',
+                      fontWeight: 600,
+                      fontSize: '0.72rem',
+                      height: 22,
+                    }}
+                  />
+                </Box>
+
+                {/* Matched Fields List */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {fields.map((fieldItem) => (
+                    <Box
+                      key={fieldItem.fieldId}
+                      sx={{
+                        bgcolor: 'rgba(255, 255, 255, 0.025)',
+                        p: { xs: 1.5, sm: 2 },
+                        borderRadius: 2.5,
+                        border: '1px solid rgba(255, 255, 255, 0.06)',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          bgcolor: 'rgba(255, 255, 255, 0.05)',
+                          borderColor: 'rgba(192, 132, 252, 0.3)',
+                        }
+                      }}
+                    >
+                      {/* Breadcrumbs Path */}
+                      <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 0.5, mb: 1 }}>
+                        {fieldItem.breadcrumbs.map((crumb, idx) => (
+                          <React.Fragment key={idx}>
+                            {idx > 0 && <ChevronRightIcon sx={{ color: 'rgba(255, 255, 255, 0.3)', fontSize: 13 }} />}
+                            <Chip
+                              size="small"
+                              label={crumb}
+                              sx={{
+                                bgcolor: idx === 0
+                                  ? 'rgba(124, 58, 237, 0.2)'
+                                  : idx === fieldItem.breadcrumbs.length - 1
+                                    ? 'rgba(56, 189, 248, 0.15)'
+                                    : 'rgba(255, 255, 255, 0.05)',
+                                color: idx === 0
+                                  ? '#C084FC'
+                                  : idx === fieldItem.breadcrumbs.length - 1
+                                    ? '#38BDF8'
+                                    : '#94A3B8',
+                                border: '1px solid rgba(255, 255, 255, 0.08)',
+                                fontSize: '0.7rem',
+                                fontWeight: 600,
+                                height: 20,
+                              }}
+                            />
+                          </React.Fragment>
+                        ))}
+                      </Box>
+
+                      {/* Editable Field */}
+                      <LeafField
+                        key={fieldItem.fieldId}
+                        fieldId={fieldItem.fieldId}
+                        fieldKey={fieldItem.fieldKey}
+                        initialValue={fieldItem.value}
+                        path={fieldItem.path}
+                        onCommit={handleLeafCommit}
+                        onAssetPick={handleAssetPick}
+                        detailedPath={fieldItem.detailedPath}
+                      />
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            ))
+          )}
+        </Box>
+      ) : (
+        /* ── COMPLETE STANDARD FORM TREE MODE ── */
+        <Box>
+          {/* ── Theme Selector (only if theme data exists) ── */}
+          {hasThemeSupport && (
+            <Box
               sx={{
-                color: '#fff',
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(255,255,255,0.2)',
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(255,255,255,0.4)',
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#C084FC',
-                },
-                '& .MuiSvgIcon-root': { color: '#C084FC' },
+                mb: 4,
+                background: 'rgba(15, 26, 46, 0.4)',
+                p: 3,
+                borderRadius: 2,
               }}
-              MenuProps={{
-                PaperProps: {
-                  sx: {
-                    bgcolor: '#0f172a',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    '& .MuiMenuItem-root': {
-                      color: '#fff',
-                      '&:hover': { bgcolor: 'rgba(192, 132, 252, 0.15)' },
-                      '&.Mui-selected': {
-                        bgcolor: 'rgba(192, 132, 252, 0.25)',
-                        '&:hover': { bgcolor: 'rgba(192, 132, 252, 0.35)' },
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <PaletteIcon sx={{ color: '#C084FC' }} />
+                <Typography variant="h6" sx={{ color: '#F8FAFC' }}>
+                  Theme
+                </Typography>
+              </Box>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel
+                  sx={{
+                    color: 'rgba(255,255,255,0.7)',
+                    '&.Mui-focused': { color: '#C084FC' },
+                  }}
+                >
+                  Active Theme
+                </InputLabel>
+                <Select
+                  value={activeTheme}
+                  label="Active Theme"
+                  onChange={handleThemeChange}
+                  sx={{
+                    color: '#fff',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(255,255,255,0.2)',
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(255,255,255,0.4)',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#C084FC',
+                    },
+                    '& .MuiSvgIcon-root': { color: '#C084FC' },
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        bgcolor: '#0f172a',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        '& .MuiMenuItem-root': {
+                          color: '#fff',
+                          '&:hover': { bgcolor: 'rgba(192, 132, 252, 0.15)' },
+                          '&.Mui-selected': {
+                            bgcolor: 'rgba(192, 132, 252, 0.25)',
+                            '&:hover': { bgcolor: 'rgba(192, 132, 252, 0.35)' },
+                          },
+                        },
                       },
                     },
-                  },
-                },
-              }}
-            >
-              {themeArray.map((t: any) => (
-                <MenuItem key={t.id} value={t.id}>
-                  {t.name || t.id}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+                  }}
+                >
+                  {themeArray.map((t: any) => (
+                    <MenuItem key={t.id} value={t.id}>
+                      {t.name || t.id}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          )}
+
+          {/* ── Content Sections (skip reserved keys) ── */}
+          {Object.entries(portfolioData)
+            .filter(([key]) => !RESERVED_KEYS.has(key))
+            .map(([key, value]) => {
+              const sectionContent = value && typeof value === 'object' && 'content' in value
+                ? (value as any).content
+                : value;
+
+              return (
+                <Box
+                  key={key}
+                  sx={{
+                    mb: { xs: 2.5, sm: 4 },
+                    background: 'rgba(15, 26, 46, 0.45)',
+                    p: { xs: 2, sm: 3 },
+                    borderRadius: 3,
+                    border: '1px solid rgba(255, 255, 255, 0.05)',
+                    position: 'relative'
+                  }}
+                >
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6" sx={{ color: '#F8FAFC', textTransform: 'capitalize', fontSize: { xs: '1rem', sm: '1.15rem' }, fontWeight: 600 }}>
+                      {key}
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleSectionRemove(key)}
+                      sx={{
+                        color: '#94A3B8',
+                        '&:hover': { color: '#EF4444', bgcolor: 'rgba(239, 68, 68, 0.1)' },
+                      }}
+                      title={`Delete ${key} section`}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                  <Box sx={{ pl: { xs: 1, sm: 2 }, borderLeft: '2px solid rgba(192, 132, 252, 0.3)' }}>
+                    {sectionContent && typeof sectionContent === 'object' && !Array.isArray(sectionContent)
+                      ? Object.entries(sectionContent).map(([subKey, subValue]) =>
+                          renderField(subKey, subValue, [key, 'content', subKey], `${key}.content.${subKey}`)
+                        )
+                      : renderField(key, sectionContent, [key, 'content'], `${key}.content`)
+                    }
+                  </Box>
+                </Box>
+              );
+            })}
         </Box>
       )}
 
-      {/* ── Content Sections (skip reserved keys) ── */}
-      {Object.entries(portfolioData)
-        .filter(([key]) => !RESERVED_KEYS.has(key))
-        .map(([key, value]) => {
-          const sectionContent = value && typeof value === 'object' && 'content' in value
-            ? (value as any).content
-            : value;
-
-          return (
-            <Box key={key} sx={{ mb: 4, background: 'rgba(15, 26, 46, 0.4)', p: 3, borderRadius: 2, position: 'relative' }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6" sx={{ color: '#F8FAFC', textTransform: 'capitalize' }}>
-                  {key}
-                </Typography>
-                <IconButton
-                  size="small"
-                  onClick={() => handleSectionRemove(key)}
-                  sx={{
-                    color: '#94A3B8',
-                    '&:hover': { color: '#EF4444', bgcolor: 'rgba(239, 68, 68, 0.1)' },
-                  }}
-                  title={`Delete ${key} section`}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Box>
-              <Box sx={{ pl: 2, borderLeft: '2px solid rgba(192, 132, 252, 0.3)' }}>
-                {sectionContent && typeof sectionContent === 'object' && !Array.isArray(sectionContent)
-                  ? Object.entries(sectionContent).map(([subKey, subValue]) =>
-                      renderField(subKey, subValue, [key, 'content', subKey], `${key}.content.${subKey}`)
-                    )
-                  : renderField(key, sectionContent, [key, 'content'], `${key}.content`)
-                }
-              </Box>
-            </Box>
-          );
-        })}
-
-
+      {/* Asset Selection Modal Dialog */}
       <Dialog
         open={isAssetDialogOpen}
         onClose={() => setIsAssetDialogOpen(false)}
         maxWidth="sm"
         fullWidth
-        PaperProps={{ sx: { bgcolor: '#0f172a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } }}
+        PaperProps={{
+          sx: {
+            bgcolor: '#0f172a',
+            color: '#fff',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: { xs: 3, sm: 4 },
+            m: { xs: 2, sm: 4 },
+            maxHeight: '85vh'
+          }
+        }}
       >
-        <DialogTitle sx={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Select an Asset</DialogTitle>
+        <DialogTitle sx={{ borderBottom: '1px solid rgba(255,255,255,0.1)', px: { xs: 2, sm: 3 }, py: 2 }}>
+          Select an Asset
+        </DialogTitle>
         <DialogContent sx={{ p: 0 }}>
           {uploadedImages.length === 0 ? (
             <Box sx={{ p: 4, textAlign: 'center' }}>

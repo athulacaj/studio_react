@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Box, CircularProgress, Tabs, Tab } from '@mui/material';
+import { Box, CircularProgress, Tabs, Tab, useTheme, useMediaQuery } from '@mui/material';
 
 import DynamicPortfolioForm from '../components/DynamicPortfolioForm';
 import UploadTemplateStep from '../components/UploadTemplateStep';
@@ -14,6 +14,8 @@ import { useManagePortfolio } from '../hooks/useManagePortfolio';
 import { PortfolioContext, usePortfolioContext } from '../context/portfolioGlobalContext';
 
 const ManageStudioPortfolioView: React.FC = () => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const { managePortfolioController } = usePortfolioContext();
 
     const {
@@ -22,6 +24,7 @@ const ManageStudioPortfolioView: React.FC = () => {
         error,
         activeTab,
         setActiveTab,
+        mobileView,
         isInitialLoading,
         sidebarWidth,
         isDragging,
@@ -53,6 +56,88 @@ const ManageStudioPortfolioView: React.FC = () => {
         );
     }
 
+    // Mobile Adaptive Layout (< md breakpoint)
+    if (isMobile) {
+        return (
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: { xs: '100dvh', sm: '100vh' },
+                    bgcolor: '#030912',
+                    overflow: 'hidden'
+                }}
+            >
+                {/* Editor View */}
+                <Box
+                    sx={{
+                        flex: 1,
+                        display: mobileView === 'editor' ? 'flex' : 'none',
+                        flexDirection: 'column',
+                        overflow: 'hidden',
+                        width: '100%',
+                        bgcolor: 'rgba(15, 26, 46, 0.95)'
+                    }}
+                >
+                    <ManagePortfolioHeader />
+
+                    <Tabs
+                        value={activeTab}
+                        onChange={(_, newValue) => setActiveTab(newValue)}
+                        variant="scrollable"
+                        scrollButtons="auto"
+                        allowScrollButtonsMobile
+                        sx={{
+                            borderBottom: '1px solid rgba(255,255,255,0.1)',
+                            bgcolor: 'rgba(15, 26, 46, 0.6)',
+                            minHeight: 48,
+                            '& .MuiTab-root': {
+                                color: '#94A3B8',
+                                fontWeight: 600,
+                                fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                                minHeight: 48,
+                                py: 1,
+                                px: { xs: 1.5, sm: 2 }
+                            },
+                            '& .Mui-selected': { color: '#C084FC !important' },
+                            '& .MuiTabs-indicator': { backgroundColor: '#C084FC', height: 3 }
+                        }}
+                    >
+                        <Tab label="Content" />
+                        <Tab label="Assets" />
+                        <Tab label="OG Graph" />
+                        <Tab label="Settings" />
+                    </Tabs>
+
+                    <Box sx={{ flexGrow: 1, overflowY: 'auto', p: { xs: 2, sm: 3 } }}>
+                        {activeTab === 0 && <DynamicPortfolioForm />}
+                        {activeTab === 1 && <AssetsTabContent />}
+                        {activeTab === 2 && <OgGraphTabContent />}
+                        {activeTab === 3 && <SettingsTabContent />}
+                    </Box>
+                </Box>
+
+                {/* Live Preview View */}
+                <Box
+                    sx={{
+                        flex: 1,
+                        display: mobileView === 'preview' ? 'flex' : 'none',
+                        flexDirection: 'column',
+                        overflow: 'hidden',
+                        width: '100%',
+                        height: '100%'
+                    }}
+                >
+                    <ManagePortfolioHeader />
+                    <Box sx={{ flexGrow: 1, position: 'relative', overflow: 'hidden' }}>
+                        {activeTab === 2 ? <OgGraphPreview /> : <PortfolioPreview />}
+                    </Box>
+                </Box>
+            </Box>
+        );
+    }
+
+    // Desktop Split-Pane Layout (>= md breakpoint)
     return (
         <Box sx={{ display: 'flex', height: '100vh', bgcolor: '#030912', overflow: 'hidden' }}>
             {/* Sidebar */}
@@ -119,7 +204,6 @@ const ManageStudioPortfolioView: React.FC = () => {
             {/* Main Live Preview Area */}
             {activeTab === 2 ? <OgGraphPreview /> : <PortfolioPreview />}
         </Box>
-
     );
 };
 

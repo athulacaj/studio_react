@@ -34,6 +34,7 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
         step, setStep,
         error, setError,
         previewMode, setPreviewMode,
+        mobileView, setMobileView,
         activeTab, setActiveTab,
         isInitialLoading, setIsInitialLoading,
         isPublishing, setIsPublishing,
@@ -450,7 +451,7 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
 
     const getTemplates = async () => {
         if (type) {
-            const response = await getWebsiteTemplatesByType(type);
+            const response = await getWebsiteTemplatesByType(type as any);
             setTemplatesData(response);
         } else {
             setTemplatesData([])
@@ -465,6 +466,7 @@ export const useManagePortfolio = (iframeRef: React.RefObject<HTMLIFrameElement 
         step, setStep,
         error, setError,
         previewMode, setPreviewMode,
+        mobileView, setMobileView,
         activeTab, setActiveTab,
         isInitialLoading,
         isPublishing,

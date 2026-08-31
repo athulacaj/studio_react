@@ -182,3 +182,35 @@ This document outlines the development plan for a modern, responsive photo proof
 2. **Route and Page Cleanup:**
    - Removed `/about` route and unused imports from [router.tsx](file:///Users/abinjosepph/develop/projects/studio_react/src/router.tsx).
    - Removed `About.tsx` page to keep the codebase lean and free of legacy placeholder details.
+
+#### Iteration 20: Mobile Responsiveness & Enhanced UX for Portfolio Management
+
+1. **Adaptive Mobile Layout & View Switcher (`ManagePortfolioView.tsx`, `ManagePortfolioHeader.tsx`):**
+   - Implemented responsive viewport detection using MUI `useTheme` and `useMediaQuery(theme.breakpoints.down('md'))`.
+   - On desktop: preserved the split-screen resizable layout with drag splitter.
+   - On mobile/tablet: introduced a seamless [Edit | Live Preview] mode switcher in the header along with a floating quick-toggle action button in preview mode.
+   - Replaced fixed sidebar width with 100% viewport width on mobile and dynamic height (`100dvh` / `100vh`) to prevent address bar clipping.
+   - Configured scrollable tabs with mobile touch navigation.
+2. **Responsive Live Preview & OG Graph Preview (`PortfolioPreview.tsx`, `OgGraphPreview.tsx`):**
+   - Eliminated hardcoded min-width constraints that broke mobile viewports.
+   - Enabled native full-width and full-height interactive iframe rendering on mobile screens.
+   - Scaled social media mockup cards cleanly for mobile displays.
+3. **Form & Tab Content Optimization (`DynamicPortfolioForm.tsx`, `AssetsTabContent.tsx`, `SettingsTabContent.tsx`):**
+   - Added touch-friendly padding, responsive leaf input fields, and spacious accordion action controls.
+   - Optimized asset list items with text truncation, compression badges, and safe delete buttons.
+   - Adjusted settings cards and action buttons (Publish, Browse Templates, Download HTML) to full-width on mobile.
+4. **Step 1 & Template Selection Dialog Mobile Upgrades (`UploadTemplateStep.tsx`, `TemplateSelectionDialog.tsx`):**
+   - Responsive button stacking for upload & template browsing.
+   - Fullscreen/adaptive dialog modal on mobile with touch-accessible selection controls and horizontally scrollable category filter pills.
+
+#### Iteration 21: Content Form Search & Breadcrumb Path Filtering
+
+1. **Instant Search Bar (`DynamicPortfolioForm.tsx`):**
+   - Added a sticky search input bar at the top of the Content customization form.
+   - Supports real-time text querying across field keys, text/number values, array item titles, section names, and nested paths.
+   - Includes quick clear action and live matched fields counter.
+2. **Parent Section & Breadcrumb Path Hierarchy:**
+   - When searching, fields are grouped by parent section with styled breadcrumb tags (e.g. `Hero › Content › Subtitle` or `Gallery › Images › Item 1 › Url`).
+   - Retains direct `LeafField` editable state, instant iframe live preview postMessage synchronization, and click-to-scroll targeting via `scrollToJsonPath`.
+   - Provides section filter pills for multi-section search results and a dedicated empty state when no matching fields are found.
+

@@ -21,6 +21,7 @@ const OgGraphTabContent: React.FC = () => {
         };
 
         const titleEl = doc.querySelector('title');
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setWebpageTitle(titleEl ? titleEl.textContent || '' : '');
 
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -30,6 +31,7 @@ const OgGraphTabContent: React.FC = () => {
             image: getMetaContent('og:image'),
             url: getMetaContent('og:url'),
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [htmlContent]);
 
     const handleChange = (field: keyof typeof ogData) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,9 +70,11 @@ const OgGraphTabContent: React.FC = () => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <Paper sx={{ p: 3, bgcolor: 'rgba(15, 26, 46, 0.6)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 2 }}>
-                <Typography variant="h6" sx={{ color: '#fff', mb: 2 }}>Open Graph Settings</Typography>
-                <Typography variant="body2" sx={{ color: '#94A3B8', mb: 3 }}>
+            <Paper sx={{ p: { xs: 2.5, sm: 3.5 }, bgcolor: 'rgba(15, 26, 46, 0.6)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 3 }}>
+                <Typography variant="h6" sx={{ color: '#fff', mb: 1, fontWeight: 600, fontSize: { xs: '1.05rem', sm: '1.25rem' } }}>
+                    Open Graph Settings
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#94A3B8', mb: 3, fontSize: { xs: '0.8125rem', sm: '0.875rem' } }}>
                     These details will be shown when your portfolio is shared on social media platforms like Facebook, Twitter, LinkedIn, etc.
                 </Typography>
                 
@@ -147,6 +151,8 @@ const OgGraphTabContent: React.FC = () => {
                             sx={{
                                 color: '#C084FC',
                                 bgcolor: 'rgba(192, 132, 252, 0.1)',
+                                p: 1.25,
+                                borderRadius: 2,
                                 '&:hover': { bgcolor: 'rgba(192, 132, 252, 0.2)' },
                             }}
                             title="Choose Asset"
@@ -178,8 +184,15 @@ const OgGraphTabContent: React.FC = () => {
                         onClick={handleSave}
                         startIcon={<SaveIcon />}
                         sx={{
+                            width: { xs: '100%', sm: 'auto' },
                             bgcolor: '#C084FC',
-                            '&:hover': { bgcolor: '#A855F7' }
+                            borderRadius: 2.5,
+                            py: 1.2,
+                            px: 3,
+                            fontWeight: 600,
+                            textTransform: 'none',
+                            boxShadow: '0 4px 14px rgba(192, 132, 252, 0.3)',
+                            '&:hover': { bgcolor: '#A855F7', boxShadow: '0 6px 18px rgba(192, 132, 252, 0.45)' }
                         }}
                     >
                         Save Details
@@ -192,9 +205,20 @@ const OgGraphTabContent: React.FC = () => {
                 onClose={() => setIsAssetDialogOpen(false)}
                 maxWidth="sm"
                 fullWidth
-                PaperProps={{ sx: { bgcolor: '#0f172a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } }}
+                PaperProps={{
+                    sx: {
+                        bgcolor: '#0f172a',
+                        color: '#fff',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: { xs: 3, sm: 4 },
+                        m: { xs: 2, sm: 4 },
+                        maxHeight: '85vh'
+                    }
+                }}
             >
-                <DialogTitle sx={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Select an Asset</DialogTitle>
+                <DialogTitle sx={{ borderBottom: '1px solid rgba(255,255,255,0.1)', px: { xs: 2, sm: 3 }, py: 2 }}>
+                    Select an Asset
+                </DialogTitle>
                 <DialogContent sx={{ p: 0 }}>
                     {uploadedImages.length === 0 ? (
                         <Box sx={{ p: 4, textAlign: 'center' }}>
