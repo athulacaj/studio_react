@@ -4,16 +4,25 @@ import { usePortfolioStore } from '../store/portfolioStore';
 function scrollToTheId(id: string) {
     // Normalize array notation (e.g. events[0]) to dot notation (events.0)
     const normalizedId = id.replace(/\[(\d+)\]/g, '.$1');
-    const element = document.getElementById(normalizedId) || document.getElementById(id);
+    let element = document.getElementById(normalizedId) || document.getElementById(id);
+    
+    // Fallback: If section container wasn't found, try appending '.content'
+    if (!element && !normalizedId.includes('.')) {
+        element = document.getElementById(`${normalizedId}.content`);
+    }
 
     if (element) {
-        // Open any parent accordions that are closed
-        let current = element.parentElement;
         let didOpenAccordion = false;
+        
+        // Find the input first so we can open any accordions it is nested inside
+        const input = element.querySelector('input') || element.querySelector('textarea');
+
+        // Traverse up from the input (or element if no input) to open any closed parent accordions
+        let current: HTMLElement | null = input || element;
 
         while (current) {
             if (current.classList.contains('MuiAccordion-root') && !current.classList.contains('Mui-expanded')) {
-                const summary = current.querySelector('.MuiAccordionSummary-root') as HTMLElement;
+                const summary = current.querySelector(':scope > .MuiAccordionSummary-root') as HTMLElement || current.querySelector('.MuiAccordionSummary-root') as HTMLElement;
                 if (summary) {
                     summary.click();
                     didOpenAccordion = true;
@@ -29,6 +38,11 @@ function scrollToTheId(id: string) {
             // Clear any lingering inline styles that might have been set previously
             element.style.removeProperty('background-color');
             element.style.removeProperty('transition');
+
+            // Try to focus an input if it exists
+            if (input) {
+                (input as HTMLElement).focus({ preventScroll: true });
+            }
 
             // Restart CSS keyframe animation cleanly
             element.classList.remove('form-field-highlight');
@@ -220,17 +234,10 @@ export const usePortfolioIframe = (
                     if (pathArray.length > 0) {
                         let val = getByPath(currentData, pathArray);
 
-                        // If val is an object (container/card), find specific text property inside it
-                        if (val && typeof val === 'object' && !Array.isArray(val) && event.data.text) {
-                            const clean = event.data.text.trim().toLowerCase();
-                            const subEntry = Object.entries(val).find(([_, v]) =>
-                                typeof v === 'string' && v.trim().toLowerCase() === clean
-                            );
-                            if (subEntry) {
-                                pathArray = [...pathArray, subEntry[0]];
-                                val = subEntry[1];
-                            }
-                        }
+                        // If val is an object (container/card), we intentionally do NOT try to drill down
+                        // via text search anymore. We pass the whole object so the dialog renders all fields.
+
+                        // Allow objects to fall through so we can show all their fields in the dialog.
 
                         const section = pathArray[0] || 'Content';
                         const rawKey = pathArray[pathArray.length - 1] || 'field';
@@ -255,7 +262,7 @@ export const usePortfolioIframe = (
                         usePortfolioStore.getState().setSelectedElement({
                             jsonPath: pathArray.join('.'),
                             path: pathArray,
-                            value: typeof val === 'object' ? (event.data.text || '') : (val ?? event.data.text ?? ''),
+                            value: val ?? event.data.text ?? '',
                             label: label || fieldKey,
                             fieldKey,
                             section: section.charAt(0).toUpperCase() + section.slice(1),

@@ -447,6 +447,7 @@ const DynamicPortfolioForm: React.FC = () => {
             return (
               <Accordion
                 key={index}
+                id={itemId}
                 sx={{
                   background: 'rgba(255,255,255,0.04)',
                   mb: 1.5,
@@ -926,6 +927,7 @@ const DynamicPortfolioForm: React.FC = () => {
               return (
                 <Box
                   key={key}
+                  id={value && typeof value === 'object' && 'content' in value ? `${key}.content` : key}
                   sx={{
                     mb: { xs: 2.5, sm: 4 },
                     background: 'rgba(15, 26, 46, 0.45)',
