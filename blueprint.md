@@ -173,3 +173,12 @@ This document outlines the development plan for a modern, responsive photo proof
    - **Action Area**: High-impact gradient button ("Get Started Now" / "Go to Studio Dashboard") with trust signals ("Instant setup • No credit card required").
 2. **Integration (`Home/index.tsx`):**
    - Replaced inline CTA code with the modularized `<CtaSection />` component.
+
+#### Iteration 19: Remove About Section from Navigation & Remove Legacy About Page
+
+1. **Navbar Navigation Updates (`GlobalNavbar.tsx`):**
+   - Removed the 'About' link and `Info` icon from desktop navigation pills and mobile drawer menus.
+   - Cleaned up `/about` route detection in scroll spy logic.
+2. **Route and Page Cleanup:**
+   - Removed `/about` route and unused imports from [router.tsx](file:///Users/abinjosepph/develop/projects/studio_react/src/router.tsx).
+   - Removed `About.tsx` page to keep the codebase lean and free of legacy placeholder details.

@@ -21,7 +21,6 @@ import {
   Sparkles,
   Layers,
   Smartphone,
-  Info,
   Mail,
   Menu as MenuIcon,
   X as CloseIcon,
@@ -78,13 +77,6 @@ const navItems: NavSectionItem[] = [
     icon: <Mail size={18} />,
     description: 'Email & official Instagram channels',
   },
-  {
-    name: 'About',
-    target: '/about',
-    isHash: false,
-    icon: <Info size={18} />,
-    description: 'Learn more about Mizhiv for studios',
-  },
 ];
 
 export const GlobalNavbar: React.FC = () => {
@@ -114,11 +106,6 @@ export const GlobalNavbar: React.FC = () => {
 
   // Scroll Spy: dynamically determine which section is currently active
   useEffect(() => {
-    if (location.pathname === '/about') {
-      setActiveSection('/about');
-      return;
-    }
-
     if (location.pathname !== '/') {
       setActiveSection('');
       return;
@@ -172,7 +159,7 @@ export const GlobalNavbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScrollSpy);
   }, [location.pathname]);
 
-  // Handle hash scrolling on external navigation (e.g. from /about to /#features-section)
+  // Handle hash scrolling on external navigation (e.g. from subpages to /#features-section)
   useEffect(() => {
     if (location.pathname === '/' && location.hash) {
       const sectionId = location.hash.replace('#', '');

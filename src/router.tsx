@@ -1,11 +1,10 @@
 import { Box } from '@mui/material';
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import About from './pages/About';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import VividView from './pages/VividView';
 import { LoginPage, SignupPage, ProtectedRoute } from './features/auth';
-import { StudioDashboard, ProjectDetailView, PublicProjectView } from './features/studio-management';
+import { StudioDashboard, PublicProjectView } from './features/studio-management';
 import { SuperAdminDashboard, AdminUserView, AdminProjectDetailWrapper } from './features/user-management';
 import { ManageStudioPortfolioViewProvider } from './features/portfolio-management';
 import Footer from './core/components/Footer';
@@ -48,7 +47,6 @@ const AppRouter = () => {
           <Route path="/view/vivid/vivid" element={<VividView />} />
           <Route path="/view/:userId/:projectId" element={<PublicProjectView />} />
           <Route path="/share/:linkId" element={<PublicProjectView />} />
-          <Route path="/about" element={<About />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Box>
