@@ -40,7 +40,7 @@ export const SettingsTabContent: React.FC = () => {
             {/* Publish Card */}
             <Paper sx={{
                 p: { xs: 2.5, sm: 4 },
-                borderRadius: 3.5,
+                borderRadius: 2,
                 bgcolor: 'rgba(124, 58, 237, 0.05)',
                 border: '1px solid rgba(124, 58, 237, 0.2)',
                 display: 'flex',
@@ -62,7 +62,7 @@ export const SettingsTabContent: React.FC = () => {
                 }} />
 
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Avatar sx={{ bgcolor: 'rgba(124, 58, 237, 0.2)', color: '#C084FC', mr: 2 }}>
+                    <Avatar sx={{ bgcolor: 'rgba(124, 58, 237, 0.2)', color: '#C084FC', mr: 2, borderRadius: 1.5 }}>
                         <UploadIcon />
                     </Avatar>
                     <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600, fontSize: { xs: '1.05rem', sm: '1.25rem' } }}>
@@ -81,7 +81,7 @@ export const SettingsTabContent: React.FC = () => {
                     startIcon={isPublishing ? <CircularProgress size={20} color="inherit" /> : <UploadIcon />}
                     sx={{
                         width: { xs: '100%', sm: 'auto' },
-                        borderRadius: '12px',
+                        borderRadius: 1.5,
                         background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)',
                         px: 4,
                         py: 1.5,
@@ -106,7 +106,7 @@ export const SettingsTabContent: React.FC = () => {
             {/* Change Template Card */}
             <Paper sx={{
                 p: { xs: 2.5, sm: 4 },
-                borderRadius: 3.5,
+                borderRadius: 2,
                 bgcolor: 'rgba(59, 130, 246, 0.05)',
                 border: '1px solid rgba(59, 130, 246, 0.2)',
                 display: 'flex',
@@ -128,7 +128,7 @@ export const SettingsTabContent: React.FC = () => {
                 }} />
 
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Avatar sx={{ bgcolor: 'rgba(59, 130, 246, 0.2)', color: '#60A5FA', mr: 2 }}>
+                    <Avatar sx={{ bgcolor: 'rgba(59, 130, 246, 0.2)', color: '#60A5FA', mr: 2, borderRadius: 1.5 }}>
                         <ChangeTemplateIcon />
                     </Avatar>
                     <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600, fontSize: { xs: '1.05rem', sm: '1.25rem' } }}>
@@ -146,7 +146,7 @@ export const SettingsTabContent: React.FC = () => {
                     startIcon={<ChangeTemplateIcon />}
                     sx={{
                         width: { xs: '100%', sm: 'auto' },
-                        borderRadius: '12px',
+                        borderRadius: 1.5,
                         background: 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)',
                         px: 4,
                         py: 1.5,
@@ -167,13 +167,13 @@ export const SettingsTabContent: React.FC = () => {
             {versions.length > 0 && (
                 <Paper sx={{
                     p: { xs: 2.5, sm: 4 },
-                    borderRadius: 3.5,
+                    borderRadius: 2,
                     bgcolor: 'rgba(15, 26, 46, 0.6)',
                     backdropFilter: 'blur(12px)',
                     border: '1px solid rgba(255,255,255,0.05)'
                 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#94A3B8', mr: 2 }}>
+                        <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: '#94A3B8', mr: 2, borderRadius: 1.5 }}>
                             <FileIcon />
                         </Avatar>
                         <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600, fontSize: { xs: '1.05rem', sm: '1.25rem' } }}>
@@ -190,7 +190,7 @@ export const SettingsTabContent: React.FC = () => {
                             '& .MuiOutlinedInput-root': {
                                 color: '#fff',
                                 bgcolor: 'rgba(0,0,0,0.2)',
-                                borderRadius: '12px',
+                                borderRadius: 1.5,
                                 transition: 'all 0.2s ease',
                                 '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
                                 '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
@@ -210,6 +210,7 @@ export const SettingsTabContent: React.FC = () => {
                                     PaperProps: {
                                         sx: {
                                             bgcolor: '#0f172a',
+                                            borderRadius: 1.5,
                                             border: '1px solid rgba(255,255,255,0.1)',
                                             '& .MuiMenuItem-root': {
                                                 color: '#e2e8f0',
@@ -243,7 +244,7 @@ export const SettingsTabContent: React.FC = () => {
                             startIcon={<DownloadIcon />}
                             sx={{
                                 height: 56,
-                                borderRadius: '12px',
+                                borderRadius: 1.5,
                                 background: 'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
                                 px: 3,
                                 fontWeight: 600,

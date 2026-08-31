@@ -22,6 +22,16 @@ export interface OgData {
     url: string;
 }
 
+export interface SelectedElementInfo {
+    jsonPath: string;
+    path: string[];
+    value: string | number;
+    label: string;
+    fieldKey: string;
+    section: string;
+    isImage: boolean;
+}
+
 // State Interface
 export interface PortfolioState {
     // Content & Data
@@ -39,6 +49,10 @@ export interface PortfolioState {
     previewMode: 'desktop' | 'mobile';
     mobileView: 'editor' | 'preview';
     activeTab: number;
+
+    // Selected Element Quick Edit States
+    selectedElement: SelectedElementInfo | null;
+    isQuickEditOpen: boolean;
 
     // Loading & Async States
     isInitialLoading: boolean;
@@ -75,6 +89,10 @@ export interface PortfolioActions {
     setPreviewMode: (mode: 'desktop' | 'mobile') => void;
     setMobileView: (mode: 'editor' | 'preview') => void;
     setActiveTab: (tab: number) => void;
+
+    // Selected Element Quick Edit Actions
+    setSelectedElement: (element: SelectedElementInfo | null) => void;
+    setIsQuickEditOpen: (isOpen: boolean) => void;
 
     // Loading & Async Setters
     setIsInitialLoading: (isLoading: boolean) => void;
@@ -114,6 +132,9 @@ export const initialState: PortfolioState = {
     mobileView: 'editor',
     activeTab: 0,
 
+    selectedElement: null,
+    isQuickEditOpen: false,
+
     isInitialLoading: true,
     isPublishing: false,
 
@@ -149,6 +170,10 @@ export const usePortfolioStore = create<PortfolioStore>((set) => ({
     setPreviewMode: (previewMode) => set({ previewMode }),
     setMobileView: (mobileView) => set({ mobileView }),
     setActiveTab: (activeTab) => set({ activeTab }),
+
+    // Selected Element Quick Edit Actions
+    setSelectedElement: (selectedElement) => set({ selectedElement }),
+    setIsQuickEditOpen: (isQuickEditOpen) => set({ isQuickEditOpen }),
 
     // Loading & Async Actions
     setIsInitialLoading: (isInitialLoading) => set({ isInitialLoading }),

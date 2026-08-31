@@ -52,7 +52,7 @@ export const ManagePortfolioHeader: React.FC<ManagePortfolioHeaderProps> = () =>
                         px: { xs: 1, sm: 1.5 },
                         py: 0.5,
                         minWidth: 'auto',
-                        borderRadius: 2,
+                        borderRadius: 1.5,
                         textTransform: 'none',
                         fontWeight: 600,
                         fontSize: { xs: '0.8125rem', sm: '0.875rem' },
@@ -94,13 +94,13 @@ export const ManagePortfolioHeader: React.FC<ManagePortfolioHeaderProps> = () =>
                     size="small"
                     sx={{
                         bgcolor: 'rgba(255,255,255,0.04)',
-                        borderRadius: '10px',
+                        borderRadius: 1.5,
                         border: '1px solid rgba(255,255,255,0.08)',
                         p: '2px',
                         '& .MuiToggleButton-root': {
                             color: '#94A3B8',
                             border: 'none',
-                            borderRadius: '8px',
+                            borderRadius: '6px',
                             px: { xs: 1.25, sm: 1.75 },
                             py: 0.5,
                             textTransform: 'none',
@@ -140,7 +140,7 @@ export const ManagePortfolioHeader: React.FC<ManagePortfolioHeaderProps> = () =>
                         sx={{
                             color: previewMode === 'desktop' ? '#C084FC' : '#64748B',
                             bgcolor: previewMode === 'desktop' ? 'rgba(192, 132, 252, 0.1)' : 'transparent',
-                            borderRadius: '8px',
+                            borderRadius: 1.5,
                             transition: 'all 0.2s',
                             '&:hover': { bgcolor: 'rgba(192, 132, 252, 0.15)', color: '#C084FC' }
                         }}
@@ -153,7 +153,7 @@ export const ManagePortfolioHeader: React.FC<ManagePortfolioHeaderProps> = () =>
                         sx={{
                             color: previewMode === 'mobile' ? '#C084FC' : '#64748B',
                             bgcolor: previewMode === 'mobile' ? 'rgba(192, 132, 252, 0.1)' : 'transparent',
-                            borderRadius: '8px',
+                            borderRadius: 1.5,
                             transition: 'all 0.2s',
                             '&:hover': { bgcolor: 'rgba(192, 132, 252, 0.15)', color: '#C084FC' }
                         }}

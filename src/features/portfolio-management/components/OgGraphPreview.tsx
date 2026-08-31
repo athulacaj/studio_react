@@ -40,7 +40,7 @@ const OgGraphPreview: React.FC = () => {
                 maxWidth: 400,
                 display: 'flex',
                 flexDirection: 'column',
-                borderRadius: '16px',
+                borderRadius: '10px',
                 overflow: 'hidden',
                 bgcolor: '#202C33', // WhatsApp dark mode bg
                 boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
@@ -125,13 +125,13 @@ const OgGraphPreview: React.FC = () => {
                         startIcon={<EditIcon sx={{ fontSize: 18 }} />}
                         onClick={() => setMobileView('editor')}
                         sx={{
-                            borderRadius: '50px',
+                            borderRadius: 2,
                             background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.9) 0%, rgba(168, 85, 247, 0.9) 100%)',
                             backdropFilter: 'blur(12px)',
                             border: '1px solid rgba(255, 255, 255, 0.2)',
                             boxShadow: '0 8px 24px rgba(124, 58, 237, 0.4), 0 2px 6px rgba(0,0,0,0.3)',
                             color: '#FFF',
-                            px: 3,
+                            px: 2.5,
                             py: 1,
                             fontWeight: 700,
                             fontSize: '0.875rem',

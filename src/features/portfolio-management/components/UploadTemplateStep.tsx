@@ -94,7 +94,7 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                 color: '#94A3B8',
                                 bgcolor: 'rgba(255, 255, 255, 0.03)',
                                 border: '1px solid rgba(255, 255, 255, 0.08)',
-                                borderRadius: 3,
+                                borderRadius: 1.5,
                                 px: 2.5,
                                 py: 1,
                                 fontWeight: 500,
@@ -122,6 +122,7 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                 fontWeight: 700,
                                 fontSize: '0.75rem',
                                 letterSpacing: '0.05em',
+                                borderRadius: 1,
                                 px: 1,
                             }}
                         />
@@ -136,7 +137,7 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                             mb: 4,
                             bgcolor: 'rgba(211, 47, 47, 0.12)',
                             color: '#ffb4ab',
-                            borderRadius: 3,
+                            borderRadius: 1.5,
                             border: '1px solid rgba(211, 47, 47, 0.3)',
                             backdropFilter: 'blur(10px)',
                             maxWidth: 800,
@@ -161,7 +162,7 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                 display: 'flex',
                                 flexDirection: 'column',
                                 justifyContent: 'space-between',
-                                borderRadius: { xs: 4, sm: 5 },
+                                borderRadius: 2.5,
                                 bgcolor: 'rgba(15, 23, 42, 0.5)',
                                 backdropFilter: 'blur(20px)',
                                 border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -185,7 +186,7 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                         sx={{
                                             width: { xs: 48, sm: 56 },
                                             height: { xs: 48, sm: 56 },
-                                            borderRadius: 3.5,
+                                            borderRadius: 2,
                                             bgcolor: 'rgba(255, 255, 255, 0.04)',
                                             border: '1px solid rgba(255, 255, 255, 0.1)',
                                             display: 'flex',
@@ -204,6 +205,7 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                             border: '1px solid rgba(56, 189, 248, 0.25)',
                                             fontWeight: 700,
                                             fontSize: '0.7rem',
+                                            borderRadius: 1,
                                             letterSpacing: '0.04em',
                                         }}
                                     />
@@ -223,7 +225,7 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                     sx={{
                                         mb: 3,
                                         p: { xs: 2, sm: 3 },
-                                        borderRadius: 3,
+                                        borderRadius: 2,
                                         bgcolor: isDragOver ? 'rgba(56, 189, 248, 0.08)' : 'rgba(9, 13, 22, 0.7)',
                                         border: `2px dashed ${isDragOver ? '#38BDF8' : 'rgba(255, 255, 255, 0.12)'}`,
                                         display: 'flex',
@@ -265,7 +267,7 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                     sx={{
                                         flex: 1,
                                         width: { xs: '100%', sm: 'auto' },
-                                        borderRadius: 3.5,
+                                        borderRadius: 1.5,
                                         borderColor: 'rgba(56, 189, 248, 0.4)',
                                         color: '#E2E8F0',
                                         py: { xs: 1.5, sm: 1.8 },
@@ -300,7 +302,7 @@ export const UploadTemplateStep: React.FC<UploadTemplateStepProps> = ({
                                     sx={{
                                         flex: 1,
                                         width: { xs: '100%', sm: 'auto' },
-                                        borderRadius: 3.5,
+                                        borderRadius: 1.5,
                                         background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)',
                                         py: { xs: 1.5, sm: 1.8 },
                                         px: 3,

@@ -214,3 +214,43 @@ This document outlines the development plan for a modern, responsive photo proof
    - Retains direct `LeafField` editable state, instant iframe live preview postMessage synchronization, and click-to-scroll targeting via `scrollToJsonPath`.
    - Provides section filter pills for multi-section search results and a dedicated empty state when no matching fields are found.
 
+#### Iteration 22: Live Preview Element Selection & In-Place Quick Edit
+
+1. **Click-to-Select Element Recognition (`usePortfolioIframe.ts`):**
+   - Injected interactive click interceptor into live preview HTML content.
+   - Resolves clicked elements to exact `jsonPath` and `portfolioData` leaf properties (or content text fallback lookup).
+   - Extracts human-friendly breadcrumbs (e.g. `Hero › Content › Title`, `Services › Item 1 › Title`), field keys, and image asset indicators.
+2. **Floating Bottom Selection Bar (`PortfolioPreview.tsx`):**
+   - Renders a glassmorphic floating action pill at bottom center when an element is clicked.
+   - Displays section/breadcrumb tag, preview value text (e.g. `"Wedding"`), a glowing **[Edit]** button, and dismiss action (`✕`).
+3. **In-Place Quick Edit Dialog (`QuickEditElementDialog.tsx`):**
+   - Clicking Edit opens a focused modal over the preview to update values directly.
+   - Supports text/multiline editing and image asset picker integration (choosing from uploaded assets or pasting image URLs).
+   - On "Apply Changes", immutably updates `portfolioData` via `setByPath`, triggers live `UPDATE_DATA` postMessage to iframe, and syncs form state.
+   - **Mobile UX & Action Bar Optimization**: Sized modal paper dynamically on mobile (`maxWidth: 'xs'`, responsive margin/padding), applied `whiteSpace: 'nowrap'` with balanced typography (`0.8125rem`–`0.875rem`, `fontWeight: 600`) to prevent awkward button line breaks, and aligned "Cancel" & "Apply Changes" cleanly across small viewports.
+
+#### Iteration 23: Refined Design System Border Radius Scale
+
+1. **Global Theme Standardization (`src/App.tsx`):**
+   - Reduced maximum curves and pill-shaped geometry across the application to achieve a sleek, modern, professional aesthetic.
+   - **Base Theme `shape.borderRadius`**: Reduced from `16px` to `8px`.
+   - **Buttons (`MuiButton`)**: Standardized to `8px` (`borderRadius: 8`, down from `16px` / `50px` pills).
+   - **Cards & Dialogs (`MuiCard`, `MuiDialog`, `MuiPaper`)**: Standardized to `10px` (`borderRadius: 10`, down from `24px` / `20px`).
+   - **Chips & Badges (`MuiChip`)**: Standardized to `6px` (`borderRadius: 6`, down from `999` pill shapes).
+   - **Inputs (`MuiOutlinedInput`)**: Standardized to `8px` (`borderRadius: 8`).
+2. **Portfolio Management Component Upgrades:**
+   - **`PortfolioPreview.tsx`**: Reduced floating selection pill and mobile action button from `50px` / `30px` pills to `2.5` (`10px`) / `1.5` (`6px`). Reduced mockup frame radius to `16px`.
+   - **`QuickEditElementDialog.tsx`**: Reduced modal dialog, preview frames, inputs, and action buttons to `1.5`–`2.5` (`6px`–`10px`) with mobile-optimized button layout and nowrap protection.
+   - **`DynamicPortfolioForm.tsx`**: Refined search bar, accordions, nested cards, chips, and asset dialog from `12px`/`16px` to sleek `8px` / `6px` (`borderRadius: 1.5`–`2`).
+   - **`UploadTemplateStep.tsx` & `TemplateSelectionDialog.tsx`**: Updated template cards, dropzone, lightbox, and navigation action buttons to `1.5`–`2.5` (`6px`–`10px`).
+   - **`SettingsTabContent.tsx`, `AssetsTabContent.tsx`, `OgGraphTabContent.tsx` & `OgGraphPreview.tsx`**: Standardized all cards, mockups, and button elements to the refined border-radius scale.
+
+#### Iteration 24: Fix Form Field Selection Indicator Sticking on Multiple Clicks
+
+1. **Root Cause Resolution (`usePortfolioIframe.ts`):**
+   - Eliminated race condition where capturing `element.style.backgroundColor` during an active highlight saved the purple indicator color into `originalBg`, permanently locking inline background color on multiple or rapid clicks.
+   - Replaced direct inline style mutation with class-based animation (`.form-field-highlight`).
+   - Added automatic inline style cleanup (`removeProperty('background-color')` and `removeProperty('transition')`) to strip any stale styles from previous interactions.
+2. **Animation Keyframes (`src/index.css`):**
+   - Added `@keyframes formFieldHighlightFade` with smooth cubic-bezier easing to gracefully pulse the field highlight and return to transparent without mutating DOM element inline styles.
+   - Reflow-forced restart (`void element.offsetWidth`) ensures multiple successive clicks reliably restart the pulse effect every time without lingering state.

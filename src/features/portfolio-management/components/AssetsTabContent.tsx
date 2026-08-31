@@ -48,7 +48,7 @@ export const AssetsTabContent: React.FC = () => {
                     sx={{
                         color: '#C084FC',
                         borderColor: 'rgba(192, 132, 252, 0.4)',
-                        borderRadius: 2.5,
+                        borderRadius: 1.5,
                         textTransform: 'none',
                         fontWeight: 600,
                         px: 2,
@@ -61,14 +61,14 @@ export const AssetsTabContent: React.FC = () => {
             </Box>
 
             {isProcessingFiles && (
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, p: 2, bgcolor: 'rgba(192, 132, 252, 0.08)', borderRadius: 2, border: '1px solid rgba(192, 132, 252, 0.2)', color: '#C084FC' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, p: 2, bgcolor: 'rgba(192, 132, 252, 0.08)', borderRadius: 1.5, border: '1px solid rgba(192, 132, 252, 0.2)', color: '#C084FC' }}>
                     <CircularProgress size={18} sx={{ mr: 1.5, color: 'inherit' }} />
                     <Typography variant="body2" sx={{ fontWeight: 500 }}>Processing files...</Typography>
                 </Box>
             )}
 
             {isUploading && (
-                <Box sx={{ mb: 3, p: 2, bgcolor: 'rgba(15, 26, 46, 0.6)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.06)' }}>
+                <Box sx={{ mb: 3, p: 2, bgcolor: 'rgba(15, 26, 46, 0.6)', borderRadius: 1.5, border: '1px solid rgba(255,255,255,0.06)' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                         <Typography variant="body2" sx={{ color: '#94A3B8' }}>Uploading to cloud...</Typography>
                         <Typography variant="body2" sx={{ color: '#C084FC', fontWeight: 'bold' }}>{uploadProgress}%</Typography>
@@ -78,7 +78,7 @@ export const AssetsTabContent: React.FC = () => {
                         value={uploadProgress}
                         sx={{
                             height: 6,
-                            borderRadius: 3,
+                            borderRadius: 1.5,
                             bgcolor: 'rgba(255,255,255,0.1)',
                             '& .MuiLinearProgress-bar': { bgcolor: '#C084FC' }
                         }}
@@ -87,7 +87,7 @@ export const AssetsTabContent: React.FC = () => {
             )}
 
             {uploadedImages.length === 0 ? (
-                <Box sx={{ textAlign: 'center', py: { xs: 6, sm: 8 }, px: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 3, border: '1px dashed rgba(255,255,255,0.08)' }}>
+                <Box sx={{ textAlign: 'center', py: { xs: 6, sm: 8 }, px: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px dashed rgba(255,255,255,0.08)' }}>
                     <ImageIcon sx={{ fontSize: { xs: 40, sm: 48 }, color: 'rgba(255,255,255,0.15)', mb: 1.5 }} />
                     <Typography variant="body1" sx={{ color: '#94A3B8', fontWeight: 500 }}>No assets uploaded yet.</Typography>
                     <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mt: 0.5 }}>
@@ -101,7 +101,7 @@ export const AssetsTabContent: React.FC = () => {
                             key={img.id}
                             sx={{
                                 bgcolor: 'rgba(255,255,255,0.03)',
-                                borderRadius: 2.5,
+                                borderRadius: 1.5,
                                 mb: 1.5,
                                 border: '1px solid rgba(255,255,255,0.06)',
                                 p: 1.5,
@@ -114,7 +114,7 @@ export const AssetsTabContent: React.FC = () => {
                             }}
                         >
                             <ListItemAvatar sx={{ minWidth: 54 }}>
-                                <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.05)', width: 44, height: 44, borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
+                                <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.05)', width: 44, height: 44, borderRadius: 1.5, border: '1px solid rgba(255,255,255,0.1)' }}>
                                     {img.file?.type.startsWith('image/') || img.url.endsWith('.webp') || img.url.match(/\.(jpeg|jpg|gif|png)$/) ? (
                                         <img src={img.url} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     ) : (

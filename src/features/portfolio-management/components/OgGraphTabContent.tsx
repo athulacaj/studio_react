@@ -70,7 +70,7 @@ const OgGraphTabContent: React.FC = () => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <Paper sx={{ p: { xs: 2.5, sm: 3.5 }, bgcolor: 'rgba(15, 26, 46, 0.6)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 3 }}>
+            <Paper sx={{ p: { xs: 2.5, sm: 3.5 }, bgcolor: 'rgba(15, 26, 46, 0.6)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 2 }}>
                 <Typography variant="h6" sx={{ color: '#fff', mb: 1, fontWeight: 600, fontSize: { xs: '1.05rem', sm: '1.25rem' } }}>
                     Open Graph Settings
                 </Typography>
@@ -152,7 +152,7 @@ const OgGraphTabContent: React.FC = () => {
                                 color: '#C084FC',
                                 bgcolor: 'rgba(192, 132, 252, 0.1)',
                                 p: 1.25,
-                                borderRadius: 2,
+                                borderRadius: 1.5,
                                 '&:hover': { bgcolor: 'rgba(192, 132, 252, 0.2)' },
                             }}
                             title="Choose Asset"
@@ -186,7 +186,7 @@ const OgGraphTabContent: React.FC = () => {
                         sx={{
                             width: { xs: '100%', sm: 'auto' },
                             bgcolor: '#C084FC',
-                            borderRadius: 2.5,
+                            borderRadius: 1.5,
                             py: 1.2,
                             px: 3,
                             fontWeight: 600,
@@ -210,7 +210,7 @@ const OgGraphTabContent: React.FC = () => {
                         bgcolor: '#0f172a',
                         color: '#fff',
                         border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: { xs: 3, sm: 4 },
+                        borderRadius: 2.5,
                         m: { xs: 2, sm: 4 },
                         maxHeight: '85vh'
                     }

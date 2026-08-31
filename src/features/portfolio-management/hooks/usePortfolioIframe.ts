@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { usePortfolioStore } from '../store/portfolioStore';
 
 function scrollToTheId(id: string) {
     // Normalize array notation (e.g. events[0]) to dot notation (events.0)
@@ -24,17 +25,113 @@ function scrollToTheId(id: string) {
         // Scroll to the element, adding a slight delay if we had to open an accordion
         setTimeout(() => {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            const originalBg = element.style.backgroundColor;
-            element.style.transition = 'background-color 0.5s ease';
-            element.style.backgroundColor = 'rgba(192, 132, 252, 0.3)';
-            setTimeout(() => {
-                element.style.backgroundColor = originalBg;
-            }, 1500);
+
+            // Clear any lingering inline styles that might have been set previously
+            element.style.removeProperty('background-color');
+            element.style.removeProperty('transition');
+
+            // Restart CSS keyframe animation cleanly
+            element.classList.remove('form-field-highlight');
+            void element.offsetWidth; // Force reflow to restart CSS animation
+            element.classList.add('form-field-highlight');
+
+            // Clean up class after animation finishes
+            const timer = setTimeout(() => {
+                element.classList.remove('form-field-highlight');
+            }, 1800);
+
+            const handleAnimEnd = () => {
+                clearTimeout(timer);
+                element.classList.remove('form-field-highlight');
+                element.removeEventListener('animationend', handleAnimEnd);
+            };
+            element.addEventListener('animationend', handleAnimEnd, { once: true });
         }, didOpenAccordion ? 300 : 0);
     } else {
         console.warn(`Element with id "${id}" (normalized to "${normalizedId}") not found for scrolling.`);
     }
 }
+
+function getByPath(obj: any, path: string[]): any {
+    return path.reduce((acc, key) => acc?.[key], obj);
+}
+
+function findFieldByValue(data: any, textToFind: string): { path: string[]; jsonPath: string; fieldKey: string; section: string; label: string } | null {
+    if (!data || !textToFind) return null;
+    const cleanText = textToFind.trim().toLowerCase();
+    if (!cleanText) return null;
+    let match: any = null;
+
+    const crawl = (node: any, path: string[], breadcrumbs: string[], section: string) => {
+        if (match) return;
+        if (node === null || typeof node !== 'object') {
+            const strVal = String(node).trim().toLowerCase();
+            if (strVal === cleanText || (cleanText.length > 3 && strVal.includes(cleanText))) {
+                match = {
+                    path,
+                    jsonPath: path.join('.'),
+                    fieldKey: breadcrumbs[breadcrumbs.length - 1] || path[path.length - 1] || 'field',
+                    section,
+                    label: breadcrumbs.filter((b) => b !== 'content').join(' › ')
+                };
+            }
+            return;
+        }
+        if (Array.isArray(node)) {
+            node.forEach((item, index) => {
+                crawl(item, [...path, index.toString()], [...breadcrumbs, `Item ${index + 1}`], section);
+            });
+            return;
+        }
+        Object.entries(node).forEach(([k, v]) => {
+            crawl(v, [...path, k], [...breadcrumbs, k], section || k);
+        });
+    };
+
+    Object.entries(data).forEach(([secKey, secVal]) => {
+        if (secKey !== 'theme' && secKey !== 'activeTheme') {
+            crawl(secVal, [secKey], [secKey], secKey);
+        }
+    });
+
+    return match;
+}
+
+const CLICK_INTERCEPTOR_SCRIPT = `
+<script id="__portfolio_click_interceptor__">
+(function() {
+  document.addEventListener("click", function(event) {
+    var target = event.target;
+    if (!target) return;
+    
+    // Find closest element with data-json-path
+    var curr = target;
+    var jsonPath = null;
+    while (curr && curr !== document.body) {
+      if (curr.dataset && curr.dataset.jsonPath) {
+        jsonPath = curr.dataset.jsonPath;
+        break;
+      }
+      curr = curr.parentElement;
+    }
+    
+    var text = (target.innerText || target.textContent || "").trim();
+    var tagName = target.tagName ? target.tagName.toLowerCase() : "";
+    var isImg = tagName === 'img' || (target.src ? true : false);
+    var imgSrc = target.src || (target.style ? target.style.backgroundImage : "") || "";
+
+    window.parent.postMessage({
+      type: "ELEMENT_CLICKED",
+      jsonPath: jsonPath,
+      text: text,
+      tagName: tagName,
+      isImg: isImg,
+      imgSrc: imgSrc
+    }, "*");
+  }, true);
+})();
+</script>
+`;
 
 export const usePortfolioIframe = (
     htmlContent: string, iframeRef: React.RefObject<HTMLIFrameElement | null>,
@@ -45,8 +142,6 @@ export const usePortfolioIframe = (
     const [blobUrl, setBlobUrl] = useState<string | null>(null);
 
     // Create blob URL when htmlContent changes, properly revoking the old one.
-    // Using useState + useEffect instead of useMemo so the URL lifecycle is
-    // explicitly controlled and never prematurely revoked.
     useEffect(() => {
         if (!htmlContent) {
             // Revoke any existing URL when content is cleared
@@ -54,12 +149,23 @@ export const usePortfolioIframe = (
                 URL.revokeObjectURL(previousBlobUrlRef.current);
                 previousBlobUrlRef.current = null;
             }
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setBlobUrl(null);
             return;
         }
 
+        // Inject click interceptor script so all clicked elements are captured
+        let finalHtml = htmlContent;
+        if (!finalHtml.includes('__portfolio_click_interceptor__')) {
+            if (finalHtml.includes('</body>')) {
+                finalHtml = finalHtml.replace('</body>', `${CLICK_INTERCEPTOR_SCRIPT}\n</body>`);
+            } else {
+                finalHtml = `${finalHtml}\n${CLICK_INTERCEPTOR_SCRIPT}`;
+            }
+        }
+
         // Create a new blob URL
-        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const blob = new Blob([finalHtml], { type: 'text/html' });
         const newUrl = URL.createObjectURL(blob);
 
         // Revoke the old URL only after the new one is ready
@@ -67,6 +173,7 @@ export const usePortfolioIframe = (
             URL.revokeObjectURL(previousBlobUrlRef.current);
         }
         previousBlobUrlRef.current = newUrl;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setBlobUrl(newUrl);
 
         // Cleanup on unmount: revoke the active URL and clear debounce timer
@@ -85,10 +192,76 @@ export const usePortfolioIframe = (
     // Handle postMessage communication from iframe
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
+            if (Object.keys(event.data).length <= 2) {
+                return;
+            }
             if (event.data?.type === "ELEMENT_CLICKED") {
                 console.log("Element clicked:", event.data);
+                const currentData = usePortfolioStore.getState().portfolioData;
+                let pathArray: string[] = [];
+
                 if (event.data.jsonPath) {
+                    const normalized = event.data.jsonPath.replace(/\[(\d+)\]/g, '.$1');
+                    pathArray = normalized.split('.').filter(Boolean);
                     scrollToTheId(event.data.jsonPath);
+                }
+
+
+                // If path not resolved from jsonPath or path points to whole object/section, try matching text
+                if (currentData) {
+                    if (pathArray.length === 0 && event.data.text) {
+                        const match = findFieldByValue(currentData, event.data.text);
+                        if (match) {
+                            pathArray = match.path;
+                            scrollToTheId(match.jsonPath);
+                        }
+                    }
+
+                    if (pathArray.length > 0) {
+                        let val = getByPath(currentData, pathArray);
+
+                        // If val is an object (container/card), find specific text property inside it
+                        if (val && typeof val === 'object' && !Array.isArray(val) && event.data.text) {
+                            const clean = event.data.text.trim().toLowerCase();
+                            const subEntry = Object.entries(val).find(([_, v]) =>
+                                typeof v === 'string' && v.trim().toLowerCase() === clean
+                            );
+                            if (subEntry) {
+                                pathArray = [...pathArray, subEntry[0]];
+                                val = subEntry[1];
+                            }
+                        }
+
+                        const section = pathArray[0] || 'Content';
+                        const rawKey = pathArray[pathArray.length - 1] || 'field';
+                        const fieldKey = isNaN(Number(rawKey))
+                            ? rawKey.charAt(0).toUpperCase() + rawKey.slice(1)
+                            : `Item ${Number(rawKey) + 1}`;
+
+                        const labelParts = pathArray
+                            .filter((p) => p !== 'content')
+                            .map((p) => (isNaN(Number(p)) ? p.charAt(0).toUpperCase() + p.slice(1) : `Item ${Number(p) + 1}`));
+
+                        const label = labelParts.join(' › ');
+
+                        const isImage =
+                            (typeof val === 'string' &&
+                                (val.startsWith('http') ||
+                                    val.startsWith('/') ||
+                                    /\.(jpeg|jpg|png|webp|gif|svg)$/i.test(val) ||
+                                    /image|img|photo|logo|banner|pic|src/i.test(rawKey))) ||
+                            event.data.isImg;
+
+                        usePortfolioStore.getState().setSelectedElement({
+                            jsonPath: pathArray.join('.'),
+                            path: pathArray,
+                            value: typeof val === 'object' ? (event.data.text || '') : (val ?? event.data.text ?? ''),
+                            label: label || fieldKey,
+                            fieldKey,
+                            section: section.charAt(0).toUpperCase() + section.slice(1),
+                            isImage,
+                        });
+                    }
                 }
             }
         };

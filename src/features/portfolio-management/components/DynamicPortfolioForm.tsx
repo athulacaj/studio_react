@@ -451,7 +451,7 @@ const DynamicPortfolioForm: React.FC = () => {
                   background: 'rgba(255,255,255,0.04)',
                   mb: 1.5,
                   color: '#fff',
-                  borderRadius: '12px !important',
+                  borderRadius: '8px !important',
                   border: '1px solid rgba(255,255,255,0.08)',
                   overflow: 'hidden',
                   '&:before': { display: 'none' },
@@ -486,7 +486,7 @@ const DynamicPortfolioForm: React.FC = () => {
                         textTransform: 'none',
                         px: 1.5,
                         py: 0.5,
-                        borderRadius: 2,
+                        borderRadius: 1.5,
                         border: '1px solid rgba(239, 68, 68, 0.2)',
                         '&:hover': {
                           bgcolor: 'rgba(239, 68, 68, 0.18)',
@@ -617,7 +617,7 @@ const DynamicPortfolioForm: React.FC = () => {
           sx={{
             '& .MuiOutlinedInput-root': {
               bgcolor: 'rgba(3, 9, 18, 0.65)',
-              borderRadius: '12px',
+              borderRadius: '8px',
               color: '#fff',
               fontSize: '0.875rem',
               '& fieldset': { borderColor: 'rgba(255,255,255,0.12)' },
@@ -639,6 +639,7 @@ const DynamicPortfolioForm: React.FC = () => {
                 border: '1px solid rgba(168, 85, 247, 0.4)',
                 fontWeight: 700,
                 fontSize: '0.72rem',
+                borderRadius: 1,
                 height: 24,
               }}
             />
@@ -663,6 +664,7 @@ const DynamicPortfolioForm: React.FC = () => {
                     height: 24,
                     fontSize: '0.72rem',
                     fontWeight: 600,
+                    borderRadius: 1,
                     cursor: 'pointer',
                     bgcolor: selectedSectionFilter === 'all' ? 'rgba(192, 132, 252, 0.25)' : 'rgba(255, 255, 255, 0.04)',
                     color: selectedSectionFilter === 'all' ? '#FFF' : '#94A3B8',
@@ -681,6 +683,7 @@ const DynamicPortfolioForm: React.FC = () => {
                         height: 24,
                         fontSize: '0.72rem',
                         fontWeight: 600,
+                        borderRadius: 1,
                         textTransform: 'capitalize',
                         cursor: 'pointer',
                         bgcolor: isSelected ? 'rgba(192, 132, 252, 0.25)' : 'rgba(255, 255, 255, 0.04)',
@@ -706,7 +709,7 @@ const DynamicPortfolioForm: React.FC = () => {
                 py: 8,
                 px: 2,
                 bgcolor: 'rgba(15, 23, 42, 0.4)',
-                borderRadius: 4,
+                borderRadius: 2,
                 border: '1px dashed rgba(255, 255, 255, 0.1)',
               }}
             >
@@ -727,7 +730,7 @@ const DynamicPortfolioForm: React.FC = () => {
                 sx={{
                   color: '#C084FC',
                   borderColor: 'rgba(192, 132, 252, 0.4)',
-                  borderRadius: 2,
+                  borderRadius: 1.5,
                   textTransform: 'none',
                   fontWeight: 600,
                   fontSize: '0.75rem',
@@ -744,7 +747,7 @@ const DynamicPortfolioForm: React.FC = () => {
                   mb: 1,
                   background: 'rgba(15, 26, 46, 0.45)',
                   p: { xs: 2, sm: 2.5 },
-                  borderRadius: 3,
+                  borderRadius: 2,
                   border: '1px solid rgba(192, 132, 252, 0.2)',
                   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
                   position: 'relative'
@@ -767,6 +770,7 @@ const DynamicPortfolioForm: React.FC = () => {
                       border: '1px solid rgba(192, 132, 252, 0.3)',
                       fontWeight: 600,
                       fontSize: '0.72rem',
+                      borderRadius: 1,
                       height: 22,
                     }}
                   />
@@ -780,7 +784,7 @@ const DynamicPortfolioForm: React.FC = () => {
                       sx={{
                         bgcolor: 'rgba(255, 255, 255, 0.025)',
                         p: { xs: 1.5, sm: 2 },
-                        borderRadius: 2.5,
+                        borderRadius: 1.5,
                         border: '1px solid rgba(255, 255, 255, 0.06)',
                         transition: 'all 0.2s ease',
                         '&:hover': {
@@ -811,6 +815,7 @@ const DynamicPortfolioForm: React.FC = () => {
                                 border: '1px solid rgba(255, 255, 255, 0.08)',
                                 fontSize: '0.7rem',
                                 fontWeight: 600,
+                                borderRadius: 1,
                                 height: 20,
                               }}
                             />
@@ -870,6 +875,7 @@ const DynamicPortfolioForm: React.FC = () => {
                   onChange={handleThemeChange}
                   sx={{
                     color: '#fff',
+                    borderRadius: 1.5,
                     '& .MuiOutlinedInput-notchedOutline': {
                       borderColor: 'rgba(255,255,255,0.2)',
                     },
@@ -885,6 +891,7 @@ const DynamicPortfolioForm: React.FC = () => {
                     PaperProps: {
                       sx: {
                         bgcolor: '#0f172a',
+                        borderRadius: 1.5,
                         border: '1px solid rgba(255,255,255,0.1)',
                         '& .MuiMenuItem-root': {
                           color: '#fff',
@@ -923,7 +930,7 @@ const DynamicPortfolioForm: React.FC = () => {
                     mb: { xs: 2.5, sm: 4 },
                     background: 'rgba(15, 26, 46, 0.45)',
                     p: { xs: 2, sm: 3 },
-                    borderRadius: 3,
+                    borderRadius: 2,
                     border: '1px solid rgba(255, 255, 255, 0.05)',
                     position: 'relative'
                   }}
@@ -937,6 +944,7 @@ const DynamicPortfolioForm: React.FC = () => {
                       onClick={() => handleSectionRemove(key)}
                       sx={{
                         color: '#94A3B8',
+                        borderRadius: 1,
                         '&:hover': { color: '#EF4444', bgcolor: 'rgba(239, 68, 68, 0.1)' },
                       }}
                       title={`Delete ${key} section`}
@@ -947,8 +955,8 @@ const DynamicPortfolioForm: React.FC = () => {
                   <Box sx={{ pl: { xs: 1, sm: 2 }, borderLeft: '2px solid rgba(192, 132, 252, 0.3)' }}>
                     {sectionContent && typeof sectionContent === 'object' && !Array.isArray(sectionContent)
                       ? Object.entries(sectionContent).map(([subKey, subValue]) =>
-                          renderField(subKey, subValue, [key, 'content', subKey], `${key}.content.${subKey}`)
-                        )
+                        renderField(subKey, subValue, [key, 'content', subKey], `${key}.content.${subKey}`)
+                      )
                       : renderField(key, sectionContent, [key, 'content'], `${key}.content`)
                     }
                   </Box>
@@ -969,7 +977,7 @@ const DynamicPortfolioForm: React.FC = () => {
             bgcolor: '#0f172a',
             color: '#fff',
             border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: { xs: 3, sm: 4 },
+            borderRadius: 2.5,
             m: { xs: 2, sm: 4 },
             maxHeight: '85vh'
           }

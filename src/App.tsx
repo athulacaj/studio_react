@@ -54,16 +54,16 @@ const mizhivTheme = createTheme({
     button: { fontWeight: 600 },
   },
   shape: {
-    borderRadius: 16,
+    borderRadius: 8,
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
+          borderRadius: 8,
           textTransform: 'none',
           fontWeight: 600,
-          padding: '10px 24px',
+          padding: '8px 20px',
           transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
         },
         containedPrimary: {
@@ -88,7 +88,7 @@ const mizhivTheme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 24,
+          borderRadius: 10,
           background: 'rgba(15, 26, 46, 0.72)',
           backdropFilter: 'blur(12px)',
           border: '1px solid rgba(255,255,255,0.06)',
@@ -100,13 +100,28 @@ const mizhivTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
+          borderRadius: 10,
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          borderRadius: 10,
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
         },
       },
     },
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 999,
+          borderRadius: 6,
           fontWeight: 600,
         },
       },

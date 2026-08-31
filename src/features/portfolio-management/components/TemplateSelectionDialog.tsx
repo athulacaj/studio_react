@@ -98,7 +98,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                 fullScreen={isMobile}
                 PaperProps={{
                     sx: {
-                        borderRadius: isMobile ? 0 : 5,
+                        borderRadius: isMobile ? 0 : 2.5,
                         bgcolor: '#0B132B',
                         backgroundImage: 'radial-gradient(ellipse at top, rgba(124, 58, 237, 0.15), transparent 70%)',
                         border: isMobile ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
@@ -125,7 +125,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                             <Box
                                 sx={{
                                     p: 1.2,
-                                    borderRadius: 3,
+                                    borderRadius: 1.5,
                                     background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.3) 0%, rgba(168, 85, 247, 0.3) 100%)',
                                     border: '1px solid rgba(168, 85, 247, 0.3)',
                                     display: 'flex',
@@ -140,7 +140,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                     Template Library
                                 </Typography>
                                 <Typography variant="body2" sx={{ color: '#94A3B8' }}>
-                                    Choose a pre-built template to start customizing your portfolio
+                                    Select from pre-built responsive HTML templates
                                 </Typography>
                             </Box>
                         </Box>
@@ -148,8 +148,9 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                             onClick={onClose}
                             sx={{
                                 color: '#94A3B8',
+                                borderRadius: 1,
                                 bgcolor: 'rgba(255, 255, 255, 0.05)',
-                                '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.1)', color: '#FFF' },
+                                '&:hover': { color: '#FFF', bgcolor: 'rgba(255, 255, 255, 0.1)' },
                             }}
                         >
                             <CloseIcon />
@@ -167,7 +168,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                 width: { xs: '100%', sm: 340 },
                                 '& .MuiOutlinedInput-root': {
                                     bgcolor: 'rgba(15, 23, 42, 0.8)',
-                                    borderRadius: 3,
+                                    borderRadius: 1.5,
                                     color: '#FFF',
                                     fontSize: '0.875rem',
                                     '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.12)' },
@@ -212,7 +213,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                         sx={{
                                             fontWeight: 600,
                                             fontSize: '0.75rem',
-                                            borderRadius: 2,
+                                            borderRadius: 1,
                                             px: 1,
                                             flexShrink: 0,
                                             bgcolor: isSelected
@@ -248,7 +249,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                 py: 8,
                                 px: 2,
                                 bgcolor: 'rgba(15, 23, 42, 0.4)',
-                                borderRadius: 4,
+                                borderRadius: 2,
                                 border: '1px solid rgba(255, 255, 255, 0.05)',
                             }}
                         >
@@ -285,7 +286,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                                 flexDirection: 'column',
                                                 bgcolor: 'rgba(15, 26, 46, 0.7)',
                                                 backdropFilter: 'blur(12px)',
-                                                borderRadius: 4,
+                                                borderRadius: 2,
                                                 border: isSelected
                                                     ? '2px solid #C084FC'
                                                     : '1px solid rgba(255, 255, 255, 0.08)',
@@ -309,6 +310,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                                     position: 'relative',
                                                     height: 180,
                                                     bgcolor: '#030912',
+                                                    borderRadius: 1.5,
                                                     overflow: 'hidden',
                                                     display: 'flex',
                                                     alignItems: 'center',
@@ -340,9 +342,9 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                                     >
                                                         <Box
                                                             sx={{
-                                                                width: 50,
-                                                                height: 50,
-                                                                borderRadius: '50%',
+                                                                width: 46,
+                                                                height: 46,
+                                                                borderRadius: 1.5,
                                                                 bgcolor: 'rgba(124, 58, 237, 0.2)',
                                                                 border: '1px solid rgba(168, 85, 247, 0.3)',
                                                                 display: 'flex',
@@ -351,7 +353,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                                                 mb: 1.5,
                                                             }}
                                                         >
-                                                            <SparklesIcon sx={{ color: '#C084FC', fontSize: 26 }} />
+                                                            <SparklesIcon sx={{ color: '#C084FC', fontSize: 24 }} />
                                                         </Box>
                                                         <Typography variant="subtitle2" sx={{ color: '#E2E8F0', fontWeight: 600 }}>
                                                             {formatCategoryName(template.type)}
@@ -389,6 +391,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                                                 }}
                                                                 sx={{
                                                                     bgcolor: 'rgba(255, 255, 255, 0.1)',
+                                                                    borderRadius: 1,
                                                                     color: '#FFF',
                                                                     '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.25)' },
                                                                 }}
@@ -404,7 +407,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                                         onClick={() => handleSelect(template)}
                                                         sx={{
                                                             background: 'linear-gradient(90deg, #7C3AED 0%, #A855F7 100%)',
-                                                            borderRadius: 2,
+                                                            borderRadius: 1.5,
                                                             fontWeight: 600,
                                                             px: 2.5,
                                                             py: 1,
@@ -428,6 +431,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                                         color: '#E2E8F0',
                                                         fontSize: '0.7rem',
                                                         fontWeight: 600,
+                                                        borderRadius: 1,
                                                         border: '1px solid rgba(255, 255, 255, 0.1)',
                                                     }}
                                                 />
@@ -466,7 +470,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                                     onClick={() => handleSelect(template)}
                                                     sx={{
                                                         mt: 2,
-                                                        borderRadius: 2.5,
+                                                        borderRadius: 1.5,
                                                         py: 1,
                                                         fontWeight: 600,
                                                         fontSize: '0.85rem',
@@ -505,7 +509,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                     onClose={() => setPreviewImageUrl(null)}
                     maxWidth="md"
                     fullWidth
-                    PaperProps={{ sx: { bgcolor: '#000', borderRadius: 4, overflow: 'hidden' } }}
+                    PaperProps={{ sx: { bgcolor: '#000', borderRadius: 2.5, overflow: 'hidden' } }}
                 >
                     <Box sx={{ position: 'relative', p: 1, textAlign: 'center' }}>
                         <IconButton
@@ -516,6 +520,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                                 right: 16,
                                 bgcolor: 'rgba(0, 0, 0, 0.7)',
                                 color: '#FFF',
+                                borderRadius: 1,
                                 zIndex: 10,
                                 '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.9)' },
                             }}
@@ -526,7 +531,7 @@ export const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = (
                             component="img"
                             src={previewImageUrl}
                             alt="Template Full Preview"
-                            sx={{ width: '100%', maxHeight: '80vh', objectFit: 'contain', borderRadius: 2 }}
+                            sx={{ width: '100%', maxHeight: '80vh', objectFit: 'contain', borderRadius: 1.5 }}
                         />
                     </Box>
                 </Dialog>

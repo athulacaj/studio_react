@@ -96,6 +96,27 @@ body::before {
   }
 }
 
+@keyframes formFieldHighlightFade {
+  0% {
+    background-color: rgba(192, 132, 252, 0.35);
+    border-radius: 8px;
+  }
+
+  65% {
+    background-color: rgba(192, 132, 252, 0.2);
+    border-radius: 8px;
+  }
+
+  100% {
+    background-color: transparent;
+    border-radius: 8px;
+  }
+}
+
+.form-field-highlight {
+  animation: formFieldHighlightFade 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
 .css-1uzihdn-MuiContainer-root {
   max-width: 1400px !important;
 }
