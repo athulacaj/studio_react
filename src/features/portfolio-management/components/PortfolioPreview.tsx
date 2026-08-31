@@ -16,6 +16,7 @@ import {
     Close as CloseIcon,
     AutoAwesome as SparklesIcon,
     Image as ImageIcon,
+    DeleteOutline as DeleteIcon,
 } from '@mui/icons-material';
 import { usePortfolioContext } from '../context/portfolioGlobalContext';
 import { usePortfolioStore } from '../store/portfolioStore';
@@ -26,6 +27,25 @@ function setByPath(obj: any, path: string[], value: any): any {
     const [head, ...rest] = path;
     const clone = Array.isArray(obj) ? [...obj] : { ...obj };
     clone[head as any] = setByPath((obj as any)[head], rest, value);
+    return clone;
+}
+
+function deleteByPath(obj: any, path: string[]): any {
+    if (path.length === 0) return obj;
+    if (path.length === 1) {
+        if (Array.isArray(obj)) {
+            const clone = [...obj];
+            clone.splice(Number(path[0]), 1);
+            return clone;
+        } else {
+            const clone = { ...obj };
+            delete clone[path[0]];
+            return clone;
+        }
+    }
+    const [head, ...rest] = path;
+    const clone = Array.isArray(obj) ? [...obj] : { ...obj };
+    clone[head as any] = deleteByPath((obj as any)[head], rest);
     return clone;
 }
 
@@ -64,6 +84,14 @@ export const PortfolioPreview: React.FC = () => {
                 value: newValue,
             });
         }
+    };
+
+    const handleDeleteElement = () => {
+        if (!selectedElement) return;
+        const current = portfolioData;
+        const newData = deleteByPath(current, selectedElement.path);
+        handleDataChange(newData);
+        setSelectedElement(null);
     };
 
     return (
@@ -151,7 +179,7 @@ export const PortfolioPreview: React.FC = () => {
                         />
 
                         {/* Selected Text Value Preview */}
-                        <Tooltip title={String(selectedElement.value || '')} arrow placement="top">
+                        <Tooltip title={typeof selectedElement.value === 'object' && selectedElement.value !== null ? 'Contains multiple editable fields' : String(selectedElement.value || '')} arrow placement="top">
                             <Typography
                                 variant="body2"
                                 sx={{
@@ -164,37 +192,55 @@ export const PortfolioPreview: React.FC = () => {
                                     whiteSpace: 'nowrap',
                                 }}
                             >
-                                {selectedElement.isImage ? 'Image Asset' : `"${String(selectedElement.value || '').trim()}"`}
+                                {selectedElement.isImage 
+                                    ? 'Image Asset' 
+                                    : typeof selectedElement.value === 'object' && selectedElement.value !== null 
+                                        ? 'Grouped Elements' 
+                                        : `"${String(selectedElement.value || '').trim()}"`}
                             </Typography>
                         </Tooltip>
 
-                        {/* Edit Button */}
-                        <Button
-                            variant="contained"
-                            size="small"
-                            startIcon={<EditIcon sx={{ fontSize: '15px !important' }} />}
-                            onClick={() => setIsQuickEditOpen(true)}
-                            sx={{
-                                borderRadius: 1.5,
-                                background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)',
-                                boxShadow: '0 4px 14px rgba(124, 58, 237, 0.4)',
-                                color: '#FFF',
-                                px: { xs: 1.5, sm: 2 },
-                                py: 0.5,
-                                fontWeight: 700,
-                                fontSize: '0.8rem',
-                                textTransform: 'none',
-                                whiteSpace: 'nowrap',
-                                transition: 'all 0.2s ease',
-                                '&:hover': {
-                                    background: 'linear-gradient(135deg, #6D28D9 0%, #9333EA 100%)',
-                                    boxShadow: '0 6px 20px rgba(124, 58, 237, 0.65)',
-                                    transform: 'scale(1.02)',
-                                },
-                            }}
-                        >
-                            Edit
-                        </Button>
+                        {/* Action Buttons */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, ml: 1 }}>
+                            <Tooltip title="Edit Content" arrow placement="top">
+                                <IconButton
+                                    size="small"
+                                    onClick={() => setIsQuickEditOpen(true)}
+                                    sx={{
+                                        color: '#FFF',
+                                        background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)',
+                                        boxShadow: '0 4px 14px rgba(124, 58, 237, 0.4)',
+                                        p: 0.6,
+                                        '&:hover': {
+                                            background: 'linear-gradient(135deg, #6D28D9 0%, #9333EA 100%)',
+                                            transform: 'scale(1.05)',
+                                        },
+                                        transition: 'all 0.2s ease',
+                                    }}
+                                >
+                                    <EditIcon sx={{ fontSize: 15 }} />
+                                </IconButton>
+                            </Tooltip>
+                            
+                            <Tooltip title="Delete Element" arrow placement="top">
+                                <IconButton
+                                    size="small"
+                                    onClick={handleDeleteElement}
+                                    sx={{
+                                        color: '#EF4444',
+                                        bgcolor: 'rgba(239, 68, 68, 0.1)',
+                                        p: 0.6,
+                                        '&:hover': {
+                                            bgcolor: 'rgba(239, 68, 68, 0.2)',
+                                            transform: 'scale(1.05)',
+                                        },
+                                        transition: 'all 0.2s ease',
+                                    }}
+                                >
+                                    <DeleteIcon sx={{ fontSize: 15 }} />
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
 
                         {/* Dismiss Button */}
                         <IconButton
