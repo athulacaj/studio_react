@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Jonathan &amp; Sarah — Holy Matrimony Digital Invitation</title>
+  <meta name="description"
+    content="You are joyfully invited to the Holy Matrimony of Jonathan &amp; Sarah. Experience our interactive walk journey, celebration schedule, and RSVP." />
+
+  <!-- Premium Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    /* ==========================================================================
+       CSS VARIABLES & THEME SYSTEM
+       ========================================================================== */
+    :root {
+      --font-display: 'Cinzel', serif;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-script: 'Alex Brush', cursive;
+      --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+      --theme-primary: #11261f;
+      --theme-primary-deep: #06110d;
+      --theme-primary-light: #1e3d32;
+      --theme-accent: #c9a44c;
+      --theme-accent-light: #e8cf8d;
+      --theme-accent-dark: #997828;
+      --theme-gold-glow: rgba(201, 164, 76, 0.4);
+
+      --theme-bg: #06110d;
+      --theme-surface-glass: rgba(10, 24, 18, 0.85);
+      --theme-surface-light: rgba(255, 255, 255, 0.94);
+      --theme-border: rgba(201, 164, 76, 0.35);
+      --theme-border-glow: rgba(201, 164, 76, 0.65);
+      --theme-text-light: #f7f2ea;
+      --theme-text-muted: #9daea4;
+
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+      --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.45);
+      --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.65);
+      --shadow-gold: 0 8px 30px rgba(201, 164, 76, 0.35);
+
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-smooth: cubic-bezier(0.25, 0.8, 0.25, 1);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --radius-full: 9999px;
+    }
+
+    /* Reset & Base */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: auto;
+      text-size-adjust: 100%;
+      background-color: var(--theme-primary-deep);
+    }
+
+    body {
+      background-color: var(--theme-primary-deep);
+      color: var(--theme-text-light);
+      font-family: var(--font-body);
+      font-weight: 400;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    img,
+    video {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    /* Typography helpers */
+    .font-display {
+      font-family: var(--font-display);
+    }
+
+    .font-serif {
+      font-family: var(--font-serif);
+    }
+
+    .font-script {
+      font-family: var(--font-script);
+    }
+
+    .font-body {
+      font-family: var(--font-body);
+    }
+
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #f3e5be 0%, #c9a44c 50%, #e8cf8d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .ornate-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 0.8rem auto 1.2rem;
+      max-width: 200px;
+    }
+
+    .ornate-divider-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--theme-accent), transparent);
+    }
+
+    .ornate-divider-symbol {
+      color: var(--theme-accent);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ==========================================================================
+       CLICK-TO-OPEN INTRO SCREEN & CURTAINS
+       ========================================================================== */
+    .opening-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+      background-color: var(--theme-primary-deep);
+    }
+
+    .opening-curtain {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 50.5%;
+      background: radial-gradient(circle at center, #163329 0%, #081410 100%);
+      box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.85);
+      transition: transform 1.3s cubic-bezier(0.77, 0, 0.175, 1);
+      z-index: 1;
+    }
+
+    .opening-curtain.left {
+      left: 0;
+      border-right: 1.5px solid rgba(201, 164, 76, 0.4);
+    }
+
+    .opening-curtain.right {
+      right: 0;
+      border-left: 1.5px solid rgba(201, 164, 76, 0.4);
+    }
+
+    .opening-curtain::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(201, 164, 76, 0.08) 1px, transparent 0);
+      background-size: 24px 24px;
+      opacity: 0.6;
+    }
+
+    .opening-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.8) 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .opening-center {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 2.5rem 2rem;
+      max-width: 520px;
+      width: 90%;
+      background: rgba(10, 24, 18, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(201, 164, 76, 0.45);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(201, 164, 76, 0.2);
+      color: #f7f2ea;
+      transition: opacity 0.6s ease, transform 0.6s var(--ease-out-expo);
+    }
+
+    .opening-monogram-circle {
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 1.25rem;
+      border-radius: 50%;
+      border: 1.5px solid var(--theme-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: rgba(201, 164, 76, 0.1);
+      box-shadow: 0 0 20px rgba(201, 164, 76, 0.3);
+    }
+
+    .opening-monogram-circle::after {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border: 1px dashed rgba(201, 164, 76, 0.35);
+      border-radius: 50%;
+      animation: rotateSlow 24s linear infinite;
+    }
+
+    @keyframes rotateSlow {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .opening-monogram-text {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--theme-accent-light);
+      letter-spacing: 0.1em;
+    }
+
+    .opening-eyebrow {
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--theme-accent);
+      margin-bottom: 0.6rem;
+    }
+
+    .opening-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 2.6rem);
+      font-weight: 400;
+      line-height: 1.2;
+      color: #ffffff;
+      margin-bottom: 0.8rem;
+    }
+
+    .opening-description {
+      font-size: 0.92rem;
+      color: rgba(247, 242, 234, 0.82);
+      margin-bottom: 1.8rem;
+      line-height: 1.6;
+    }
+
+    .btn-open-invitation {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 15px 36px;
+      background: linear-gradient(135deg, #d4af37 0%, #b89028 100%);
+      color: #081410;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      border-radius: var(--radius-full);
+      box-shadow: 0 6px 24px rgba(201, 164, 76, 0.4);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-open-invitation:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 32px rgba(201, 164, 76, 0.6);
+      background: linear-gradient(135deg, #e8cf8d 0%, #c9a44c 100%);
+    }
+
+    .btn-open-invitation::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(60deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transform: rotate(30deg) translateY(-100%);
+      animation: sheen 3.5s infinite;
+    }
+
+    @keyframes sheen {
+
+      0%,
+      70% {
+        transform: rotate(30deg) translateY(-100%);
+      }
+
+      100% {
+        transform: rotate(30deg) translateY(100%);
+      }
+    }
+
+    .opening-hint {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(201, 164, 76, 0.7);
+    }
+
+    .opening-screen.opening .opening-curtain.left {
+      transform: translateX(-102%);
+    }
+
+    .opening-screen.opening .opening-curtain.right {
+      transform: translateX(102%);
+    }
+
+    .opening-screen.opening .opening-center {
+      opacity: 0;
+      transform: scale(0.9) translateY(-20px);
+    }
+
+    .opening-screen.is-open {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* ==========================================================================
+       FIXED FULLSCREEN STAGE (Cathedral, Walking Couple, Particles)
+       ========================================================================== */
+    .fixed-stage {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      isolation: isolate;
+      background-color: #06110d;
+      z-index: 10;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    /* Cathedral Sanctuary Backdrop Layer */
+    .sanctuary-bg {
+      position: absolute;
+      inset: -5%;
+      width: 110%;
+      height: 110%;
+      background-image: var(--desktop-bg);
+      background-size: cover;
+      background-position: center 68%;
+      transform-origin: center center;
+      transition: transform 0.1s linear;
+      will-change: transform;
+      z-index: 1;
+    }
+
+    .sanctuary-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 30%, rgba(6, 17, 13, 0.15) 0%, rgba(6, 17, 13, 0.65) 75%, rgba(6, 17, 13, 0.95) 100%);
+      z-index: 2;
+    }
+
+    .sanctuary-rays {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 15%, rgba(232, 207, 141, 0.32) 0%, rgba(201, 164, 76, 0.14) 45%, transparent 80%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+      z-index: 3;
+      transition: opacity 0.4s ease;
+      will-change: opacity;
+    }
+
+    /* Floating Particle Canvas */
+    #particleCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    /* Couple Subject Wrap - Grounded at bottom with full visibility of legs */
+    .couple-stage-wrap {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      width: 100%;
+      max-width: 1440px;
+      height: 92vh;
+      height: 92dvh;
+      max-height: 940px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .couple-ground-shadow {
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      right: 10%;
+      height: 32px;
+      background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.25) 55%, transparent 80%);
+      filter: blur(12px);
+      z-index: 1;
+      transform: scaleY(0.5);
+    }
+
+    /* Video Element & Frame Layers */
+    .couple-video-layer {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center bottom;
+      z-index: 2;
+      filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
+    }
+
+    .couple-frame-image {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center bottom;
+      z-index: 3;
+      transition: opacity 0.35s ease;
+      filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
+      pointer-events: none;
+    }
+
+    #firstFrameImg {
+      opacity: 1;
+    }
+
+    #lastFrameImg {
+      opacity: 0;
+    }
+
+    /* ==========================================================================
+       DYNAMIC ON-SCREEN CONTENT STAGES (Flowing Content)
+       ========================================================================== */
+    .stage-content-wrap {
+      position: relative;
+      width: 100%;
+      z-index: 25;
+      padding: 30vh 0 40vh 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 75vh;
+      pointer-events: none;
+    }
+    
+    .stage-content-wrap > * {
+      pointer-events: auto;
+    }
+
+    .stage-card {
+      position: relative;
+      width: 92%;
+      max-width: 780px;
+      background: rgba(10, 24, 18, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--theme-border);
+      border-radius: var(--radius-lg);
+      padding: clamp(1.5rem, 3.5vw, 2.2rem) clamp(1.5rem, 4vw, 2.5rem);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 30px rgba(201, 164, 76, 0.15);
+      text-align: center;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.6s ease, transform 0.6s var(--ease-out-expo), border-color 0.4s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-y: visible;
+    }
+
+    .stage-card.in-view {
+      opacity: 0.9;
+      transform: translateY(0);
+    }
+    
+    .stage-card.in-view:hover {
+      opacity: 1;
+      border-color: rgba(201, 164, 76, 0.6);
+    }
+
+    /* Stage Badge */
+    .stage-badge {
+      font-family: var(--font-display);
+      font-size: 0.74rem;
+      font-weight: 600;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--theme-accent);
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stage-badge::before,
+    .stage-badge::after {
+      content: "";
+      display: inline-block;
+      width: 20px;
+      height: 1px;
+      background: var(--theme-accent);
+      opacity: 0.6;
+    }
+
+    .stage-heading {
+      font-family: var(--font-serif);
+      font-size: clamp(1.8rem, 4.2vw, 2.8rem);
+      font-weight: 400;
+      color: #ffffff;
+      line-height: 1.18;
+      margin-bottom: 0.5rem;
+    }
+
+    .stage-desc {
+      font-size: clamp(0.88rem, 1.6vw, 1.05rem);
+      color: rgba(247, 242, 234, 0.88);
+      line-height: 1.55;
+      max-width: 600px;
+      margin: 0 auto 1rem;
+    }
+
+    /* STAGE 1: Verse & Names */
+    .verse-box {
+      font-family: var(--font-serif);
+      font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+      font-style: italic;
+      color: #ffffff;
+      line-height: 1.45;
+      margin: 0.5rem 0;
+    }
+
+    .verse-cit {
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      color: var(--theme-accent-light);
+      text-transform: uppercase;
+    }
+
+    /* STAGE 2: Countdown Timer */
+    .countdown-mini-grid {
+      display: flex;
+      justify-content: center;
+      gap: clamp(8px, 2vw, 18px);
+      margin: 1rem 0;
+      flex-wrap: wrap;
+    }
+
+    .countdown-mini-box {
+      width: clamp(62px, 14vw, 84px);
+      height: clamp(68px, 15vw, 90px);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(201, 164, 76, 0.4);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .countdown-mini-val {
+      font-family: var(--font-display);
+      font-size: clamp(1.4rem, 3.2vw, 1.9rem);
+      font-weight: 700;
+      color: var(--theme-accent-light);
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+
+    .countdown-mini-lbl {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(247, 242, 234, 0.7);
+    }
+
+    /* STAGES 3 & 4: Event Cards */
+    .event-info-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(201, 164, 76, 0.12);
+      border: 1px solid var(--theme-border);
+      border-radius: var(--radius-full);
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--theme-accent-light);
+      margin-bottom: 0.6rem;
+    }
+
+    .event-venue-text {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 0.25rem;
+    }
+
+    .event-btn-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 0.8rem;
+    }
+
+    .btn-glass-action {
+      padding: 8px 18px;
+      background: rgba(201, 164, 76, 0.15);
+      border: 1px solid var(--theme-border);
+      border-radius: var(--radius-full);
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #ffffff;
+      transition: all 0.3s ease;
+    }
+
+    .btn-glass-action:hover {
+      background: var(--theme-accent);
+      color: var(--theme-primary-deep);
+      border-color: var(--theme-accent);
+      transform: translateY(-2px);
+    }
+
+    /* STAGE 5: Story timeline */
+    .story-chips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      width: 100%;
+      margin: 0.6rem 0;
+      text-align: left;
+    }
+
+    .story-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(201, 164, 76, 0.25);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+    }
+
+    .story-chip-yr {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--theme-accent-light);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .story-chip-title {
+      font-family: var(--font-serif);
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 2px;
+    }
+
+    .story-chip-p {
+      font-size: 0.78rem;
+      color: rgba(247, 242, 234, 0.75);
+      line-height: 1.4;
+    }
+
+    /* STAGE 6: RSVP & Registry Mini Form */
+    .rsvp-mini-form {
+      width: 100%;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    .form-mini-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 520px) {
+      .form-mini-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .input-glass {
+      width: 100%;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(201, 164, 76, 0.35);
+      border-radius: var(--radius-sm);
+      color: #ffffff;
+      font-size: 0.85rem;
+      transition: border-color 0.3s ease;
+    }
+
+    .input-glass::placeholder {
+      color: rgba(247, 242, 234, 0.5);
+    }
+
+    .input-glass:focus {
+      outline: none;
+      border-color: var(--theme-accent);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .btn-submit-gold {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--theme-accent) 0%, var(--theme-accent-dark) 100%);
+      color: var(--theme-primary-deep);
+      font-family: var(--font-display);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-gold);
+      transition: all 0.3s ease;
+      margin-top: 4px;
+    }
+
+    .btn-submit-gold:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+    }
+
+    .registry-mini-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 0.8rem;
+      font-size: 0.78rem;
+      color: rgba(247, 242, 234, 0.8);
+      flex-wrap: wrap;
+    }
+
+    /* ==========================================================================
+       STAGE NAVIGATION DOTS (Right Side)
+       ========================================================================== */
+    .stage-nav-dots {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 12px 8px;
+      background: rgba(10, 24, 18, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(201, 164, 76, 0.35);
+      border-radius: var(--radius-full);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .nav-dot-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      cursor: pointer;
+    }
+
+    .nav-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(201, 164, 76, 0.3);
+      border: 1.5px solid var(--theme-accent);
+      transition: all 0.3s ease;
+    }
+
+    .nav-dot-label {
+      position: absolute;
+      right: 24px;
+      padding: 4px 10px;
+      background: rgba(10, 24, 18, 0.9);
+      border: 1px solid var(--theme-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-display);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--theme-accent-light);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(8px);
+      transition: all 0.25s ease;
+    }
+
+    .nav-dot-item:hover .nav-dot-label {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .nav-dot-item.active .nav-dot {
+      background: var(--theme-accent);
+      box-shadow: 0 0 10px var(--theme-accent);
+      transform: scale(1.4);
+    }
+
+    @media (max-width: 640px) {
+      .stage-nav-dots {
+        right: 8px;
+        gap: 10px;
+        padding: 10px 6px;
+      }
+
+      .nav-dot-label {
+        display: none;
+      }
+    }
+
+    /* ==========================================================================
+       BOTTOM CONTROLS & TIMELINE
+       ========================================================================== */
+    .fixed-bottom-bar {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      pointer-events: auto;
+    }
+
+    .scroll-hint-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 16px;
+      background: rgba(10, 24, 18, 0.85);
+      border: 1px solid rgba(201, 164, 76, 0.35);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-full);
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--theme-accent-light);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      transition: opacity 0.4s ease;
+    }
+
+    .timeline-track-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .timeline-track {
+      width: 140px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .timeline-fill {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, #c9a44c, #f3e5be);
+      transform-origin: left center;
+      transform: scaleX(0);
+      will-change: transform;
+    }
+
+    .timeline-time-label {
+      font-family: monospace;
+      font-size: 0.7rem;
+      color: var(--theme-accent-light);
+    }
+
+    /* Top-Right Auto Walk Preview Button */
+    .btn-auto-walk {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9998;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      background: rgba(10, 24, 18, 0.88);
+      border: 1px solid rgba(201, 164, 76, 0.4);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-full);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--theme-accent-light);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      transition: all 0.3s ease;
+    }
+
+    .btn-auto-walk:hover {
+      background: var(--theme-accent);
+      color: var(--theme-primary-deep);
+      border-color: var(--theme-accent);
+    }
+
+    /* Bottom-Right Audio Pill */
+    .floating-audio-pill {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(10, 24, 18, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(201, 164, 76, 0.4);
+      border-radius: var(--radius-full);
+      color: var(--theme-accent-light);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .floating-audio-pill:hover {
+      transform: scale(1.04);
+      border-color: var(--theme-accent);
+    }
+
+    .sound-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 2.5px;
+      height: 14px;
+    }
+
+    .sound-bar {
+      width: 2px;
+      background: var(--theme-accent);
+      border-radius: 2px;
+      height: 3px;
+      transition: height 0.2s ease;
+    }
+
+    .sound-bars.playing .sound-bar:nth-child(1) {
+      animation: soundWave 0.8s ease infinite alternate;
+    }
+
+    .sound-bars.playing .sound-bar:nth-child(2) {
+      animation: soundWave 0.9s ease 0.2s infinite alternate;
+    }
+
+    .sound-bars.playing .sound-bar:nth-child(3) {
+      animation: soundWave 0.7s ease 0.4s infinite alternate;
+    }
+
+    @keyframes soundWave {
+      from {
+        height: 3px;
+      }
+
+      to {
+        height: 14px;
+      }
+    }
+
+    /* RSVP Success Modal */
+    .rsvp-success-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 17, 13, 0.88);
+      backdrop-filter: blur(16px);
+      z-index: 100001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s ease;
+    }
+
+    .rsvp-success-modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .rsvp-success-card {
+      background: rgba(10, 24, 18, 0.95);
+      border: 1px solid var(--theme-border-glow);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      max-width: 460px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(201, 164, 76, 0.25);
+      transform: scale(0.9);
+      transition: transform 0.4s var(--ease-out-expo);
+      color: #ffffff;
+    }
+
+    .rsvp-success-modal.active .rsvp-success-card {
+      transform: scale(1);
+    }
+
+    /* Mobile Scale Optimizations */
+    @media (max-width: 768px) {
+      .sanctuary-bg {
+        background-image: var(--mobile-bg);
+        background-size: auto 75vh;
+        background-position: center bottom;
+        background-repeat: no-repeat;
+      }
+      .sanctuary-overlay {
+        background: linear-gradient(to bottom, var(--theme-primary-deep) 0%, rgba(6, 17, 13, 0.8) 35%, rgba(6, 17, 13, 0.15) 100%);
+      }
+      .couple-stage-wrap {
+        width: 150%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ==========================================================================
+       CLICK-TO-OPEN INTRO SCREEN (Dual Velvet Curtains & Monogram Seal)
+       ========================================================================== -->
+  <div class="opening-screen" id="openingScreen">
+    <div class="opening-curtain left"></div>
+    <div class="opening-curtain right"></div>
+    <div class="opening-vignette"></div>
+
+    <div class="opening-center" id="openingCenter">
+      <div class="opening-monogram-circle">
+        <span class="opening-monogram-text" id="openingMonogram">J &amp; S</span>
+      </div>
+      <div class="opening-eyebrow" id="openingEyebrow">The Holy Matrimony</div>
+      <h1 class="opening-title" id="openingTitle">Jonathan &amp; Sarah</h1>
+      <p class="opening-description" id="openingDescription">
+        Before the sacred journey unfolds, step inside to celebrate a blessed covenant of faith, hope, and love.
+      </p>
+      <button class="btn-open-invitation" id="btnOpenInvitation">
+        <span>✦</span>
+        <span id="openingButtonText">Open Invitation</span>
+        <span>✦</span>
+      </button>
+      <div class="opening-hint" id="openingHint">Scroll to walk together</div>
+    </div>
+  </div>
+
+  <!-- Background Music Audio -->
+  <audio id="weddingAudio" loop preload="none">
+    <source
+      src="https://cdn.pixabay.com/download/audio/2022/05/16/audio_c97a8e03e5.mp3?filename=romantic-wedding-piano-111978.mp3"
+      type="audio/mp3" />
+  </audio>
+
+  <!-- Floating Audio Controls -->
+  <div class="floating-audio-pill" id="audioToggleBtn" title="Toggle Music">
+    <div class="sound-bars" id="soundBars">
+      <div class="sound-bar"></div>
+      <div class="sound-bar"></div>
+      <div class="sound-bar"></div>
+    </div>
+    <span style="font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;" id="audioLabel">Music</span>
+  </div>
+
+  <!-- Top-Right Auto Walk Preview Button -->
+  <button class="btn-auto-walk" id="btnAutoWalk" title="Autoplay the walking journey">
+    <span>▶</span> Auto Walk
+  </button>
+
+  <!-- Right-Side Stage Dot Navigation -->
+  <div class="stage-nav-dots" id="stageNavDots">
+    <div class="nav-dot-item active" data-stage="0" onclick="jumpToStage(0)">
+      <div class="nav-dot-label">1. Welcome</div>
+      <div class="nav-dot"></div>
+    </div>
+    <div class="nav-dot-item" data-stage="1" onclick="jumpToStage(1)">
+      <div class="nav-dot-label">2. Countdown</div>
+      <div class="nav-dot"></div>
+    </div>
+    <div class="nav-dot-item" data-stage="2" onclick="jumpToStage(2)">
+      <div class="nav-dot-label">3. Ceremony</div>
+      <div class="nav-dot"></div>
+    </div>
+    <div class="nav-dot-item" data-stage="3" onclick="jumpToStage(3)">
+      <div class="nav-dot-label">4. Reception</div>
+      <div class="nav-dot"></div>
+    </div>
+    <div class="nav-dot-item" data-stage="4" onclick="jumpToStage(4)">
+      <div class="nav-dot-label">5. Our Story</div>
+      <div class="nav-dot"></div>
+    </div>
+    <div class="nav-dot-item" data-stage="5" onclick="jumpToStage(5)">
+      <div class="nav-dot-label">6. RSVP</div>
+      <div class="nav-dot"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Timeline & Scroll Hint -->
+  <div class="fixed-bottom-bar">
+    <div class="scroll-hint-chip" id="scrollHintChip">
+      <span>↓</span> Scroll to walk together
+    </div>
+    <div class="timeline-track-wrap">
+      <div class="timeline-track">
+        <div class="timeline-fill" id="timelineFill"></div>
+      </div>
+      <span class="timeline-time-label" id="timelineTimeLabel">0:00 / 0:10</span>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       FIXED CONSTANT STAGE (Cathedral Sanctuary & Walking Couple)
+       ========================================================================== -->
+  <div class="fixed-stage" id="fixedStage">
+
+    <!-- Cathedral Sanctuary Backdrop -->
+    <div class="sanctuary-bg" id="sanctuaryBg"></div>
+    <div class="sanctuary-overlay"></div>
+    <div class="sanctuary-rays" id="sanctuaryRays"></div>
+
+    <!-- Floating White Rose Petals & Golden Embers -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Couple Walking Stage Container (Grounded at Bottom with full legs visibility) -->
+    <div class="couple-stage-wrap" id="coupleWrap">
+      <div class="couple-ground-shadow"></div>
+
+      <!-- Initial Frame Image (Instant zero latency start at 0s) -->
+      <img alt="Jonathan &amp; Sarah at Start" id="firstFrameImg" class="couple-frame-image" />
+
+      <!-- 10-Second VP9 Transparent WebM Video (Scrubbed on Scroll) -->
+      <video id="walkVideo" class="couple-video-layer" playsinline muted preload="auto"
+        disableRemotePlayback></video>
+
+      <!-- Last Frame Image (Crystal clear finish at 10s holding hands) -->
+      <img alt="Jonathan &amp; Sarah Holding Hands" id="lastFrameImg"
+        class="couple-frame-image" />
+    </div>
+  </div> <!-- end of fixed-stage -->
+
+  <!-- ==========================================================================
+       DYNAMIC OVERLAY CONTENT STAGES (Flowing content)
+       ========================================================================== -->
+  <div class="stage-content-wrap">
+
+    <!-- STAGE 1: Welcome, Holy Matrimony & Scripture -->
+    <div class="stage-card" id="stageCard0">
+        <div class="stage-badge">The Holy Matrimony</div>
+        <h2 class="stage-heading">
+          <span id="groomNameText">Jonathan Edwards</span>
+          <span class="font-script"
+            style="color: var(--theme-accent); font-size: 1.4em; vertical-align: middle; margin: 0 0.15em;">&amp;</span>
+          <span id="brideNameText">Sarah Grace</span>
+        </h2>
+        <div class="ornate-divider">
+          <div class="ornate-divider-line"></div>
+          <div class="ornate-divider-symbol">✦ ✝ ✦</div>
+          <div class="ornate-divider-line"></div>
+        </div>
+        <blockquote class="verse-box" id="bibleVerseBox">
+          "Therefore what God has joined together, let no one separate."
+        </blockquote>
+        <div class="verse-cit" id="bibleVerseCit">— Mark 10:9 —</div>
+      </div>
+
+      <!-- STAGE 2: Countdown & Date (16% – 34%) -->
+      <div class="stage-card" id="stageCard1">
+        <div class="stage-badge">Save The Date</div>
+        <h2 class="stage-heading" style="font-size: clamp(1.6rem, 3.8vw, 2.4rem);" id="weddingDateHero">
+          Saturday, December 20, 2026
+        </h2>
+        <p class="stage-desc" style="margin-bottom: 0.5rem;">
+          Together with our parents, we count down the moments until we speak our sacred vows before God.
+        </p>
+        <div class="countdown-mini-grid">
+          <div class="countdown-mini-box">
+            <div class="countdown-mini-val" id="cdDays">00</div>
+            <div class="countdown-mini-lbl">Days</div>
+          </div>
+          <div class="countdown-mini-box">
+            <div class="countdown-mini-val" id="cdHours">00</div>
+            <div class="countdown-mini-lbl">Hours</div>
+          </div>
+          <div class="countdown-mini-box">
+            <div class="countdown-mini-val" id="cdMinutes">00</div>
+            <div class="countdown-mini-lbl">Minutes</div>
+          </div>
+          <div class="countdown-mini-box">
+            <div class="countdown-mini-val" id="cdSeconds">00</div>
+            <div class="countdown-mini-lbl">Seconds</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAGE 3: Church Ceremony (34% – 52%) -->
+      <div class="stage-card" id="stageCard2">
+        <div class="stage-badge">The Holy Ceremony</div>
+        <h2 class="stage-heading">St. Peter's Cathedral Sanctuary</h2>
+        <div class="event-info-pill">
+          <span>⛪</span> 2:30 PM – 4:00 PM
+        </div>
+        <p class="stage-desc" style="margin-bottom: 0.8rem;">
+          100 Cathedral Way, San Francisco, CA 94108<br />
+          <span style="font-size: 0.85em; opacity: 0.8;">Please be seated by 2:15 PM for the sacred prelude</span>
+        </p>
+        <div class="event-btn-row">
+          <a href="https://maps.google.com/?q=St.+Peter's+Cathedral" target="_blank" rel="noopener"
+            class="btn-glass-action">
+            📍 Get Directions
+          </a>
+          <button class="btn-glass-action" onclick="addToCalendar('ceremony')">
+            📅 Add to Calendar
+          </button>
+        </div>
+      </div>
+
+      <!-- STAGE 4: Dinner & Reception (52% – 70%) -->
+      <div class="stage-card" id="stageCard3">
+        <div class="stage-badge">Evening Celebration</div>
+        <h2 class="stage-heading">The Grand Crystal Conservatory</h2>
+        <div class="event-info-pill">
+          <span>🥂</span> 6:00 PM – 11:00 PM
+        </div>
+        <p class="stage-desc" style="margin-bottom: 0.8rem;">
+          450 Garden Promenade, San Francisco, CA 94109<br />
+          <span style="font-size: 0.85em; opacity: 0.8;">Attire: Black Tie / Formal Evening Elegance</span>
+        </p>
+        <div class="event-btn-row">
+          <a href="https://maps.google.com/?q=The+Grand+Crystal+Conservatory" target="_blank" rel="noopener"
+            class="btn-glass-action">
+            📍 Get Directions
+          </a>
+          <button class="btn-glass-action" onclick="addToCalendar('reception')">
+            📅 Add to Calendar
+          </button>
+        </div>
+      </div>
+
+      <!-- STAGE 5: Love Story & Testimony (70% – 86%) -->
+      <div class="stage-card" id="stageCard4">
+        <div class="stage-badge">Our Testimony</div>
+        <h2 class="stage-heading" style="font-size: clamp(1.6rem, 3.5vw, 2.3rem);">How God Wrote Our Love Story</h2>
+        <div class="story-chips-grid">
+          <div class="story-chip">
+            <div class="story-chip-yr">2021 • First Met</div>
+            <div class="story-chip-title">Fellowship Meeting</div>
+            <div class="story-chip-p">A greeting over coffee sparked shared purpose and faith.</div>
+          </div>
+          <div class="story-chip">
+            <div class="story-chip-yr">2022 • Courtship</div>
+            <div class="story-chip-title">Growing in Grace</div>
+            <div class="story-chip-p">Through shared prayers and hikes, friendship grew into devotion.</div>
+          </div>
+          <div class="story-chip">
+            <div class="story-chip-yr">2025 • The Proposal</div>
+            <div class="story-chip-title">Sunset Covenant</div>
+            <div class="story-chip-p">Overlooking the ocean, a ring and a promise for eternity.</div>
+          </div>
+          <div class="story-chip">
+            <div class="story-chip-yr">2026 • Forever</div>
+            <div class="story-chip-title">Holy Matrimony</div>
+            <div class="story-chip-p">Standing before God and loved ones to become one flesh.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAGE 6: United, RSVP & Registry (86% – 100%) -->
+      <div class="stage-card" id="stageCard5">
+        <div class="stage-badge">United in Christ ✦ RSVP</div>
+        <h2 class="stage-heading" style="font-size: clamp(1.5rem, 3.2vw, 2.2rem);">Celebrate With Us</h2>
+
+        <form class="rsvp-mini-form" onsubmit="handleRsvpSubmit(event)">
+          <div class="form-mini-row">
+            <input class="input-glass" type="text" id="rsvpName" placeholder="Your Name(s) *" required />
+            <input class="input-glass" type="email" id="rsvpEmail" placeholder="Email Address *" required />
+          </div>
+          <div class="form-mini-row">
+            <select class="input-glass" id="rsvpAttendance">
+              <option value="attending" style="background: #11261f;">Joyfully Accepts (Will Attend)</option>
+              <option value="declined" style="background: #11261f;">Regretfully Declines</option>
+            </select>
+            <select class="input-glass" id="rsvpGuests">
+              <option value="1" style="background: #11261f;">1 Guest</option>
+              <option value="2" style="background: #11261f;" selected>2 Guests</option>
+              <option value="3" style="background: #11261f;">3 Guests</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-submit-gold">
+            Confirm My RSVP
+          </button>
+        </form>
+
+        <div class="registry-mini-strip">
+          <span>🎁 Wishing Well: First National Bank <code>1234-5678-9012</code></span>
+          <button class="btn-glass-action" style="padding: 4px 12px; font-size: 0.68rem;"
+            onclick="copyToClipboard('1234-5678-9012-3456', this)">
+            📋 Copy Bank Info
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  <!-- RSVP SUCCESS CELEBRATION MODAL -->
+  <div class="rsvp-success-modal" id="rsvpSuccessModal">
+    <div class="rsvp-success-card">
+      <div style="font-size: 2.8rem; color: var(--theme-accent); margin-bottom: 0.8rem;">✨ ✝ ✨</div>
+      <h3 style="font-family: var(--font-serif); font-size: 1.9rem; color: #ffffff; margin-bottom: 0.5rem;">
+        Praise God!
+      </h3>
+      <p style="color: var(--theme-text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;" id="rsvpSuccessMsg">
+        Your RSVP has been joyfully received. We eagerly look forward to celebrating God's blessing with you!
+      </p>
+      <button class="btn-submit-gold" style="width: auto; padding: 10px 32px;" onclick="closeRsvpSuccess()">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       JAVASCRIPT: SINGLE-SCREEN CONSTANT SCROLL & STAGE ENGINE
+       ========================================================================== -->
+  <script>
+    /* ==========================================================================
+       1. DATA ARCHITECTURE (websiteData)
+       ========================================================================== */
+    let websiteData = {
+      opening: {
+        content: {
+          monogram: "J & S",
+          eyebrow: "The Holy Matrimony",
+          title: "Jonathan & Sarah",
+          description: "Before the sacred journey unfolds, step inside to celebrate a blessed covenant of faith, hope, and love.",
+          buttonText: "Open Invitation",
+          hint: "Scroll to walk together"
+        }
+      },
+      hero: {
+        content: {
+          videoUrl: "https://cdn.mizhiv.com/users/5fbfdab0-a592-43dc-9a0f-f7de15445955/websites/Jonathan/assets/toEdit-transparent.webm",
+          firstFrame: "./first-frame.png",
+          lastFrame: "./last-frame.png",
+          backdropUrl: "./cathedral-bg.jpg",
+          mobileBackdropUrl: ""
+        }
+      },
+      couple: {
+        content: {
+          groom: "Jonathan Edwards",
+          bride: "Sarah Grace",
+          verse: "Therefore what God has joined together, let no one separate.",
+          citation: "— Mark 10:9 —",
+          dateText: "Saturday, December 20, 2026"
+        }
+      },
+      countdown: {
+        content: {
+          targetDate: "2026-12-20T14:30:00"
+        }
+      }
+    };
+
+    /* ==========================================================================
+       2. CLICK-TO-OPEN CURTAIN CONTROLLER
+       ========================================================================== */
+    const openingScreen = document.getElementById("openingScreen");
+    const btnOpenInvitation = document.getElementById("btnOpenInvitation");
+    const weddingAudio = document.getElementById("weddingAudio");
+    let isInvitationOpened = false;
+
+    function openInvitation() {
+      if (isInvitationOpened) return;
+      isInvitationOpened = true;
+
+      // Start audio softly upon user click
+      try {
+        weddingAudio.play().then(() => {
+          document.getElementById("soundBars").classList.add("playing");
+          document.getElementById("audioLabel").textContent = "Pause";
+        }).catch(err => {
+          console.log("Audio autoplay prevented, available on manual toggle");
+        });
+      } catch (e) { }
+
+      openingScreen.classList.add("opening");
+      document.body.style.overflow = "hidden";
+
+      setTimeout(() => {
+        openingScreen.classList.add("is-open");
+        document.body.style.overflow = "";
+      }, 1300);
+    }
+
+    btnOpenInvitation.addEventListener("click", openInvitation);
+
+    /* Audio Toggle */
+    const audioToggleBtn = document.getElementById("audioToggleBtn");
+    audioToggleBtn.addEventListener("click", () => {
+      if (weddingAudio.paused) {
+        weddingAudio.play();
+        document.getElementById("soundBars").classList.add("playing");
+        document.getElementById("audioLabel").textContent = "Pause";
+      } else {
+        weddingAudio.pause();
+        document.getElementById("soundBars").classList.remove("playing");
+        document.getElementById("audioLabel").textContent = "Music";
+      }
+    });
+
+    /* ==========================================================================
+       3. 10-SECOND CONTINUOUS SCROLL-DRIVEN VIDEO & STAGE ENGINE
+       ========================================================================== */
+    const walkVideo = document.getElementById("walkVideo");
+    const firstFrameImg = document.getElementById("firstFrameImg");
+    const lastFrameImg = document.getElementById("lastFrameImg");
+    const sanctuaryBg = document.getElementById("sanctuaryBg");
+    const sanctuaryRays = document.getElementById("sanctuaryRays");
+    const timelineFill = document.getElementById("timelineFill");
+    const timelineTimeLabel = document.getElementById("timelineTimeLabel");
+    const scrollHintChip = document.getElementById("scrollHintChip");
+
+    const VIDEO_DURATION = 10.0;
+    const NUM_STAGES = 6;
+    let targetProgress = 0;
+    let currentProgress = 0;
+    let currentActiveStage = 0;
+    let isAutoWalking = false;
+
+    function getNormalizedScroll() {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      if (scrollable <= 0) return 0;
+      return Math.max(0, Math.min(1, window.scrollY / scrollable));
+    }
+
+    let isTicking = false;
+    let isRendering = true;
+    window.addEventListener("scroll", () => {
+      if (!isTicking) {
+        requestAnimationFrame(() => {
+          targetProgress = getNormalizedScroll();
+          if (!isRendering) {
+            isRendering = true;
+            lastRenderTime = performance.now();
+            requestAnimationFrame(renderVideoFrame);
+          }
+          isTicking = false;
+        });
+        isTicking = true;
+      }
+    }, { passive: true });
+
+    /* Jump to Stage via Dot Navigation */
+    function jumpToStage(stageIndex) {
+      if (isAutoWalking) stopAutoWalk();
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const targetY = (stageIndex / (NUM_STAGES - 1)) * scrollable;
+      window.scrollTo({ top: targetY, behavior: "smooth" });
+    }
+
+    /* Auto Walk Preview */
+    const btnAutoWalk = document.getElementById("btnAutoWalk");
+    btnAutoWalk.addEventListener("click", () => {
+      if (isAutoWalking) {
+        stopAutoWalk();
+      } else {
+        startAutoWalk();
+      }
+    });
+
+    function startAutoWalk() {
+      isAutoWalking = true;
+      btnAutoWalk.innerHTML = "<span>⏸</span> Pause Walk";
+
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const startScroll = window.scrollY;
+      const targetScroll = scrollable;
+      const startTime = performance.now();
+      
+      const remainingRatio = Math.max(0.1, 1 - (startScroll / scrollable));
+      const duration = 18000 * remainingRatio; // 18s for full scroll, adjust based on current pos
+
+      function step(now) {
+        if (!isAutoWalking) return;
+        const elapsed = now - startTime;
+        const p = Math.min(1, elapsed / duration);
+        // Linear ease for auto walk looks better for reading flowing content
+        window.scrollTo(0, startScroll + (targetScroll - startScroll) * p);
+
+        if (p < 1) {
+          requestAnimationFrame(step);
+        } else {
+          stopAutoWalk();
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    function stopAutoWalk() {
+      isAutoWalking = false;
+      btnAutoWalk.innerHTML = "<span>▶</span> Auto Walk";
+    }
+
+    window.addEventListener("wheel", () => { if (isAutoWalking) stopAutoWalk(); }, { passive: true });
+    window.addEventListener("touchstart", () => { if (isAutoWalking) stopAutoWalk(); }, { passive: true });
+
+    /* Intersection Observer for Flowing Stage Cards */
+    const stageObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view");
+          const index = parseInt(entry.target.id.replace("stageCard", ""));
+          currentActiveStage = index;
+          
+          const dotItems = document.querySelectorAll(".nav-dot-item");
+          dotItems.forEach((dot, idx) => {
+            if (idx === index) dot.classList.add("active");
+            else dot.classList.remove("active");
+          });
+        } else {
+          entry.target.classList.remove("in-view");
+        }
+      });
+    }, { rootMargin: "-15% 0px -15% 0px", threshold: 0.1 });
+
+    document.querySelectorAll(".stage-card").forEach(card => stageObserver.observe(card));
+
+    /* Main Render Loop */
+    let lastRenderTime = performance.now();
+
+    function renderVideoFrame(now) {
+      if (!now) now = performance.now();
+      const dt = Math.min(now - lastRenderTime, 32); // max 32ms step
+      lastRenderTime = now;
+
+      // Smooth interpolation decoupled from frame rate
+      const diff = targetProgress - currentProgress;
+      currentProgress += diff * (dt * 0.005);
+      const p = Math.max(0, Math.min(1, currentProgress));
+
+      // Video scrubbing (0s to 10s) with target delta threshold to prevent decoder lag
+      const duration = walkVideo.duration || VIDEO_DURATION;
+      const targetTime = p * duration;
+      if (!walkVideo.seeking && Math.abs(walkVideo.currentTime - targetTime) > 0.08) {
+        walkVideo.currentTime = targetTime;
+      }
+
+      // First and Last Frame Visibility
+      if (p <= 0.015) {
+        firstFrameImg.style.opacity = "1";
+        lastFrameImg.style.opacity = "0";
+      } else if (p >= 0.97) {
+        firstFrameImg.style.opacity = "0";
+        lastFrameImg.style.opacity = "1";
+      } else {
+        firstFrameImg.style.opacity = "0";
+        lastFrameImg.style.opacity = "0";
+      }
+
+      // Hardware-accelerated Parallax Backdrop zoom
+      const bgScale = 1.0 + p * 0.06;
+      sanctuaryBg.style.transform = `scale(${bgScale}) translateZ(0)`;
+
+      // Sanctuary light glow pulse
+      sanctuaryRays.style.opacity = 0.4 + Math.sin(p * Math.PI) * 0.45;
+
+      // Stage observer handles active states now
+
+      // Bottom progress bar (GPU accelerated) & time label
+      timelineFill.style.transform = `scaleX(${p})`;
+      const currentSec = (p * 10).toFixed(1);
+      timelineTimeLabel.textContent = `0:${currentSec < 10 ? '0' : ''}${Math.floor(currentSec)} / 0:10`;
+
+      // Hide scroll hint chip after initial scroll
+      scrollHintChip.style.opacity = p > 0.04 ? "0.3" : "1";
+
+      // Pause rendering if fully idle to save battery and reduce glitching
+      if (Math.abs(diff) < 0.0005 && !isAutoWalking) {
+        currentProgress = targetProgress;
+        isRendering = false;
+        return;
+      }
+
+      requestAnimationFrame(renderVideoFrame);
+    }
+
+    requestAnimationFrame(renderVideoFrame);
+
+    /* ==========================================================================
+       4. PARTICLES CANVAS (Floating White Rose Petals & Golden Embers)
+       ========================================================================== */
+    const canvas = document.getElementById("particleCanvas");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.reset(true);
+      }
+      reset(initial = false) {
+        this.type = Math.random() > 0.4 ? "petal" : "ember";
+        this.x = Math.random() * canvas.width;
+        this.y = initial ? Math.random() * canvas.height : -20;
+        this.size = this.type === "petal" ? 5 + Math.random() * 7 : 1.5 + Math.random() * 2.5;
+        this.speedY = 0.5 + Math.random() * 1.1;
+        this.speedX = (Math.random() - 0.5) * 0.7;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotSpeed = (Math.random() - 0.5) * 0.02;
+        this.opacity = this.type === "petal" ? 0.35 + Math.random() * 0.4 : 0.4 + Math.random() * 0.5;
+      }
+      update() {
+        this.y += this.speedY;
+        this.x += Math.sin(this.y * 0.01) * 0.5 + this.speedX;
+        this.rotation += this.rotSpeed;
+
+        if (this.y > canvas.height + 20) {
+          this.reset(false);
+        }
+      }
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+
+        if (this.type === "petal") {
+          ctx.fillStyle = `rgba(255, 250, 240, ${this.opacity})`;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, this.size, this.size * 0.55, 0, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.fillStyle = `rgba(232, 207, 141, ${this.opacity})`;
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = "rgba(201, 164, 76, 0.8)";
+          ctx.beginPath();
+          ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+
+    for (let i = 0; i < 40; i++) {
+      particles.push(new Particle());
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    /* ==========================================================================
+       5. LIVE COUNTDOWN TIMER
+       ========================================================================== */
+    function updateCountdown() {
+      const target = new Date(websiteData.countdown.content.targetDate || "2026-12-20T14:30:00").getTime();
+      const now = new Date().getTime();
+      const difference = target - now;
+
+      if (difference <= 0) {
+        document.getElementById("cdDays").textContent = "00";
+        document.getElementById("cdHours").textContent = "00";
+        document.getElementById("cdMinutes").textContent = "00";
+        document.getElementById("cdSeconds").textContent = "00";
+        return;
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+      document.getElementById("cdDays").textContent = String(days).padStart(2, "0");
+      document.getElementById("cdHours").textContent = String(hours).padStart(2, "0");
+      document.getElementById("cdMinutes").textContent = String(minutes).padStart(2, "0");
+      document.getElementById("cdSeconds").textContent = String(seconds).padStart(2, "0");
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    /* ==========================================================================
+       6. ADD TO CALENDAR (.ICS FILE GENERATOR)
+       ========================================================================== */
+    function addToCalendar(eventType) {
+      const isCeremony = eventType === 'ceremony';
+      const title = isCeremony ? "Jonathan & Sarah's Holy Matrimony Ceremony" : "Jonathan & Sarah's Wedding Reception";
+      const start = isCeremony ? "20261220T143000" : "20261220T180000";
+      const end = isCeremony ? "20261220T160000" : "20261220T230000";
+      const location = isCeremony ? "St. Peter's Cathedral, 100 Cathedral Way, San Francisco, CA" : "The Grand Crystal Conservatory, 450 Garden Promenade, San Francisco, CA";
+      const desc = "You are warmly invited to celebrate the holy matrimony of Jonathan & Sarah.";
+
+      const icsData = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "BEGIN:VEVENT",
+        `SUMMARY:${title}`,
+        `DESCRIPTION:${desc}`,
+        `LOCATION:${location}`,
+        `DTSTART:${start}`,
+        `DTEND:${end}`,
+        "STATUS:CONFIRMED",
+        "END:VEVENT",
+        "END:VCALENDAR"
+      ].join("\n");
+
+      const blob = new Blob([icsData], { type: "text/calendar;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.setAttribute("download", `jonathan-sarah-${eventType}.ics`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    /* ==========================================================================
+       7. RSVP FORM SUBMISSION & SUCCESS
+       ========================================================================== */
+    function handleRsvpSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById("rsvpName").value;
+      const attendance = document.getElementById("rsvpAttendance").value;
+
+      const successModal = document.getElementById("rsvpSuccessModal");
+      const successMsg = document.getElementById("rsvpSuccessMsg");
+
+      if (attendance === "attending") {
+        successMsg.innerHTML = `Dear <strong>${name}</strong>,<br>Thank you so much! Your attendance has been joyfully recorded. We look forward to celebrating God's blessing together!`;
+      } else {
+        successMsg.innerHTML = `Dear <strong>${name}</strong>,<br>Thank you for letting us know. You will be dearly remembered in our prayers!`;
+      }
+
+      successModal.classList.add("active");
+    }
+
+    function closeRsvpSuccess() {
+      document.getElementById("rsvpSuccessModal").classList.remove("active");
+    }
+
+    /* ==========================================================================
+       8. ONE-CLICK COPY TO CLIPBOARD
+       ========================================================================== */
+    function copyToClipboard(text, btnElement) {
+      navigator.clipboard.writeText(text).then(() => {
+        const originalText = btnElement.innerHTML;
+        btnElement.innerHTML = "✓ Copied!";
+        btnElement.style.background = "var(--theme-accent)";
+        btnElement.style.color = "var(--theme-primary-deep)";
+
+        setTimeout(() => {
+          btnElement.innerHTML = originalText;
+          btnElement.style.background = "";
+          btnElement.style.color = "";
+        }, 2000);
+      }).catch(err => {
+        console.error("Copy failed", err);
+      });
+    }
+
+    /* Initial render from websiteData */
+    function renderHero() {
+      const hero = websiteData.hero;
+      if (!hero || !hero.content) return;
+      const c = hero.content;
+      if (c.videoUrl) document.getElementById("walkVideo").src = c.videoUrl;
+      if (c.firstFrame) document.getElementById("firstFrameImg").src = c.firstFrame;
+      if (c.lastFrame) document.getElementById("lastFrameImg").src = c.lastFrame;
+      
+      const root = document.documentElement;
+      if (c.backdropUrl) {
+        root.style.setProperty('--desktop-bg', `url('${c.backdropUrl}')`);
+        root.style.setProperty('--mobile-bg', `url('${c.backdropUrl}')`);
+      }
+      if (c.mobileBackdropUrl || c.mobileCathedral) {
+        const mobileBg = c.mobileBackdropUrl || c.mobileCathedral;
+        root.style.setProperty('--mobile-bg', `url('${mobileBg}')`);
+      }
+    }
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        renderHero();
+    });
+
+    /* ==========================================================================
+       9. REACT STUDIO LIVE PREVIEW LISTENER (PostMessage Support)
+       ========================================================================== */
+    window.addEventListener("message", (event) => {
+      if (event.data && event.data.type === "UPDATE_DATA") {
+        try {
+          const newData = event.data.data;
+          if (newData) {
+            websiteData = Object.assign(websiteData, newData);
+            if (websiteData.couple && websiteData.couple.content) {
+              const c = websiteData.couple.content;
+              if (c.groom) document.getElementById("groomNameText").textContent = c.groom;
+              if (c.bride) document.getElementById("brideNameText").textContent = c.bride;
+              if (c.verse) document.getElementById("bibleVerseBox").textContent = `"${c.verse}"`;
+              if (c.citation) document.getElementById("bibleVerseCit").textContent = c.citation;
+              if (c.dateText) document.getElementById("weddingDateHero").textContent = c.dateText;
+            }
+            if (websiteData.hero) {
+              renderHero();
+            }
+          }
+        } catch (e) {
+          console.error("Error updating preview from postMessage:", e);
+        }
+      }
+    });
+
+  </script>
+</body>
+
+</html>

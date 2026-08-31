@@ -254,3 +254,23 @@ This document outlines the development plan for a modern, responsive photo proof
 2. **Animation Keyframes (`src/index.css`):**
    - Added `@keyframes formFieldHighlightFade` with smooth cubic-bezier easing to gracefully pulse the field highlight and return to transparent without mutating DOM element inline styles.
    - Reflow-forced restart (`void element.offsetWidth`) ensures multiple successive clicks reliably restart the pulse effect every time without lingering state.
+
+#### Iteration 25: Modern Christian Wedding Digital Invitation Template (Single-Screen Constant Walk)
+
+1. **Fixed Fullscreen Constant Walk Engine (`public/templates/christian/index.html`):**
+   - The sanctuary background and couple remain fixed on the viewport throughout the entire 600vh scroll runway.
+   - The 10-second VP9 video `toEdit-transparent.webm` scrubs continuously from top to bottom, with `first-frame.png` at 0% (groom on left, bride on right) and `last-frame.png` at 100% (couple united holding hands).
+   - Couple legs and bride's gown are grounded at the bottom of the screen with realistic floor shadows.
+2. **Dynamic On-Screen Content Stages:**
+   - Content panels dynamically crossfade and transition within the same upper/middle screen overlay across 6 milestones:
+     1. Sacred Scripture & Holy Matrimony Welcome.
+     2. Live Glowing Countdown Timer & Save the Date.
+     3. Holy Matrimony Church Ceremony with Add to Calendar / Map.
+     4. Grand Reception Celebration with Dress Code / Map.
+     5. Love Story Timeline & Testimonies.
+     6. Couple United, Interactive RSVP Form with Success Modal & Gift Registry Wishing Well.
+3. **Interactive Controls & Polish:**
+   - Added right-side interactive stage dot navigation with smooth jump scrolling.
+   - Incorporated Auto-Walk preview mode, ambient background music pill, falling rose petal & ember particles canvas, and click-to-open dual velvet curtains.
+   - Retained full `websiteData` single-source-of-truth and postMessage support for React Studio live editing.
+
