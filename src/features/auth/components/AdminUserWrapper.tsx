@@ -8,16 +8,17 @@ import { getUserById } from '../../user-management/services/userService';
 import { adminSwithUser } from '../services/authService';
 
 const AdminUserWrapper = () => {
-    const { currentUser, loading: authLoading, setUser, setEffectiveUserId, setEffectiveUser } = useAuthStore();
+    const { currentUser, loading: authLoading, setUser, setEffectiveUserId, setEffectiveUser, effectiveUserId } = useAuthStore();
     const { showNavBar } = useConfigStore();
     const location = useLocation();
     const { userId } = useParams();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        setLoading(true)
         if (userId) {
             setEffectiveUserId(userId);
-            if (userId != currentUser?.userId) {
+            if (userId != effectiveUserId) {
                 adminSwithUser(userId).then(res => {
                     setEffectiveUser(res.user);
                     setLoading(false);
@@ -34,7 +35,9 @@ const AdminUserWrapper = () => {
     }, [userId])
 
     if (loading) {
-        return <div>loading user data ...</div>
+        return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <CircularProgress />
+        </div>
     }
 
     return (

@@ -471,28 +471,7 @@
       filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
     }
 
-    .couple-frame-image {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: center bottom;
-      z-index: 3;
-      transition: opacity 0.35s ease;
-      filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
-      pointer-events: none;
-    }
 
-    #firstFrameImg {
-      opacity: 1;
-    }
-
-    #lastFrameImg {
-      opacity: 0;
-    }
 
     /* ==========================================================================
        DYNAMIC ON-SCREEN CONTENT STAGES (Flowing Content)
@@ -508,8 +487,8 @@
       gap: 75vh;
       pointer-events: none;
     }
-    
-    .stage-content-wrap > * {
+
+    .stage-content-wrap>* {
       pointer-events: auto;
     }
 
@@ -539,7 +518,7 @@
       opacity: 0.9;
       transform: translateY(0);
     }
-    
+
     .stage-card.in-view:hover {
       opacity: 1;
       border-color: rgba(201, 164, 76, 0.6);
@@ -1087,11 +1066,21 @@
         background-position: center bottom;
         background-repeat: no-repeat;
       }
+
       .sanctuary-overlay {
         background: linear-gradient(to bottom, var(--theme-primary-deep) 0%, rgba(6, 17, 13, 0.8) 35%, rgba(6, 17, 13, 0.15) 100%);
       }
+
       .couple-stage-wrap {
         width: 150%;
+      }
+
+      .stage-card {
+        /* Backdrop filters are extremely heavy on mobile scroll, fallback to solid opacity */
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: rgba(10, 24, 18, 0.96);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
       }
     }
   </style>
@@ -1205,16 +1194,8 @@
     <div class="couple-stage-wrap" id="coupleWrap">
       <div class="couple-ground-shadow"></div>
 
-      <!-- Initial Frame Image (Instant zero latency start at 0s) -->
-      <img alt="Jonathan &amp; Sarah at Start" id="firstFrameImg" class="couple-frame-image" />
-
       <!-- 10-Second VP9 Transparent WebM Video (Scrubbed on Scroll) -->
-      <video id="walkVideo" class="couple-video-layer" playsinline muted preload="auto"
-        disableRemotePlayback></video>
-
-      <!-- Last Frame Image (Crystal clear finish at 10s holding hands) -->
-      <img alt="Jonathan &amp; Sarah Holding Hands" id="lastFrameImg"
-        class="couple-frame-image" />
+      <video id="walkVideo" class="couple-video-layer" playsinline muted preload="auto" disableRemotePlayback></video>
     </div>
   </div> <!-- end of fixed-stage -->
 
@@ -1225,161 +1206,161 @@
 
     <!-- STAGE 1: Welcome, Holy Matrimony & Scripture -->
     <div class="stage-card" id="stageCard0">
-        <div class="stage-badge">The Holy Matrimony</div>
-        <h2 class="stage-heading">
-          <span id="groomNameText">Jonathan Edwards</span>
-          <span class="font-script"
-            style="color: var(--theme-accent); font-size: 1.4em; vertical-align: middle; margin: 0 0.15em;">&amp;</span>
-          <span id="brideNameText">Sarah Grace</span>
-        </h2>
-        <div class="ornate-divider">
-          <div class="ornate-divider-line"></div>
-          <div class="ornate-divider-symbol">✦ ✝ ✦</div>
-          <div class="ornate-divider-line"></div>
-        </div>
-        <blockquote class="verse-box" id="bibleVerseBox">
-          "Therefore what God has joined together, let no one separate."
-        </blockquote>
-        <div class="verse-cit" id="bibleVerseCit">— Mark 10:9 —</div>
+      <div class="stage-badge">The Holy Matrimony</div>
+      <h2 class="stage-heading">
+        <span id="groomNameText">Jonathan Edwards</span>
+        <span class="font-script"
+          style="color: var(--theme-accent); font-size: 1.4em; vertical-align: middle; margin: 0 0.15em;">&amp;</span>
+        <span id="brideNameText">Sarah Grace</span>
+      </h2>
+      <div class="ornate-divider">
+        <div class="ornate-divider-line"></div>
+        <div class="ornate-divider-symbol">✦ ✝ ✦</div>
+        <div class="ornate-divider-line"></div>
       </div>
-
-      <!-- STAGE 2: Countdown & Date (16% – 34%) -->
-      <div class="stage-card" id="stageCard1">
-        <div class="stage-badge">Save The Date</div>
-        <h2 class="stage-heading" style="font-size: clamp(1.6rem, 3.8vw, 2.4rem);" id="weddingDateHero">
-          Saturday, December 20, 2026
-        </h2>
-        <p class="stage-desc" style="margin-bottom: 0.5rem;">
-          Together with our parents, we count down the moments until we speak our sacred vows before God.
-        </p>
-        <div class="countdown-mini-grid">
-          <div class="countdown-mini-box">
-            <div class="countdown-mini-val" id="cdDays">00</div>
-            <div class="countdown-mini-lbl">Days</div>
-          </div>
-          <div class="countdown-mini-box">
-            <div class="countdown-mini-val" id="cdHours">00</div>
-            <div class="countdown-mini-lbl">Hours</div>
-          </div>
-          <div class="countdown-mini-box">
-            <div class="countdown-mini-val" id="cdMinutes">00</div>
-            <div class="countdown-mini-lbl">Minutes</div>
-          </div>
-          <div class="countdown-mini-box">
-            <div class="countdown-mini-val" id="cdSeconds">00</div>
-            <div class="countdown-mini-lbl">Seconds</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- STAGE 3: Church Ceremony (34% – 52%) -->
-      <div class="stage-card" id="stageCard2">
-        <div class="stage-badge">The Holy Ceremony</div>
-        <h2 class="stage-heading">St. Peter's Cathedral Sanctuary</h2>
-        <div class="event-info-pill">
-          <span>⛪</span> 2:30 PM – 4:00 PM
-        </div>
-        <p class="stage-desc" style="margin-bottom: 0.8rem;">
-          100 Cathedral Way, San Francisco, CA 94108<br />
-          <span style="font-size: 0.85em; opacity: 0.8;">Please be seated by 2:15 PM for the sacred prelude</span>
-        </p>
-        <div class="event-btn-row">
-          <a href="https://maps.google.com/?q=St.+Peter's+Cathedral" target="_blank" rel="noopener"
-            class="btn-glass-action">
-            📍 Get Directions
-          </a>
-          <button class="btn-glass-action" onclick="addToCalendar('ceremony')">
-            📅 Add to Calendar
-          </button>
-        </div>
-      </div>
-
-      <!-- STAGE 4: Dinner & Reception (52% – 70%) -->
-      <div class="stage-card" id="stageCard3">
-        <div class="stage-badge">Evening Celebration</div>
-        <h2 class="stage-heading">The Grand Crystal Conservatory</h2>
-        <div class="event-info-pill">
-          <span>🥂</span> 6:00 PM – 11:00 PM
-        </div>
-        <p class="stage-desc" style="margin-bottom: 0.8rem;">
-          450 Garden Promenade, San Francisco, CA 94109<br />
-          <span style="font-size: 0.85em; opacity: 0.8;">Attire: Black Tie / Formal Evening Elegance</span>
-        </p>
-        <div class="event-btn-row">
-          <a href="https://maps.google.com/?q=The+Grand+Crystal+Conservatory" target="_blank" rel="noopener"
-            class="btn-glass-action">
-            📍 Get Directions
-          </a>
-          <button class="btn-glass-action" onclick="addToCalendar('reception')">
-            📅 Add to Calendar
-          </button>
-        </div>
-      </div>
-
-      <!-- STAGE 5: Love Story & Testimony (70% – 86%) -->
-      <div class="stage-card" id="stageCard4">
-        <div class="stage-badge">Our Testimony</div>
-        <h2 class="stage-heading" style="font-size: clamp(1.6rem, 3.5vw, 2.3rem);">How God Wrote Our Love Story</h2>
-        <div class="story-chips-grid">
-          <div class="story-chip">
-            <div class="story-chip-yr">2021 • First Met</div>
-            <div class="story-chip-title">Fellowship Meeting</div>
-            <div class="story-chip-p">A greeting over coffee sparked shared purpose and faith.</div>
-          </div>
-          <div class="story-chip">
-            <div class="story-chip-yr">2022 • Courtship</div>
-            <div class="story-chip-title">Growing in Grace</div>
-            <div class="story-chip-p">Through shared prayers and hikes, friendship grew into devotion.</div>
-          </div>
-          <div class="story-chip">
-            <div class="story-chip-yr">2025 • The Proposal</div>
-            <div class="story-chip-title">Sunset Covenant</div>
-            <div class="story-chip-p">Overlooking the ocean, a ring and a promise for eternity.</div>
-          </div>
-          <div class="story-chip">
-            <div class="story-chip-yr">2026 • Forever</div>
-            <div class="story-chip-title">Holy Matrimony</div>
-            <div class="story-chip-p">Standing before God and loved ones to become one flesh.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- STAGE 6: United, RSVP & Registry (86% – 100%) -->
-      <div class="stage-card" id="stageCard5">
-        <div class="stage-badge">United in Christ ✦ RSVP</div>
-        <h2 class="stage-heading" style="font-size: clamp(1.5rem, 3.2vw, 2.2rem);">Celebrate With Us</h2>
-
-        <form class="rsvp-mini-form" onsubmit="handleRsvpSubmit(event)">
-          <div class="form-mini-row">
-            <input class="input-glass" type="text" id="rsvpName" placeholder="Your Name(s) *" required />
-            <input class="input-glass" type="email" id="rsvpEmail" placeholder="Email Address *" required />
-          </div>
-          <div class="form-mini-row">
-            <select class="input-glass" id="rsvpAttendance">
-              <option value="attending" style="background: #11261f;">Joyfully Accepts (Will Attend)</option>
-              <option value="declined" style="background: #11261f;">Regretfully Declines</option>
-            </select>
-            <select class="input-glass" id="rsvpGuests">
-              <option value="1" style="background: #11261f;">1 Guest</option>
-              <option value="2" style="background: #11261f;" selected>2 Guests</option>
-              <option value="3" style="background: #11261f;">3 Guests</option>
-            </select>
-          </div>
-          <button type="submit" class="btn-submit-gold">
-            Confirm My RSVP
-          </button>
-        </form>
-
-        <div class="registry-mini-strip">
-          <span>🎁 Wishing Well: First National Bank <code>1234-5678-9012</code></span>
-          <button class="btn-glass-action" style="padding: 4px 12px; font-size: 0.68rem;"
-            onclick="copyToClipboard('1234-5678-9012-3456', this)">
-            📋 Copy Bank Info
-          </button>
-        </div>
-      </div>
-
+      <blockquote class="verse-box" id="bibleVerseBox">
+        "Therefore what God has joined together, let no one separate."
+      </blockquote>
+      <div class="verse-cit" id="bibleVerseCit">— Mark 10:9 —</div>
     </div>
+
+    <!-- STAGE 2: Countdown & Date (16% – 34%) -->
+    <div class="stage-card" id="stageCard1">
+      <div class="stage-badge">Save The Date</div>
+      <h2 class="stage-heading" style="font-size: clamp(1.6rem, 3.8vw, 2.4rem);" id="weddingDateHero">
+        Saturday, December 20, 2026
+      </h2>
+      <p class="stage-desc" style="margin-bottom: 0.5rem;">
+        Together with our parents, we count down the moments until we speak our sacred vows before God.
+      </p>
+      <div class="countdown-mini-grid">
+        <div class="countdown-mini-box">
+          <div class="countdown-mini-val" id="cdDays">00</div>
+          <div class="countdown-mini-lbl">Days</div>
+        </div>
+        <div class="countdown-mini-box">
+          <div class="countdown-mini-val" id="cdHours">00</div>
+          <div class="countdown-mini-lbl">Hours</div>
+        </div>
+        <div class="countdown-mini-box">
+          <div class="countdown-mini-val" id="cdMinutes">00</div>
+          <div class="countdown-mini-lbl">Minutes</div>
+        </div>
+        <div class="countdown-mini-box">
+          <div class="countdown-mini-val" id="cdSeconds">00</div>
+          <div class="countdown-mini-lbl">Seconds</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAGE 3: Church Ceremony (34% – 52%) -->
+    <div class="stage-card" id="stageCard2">
+      <div class="stage-badge">The Holy Ceremony</div>
+      <h2 class="stage-heading">St. Peter's Cathedral Sanctuary</h2>
+      <div class="event-info-pill">
+        <span>⛪</span> 2:30 PM – 4:00 PM
+      </div>
+      <p class="stage-desc" style="margin-bottom: 0.8rem;">
+        100 Cathedral Way, San Francisco, CA 94108<br />
+        <span style="font-size: 0.85em; opacity: 0.8;">Please be seated by 2:15 PM for the sacred prelude</span>
+      </p>
+      <div class="event-btn-row">
+        <a href="https://maps.google.com/?q=St.+Peter's+Cathedral" target="_blank" rel="noopener"
+          class="btn-glass-action">
+          📍 Get Directions
+        </a>
+        <button class="btn-glass-action" onclick="addToCalendar('ceremony')">
+          📅 Add to Calendar
+        </button>
+      </div>
+    </div>
+
+    <!-- STAGE 4: Dinner & Reception (52% – 70%) -->
+    <div class="stage-card" id="stageCard3">
+      <div class="stage-badge">Evening Celebration</div>
+      <h2 class="stage-heading">The Grand Crystal Conservatory</h2>
+      <div class="event-info-pill">
+        <span>🥂</span> 6:00 PM – 11:00 PM
+      </div>
+      <p class="stage-desc" style="margin-bottom: 0.8rem;">
+        450 Garden Promenade, San Francisco, CA 94109<br />
+        <span style="font-size: 0.85em; opacity: 0.8;">Attire: Black Tie / Formal Evening Elegance</span>
+      </p>
+      <div class="event-btn-row">
+        <a href="https://maps.google.com/?q=The+Grand+Crystal+Conservatory" target="_blank" rel="noopener"
+          class="btn-glass-action">
+          📍 Get Directions
+        </a>
+        <button class="btn-glass-action" onclick="addToCalendar('reception')">
+          📅 Add to Calendar
+        </button>
+      </div>
+    </div>
+
+    <!-- STAGE 5: Love Story & Testimony (70% – 86%) -->
+    <div class="stage-card" id="stageCard4">
+      <div class="stage-badge">Our Testimony</div>
+      <h2 class="stage-heading" style="font-size: clamp(1.6rem, 3.5vw, 2.3rem);">How God Wrote Our Love Story</h2>
+      <div class="story-chips-grid">
+        <div class="story-chip">
+          <div class="story-chip-yr">2021 • First Met</div>
+          <div class="story-chip-title">Fellowship Meeting</div>
+          <div class="story-chip-p">A greeting over coffee sparked shared purpose and faith.</div>
+        </div>
+        <div class="story-chip">
+          <div class="story-chip-yr">2022 • Courtship</div>
+          <div class="story-chip-title">Growing in Grace</div>
+          <div class="story-chip-p">Through shared prayers and hikes, friendship grew into devotion.</div>
+        </div>
+        <div class="story-chip">
+          <div class="story-chip-yr">2025 • The Proposal</div>
+          <div class="story-chip-title">Sunset Covenant</div>
+          <div class="story-chip-p">Overlooking the ocean, a ring and a promise for eternity.</div>
+        </div>
+        <div class="story-chip">
+          <div class="story-chip-yr">2026 • Forever</div>
+          <div class="story-chip-title">Holy Matrimony</div>
+          <div class="story-chip-p">Standing before God and loved ones to become one flesh.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAGE 6: United, RSVP & Registry (86% – 100%) -->
+    <div class="stage-card" id="stageCard5">
+      <div class="stage-badge">United in Christ ✦ RSVP</div>
+      <h2 class="stage-heading" style="font-size: clamp(1.5rem, 3.2vw, 2.2rem);">Celebrate With Us</h2>
+
+      <form class="rsvp-mini-form" onsubmit="handleRsvpSubmit(event)">
+        <div class="form-mini-row">
+          <input class="input-glass" type="text" id="rsvpName" placeholder="Your Name(s) *" required />
+          <input class="input-glass" type="email" id="rsvpEmail" placeholder="Email Address *" required />
+        </div>
+        <div class="form-mini-row">
+          <select class="input-glass" id="rsvpAttendance">
+            <option value="attending" style="background: #11261f;">Joyfully Accepts (Will Attend)</option>
+            <option value="declined" style="background: #11261f;">Regretfully Declines</option>
+          </select>
+          <select class="input-glass" id="rsvpGuests">
+            <option value="1" style="background: #11261f;">1 Guest</option>
+            <option value="2" style="background: #11261f;" selected>2 Guests</option>
+            <option value="3" style="background: #11261f;">3 Guests</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-submit-gold">
+          Confirm My RSVP
+        </button>
+      </form>
+
+      <div class="registry-mini-strip">
+        <span>🎁 Wishing Well: First National Bank <code>1234-5678-9012</code></span>
+        <button class="btn-glass-action" style="padding: 4px 12px; font-size: 0.68rem;"
+          onclick="copyToClipboard('1234-5678-9012-3456', this)">
+          📋 Copy Bank Info
+        </button>
+      </div>
+    </div>
+
+  </div>
 
   <!-- RSVP SUCCESS CELEBRATION MODAL -->
   <div class="rsvp-success-modal" id="rsvpSuccessModal">
@@ -1418,10 +1399,9 @@
       hero: {
         content: {
           videoUrl: "https://cdn.mizhiv.com/users/5fbfdab0-a592-43dc-9a0f-f7de15445955/websites/Jonathan/assets/toEdit-transparent.webm",
-          firstFrame: "./first-frame.png",
-          lastFrame: "./last-frame.png",
+
           backdropUrl: "./cathedral-bg.jpg",
-          mobileBackdropUrl: ""
+          mobileBackdropUrl: "./mobile_view.png"
         }
       },
       couple: {
@@ -1491,8 +1471,7 @@
        3. 10-SECOND CONTINUOUS SCROLL-DRIVEN VIDEO & STAGE ENGINE
        ========================================================================== */
     const walkVideo = document.getElementById("walkVideo");
-    const firstFrameImg = document.getElementById("firstFrameImg");
-    const lastFrameImg = document.getElementById("lastFrameImg");
+
     const sanctuaryBg = document.getElementById("sanctuaryBg");
     const sanctuaryRays = document.getElementById("sanctuaryRays");
     const timelineFill = document.getElementById("timelineFill");
@@ -1555,7 +1534,7 @@
       const startScroll = window.scrollY;
       const targetScroll = scrollable;
       const startTime = performance.now();
-      
+
       const remainingRatio = Math.max(0.1, 1 - (startScroll / scrollable));
       const duration = 18000 * remainingRatio; // 18s for full scroll, adjust based on current pos
 
@@ -1590,7 +1569,7 @@
           entry.target.classList.add("in-view");
           const index = parseInt(entry.target.id.replace("stageCard", ""));
           currentActiveStage = index;
-          
+
           const dotItems = document.querySelectorAll(".nav-dot-item");
           dotItems.forEach((dot, idx) => {
             if (idx === index) dot.classList.add("active");
@@ -1614,27 +1593,19 @@
 
       // Smooth interpolation decoupled from frame rate
       const diff = targetProgress - currentProgress;
-      currentProgress += diff * (dt * 0.005);
+      // Use constant lerp for buttery smooth catch-up, especially on mobile
+      currentProgress += diff * 0.08;
       const p = Math.max(0, Math.min(1, currentProgress));
 
       // Video scrubbing (0s to 10s) with target delta threshold to prevent decoder lag
       const duration = walkVideo.duration || VIDEO_DURATION;
       const targetTime = p * duration;
-      if (!walkVideo.seeking && Math.abs(walkVideo.currentTime - targetTime) > 0.08) {
+      // Ensure smooth visual updates while keeping main thread free from excessive decode requests
+      if (!walkVideo.seeking && Math.abs(walkVideo.currentTime - targetTime) > 0.06) {
         walkVideo.currentTime = targetTime;
       }
 
-      // First and Last Frame Visibility
-      if (p <= 0.015) {
-        firstFrameImg.style.opacity = "1";
-        lastFrameImg.style.opacity = "0";
-      } else if (p >= 0.97) {
-        firstFrameImg.style.opacity = "0";
-        lastFrameImg.style.opacity = "1";
-      } else {
-        firstFrameImg.style.opacity = "0";
-        lastFrameImg.style.opacity = "0";
-      }
+
 
       // Hardware-accelerated Parallax Backdrop zoom
       const bgScale = 1.0 + p * 0.06;
@@ -1725,7 +1696,9 @@
       }
     }
 
-    for (let i = 0; i < 40; i++) {
+    // Reduce particle count on mobile to save GPU cycles
+    const particleCount = window.innerWidth < 768 ? 15 : 40;
+    for (let i = 0; i < particleCount; i++) {
       particles.push(new Particle());
     }
 
@@ -1852,9 +1825,8 @@
       if (!hero || !hero.content) return;
       const c = hero.content;
       if (c.videoUrl) document.getElementById("walkVideo").src = c.videoUrl;
-      if (c.firstFrame) document.getElementById("firstFrameImg").src = c.firstFrame;
-      if (c.lastFrame) document.getElementById("lastFrameImg").src = c.lastFrame;
-      
+
+
       const root = document.documentElement;
       if (c.backdropUrl) {
         root.style.setProperty('--desktop-bg', `url('${c.backdropUrl}')`);
@@ -1863,11 +1835,14 @@
       if (c.mobileBackdropUrl || c.mobileCathedral) {
         const mobileBg = c.mobileBackdropUrl || c.mobileCathedral;
         root.style.setProperty('--mobile-bg', `url('${mobileBg}')`);
+        if (c.mobileBackdropUrl) {
+          document.getElementById("sanctuaryBg").style.backgroundSize = "70%";
+        }
       }
     }
-    
+
     document.addEventListener("DOMContentLoaded", function () {
-        renderHero();
+      renderHero();
     });
 
     /* ==========================================================================
